@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -14,7 +14,7 @@
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
-}
+} */
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -25,7 +25,26 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+.responsive {
+  /* PC (해상도 1024px)*/ 
+@media all and (min-width:1024px) {
+  width: 100%;
+  background-color: red;
+} 
 
+/* 테블릿 가로, 테블릿 세로 (해상도 768px ~ 1023px)*/ 
+@media all and (min-width:768px) and (max-width:1023px) {
+  width: 786px;
+  background-color: blue;
+} 
+
+/* 모바일 가로, 모바일 세로 (해상도 480px ~ 767px)*/ 
+@media all and (max-width:767px) {
+  width: 128px;
+  background-color: orange;
+}
+
+}
 @layer utilities {
   .text-balance {
     text-wrap: balance;
