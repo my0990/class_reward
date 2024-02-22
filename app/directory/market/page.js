@@ -21,7 +21,7 @@ export default function Market() {
                     <tbody>
                         {data.map((a, i) => {
                             return (
-                                <tr className="hover">
+                                <tr className="hover" key={i}>
                                     <th className="max-[443px]:hidden">{i}</th>
                                     <th>{a.name}</th>
                                     <td>{a.price}</td>

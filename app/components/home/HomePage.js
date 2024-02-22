@@ -41,7 +41,7 @@ export default function Home() {
                     <ul className="flex">
                         {[1,2,3,5,10].map((a,i)=>{
                             return(
-                                <button onClick={()=>setPoint(pres => pres + a)} className="btn btn-square bg-orange-300 text-[1.5rem] text-white mr-5 focus:outline-none">{a}</button>
+                                <button key={i} onClick={()=>setPoint(pres => pres + a)} className="btn btn-square bg-orange-300 text-[1.5rem] text-white mr-5 focus:outline-none">{a}</button>
                             )
                         })}
 
