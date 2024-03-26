@@ -15,6 +15,20 @@
     --background-end-rgb: 0, 0, 0;
   }
 } */
+.item-enter {
+  opacity: 0;
+}
+.item-enter-active {
+opacity: 1;
+transition: opacity 700ms ease-in;
+}
+.item-exit {
+opacity: 1;
+}
+.item-exit-active {
+opacity: 0;
+transition: opacity 700ms ease-in;
+}
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -31,6 +45,9 @@ body {
   width: 100%;
   background-color: red;
 } 
+
+
+
 
 /* 테블릿 가로, 테블릿 세로 (해상도 768px ~ 1023px)*/ 
 @media all and (min-width:768px) and (max-width:1023px) {

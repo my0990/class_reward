@@ -1,13 +1,13 @@
 'use client'
-import AuthInput from "./components/authInput"
-import AuthBtn from "./components/authBtn"
+import AuthInput from "@/app/components/auth/components/authInput"
+import AuthBtn from "@/app/components/auth/components/authBtn"
 import { useState } from "react"
 import { useValidateForm } from "@/app/lib/useValidateForm"
-export default function SignUpPage(){
+export default function SignUpPage({params}){
+    const {id} = params
     const onChange = (e) => {
         const {changeHandler, value, blurHandler} = getFieldProps(e.target.name);
         changeHandler(e);
-        console.log(value);
     }
     const validate = (values) => {
         const errors = { id: "", pwd: "", pwdCheck: "", name: "" }
@@ -23,9 +23,9 @@ export default function SignUpPage(){
     
         return errors
       }
-
+    console.log(id)
     const { form, errors, isTouched, submitHandler, getFieldProps } = useValidateForm({
-    initialForm: { id: "", pwd: "", pwdCheck: "", name: "", admin: true },
+    initialForm: { id: "", pwd: "", pwdCheck: "", name: "" , admin: false, teacher: id},
     initialError: { id: "", pwd: "", pwdCheck: "", name: ""  },
     initialIsTouched: { id: false, pwd: false, pwdCheck: false, name: false },
     validate,
