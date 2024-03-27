@@ -20,6 +20,6 @@ export default async function handler(req, res) {
 //   );
     // const response = await db.collection(id).updateOne({"itemList.id": buyId},{$inc : {"itemList.quantity": -1}})
     const response = await db.collection('teacher').updateOne({user: teacher, "itemList.id": buyId},{$inc : {'itemList.$.quantity': -1}})
-    const response2 = await db.collection('student').updateOne({user: id},{$push: {itemList: {name: req.body.name, price: req.body.price, state: '사용 가능', itemId: itemId}}}, {upsert: true})
+    const response2 = await db.collection('student').updateOne({user: id},{$push: {itemList: {name: req.body.name, price: req.body.price, state: '사용 가능', itemId: itemId, teacher: teacher}}}, {upsert: true})
     res.status(201).json({ result: true, message: 'delete 성공' });
 }}

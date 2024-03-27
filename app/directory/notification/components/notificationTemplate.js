@@ -1,8 +1,8 @@
 'use client'
 
-import UseModal from "./useModal"
 import { useState } from "react"
-export default function Inventory({data, user, teacher}) {
+import NotificationModal from "./notificationModal";
+export default function NotificationTemplate({data, id}) {
     const [item,setItem] = useState();
     const onClick = (a) => {
         document.getElementById('my_modal_3').showModal()
@@ -18,8 +18,7 @@ export default function Inventory({data, user, teacher}) {
                         <tr >
                             <th className="max-[443px]:hidden"></th>
                             <th>아이템 <br></br>이름</th>
-                            <th>가격</th>
-                            <th>남은 <br></br>수량</th>
+                            <th>사용자</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -28,27 +27,19 @@ export default function Inventory({data, user, teacher}) {
                             return (
                                 <tr className="hover" key={i}>
                                     <th className="max-[443px]:hidden">{i}</th>
-                                    <th>{a.name}</th>
-                                    <td>{a.price}</td>
-                                    <td>1개</td>
-
+                                    <th>{a.itemName}</th>
+                                    <td>{a.user}</td>
                                     <td className="flex justify-center">
-                                        {a.state === "대기중"?
-                                        <button className="btn bg-red-500 text-white" onClick={()=>onClick(a)}>사용</button>
-  
-                                    :<button className="btn btn-disabled">사용완료</button>
-                                }
-
+                                        {a.state === '대기중' ? <button className="btn bg-red-500 text-white" onClick={()=>onClick(a)}>승인</button> :
+                            <button className="btn btn-disabled">사용 완료</button>
+                        }
                                     </td>
                                 </tr>
                             )
                         })}
-
-
                     </tbody>
-
                 </table>
-                <UseModal item={item} user={user} teacher={teacher}/>
+                <NotificationModal item={item} id={id}/>
             </div>
         </div>
     )
