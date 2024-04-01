@@ -1,6 +1,4 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
-import GithubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectDB } from "@/app/lib/database";
 import { compare } from "bcryptjs";
@@ -30,19 +28,10 @@ export const authOptions = {
       },
 
       async authorize(credentials, req) {
-        // You need to provide your own logic here that takes the credentials
-        // submitted and returns either a object representing a user or value
-        // that is false/null if the credentials are invalid.
-        // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
-        // You can also use the `req` object to obtain additional parameters
-        // (i.e., the request IP address)
         const {id, password} = credentials;
-
         const db = (await connectDB).db('user');
-
-
         // 기존의 가입된 아이디 체크하기
-        const user = await db.collection('users').findOne({ id: id });
+        const user = await db.collection('users').findOne({ userId: id });
         if(!user){
           return null
         } 
@@ -56,8 +45,6 @@ export const authOptions = {
 
 
         // If no error and we have user data, return it
-        console.log('nextauth')
-        console.log(user)
         // Return null if user data could not be retrieved
         return user;
       }
@@ -75,8 +62,8 @@ export const authOptions = {
 
       if (user) {
         token.user = {};
-        token.user.name = user.name
-        token.user.id = user.id
+        token.user.userName = user.userName
+        token.user.userId = user.userId
         token.user.role = user.role
         token.user.teacher = user.teacher
       }

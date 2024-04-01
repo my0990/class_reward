@@ -1,12 +1,12 @@
 'use client'
 import { useRouter } from "next/navigation";
-export default function UseModal({item, user, teacher}) {
+export default function UseModal({item, userId, teacher, userName}) {
     const router = useRouter();
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/useItem", {
             method: "POST",
-            body: JSON.stringify({name: item.name, user: user, itemId: item.itemId, teacher: teacher}),
+            body: JSON.stringify({itemName: item.itemName, userId: userId, itemId: item.itemId, teacher: teacher, userName: userName}),
             headers: {
               "Content-Type": "application/json",
             },

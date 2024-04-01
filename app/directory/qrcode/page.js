@@ -1,6 +1,6 @@
 import QrcodeImg from '@/public/qrcode.png'
 import Image from 'next/image'
-import CreateQr from './CreateQr';
+import CreateQr from './component/CreateQr';
 import { connectDB } from '@/app/lib/database';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
@@ -19,14 +19,12 @@ export default async function Qrcode() {
             {response.code ?<div>
                 <div className="text-[3rem]">학생가입 페이지로 연결됩니다</div>
             <div>
-                <QRCode value={`localhost:3000/directory/qrcode/${id}/${response.code}`}/>
-
+                <QRCode value={`localhost:3000/qrcode/${id}/${response.code}`}/>
             </div>
             </div> 
             : <div>
                 <CreateQr />
             </div>}
-
         </div>
     )
 }

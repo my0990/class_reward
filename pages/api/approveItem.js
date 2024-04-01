@@ -12,11 +12,13 @@ export default async function handler(req, res) {
     // // MongoDB 연결
     // let itemId = (new ObjectId()).toString();
     const db = (await connectDB).db('data');
-    const {user, itemId, teacher} = req.body;
+    const {userId, itemId, teacher} = req.body;
+    console.log(req.body)
     // const response = await db.collection('student').updateOne({user:req.body.user},{$push: {"itemList": {id: itemId, price: parseInt(price), name: name, quantity: parseInt(quantity)}}},{upsert: true})
-    const response = await db.collection('student').updateOne({ user: user,"itemList.itemId": itemId},{$set : {'itemList.$.state': '사용완료'}})
-    const response2 = await db.collection('teacher').updateOne({ user: teacher,"notification.itemId": itemId},{$set : {'notification.$.state': '사용완료'}})
+    const response = await db.collection('student').updateOne({ userId: userId,"itemList.itemId": itemId},{$set : {'itemList.$.state': '사용완료'}})
+    const response2 = await db.collection('teacher').updateOne({ userId: teacher,"notification.itemId": itemId},{$set : {'notification.$.state': '사용완료'}})
     // const response2 = await db.collection('teacher').updateOne({user:teacher},{$push: {"notification": {itemId: itemId, user: user, itemName: name, state: '대기중'}}},{upsert: true})
+    const response3 = await db.collection('teacher').updateOne({userId:teacher},{$inc: {"notificationCount": -1}}, {upsert: true})
     console.log('body')
     console.log(req.body)
     console.log(teacher)

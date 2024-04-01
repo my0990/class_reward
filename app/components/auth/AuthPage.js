@@ -1,9 +1,8 @@
 'use client'
 import AuthInput from "./components/authInput"
 import AuthBtn from "./components/authBtn"
-import { useState, useRef } from "react"
 import { useValidateForm } from "@/app/lib/useValidateForm"
-import {signIn} from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 export default function AuthPage(){
 
@@ -15,11 +14,8 @@ export default function AuthPage(){
         const errors = { id: "", pwd: "", pwdCheck: ""}
         
         if (!values.id) errors.id = "아이디를 입력하세요"
-        // if (!regExp.email.test(values.email)) errors.email = "이메일은 aws@snaps.com 형식으로 입력해주세요"
         if (!values.pwd) errors.pwd = "비밀번호를 입력하세요"
-        // if (!regExp.pwd.test(values.pwd)) errors.pwd = "비밀번호는 8자 이상 영문, 숫자, 특수문자 조합으로 입력해주세요"
         
-    
         return errors
       }
 
@@ -30,6 +26,8 @@ export default function AuthPage(){
     validate,
     type: 'logIn'
     });
+
+    const route = useRouter();
     return(
         <form type="POST" onSubmit={submitHandler}>
         <div className="w-full h-screen flex flex-col items-center justify-center">
@@ -38,13 +36,13 @@ export default function AuthPage(){
                     <div className="text-[15vw] min-[400px]:text-[56px] text-white origin-bottom -rotate-12 italic">something</div>
                 </div>
                 <AuthInput placeholder="아이디를 입력해주세요" name="id" onChange={onChange} />
-                <AuthInput placeholder="비밀번호를 입력해주세요" name="pwd" onChange={onChange}/>
+                <AuthInput placeholder="비밀번호를 입력해주세요" name="pwd" type="password"  onChange={onChange}/>
                 <div className="text-red-500 text-center mb-3">{errors[Object.keys(errors).find((element)=> errors[element] !== '')]}</div>
                 <AuthBtn className="text-blue-100 mb-[0px]" type="submit">로그인</AuthBtn>
                 <div className="flex flex-col w-full border-opacity-50">
                     <div className="divider">OR</div>
                 </div>
-                <AuthBtn className="text-blue-100">회원가입</AuthBtn>
+                <AuthBtn className="text-blue-100" type="button" onClick={()=> route.push("./signup")}>회원가입</AuthBtn>
             </div>
         </div>
         </form>

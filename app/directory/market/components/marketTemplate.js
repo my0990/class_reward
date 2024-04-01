@@ -9,16 +9,19 @@ import {
     TransitionGroup,
   } from 'react-transition-group';
 
-export default function MarketTemplate({data, role}) {
+export default function MarketTemplate({data, role, money}) {
     const nodeRef = useRef();
-    const onDelete = (id) => {
+    const childRef= useRef();
+    const onDelete = (itemId) => {
+        setDeleteId(itemId)
+
         document.getElementById('my_modal_3').showModal()
-        setDeleteId(id)
+
     }
     const onBuy = (picked) => {
         document.getElementById('my_modal_3').showModal()
         setBuyList(picked)
-        console.log(picked)
+
     }
     const [deleteId,setDeleteId] = useState();
     const [itemList, setItemList] = useState([...data]);
@@ -45,21 +48,22 @@ export default function MarketTemplate({data, role}) {
                              (
 
                                 <CSSTransition
-                                    key={a.id}
+                                    key={a.itemId}
                                     timeout={600}
                                     classNames="item"
+
                                     >
 
-                                <tr className="hover" >
+                                <tr className="hover" key={a.itemId}>
                                     <th className="max-[443px]:hidden">{i}</th>
-                                    <th>{a.name}</th>
-                                    <td>{a.price}</td>
-                                    <td>{a.quantity}개</td>
+                                    <th>{a.itemName}</th>
+                                    <td>{a.itemPrice}</td>
+                                    <td>{a.itemQuantity}개</td>
                                     <td className="flex justify-center">
                                         
                                         {role === 'teacher' ? <>
                                         {/* <button className="btn mr-0 min-[443px]:mr-1 min-[443px]:mb-2 bg-orange-300">수정</button> */}
-                                    <button className="btn bg-red-500 text-white" onClick={() => onDelete(a.id)}>삭제</button></> :  <button className="btn bg-orange-300" onClick={() => onBuy(a)}>구입</button>}
+                                    <button className="btn bg-red-500 text-white" onClick={() => onDelete(a.itemId)}>삭제</button></> :  <button className="btn bg-orange-300" onClick={() => onBuy(a)}>구입</button>}
                                     
                                     </td>
                                 </tr>
@@ -77,7 +81,7 @@ export default function MarketTemplate({data, role}) {
                     <div ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z" /></svg></div>
                 </div> : null}
                 <AddModal itemList={itemList} setItemList={setItemList}/>
-                {role==='teacher' ? <DeleteModal deleteId={deleteId} itemList={itemList} setItemList={setItemList}/> : <BuyModal buyList={buyList} setItemList={setItemList} itemList={itemList}/>}
+                {role==='teacher' ? <DeleteModal deleteId={deleteId} itemList={itemList} setItemList={setItemList}/> : <BuyModal buyList={buyList} setItemList={setItemList} itemList={itemList} money={money}/>}
             </div>
 
         </div>

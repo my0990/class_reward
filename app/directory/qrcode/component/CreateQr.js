@@ -10,11 +10,9 @@ export default function CreateQr(){
               "Content-Type": "application/json",
             },
           });
-          console.log('+++++++++')
-          console.log(response)
         //   response.json().then((data) => console.log(data));
           if(response.status === 200){
-            router.refresh();
+            window.location.reload();
           }
     }
     return(

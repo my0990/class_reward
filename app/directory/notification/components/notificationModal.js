@@ -1,12 +1,12 @@
 'use client'
 import { useRouter } from "next/navigation";
-export default function NotificationModal({item, id}) {
+export default function NotificationModal({item, userId}) {
     const router = useRouter();
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/approveItem", {
             method: "POST",
-            body: JSON.stringify({user: item.user, itemId: item.itemId, teacher: id}),
+            body: JSON.stringify({userId: item.userId, itemId: item.itemId, teacher: userId}),
             headers: {
               "Content-Type": "application/json",
             },

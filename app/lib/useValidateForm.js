@@ -51,13 +51,11 @@ export const useValidateForm = ({
             if(logInResponse.status!== 200){
               setErrors({...errors, 'pwdCheck': '아이디와 비밀번호를 확인해주세요'})
             } else {
-              console.log('useValidate')
-              console.log('res: ', logInResponse)
               router.replace('/directory/dashboard')
             }
             break;
           case 'register': // 회원가입 로직
-
+            console.log(form)
             const registerResponse = await CreateUser(
               form.name,
               form.id,

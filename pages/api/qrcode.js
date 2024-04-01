@@ -11,8 +11,8 @@ export default async function handler(req, res) {
     const randomString = Math.random().toString(16).substr(2, 8);
     const db = (await connectDB).db('user');
     const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    const {name, id} = session.user;
-    const response = await db.collection('users').updateOne({ id: id},{$set: { code: randomString }});
+    const {userName, userId} = session.user;
+    const response = await db.collection('users').updateOne({ userId: userId},{$set: { code: randomString }});
 
 
     

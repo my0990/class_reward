@@ -11,16 +11,15 @@ export default  function  AddModal({itemList, setItemList}) {
         e.preventDefault();
         fetch("/api/addItem", {
             method: "POST",
-            body: JSON.stringify({ name: nameRef.current.value, price: priceRef.current.value, quantity: quantityRef.current.value}),
+            body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value}),
             headers: {
               "Content-Type": "application/json",
             },
         }).then((res) => res.json()).then((data) => {
-            console.log(data)
             if(data.result === true){
                 alert('추가하였습니다.');
                 document.getElementById('my_modal_2').close()
-                setItemList(() => [...itemList,{ name: nameRef.current.value, price: priceRef.current.value, quantity: quantityRef.current.value, id: data.itemId}])
+                setItemList(() => [...itemList,{ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemId: data.itemId}])
                 nameRef.current.value = ""
                 priceRef.current.value = ""
                 quantityRef.current.value = ""

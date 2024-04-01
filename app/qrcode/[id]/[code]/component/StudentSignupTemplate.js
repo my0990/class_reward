@@ -3,14 +3,15 @@ import AuthInput from "@/app/components/auth/components/authInput"
 import AuthBtn from "@/app/components/auth/components/authBtn"
 import { useState } from "react"
 import { useValidateForm } from "@/app/lib/useValidateForm"
-export default function SignUpPage({params}){
-    const {id} = params
+export default function StudentSignupTemplate({id, code}){
+
+
     const onChange = (e) => {
         const {changeHandler, value, blurHandler} = getFieldProps(e.target.name);
         changeHandler(e);
     }
     const validate = (values) => {
-        const errors = { id: "", pwd: "", pwdCheck: "", name: "" }
+        const errors = { id: "", pwd: "", pwdCheck: "", name: "", teacher: "", admin: false }
         
         if (!values.id) errors.id = "아이디를 입력하세요"
         // if (!regExp.email.test(values.email)) errors.email = "이메일은 aws@snaps.com 형식으로 입력해주세요"
@@ -26,7 +27,7 @@ export default function SignUpPage({params}){
     console.log(id)
     const { form, errors, isTouched, submitHandler, getFieldProps } = useValidateForm({
     initialForm: { id: "", pwd: "", pwdCheck: "", name: "" , admin: false, teacher: id},
-    initialError: { id: "", pwd: "", pwdCheck: "", name: ""  },
+    initialError: { id: "", pwd: "", pwdCheck: "", name: "",  admin: false, teacher: ""},
     initialIsTouched: { id: false, pwd: false, pwdCheck: false, name: false },
     validate,
     type: 'register'

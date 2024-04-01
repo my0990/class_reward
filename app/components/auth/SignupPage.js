@@ -7,7 +7,7 @@ export default function SignUpPage(){
     const onChange = (e) => {
         const {changeHandler, value, blurHandler} = getFieldProps(e.target.name);
         changeHandler(e);
-        console.log(value);
+
     }
     const validate = (values) => {
         const errors = { id: "", pwd: "", pwdCheck: "", name: "" }

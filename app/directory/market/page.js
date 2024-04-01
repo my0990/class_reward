@@ -5,13 +5,16 @@ import { getServerSession } from "next-auth";
 
 export default async function Market(){
     const session = await getServerSession(authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    let {id, role, teacher} = session.user;
+    let {userId, role, teacher} = session.user;
     const db = (await connectDB).db('data')
+    console.log(session)
+    let response2 = await db.collection('student').findOne({userId: userId})
+
     if(role === 'student'){
-        id = teacher
+        userId = teacher
     }
 
-    let response = await db.collection('teacher').findOne({user:id})
+    let response = await db.collection('teacher').findOne({userId:userId})
     if(!response){
         response= {'itemList': []}
     }
@@ -23,7 +26,7 @@ export default async function Market(){
     //   return a})
     return(
         <div>
-            <MarketTemplate data={data} role={role}/>
+            <MarketTemplate data={data} role={role} money={response2.money}/>
         </div>
     )
 }

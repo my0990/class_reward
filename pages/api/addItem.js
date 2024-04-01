@@ -6,15 +6,16 @@ export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
-    const {  name, price, quantity} = req.body;
+    const {  itemName, itemPrice, itemQuantity} = req.body;
+    console.log(req.body)
     const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    const {id} = session.user;
+    const {userId} = session.user;
     // MongoDB 연결
     let itemId = (new ObjectId()).toString();
     const db = (await connectDB).db('data');
 
 
-    const response = await db.collection('teacher').updateOne({user:'my0990'},{$push: {"itemList": {id: itemId, price: parseInt(price), name: name, quantity: parseInt(quantity)}}},{upsert: true})
+    const response = await db.collection('teacher').updateOne({userId:userId},{$push: {"itemList": {itemId: itemId, itemPrice: parseInt(itemPrice), itemName: itemName, itemQuantity: parseInt(itemQuantity)}}},{upsert: true})
 
 
 

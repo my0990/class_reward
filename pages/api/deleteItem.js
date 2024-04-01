@@ -7,14 +7,15 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    const {id} = session.user;
+    const {userId} = session.user;
     // MongoDB 연결
-    const deleteId = req.body.id
-
+    const deleteId = req.body.itemId
+    console.log('req')
+    console.log(req.body)
     const db = (await connectDB).db('data');
     const response = await db.collection('teacher').updateOne(
-      { user : id },
-      { $pull : { "itemList": { "id": deleteId} } }
+      { userId : userId },
+      { $pull : { "itemList": { "itemId": deleteId} } }
   );
     res.status(201).json({ result: true, message: 'delete 성공' });
 }}
