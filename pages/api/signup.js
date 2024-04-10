@@ -25,7 +25,8 @@ export default async function handler(req, res) {
         // 비밀번호 암호화
         password: await hash(password, 12),
         teacher,
-        role: 'student'
+        role: 'student',
+        userName:name
       });
       const db2 = (await connectDB).db('data')
       const status2 = await db2.collection('student').insertOne({
@@ -45,6 +46,7 @@ export default async function handler(req, res) {
       // 비밀번호 암호화
       password: await hash(password, 12),
       role: 'teacher',
+      userName: name
 
     });
     const db2 = (await connectDB).db('data')

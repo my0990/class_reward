@@ -10,21 +10,24 @@ export default async function Qrcode() {
 
     const db = (await connectDB).db('user');
     const session = await getServerSession(authOptions);
-    const {id, name} = session.user;
-    const response = await db.collection('users').findOne({id: id});
+    const { id, name } = session.user;
+    const response = await db.collection('users').findOne({ id: id });
 
 
-    return(
+    return (
         <div className="w-lg flex flex-col justify-center items-center mt-5">
-            {response.code ?<div>
-                <div className="text-[3rem]">학생가입 페이지로 연결됩니다</div>
-            <div>
-                <QRCode value={`localhost:3000/qrcode/${id}/${response.code}`}/>
-            </div>
-            </div> 
-            : <div>
+            {response.code ?
+                <>
+                    <div className="flex justify-center items-center flex-col w-[400px] h-[400px] bg-gray-300 rounded-full bg-orange-200 mt-[80px]">
+                        <div className="bg-white w-[272px] h-[272px] rounded-3xl flex justify-center items-center">
+                            <QRCode value={`localhost:3000/qrcode/${id}/${response.code}`} style={{ height: "auto", maxWidth: "100%", width: "65%" }} />
+                        </div>
+                    </div>
+                    <div className="mt-[56px] text-[2rem]">학생 회원가입 페이지로 이동합니다</div>
+                </>
+                :
                 <CreateQr />
-            </div>}
+            }
         </div>
     )
 }

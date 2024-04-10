@@ -20,12 +20,12 @@ export default async function Page(){
                 <h1 className="text-center">LV {response.lv}</h1>
                 <h2 className="text-center">{response.userName}</h2>
                 <div className="w-[120px] h-[160px] bg-gray-300 mx-auto mb-[32px] rounded-lg rounded-[48px] ">
-                    <Image src={character} alt="character" width={120} height={160} priority={true}/>
+                    <Image src={character} alt="character" width={180} height={160} priority={true}/>
                 </div>
-                <div className="flex justify-center mb-5">
+                {/* <div className="flex justify-center mb-5">
                     <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold"/></div>
                     <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>
-                </div>
+                </div> */}
                 <div>
                     <Link href="./inventory"><button className="btn w-full bg-blue-700 text-white">보유 아이템 보러가기</button></Link>
                 </div>

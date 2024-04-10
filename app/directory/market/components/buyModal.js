@@ -3,7 +3,7 @@ export default function BuyModal({buyList, setItemList, itemList, money}) {
     const router = useRouter();
     const onSubmit = (e) => {
         e.preventDefault();
-        if(money <= buyList.itemPrice){
+        if(money < buyList.itemPrice){
             alert('돈이 모자랍니다')
             document.getElementById('my_modal_3').close()
             return

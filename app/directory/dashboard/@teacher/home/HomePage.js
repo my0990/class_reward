@@ -13,6 +13,7 @@ export default function Home({data}) {
         document.getElementById('my_modal_2').showModal()
         setModalData(a)
     }
+    let testData = [1]
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/givePoint", {
@@ -48,11 +49,11 @@ export default function Home({data}) {
         )
     } else {
     return (
-        <div >
+        <div className="p-[32px]">
 
 
-            <div className="grid min-[1300px]:grid-cols-10 min-[1300px]:w-[1290px] min-[800px]:grid-cols-6 min-[800px]:w-[780px] min-[550px]:grid-cols-4 min-[550px]:w-[510px] min-[400px]:grid-cols-3 min-[400px]:w-[380px] grid-cols-2 w-[250px] gap-[10px] mx-auto ">            
-            {data.map((a,i)=>{
+            <div className="grid min-[1300px]:grid-cols-10  min-[800px]:grid-cols-6  min-[550px]:grid-cols-4 min-[400px]:grid-cols-3  grid-cols-2  gap-[10px]  ">            
+            {testData.map((a,i)=>{
                 return(
                     <StudentInfoCard key={i} onClick={(e)=>onClick(a)}>{a.userName}</StudentInfoCard>
                 )

@@ -41,8 +41,8 @@ export default function SignUpPage(){
                     </div>
                     <AuthInput placeholder="이름을 입력해주세요" name="name" onChange={onChange}/>
                     <AuthInput placeholder="아이디를 입력해주세요" name="id" onChange={onChange}/>
-                    <AuthInput placeholder="비밀번호를 입력해주세요" name="pwd" onChange={onChange}/>
-                    <AuthInput placeholder="비밀번호를 한번 더 입력해주세요" name="pwdCheck" onChange={onChange}/>
+                    <AuthInput placeholder="비밀번호를 입력해주세요" type="password" name="pwd" onChange={onChange}/>
+                    <AuthInput placeholder="비밀번호를 한번 더 입력해주세요" type="password" name="pwdCheck" onChange={onChange}/>
                     <AuthBtn className="text-blue-100 mb-[0px]">회원가입</AuthBtn>
                     <div className="flex flex-col w-full border-opacity-50">
                         <div className="divider">OR</div>

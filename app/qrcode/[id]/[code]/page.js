@@ -12,7 +12,7 @@ export default async function StudentSignup({params}) {
         )
     } else {
         return(
-           <div>잘못된 접근입니다. 지금 뭐하는 것입니까?</div> 
+           <div>잘못된 접근입니다.</div> 
         )
 
 }

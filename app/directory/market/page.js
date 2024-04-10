@@ -26,7 +26,7 @@ export default async function Market(){
     //   return a})
     return(
         <div>
-            <MarketTemplate data={data} role={role} money={response2.money}/>
+            <MarketTemplate data={data} role={role} money={response2?.money}/>
         </div>
     )
 }
