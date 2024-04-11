@@ -1,16 +1,15 @@
 import { signOut } from "next-auth/react"
 import Link from "next/link"
-
-export default function DropDown({ session }) {
-    let tmp = ['학생 관리', '초대하기', '아이템 관리', '기록 보기']
-    console.log(session)
+import gold from "@/public/gold.png";
+import Image from "next/image";
+export default function DropDown({ session, money }) {
     return (
         <div className="border-b-2 min-[601px]:hidden">
             <ul>
                 <li>
                     <div className="flex items-center justify-space ">
-                        <div className="py-[1rem] px-[8px] text-[1.2rem] ml-[8px]">
-                            강지현님, 환영합니다
+                        <div className="py-[0.5rem] px-[8px] text-[1.2rem] ml-[8px]">
+                            {session.userName}님, 환영합니다
                         </div>
 
                         <button className="rounded-[20px] border-2 py-[4px] px-[8px] text-gray-500 border-gray-300 flex" onClick={() => signOut()}>로그아웃
@@ -20,16 +19,24 @@ export default function DropDown({ session }) {
                         </button>
                     </div>
                 </li>
+                <li className="py-[0.5rem] px-[16px]  text-[1.2rem]">
+                    <div className="flex">
+                        <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold" /></div>
+                        {/* <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div> */}
+                        {session.role === "teacher" ? <div>- 원 </div> : <div>{money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>}
+                    </div>
+                </li>
+                <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem] border-b-2">프로필 수정하기</li></Link>
                 {session.role === 'teacher' ?
                     <>
-                        <Link href="./"><li className="pb-[1rem] px-[8px] ml-[8px] text-[1.2rem]">학생 관리</li></Link>
-                        <Link href="./"><li className="pb-[1rem] px-[8px] ml-[8px] text-[1.2rem]">아이템 관리</li></Link>
-                        <Link href="./"><li className="pb-[1rem] px-[8px] ml-[8px] text-[1.2rem]">기록 보기</li></Link>
-                        <Link href="./"><li className="pb-[1rem] px-[8px] ml-[8px] text-[1.2rem]">구성원 초대</li></Link>
+                        <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">학생 관리</li></Link>
+                        <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">아이템 관리</li></Link>
+                        {/* <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">기록 보기</li></Link> */}
+                        <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">구성원 초대</li></Link>
                     </> :
                     <>
-                        <Link href="./"><li className="pb-[1rem] px-[8px] ml-[8px] text-[1.2rem]">기록보기</li></Link>
-                        <Link href="./"><li className="pb-[1rem] px-[8px] ml-[8px] text-[1.2rem]">염탐하기</li></Link>
+                        {/* <Link href="./"><li className="py-[0.5rem] px-[8px] ml-[8px] text-[1.2rem]">기록보기</li></Link> */}
+                        <Link href="./browse"><li className="py-[0.5rem] px-[8px] ml-[8px] text-[1.2rem]">둘러보기</li></Link>
                     </>
                 }
 

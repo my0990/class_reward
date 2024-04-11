@@ -2,8 +2,8 @@ import styles from './userinfo.module.css'
 import { signOut } from "next-auth/react"
 import Image from "next/image"
 import gold from "@/public/gold.png";
-import { useState, useRef, useEffect } from 'react';
-export default function UserInfo({isUserinfoClicked, setIsUserinfoClicked, profileiconRef}) {
+import { useRef, useEffect } from 'react';
+export default function UserInfo({session, isUserinfoClicked, setIsUserinfoClicked, profileiconRef, money}) {
     const dropDownRef = useRef();
     useEffect(()=> {
 
@@ -28,7 +28,7 @@ export default function UserInfo({isUserinfoClicked, setIsUserinfoClicked, profi
             <div className={styles.speechBubble}>
                 <div className="flex items-center justify-space text-[1rem]">
                     <div className="py-[1rem] px-[8px]  ml-[8px]">
-                        강지현님, 환영합니다
+                        {session.userName}님, 환영합니다
                     </div>
                     <button className="rounded-[20px] border-2 py-[4px] px-[8px] text-gray-500 border-gray-300 flex" onClick={() => signOut()}>로그아웃
                         <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" className="ml-[4px] text-gray-500">
@@ -41,7 +41,8 @@ export default function UserInfo({isUserinfoClicked, setIsUserinfoClicked, profi
                         <div className="flex">
                             <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold" /></div>
                             {/* <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div> */}
-                            <div>100,000원</div>
+                            {session.role === "teacher" ? <div>- 원 </div> : <div>{money}원 </div>}
+
                         </div>
                     </li>
                     <li className="py-[1rem] px-[8px]  ml-[8px]">프로필 수정하기</li>

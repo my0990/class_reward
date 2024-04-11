@@ -15,8 +15,8 @@ export default async function Page(){
         return
     }
     return(
-        <div className="flex justify-center bg-orange-300 py-[100px]">
-            <div className="w-[320px] bg-pink-100 rounded-lg p-[24px]">
+        <div className="flex justify-center py-[100px]">
+            <div className="w-[320px] border-4 rounded-lg p-[24px]">
                 <h1 className="text-center">LV {response.lv}</h1>
                 <h2 className="text-center">{response.userName}</h2>
                 <div className="w-[120px] h-[160px] bg-gray-300 mx-auto mb-[32px] rounded-lg rounded-[48px] ">

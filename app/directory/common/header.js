@@ -10,12 +10,12 @@ import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
 import { useRef } from "react";
 import { useEffect } from "react";
-export default function Header({ session, notificationCount }) {
+export default function Header({ session, notificationCount, money }) {
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {
         setIsHamburgerClicked(props => !props)
     }
-    const [isUserinfoClicked,setIsUserinfoClicked] = useState(false);
+    const [isUserinfoClicked, setIsUserinfoClicked] = useState(false);
     const userinfoClicked = () => {
         setIsUserinfoClicked(props => !props)
     }
@@ -66,7 +66,7 @@ export default function Header({ session, notificationCount }) {
         // </div>
         <>
             <div className="border-b-2" >
-                <div className="p-[24px]  flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
+                <div className="p-[24px] max-[600px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
                     <div className="flex items-center">
                         <div className="min-[601px]:mr-[5vw]">
                             <Link href="./dashboard"><div className="w-[48px] h-[48px] rounded-lg bg-orange-500 align-middle"></div></Link>
@@ -76,12 +76,12 @@ export default function Header({ session, notificationCount }) {
                                 <ul className="flex max-[600px]:hidden">
                                     <Link href="./qrcode"><li className="mr-[5vw]">학생 관리</li></Link>
                                     <Link href="./market"><li className="mr-[5vw]">아이템 관리</li></Link>
-                                    <Link href="./log"><li className="mr-[5vw]">기록 보기</li></Link>
+                                    {/* <Link href="./log"><li className="mr-[5vw]">기록 보기</li></Link> */}
                                     <Link href="./qrcode"><li>학생 초대</li></Link>
                                 </ul> :
                                 <ul className="flex max-[600px]:hidden">
-                                    <Link href="./qrcode"><li className="mr-[5vw]">기록보기</li></Link>
-                                    <Link href="./market"><li>염탐하기</li></Link>
+                                    {/* <Link href="./qrcode"><li className="mr-[5vw]">기록보기</li></Link> */}
+                                    <Link href="./browse"><li>둘러보기</li></Link>
                                 </ul>
                             }
 
@@ -90,7 +90,7 @@ export default function Header({ session, notificationCount }) {
                     {/* 아이콘 */}
                     <div className="avatar cursor-pointer max-[600px]:hidden" onClick={userinfoClicked} ref={profileiconRef}>
                         <div className="w-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2">
-                            <Image src={character} alt="character"/>
+                            <Image src={character} alt="character" />
                         </div>
                     </div>
 
@@ -102,8 +102,8 @@ export default function Header({ session, notificationCount }) {
                     </div>
                 </div>
             </div>
-            {isHamburgerClicked ? <DropDown session={session} /> : null}
-            {isUserinfoClicked ? <UserInfo profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked}/> : null }
+            {isHamburgerClicked ? <DropDown session={session} money={money} /> : null}
+            {isUserinfoClicked ? <UserInfo session={session} money={money} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} /> : null}
             {/* <UserInfo ref={dropDownRef}/> */}
 
         </>
