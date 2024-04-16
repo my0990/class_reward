@@ -6,7 +6,7 @@ export default function DropDown({ session, money }) {
     return (
         <div className="border-b-2 min-[601px]:hidden">
             <ul>
-                <li>
+                <li className="mt-[1rem]"> 
                     <div className="flex items-center justify-space ">
                         <div className="py-[0.5rem] px-[8px] text-[1.2rem] ml-[8px]">
                             {session.userName}님, 환영합니다
@@ -26,17 +26,17 @@ export default function DropDown({ session, money }) {
                         {session.role === "teacher" ? <div>- 원 </div> : <div>{money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>}
                     </div>
                 </li>
-                <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem] border-b-2">프로필 수정하기</li></Link>
+                <Link href="./"><li className="py-[0.5rem] px-[16px] pb-[1rem] text-[1.2rem] border-b-2">프로필 수정하기</li></Link>
                 {session.role === 'teacher' ?
                     <>
-                        <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">학생 관리</li></Link>
-                        <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">아이템 관리</li></Link>
+                        <Link href="./"><li className="py-[0.5rem] px-[16px] mt-[1rem] text-[1.2rem]">학생 관리</li></Link>
+                        <Link href="./market"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">아이템 관리</li></Link>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">기록 보기</li></Link> */}
-                        <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">구성원 초대</li></Link>
+                        <Link href="./"><li className="py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem]">구성원 초대</li></Link>
                     </> :
                     <>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[8px] ml-[8px] text-[1.2rem]">기록보기</li></Link> */}
-                        <Link href="./browse"><li className="py-[0.5rem] px-[8px] ml-[8px] text-[1.2rem]">둘러보기</li></Link>
+                        <Link href="./browse"><li className="py-[1.5rem] px-[8px] ml-[8px] text-[1.2rem]">둘러보기</li></Link>
                     </>
                 }
 

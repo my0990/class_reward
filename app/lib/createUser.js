@@ -3,12 +3,13 @@ const CreateUser = async (
     id,
     password,
     admin,
-    teacher
+    teacher,
+    nickname
   ) => {
-    console.log('teacher: ', teacher)
+
     const response = await fetch("/api/signup", {
       method: "POST",
-      body: JSON.stringify({ name,  password, id, admin, teacher}),
+      body: JSON.stringify({ name,  password, id, admin, teacher, nickname}),
       headers: {
         "Content-Type": "application/json",
       },

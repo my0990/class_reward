@@ -11,7 +11,7 @@ export default function DeleteModal({deleteId, itemList, setItemList}) {
               "Content-Type": "application/json",
             },
         }).then((res) => res.json()).then((data) => {
-            console.log(itemList)
+
             if(data.result === true){
                 alert('성공했습니다.')
                 const newItemList = itemList.filter((it) => it.itemId !== deleteId);
@@ -21,8 +21,7 @@ export default function DeleteModal({deleteId, itemList, setItemList}) {
         })}
 
     useEffect(()=>{
-        console.log('itemList')
-        console.log(itemList)
+
     },[itemList,setItemList])
     return (
         <dialog id="my_modal_3" className="modal sm:modal-bottom modal-middle">

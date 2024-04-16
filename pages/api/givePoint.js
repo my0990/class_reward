@@ -8,6 +8,7 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const {userId, point} = req.body;
     console.log(point, typeof(point))
+    console.log(userId)
     // const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
     // const {id} = session.user;
     // // MongoDB 연결
@@ -15,7 +16,7 @@ export default async function handler(req, res) {
     const db = (await connectDB).db('data');
 
 
-    const response = await db.collection('student').updateOne({userId:userId},{$inc: {money: point}})
+    const response = await db.collection('student').updateOne({userId:userId},{$inc: {money: parseInt(point)}})
 
 
 

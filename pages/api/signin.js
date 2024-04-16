@@ -11,9 +11,9 @@ export default async function handler(req, res) {
     const { id, password } = req.body;
 	
     // MongoDB 연결
-
+    console.log('test')
     const db = (await connectDB).db('user');
-
+    console.log('db')
 
     // 기존의 가입된 아이디 체크하기
     const response = await db.collection('users').findOne({ id });

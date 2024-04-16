@@ -61,7 +61,8 @@ export const useValidateForm = ({
               form.id,
               form.pwd,
               form.admin,
-              form.teacher
+              form.teacher,
+              form.nickname
             );
   
             if (registerResponse) {

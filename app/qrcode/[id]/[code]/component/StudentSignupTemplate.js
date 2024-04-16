@@ -11,7 +11,7 @@ export default function StudentSignupTemplate({id, code}){
         changeHandler(e);
     }
     const validate = (values) => {
-        const errors = { id: "", pwd: "", pwdCheck: "", name: "", teacher: "", admin: false }
+        const errors = { id: "", pwd: "", pwdCheck: "", name: "", teacher: "", nickname: "", admin: false }
         
         if (!values.id) errors.id = "아이디를 입력하세요"
         // if (!regExp.email.test(values.email)) errors.email = "이메일은 aws@snaps.com 형식으로 입력해주세요"
@@ -20,14 +20,15 @@ export default function StudentSignupTemplate({id, code}){
         if (!values.pwdCheck) errors.pwdCheck = "비밀번호를 입력해주세요"
         if (values.pwd !== values.pwdCheck) errors.pwdCheck = "비밀번호가 일치하지 않습니다"
         if (!values.name) errors.name = "이름을 입력하세요"
+        if (!values.nickname) errors.nickname = "별명을 입력하세요"
 
     
         return errors
       }
     console.log(id)
     const { form, errors, isTouched, submitHandler, getFieldProps } = useValidateForm({
-    initialForm: { id: "", pwd: "", pwdCheck: "", name: "" , admin: false, teacher: id},
-    initialError: { id: "", pwd: "", pwdCheck: "", name: "",  admin: false, teacher: ""},
+    initialForm: { id: "", pwd: "", pwdCheck: "", name: "" , admin: false, nickname: "", teacher: id},
+    initialError: { id: "", pwd: "", pwdCheck: "", name: "",  admin: false, nickname: "", teacher: ""},
     initialIsTouched: { id: false, pwd: false, pwdCheck: false, name: false },
     validate,
     type: 'register'
@@ -42,6 +43,7 @@ export default function StudentSignupTemplate({id, code}){
                     </div>
                     <AuthInput placeholder="이름을 입력해주세요" name="name" onChange={onChange}/>
                     <AuthInput placeholder="아이디를 입력해주세요" name="id" onChange={onChange}/>
+                    <AuthInput placeholder="별명을 입력해주세요" name="nickname" onChange={onChange}/>
                     <AuthInput placeholder="비밀번호를 입력해주세요" type="password" name="pwd" onChange={onChange}/>
                     <AuthInput placeholder="비밀번호를 한번 더 입력해주세요" type="password" name="pwdCheck" onChange={onChange}/>
                     <AuthBtn className="text-blue-100 mb-[0px]">회원가입</AuthBtn>

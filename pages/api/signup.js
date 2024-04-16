@@ -6,13 +6,13 @@ const uri = process.env.MONGODB_URI;
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { id, password, name, admin, teacher } = req.body;
+    const { id, password, name, admin, teacher, nickname } = req.body;
     // MongoDB 연결
     const client = await MongoClient.connect(uri);
     const db = client.db('user');
 	
     // 기존의 가입된 아이디 체크하기
-    const checkExisting = await db.collection('users').findOne({ id });
+    const checkExisting = await db.collection('users').findOne({ userId: id });
 
     if (checkExisting) {
       client.close();
@@ -26,7 +26,8 @@ export default async function handler(req, res) {
         password: await hash(password, 12),
         teacher,
         role: 'student',
-        userName:name
+        userName:name,
+
       });
       const db2 = (await connectDB).db('data')
       const status2 = await db2.collection('student').insertOne({
@@ -35,7 +36,8 @@ export default async function handler(req, res) {
         money: 0,
         teacher: teacher,
         itemList: [],
-        lv: 0
+        lv: 0,
+        nickname: nickname
         
       })
       res.status(201).json({result: true, message: 'User created'})

@@ -33,11 +33,11 @@ export default function MarketTemplate({data, role, money}) {
                     
                     {/* head */}
                     <thead>
-                        <tr >
+                        <tr className="text-[1.2rem]">
                             <th className="max-[443px]:hidden"></th>
-                            <th>아이템 <br></br>이름</th>
+                            <th>이름</th>
                             <th>가격</th>
-                            <th>남은 <br></br>수량</th>
+                            <th>수량</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -54,7 +54,7 @@ export default function MarketTemplate({data, role, money}) {
 
                                     >
 
-                                <tr className="hover" key={a.itemId}>
+                                <tr className="hover text-[1.2rem]" key={a.itemId}>
                                     <th className="max-[443px]:hidden">{i}</th>
                                     <th>{a.itemName}</th>
                                     <td>{a.itemPrice}</td>
