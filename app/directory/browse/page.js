@@ -8,7 +8,7 @@ export default async function Browse() {
             <div className="flex  flex-wrap  w-[1344px] max-[1344px]:w-[640px]">
                 {response.map((a, i) => {
                     return (
-                        <BrowseCard data={a} />
+                        <BrowseCard key={i} data={a} />
                     )
                 })}
             </div>
