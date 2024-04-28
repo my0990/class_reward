@@ -38,7 +38,7 @@ export default function DeleteModal({ deleteId, itemList, setItemList, buyList }
                         </div>
                     </div>
                 </div> */}
-            <div className="modal-box min-[600px]:p-[48px]">
+            <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
 
                 <div className="flex items-center">
                     <h1 className="text-[1.5rem] font-bold mb-[8px]">{buyList?.itemName}</h1>

@@ -26,8 +26,8 @@ export default function Home({data}) {
                         animationData={lottieJson}
                         play
                     />
-                    <span className=" text-[3vw] mt-[2vw] min-[600px]:text-[20px] ">
-                        등록된 학생이 없습니다. <button className="cursor-pointer z-0 text-blue-600" onClick={()=> route.push("../directory/qrcode")}>학생 등록하기</button>
+                    <span className=" text-[3vw] mt-[2vw] min-[600px]:text-[20px] dark:text-white">
+                        등록된 학생이 없습니다. <button className="cursor-pointer z-0 text-blue-600 dark:text-blue-300" onClick={()=> route.push("../directory/qrcode")}>학생 등록하기</button>
                     </span>
                 </div>
             </div>

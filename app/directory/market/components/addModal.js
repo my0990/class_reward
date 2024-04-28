@@ -71,7 +71,7 @@ export default function AddModal({ itemList, setItemList }) {
                 </div>
             </div> */}
 
-            <div className="modal-box  p-[16px] min-[600px]:p-[32px]">
+            <div className="modal-box  p-[16px] min-[600px]:p-[32px] dark:bg-orange-200">
                 <div className="text-right absolute top-5 right-5 text-[1.2rem] cursor-pointer leading-none max-[600px]:top-3 min-[600px]:right-3 hover:bg-gray-300 hover:rounded-full w-[34px] h-[34px] flex justify-center items-center" onClick={onCloseModal}>x</div>
                 <h1 className="text-[1.5rem] mb-[32px]">학급 아이템 추가하기</h1>
                 <div className="mb-[16px]">

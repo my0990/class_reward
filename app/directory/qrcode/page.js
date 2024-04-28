@@ -24,7 +24,7 @@ export default async function Qrcode() {
                         </div>
                     </div> */}
                     <Qr id={userId} code={response.code}/>
-                    <div className="mt-[56px] text-[2rem]">학생 회원가입 페이지로 이동합니다</div>
+                    <div className="mt-[56px] text-[2rem] dark:text-white">학생 회원가입 페이지로 이동합니다</div>
                 </>
                 :
                 <CreateQr />

@@ -70,7 +70,7 @@ export default function Header({ session, notificationCount, money }) {
         //     </div>
         // </div>
         <>
-            <div className="border-b-2 dark:bg-orange-300" >
+            <div className="border-b-2" >
                 <div className="p-[24px] max-[600px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
                     <div className="flex items-center">
                         <div className="min-[601px]:mr-[5vw]">
@@ -80,14 +80,14 @@ export default function Header({ session, notificationCount, money }) {
                         <div>
                             {session.role === 'teacher' ?
                                 <ul className="flex max-[600px]:hidden">
-                                    <Link href="./qrcode"><li className="mr-[5vw]">학생 관리</li></Link>
-                                    <Link href="./market"><li className="mr-[5vw]">아이템 관리</li></Link>
+                                    <Link href="./qrcode"><li className="mr-[5vw] dark:text-white">학생 관리</li></Link>
+                                    <Link href="./market"><li className="mr-[5vw] dark:text-white">아이템 관리</li></Link>
                                     {/* <Link href="./log"><li className="mr-[5vw]">기록 보기</li></Link> */}
-                                    <Link href="./qrcode"><li>학생 초대</li></Link>
+                                    <Link href="./qrcode"><li className="dark:text-white">학생 초대</li></Link>
                                 </ul> :
                                 <ul className="flex max-[600px]:hidden">
                                     {/* <Link href="./qrcode"><li className="mr-[5vw]">기록보기</li></Link> */}
-                                    <Link href="./browse"><li>둘러보기</li></Link>
+                                    <Link href="./browse"><li className="dark:text-white">둘러보기</li></Link>
                                 </ul>
                             }
 

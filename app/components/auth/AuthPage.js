@@ -40,7 +40,7 @@ export default function AuthPage(){
                 <div className="text-red-500 text-center mb-3">{errors[Object.keys(errors).find((element)=> errors[element] !== '')]}</div>
                 <AuthBtn className="text-blue-100 mb-[0px]" type="submit">로그인</AuthBtn>
                 <div className="flex flex-col w-full border-opacity-50">
-                    <div className="divider">OR</div>
+                    <div className="divider dark:before:bg-white dark:after:bg-white dark:text-white">OR</div>
                 </div>
                 <AuthBtn className="text-blue-100" type="button" onClick={()=> route.push("./signup")}>회원가입</AuthBtn>
             </div>

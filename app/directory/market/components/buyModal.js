@@ -46,7 +46,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money }) {
                     </div>
                 </div>
             </div> */}
-            <div className="modal-box min-[600px]:p-[48px]">
+            <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
                 <div className="flex justify-end">
                     <div className="w-[20px] h-[20px] mr-[8px]">
                         <Image src={gold} />

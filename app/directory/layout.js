@@ -20,7 +20,7 @@ export default async function RootLayout({children}){
 
     
     return(
-        <div>
+        <div className="dark:text-black">
             <Header session={session.user} notificationCount={notificationCount} money={money}/>
             {children}
             <SpeedInsights />

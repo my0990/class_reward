@@ -18,8 +18,8 @@ export default function CreateQr(){
     return(
         <div>
             <form onSubmit={submitHandler}>
-                <div>qr코드를 생성하시겠습니까?</div>
-                <button className="btn" type="submit">생성하기</button>
+                <div className="dark:text-white">qr코드를 생성하시겠습니까?</div>
+                <button className="btn dark:bg-orange-400 dark:text-white dark:hover:bg-orange-200" type="submit">생성하기</button>
             </form>
         </div>
     )

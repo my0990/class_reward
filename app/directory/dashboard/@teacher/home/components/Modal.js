@@ -44,8 +44,8 @@ export default function Modal({ modalData }) {
         setFontSize(1.7)
     }
     return (
-        <dialog id="my_modal_2" className="modal" tabIndex="-1">
-            <div className="modal-box w-[320px] flex justify-center">
+        <dialog id="my_modal_2" className="modal " tabIndex="-1">
+            <div className="modal-box w-[320px] flex justify-center dark:bg-gray-400">
                 {/* <h3 className="font-bold text-lg mb-5">{modalData.userName}에게</h3>
                 <ul className="flex">
                     {[1, 2, 3, 5, 10].map((a, i) => {
