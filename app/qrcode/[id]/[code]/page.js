@@ -4,8 +4,6 @@ export default async function StudentSignup({params}) {
     const {id, code} = params
     const db = (await connectDB).db('user')
     const response = await db.collection('users').findOne({userId: id})
-    console.log(response)
-    console.log(id, code)
     if(code === response.code){
         return(
             <StudentSignupTemplate id={id} code={code}/>

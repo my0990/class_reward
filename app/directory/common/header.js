@@ -70,7 +70,7 @@ export default function Header({ session, notificationCount, money }) {
         //     </div>
         // </div>
         <>
-            <div className="border-b-2" >
+            <div className="border-b-2 dark:bg-orange-300" >
                 <div className="p-[24px] max-[600px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
                     <div className="flex items-center">
                         <div className="min-[601px]:mr-[5vw]">

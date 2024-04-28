@@ -74,8 +74,8 @@ export default function BuyModal({ buyList, setItemList, itemList, money }) {
                 </div>
                 <div className="mb-[32px]">남은 수량: {buyList?.itemQuantity}</div>
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
-                    <form onSubmit={onSubmit}>
-                        <button className="w-[48%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
+                    <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
+                        <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
                     </form>
                     <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]">취소</button>
                 </div>
