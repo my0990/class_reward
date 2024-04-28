@@ -39,6 +39,8 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+
 .responsive {
   /* PC (해상도 1024px)*/ 
 @media all and (min-width:1024px) {
@@ -62,8 +64,22 @@ body {
 }
 
 }
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
+

@@ -7,14 +7,13 @@ import { useState, useRef } from "react"
 import {
     CSSTransition,
     TransitionGroup,
-  } from 'react-transition-group';
+} from 'react-transition-group';
 
-export default function MarketTemplate({data, role, money}) {
-    const nodeRef = useRef();
-    const childRef= useRef();
-    const onDelete = (itemId) => {
-        setDeleteId(itemId)
+export default function MarketTemplate({ data, role, money }) {
 
+    const onDelete = (picked) => {
+        setDeleteId(picked.itemId)
+        setBuyList(picked)
         document.getElementById('my_modal_3').showModal()
 
     }
@@ -23,65 +22,72 @@ export default function MarketTemplate({data, role, money}) {
         setBuyList(picked)
 
     }
-    const [deleteId,setDeleteId] = useState();
+
+    const [deleteId, setDeleteId] = useState();
     const [itemList, setItemList] = useState([...data]);
-    const [buyList,setBuyList] = useState();
+    const [buyList, setBuyList] = useState();
+    const nodeRef = useRef();
     return (
-        <div className=" flex justify-center">
+        <div className="flex justify-center">
             <div className="overflow-x-auto w-[1024px]">
-                <table className="table">
-                    
-                    {/* head */}
-                    <thead>
+                {/* <table className="table"> */}
+
+                {/* head */}
+                {/* <thead>
                         <tr className="text-[1.2rem]">
-                            <th className="max-[443px]:hidden"></th>
+                            <th className="max-[443px]:hidden">순번</th>
                             <th>이름</th>
                             <th>가격</th>
                             <th>수량</th>
                             <th></th>
                         </tr>
-                    </thead>
+                    </thead> */}
 
 
-                    <TransitionGroup component="tbody">
-                        {itemList?.map((a, i) => 
-                             (
+                <TransitionGroup noderef={nodeRef} className="flex p-[8px] flex-wrap">
+                    {itemList?.map((a, i) =>
+                    (
 
-                                <CSSTransition
-                                    key={a.itemId}
-                                    timeout={600}
-                                    classNames="item"
+                        <CSSTransition
+                            key={a.itemId}
+                            timeout={600}
+                            classNames="item"
 
-                                    >
-
-                                <tr className="hover text-[1.2rem]" key={a.itemId}>
-                                    <th className="max-[443px]:hidden">{i}</th>
-                                    <th>{a.itemName}</th>
+                        >
+                            {/* <tr className="hover text-[1.2rem]" key={a.itemId}>
+                                    <td className="max-[443px]:hidden">{i}</td>
+                                    <td className="overflow-hidden">
+                                        <div>{a.itemName}</div>
+                                        <div className="text-[0.9rem] font-normal text-gray-500">{a.itemExplanation}</div>
+                                    </td>
                                     <td>{a.itemPrice}</td>
                                     <td>{a.itemQuantity}개</td>
                                     <td className="flex justify-center">
-                                        
+
                                         {role === 'teacher' ? <>
-                                        {/* <button className="btn mr-0 min-[443px]:mr-1 min-[443px]:mb-2 bg-orange-300">수정</button> */}
-                                    <button className="btn bg-red-500 text-white" onClick={() => onDelete(a.itemId)}>삭제</button></> :  <button className="btn bg-orange-300" onClick={() => onBuy(a)}>구입</button>}
-                                    
+                                            <button className="btn bg-red-500 text-white" onClick={() => onDelete(a.itemId)}>삭제</button></> : <button className="btn bg-orange-300" onClick={() => onBuy(a)}>구입</button>}
                                     </td>
-                                </tr>
+                                </tr> */}
+                            <div className="m-[16px] flex justify-center items-center relative bg-orange-100 p-[16px] rounded-lg" ref={nodeRef}>
+                                {role === 'teacher' ? <>
+                                    <button className="text-[1.2rem] cursor-pointer" onClick={() => onDelete(a)}>{a.itemName}</button></> : 
+                                    <button className="text-[1.2rem] cursor-pointer" onClick={() => onBuy(a)}>{a.itemName}</button>}
+                            </div>
 
-                                </CSSTransition>
+                        </CSSTransition>
 
-                            )
-                        )}
+                    )
+                    )}
 
 
-                    </TransitionGroup>
-                </table>
+                </TransitionGroup>
+                {/* </table> */}
 
-                {role === 'teacher' ?  <div className="h-[73px] w-full flex justify-center items-center hover:bg-gray-100 cursor-pointer" onClick={()=>document.getElementById('my_modal_2').showModal()}>
+                {role === 'teacher' ? <div className="h-[73px] w-full flex justify-center items-center bg-white hover:bg-gray-100 cursor-pointer" onClick={() => document.getElementById('my_modal_2').showModal()}>
                     <div ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z" /></svg></div>
                 </div> : null}
-                <AddModal itemList={itemList} setItemList={setItemList}/>
-                {role==='teacher' ? <DeleteModal deleteId={deleteId} itemList={itemList} setItemList={setItemList}/> : <BuyModal buyList={buyList} setItemList={setItemList} itemList={itemList} money={money}/>}
+                <AddModal itemList={itemList} setItemList={setItemList} />
+                {role === 'teacher' ? <DeleteModal deleteId={deleteId} itemList={itemList} setItemList={setItemList} buyList={buyList} /> : <BuyModal buyList={buyList} setItemList={setItemList} itemList={itemList} money={money} />}
             </div>
 
         </div>

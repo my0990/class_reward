@@ -8,19 +8,24 @@ import Image from "next/image";
 import { useState } from "react";
 import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
-import { useRef } from "react";
-import { useEffect } from "react";
+import { useRef, useEffect} from "react";
+import { useRouter, usePathname } from "next/navigation";
+
 export default function Header({ session, notificationCount, money }) {
+    const router = useRouter();
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {
         setIsHamburgerClicked(props => !props)
     }
     const [isUserinfoClicked, setIsUserinfoClicked] = useState(false);
+
     const userinfoClicked = () => {
         setIsUserinfoClicked(props => !props)
     }
-    const profileiconRef = useRef();
 
+    const profileiconRef = useRef();
+    const pathname = usePathname();
+    useEffect(()=> { isHamburgerClicked ? setIsHamburgerClicked(false): null}, [pathname])
     return (
         // <div className="navbar bg-base-100 min-[1300px]:w-[1290px] min-[800px]:w-[780px]  mx-auto">
         //     <div className="navbar-start">
@@ -69,7 +74,8 @@ export default function Header({ session, notificationCount, money }) {
                 <div className="p-[24px] max-[600px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
                     <div className="flex items-center">
                         <div className="min-[601px]:mr-[5vw]">
-                            <Link href="./dashboard"><div className="w-[48px] h-[48px] rounded-lg bg-orange-500 align-middle"></div></Link>
+                            <Link href="./dashboard" replace><div className="w-[48px] h-[48px] rounded-lg bg-orange-500 align-middle"></div></Link>
+                            {/* <div className="w-[48px] h-[48px] rounded-lg bg-orange-500 align-middle" onClick={()=> router.replace("./dashboard")}></div> */}
                         </div>
                         <div>
                             {session.role === 'teacher' ?
@@ -88,10 +94,19 @@ export default function Header({ session, notificationCount, money }) {
                         </div>
                     </div>
                     {/* 아이콘 */}
-                    <div className="avatar cursor-pointer max-[600px]:hidden" onClick={userinfoClicked} ref={profileiconRef}>
-                        <div className="w-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2">
+                    <div className="flex">
+                    {session.role === "teacher" && notificationCount > 0 &&
+                            <div className="mr-[8px] min-[600px]:mr-[16px]">
+                                <Link href="./notification"><Notification /></Link>
+                            </div>
+
+                        }
+                    <div className="avatar cursor-pointer max-[600px]:hidden flex items-center justify-center" onClick={userinfoClicked} ref={profileiconRef}>
+
+                        <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2 ">
                             <Image src={character} alt="character" />
                         </div>
+
                     </div>
 
                     {/* 메뉴창 */}
@@ -99,6 +114,7 @@ export default function Header({ session, notificationCount, money }) {
                         <div tabIndex={0} role="button" className="btn btn-ghost align-middle p-0 ">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={hamburgerClicked}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>

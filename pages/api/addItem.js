@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
-    const {  itemName, itemPrice, itemQuantity} = req.body;
+    const {  itemName, itemPrice, itemQuantity, itemExplanation} = req.body;
     console.log(req.body)
     const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
     const {userId} = session.user;
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     const db = (await connectDB).db('data');
 
 
-    const response = await db.collection('teacher').updateOne({userId:userId},{$push: {"itemList": {itemId: itemId, itemPrice: parseInt(itemPrice), itemName: itemName, itemQuantity: parseInt(itemQuantity)}}},{upsert: true})
+    const response = await db.collection('teacher').updateOne({userId:userId},{$push: {"itemList": {itemId: itemId, itemPrice: parseInt(itemPrice), itemName: itemName, itemQuantity: parseInt(itemQuantity), itemExplanation: itemExplanation}}},{upsert: true})
 
 
 

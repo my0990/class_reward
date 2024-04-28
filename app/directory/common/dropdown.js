@@ -2,7 +2,9 @@ import { signOut } from "next-auth/react"
 import Link from "next/link"
 import gold from "@/public/gold.png";
 import Image from "next/image";
+import { useEffect } from "react";
 export default function DropDown({ session, money }) {
+    
     return (
         <div className="border-b-2 min-[601px]:hidden">
             <ul>
