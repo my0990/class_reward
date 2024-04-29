@@ -46,6 +46,7 @@ export default function AuthPage(){
           return false;
         }
       });
+      console.log(installPrompt)
     }, []);
 
     const installApp = async () => {
