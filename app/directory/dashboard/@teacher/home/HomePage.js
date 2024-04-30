@@ -35,7 +35,7 @@ export default function Home({data}) {
         )
     } else {
     return (
-        <div className="p-[32px] h-[calc(100vh-96px)]">
+        <div className="p-[32px]">
             <div className="grid min-[1300px]:grid-cols-10  min-[800px]:grid-cols-6  min-[550px]:grid-cols-4 min-[400px]:grid-cols-3  grid-cols-2  gap-[10px]  ">            
             {data.map((a,i)=>{
                 return(
