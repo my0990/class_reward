@@ -6,6 +6,7 @@ import StudentInfoCard from "./components/StudentInfoCard";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "./components/Modal";
+import InstallPrompt from "../../component/InstallPrompt";
 export default function Home({data}) {
     const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
     const [modalData,setModalData] = useState('data');
@@ -34,9 +35,7 @@ export default function Home({data}) {
         )
     } else {
     return (
-        <div className="p-[32px]">
-
-
+        <div className="p-[32px] h-[calc(100vh-96px)]">
             <div className="grid min-[1300px]:grid-cols-10  min-[800px]:grid-cols-6  min-[550px]:grid-cols-4 min-[400px]:grid-cols-3  grid-cols-2  gap-[10px]  ">            
             {data.map((a,i)=>{
                 return(
@@ -44,7 +43,7 @@ export default function Home({data}) {
                 )
             })}</div>
             <Modal modalData = {modalData}/>
-
+            <InstallPrompt />
         </div>
     )
 }}

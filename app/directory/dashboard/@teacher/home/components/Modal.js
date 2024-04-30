@@ -37,7 +37,7 @@ export default function Modal({ modalData }) {
             setFontSize(Math.min(12/point.length, fontSize) )
         }
 
-        console.log(fontSize)
+
     }, [point,setPoint])
     const modalClose = () => {
         setPoint(null)
