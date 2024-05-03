@@ -9,10 +9,11 @@ const InstallPrompt = () => {
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [isDenied,setIsDenied] = useState(false);
     useEffect(()=>{
+        console.log('isDenied: ', JSON.parse(localStorage.getItem('a2hsDenied')))
         setIsDenied(JSON.parse(localStorage.getItem('a2hsDenied')));
-    })
+    },[])
 
-    console.log(isDenied)
+
     const handleClick = async () => {
         setIsShown(false);
         if (!deferredPrompt) {
@@ -23,7 +24,19 @@ const InstallPrompt = () => {
         setDeferredPrompt(null); 
     };
     const handleCancelClicked = () => {
-        localStorage.setItem('a2hsDenied', 'true');
+        const obj = {    value : 'true',    expire : Date.now() + (1000 * 3600 * 24 * 7)  }   
+        const objString = JSON.stringify(obj);
+
+        localStorage.setItem('a2hsDenied', objString);
+        setIsDenied(true);
+        setDeferredPrompt(null);
+    }
+    const iosCancelClicked = () =>{
+        const obj = {    value : 'true' }   
+        const objString = JSON.stringify(obj);
+
+        localStorage.setItem('a2hsDenied', objString);
+        setIsDenied(true);
         setDeferredPrompt(null);
     }
     useEffect(() => {
@@ -50,10 +63,10 @@ const InstallPrompt = () => {
     if (!isIOS && !isShown) {
         return null;
     }
-
+    console.log(isDenied)
     return (
         /* 설치 프롬프트 컴포넌트 */
-        isDenied ? null : isIOS  ? <IosPrompt /> : <AndroidPrompt handleClick={handleClick} handleCancelClicked={handleCancelClicked}/>
+        isDenied  ? null : isIOS  ? <IosPrompt iosCancelClicked={iosCancelClicked}/> : <AndroidPrompt handleClick={handleClick} handleCancelClicked={handleCancelClicked}/>
 
     );
 };

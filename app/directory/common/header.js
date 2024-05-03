@@ -80,7 +80,7 @@ export default function Header({ session, notificationCount, money }) {
                         <div>
                             {session.role === 'teacher' ?
                                 <ul className="flex max-[600px]:hidden">
-                                    <Link href="./qrcode"><li className="mr-[5vw] dark:text-white">학생 관리</li></Link>
+                                    <Link href="./manage"><li className="mr-[5vw] dark:text-white">학생 관리</li></Link>
                                     <Link href="./market"><li className="mr-[5vw] dark:text-white">아이템 관리</li></Link>
                                     {/* <Link href="./log"><li className="mr-[5vw]">기록 보기</li></Link> */}
                                     <Link href="./qrcode"><li className="dark:text-white">학생 초대</li></Link>

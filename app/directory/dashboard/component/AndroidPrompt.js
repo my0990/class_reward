@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+
 
 export default function AndroidPrompt({handleClick, handleCancelClicked}) {
     return (
