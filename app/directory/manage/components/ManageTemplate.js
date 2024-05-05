@@ -2,7 +2,13 @@
 import character from "@/public/character.jpeg"
 import Image from "next/image"
 import ResetModal from "./ResetModal"
-export default function ManageTemplate({ data }) {
+import { useState } from "react"
+export default function ManageTemplate({ data, teacher }) {
+    const [picked,setPicked] = useState(null);
+    const onClick = (a) => {
+        document.getElementById('my_modal_2').showModal();
+        setPicked(a)
+    }
     return (
         <div>
             <div className="overflow-x-auto flex justify-center">
@@ -40,7 +46,7 @@ export default function ManageTemplate({ data }) {
                                         {a.userId}
                                     </td>
                                     <th className="p-[8px]">
-                                        <button onClick={() => document.getElementById('my_modal_2').showModal()} className="btn bg-red-500 border-0 text-white text-[0.8rem]">비밀번호<br />초기화</button>
+                                        <button onClick={(e) => onClick(a)} className="btn bg-red-500 border-0 text-white text-[0.8rem]">비밀번호<br />초기화</button>
                                     </th>
                                 </tr>
                             )
@@ -53,7 +59,7 @@ export default function ManageTemplate({ data }) {
                 </table>
             </div>
 
-            <ResetModal />
+            <ResetModal picked={picked} teacher={teacher}/>
         </div>
     )
 }

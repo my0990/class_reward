@@ -13,7 +13,10 @@ export default function Modal({ modalData }) {
         }
     }
     const onBackspace = () => {
-        setPoint(prev => prev.slice(0,-1))
+        if(point){
+            setPoint(prev => prev.slice(0,-1))
+        }
+
     }
     const onSubmit = (e) => {
         e.preventDefault();
