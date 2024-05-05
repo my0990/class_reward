@@ -10,8 +10,9 @@ import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
 import { useRef, useEffect} from "react";
 import { useRouter, usePathname } from "next/navigation";
+import path from "path";
 
-export default function Header({ session, notificationCount, money }) {
+export default function Header({ session, notificationCount, money, params}) {
     const router = useRouter();
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {
@@ -25,6 +26,8 @@ export default function Header({ session, notificationCount, money }) {
 
     const profileiconRef = useRef();
     const pathname = usePathname();
+    console.log("%%%%%%%%%%%%")
+    console.log(pathname)
     useEffect(()=> { isHamburgerClicked ? setIsHamburgerClicked(false): null}, [pathname])
     return (
         // <div className="navbar bg-base-100 min-[1300px]:w-[1290px] min-[800px]:w-[780px]  mx-auto">
@@ -80,14 +83,14 @@ export default function Header({ session, notificationCount, money }) {
                         <div>
                             {session.role === 'teacher' ?
                                 <ul className="flex max-[600px]:hidden">
-                                    <Link href="./manage"><li className="mr-[5vw] dark:text-white">학생 관리</li></Link>
-                                    <Link href="./market"><li className="mr-[5vw] dark:text-white">아이템 관리</li></Link>
+                                    <Link href="./manage"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
+                                    <Link href="./market"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
                                     {/* <Link href="./log"><li className="mr-[5vw]">기록 보기</li></Link> */}
-                                    <Link href="./qrcode"><li className="dark:text-white">학생 초대</li></Link>
+                                    <Link href="./qrcode"><li className={`dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>학생 초대</li></Link>
                                 </ul> :
                                 <ul className="flex max-[600px]:hidden">
                                     {/* <Link href="./qrcode"><li className="mr-[5vw]">기록보기</li></Link> */}
-                                    <Link href="./browse"><li className="dark:text-white">둘러보기</li></Link>
+                                    <Link href="./browse"><li className={`dark:text-white ${pathname === "/directory/browse" ? "border-b-8 border-orange-400" : null}`}>둘러보기</li></Link>
                                 </ul>
                             }
 

@@ -2,13 +2,13 @@ import { signOut } from "next-auth/react"
 import Link from "next/link"
 import gold from "@/public/gold.png";
 import Image from "next/image";
-import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 export default function DropDown({ session, money }) {
-    
+    const pathname = usePathname();
     return (
         <div className="border-b-2 min-[601px]:hidden dark:text-white">
             <ul>
-                <li className="mt-[1rem]"> 
+                <li className="mt-[1rem]">
                     <div className="flex items-center justify-space ">
                         <div className="py-[0.5rem] px-[8px] text-[1.2rem] ml-[8px]">
                             {session.userName}님, 환영합니다
@@ -16,7 +16,7 @@ export default function DropDown({ session, money }) {
 
                         <button className="rounded-[20px]  py-[4px] px-[8px] text-gray-700 border-gray-300 flex  bg-orange-200 border-0" onClick={() => signOut()}>로그아웃
                             <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" className="ml-[4px] text-gray-500">
-                                <path  d="M17 16L21 12M21 12L17 8M21 12L7 12M13 16V17C13 18.6569 11.6569 20 10 20H6C4.34315 20 3 18.6569 3 17V7C3 5.34315 4.34315 4 6 4H10C11.6569 4 13 5.34315 13 7V8" stroke="#374151" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                                <path d="M17 16L21 12M21 12L17 8M21 12L7 12M13 16V17C13 18.6569 11.6569 20 10 20H6C4.34315 20 3 18.6569 3 17V7C3 5.34315 4.34315 4 6 4H10C11.6569 4 13 5.34315 13 7V8" stroke="#374151" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                             </svg>
                         </button>
                     </div>
@@ -31,14 +31,14 @@ export default function DropDown({ session, money }) {
                 <Link href="./"><li className="py-[0.5rem] px-[16px] pb-[1rem] text-[1.2rem] border-b-2">프로필 수정하기</li></Link>
                 {session.role === 'teacher' ?
                     <>
-                        <Link href="./manage"><li className="py-[0.5rem] px-[16px] mt-[1rem] text-[1.2rem]">학생 관리</li></Link>
-                        <Link href="./market"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">아이템 관리</li></Link>
+                        <Link href="./manage"><li className={`py-[0.5rem] px-[16px] mt-[1rem] text-[1.2rem] ${pathname === "/directory/manage" ? "text-orange-400" : null}`}>학생 관리</li></Link>
+                        <Link href="./market"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/market" ? "text-orange-400" : null}`}>아이템 관리</li></Link>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">기록 보기</li></Link> */}
-                        <Link href="./qrcode"><li className="py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem]">학생 초대</li></Link>
+                        <Link href="./qrcode"><li className={`py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem] ${pathname === "/directory/qrcode" ? "text-orange-400" : null}`}>학생 초대</li></Link>
                     </> :
                     <>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[8px] ml-[8px] text-[1.2rem]">기록보기</li></Link> */}
-                        <Link href="./browse"><li className="py-[1.5rem] px-[8px] ml-[8px] text-[1.2rem]">둘러보기</li></Link>
+                        <Link href="./browse"><li className={`py-[1.5rem] px-[8px] ml-[8px] text-[1.2rem] ${pathname === "/directory/browse" ? "text-orange-400" : null}`}>둘러보기</li></Link>
                     </>
                 }
 
