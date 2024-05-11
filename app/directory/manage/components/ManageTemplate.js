@@ -26,7 +26,7 @@ export default function ManageTemplate({ data, teacher }) {
                         {/* row 1 */}
                         {data.map((a, i) => {
                             return (
-                                <tr>
+                                <tr key={i}>
                                     <td className="p-[8px]">
                                         <div className="avatar">
                                             <div className="mask mask-squircle w-12 h-12">
