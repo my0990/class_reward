@@ -37,7 +37,7 @@ export default async function handler(req, res) {
         teacher: teacher,
         itemList: [],
         lv: 0,
-        nickname: nickname
+        profileNickname: nickname
         
       })
       res.status(201).json({result: true, message: 'User created'})

@@ -31,43 +31,24 @@ export default function AuthPage(){
 
     let installPrompt = null;
   
-    useEffect(() => {
-      console.log('Listening for Install prompt');
-      window.addEventListener('beforeinstallprompt', (e) => {
-        // For older browsers
-        e.preventDefault();
-        console.log('Install Prompt fired');
-        installPrompt = e;
-        // See if the app is already installed, in that case, do nothing
-        if (
-          (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-          window.navigator.standalone === true
-        ) {
-          return false;
-        }
-      });
-      console.log(installPrompt)
-    }, []);
+    // useEffect(() => {
+    //   console.log('Listening for Install prompt');
+    //   window.addEventListener('beforeinstallprompt', (e) => {
+    //     // For older browsers
+    //     e.preventDefault();
+    //     console.log('Install Prompt fired');
+    //     installPrompt = e;
+    //     // See if the app is already installed, in that case, do nothing
+    //     if (
+    //       (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    //       window.navigator.standalone === true
+    //     ) {
+    //       return false;
+    //     }
+    //   });
+    //   console.log(installPrompt)
+    // }, []);
 
-    const installApp = async () => {
-        if (!installPrompt) {
-          alert('이미 다운로드 했습니다')
-          return false;
-        }
-    
-        installPrompt.prompt();
-    
-        let outcome = await installPrompt.userChoice;
-    
-        if (outcome.outcome == 'accepted') {
-          console.log('App Installed');
-    
-        } else {
-          console.log('App not installed');
-        }
-        // Remove the event reference
-        installPrompt = null;
-      };
     return(
         <form type="POST" onSubmit={submitHandler}>
         <div className="w-full h-screen flex flex-col items-center justify-center">
@@ -84,7 +65,6 @@ export default function AuthPage(){
                 </div>
                 <AuthBtn className="text-blue-100" type="button" onClick={()=> route.push("./signup")}>회원가입</AuthBtn>
             </div>
-            <div onClick={installApp}>before install prompt test</div>
         </div>
         </form>
 

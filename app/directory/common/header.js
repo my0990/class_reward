@@ -26,9 +26,9 @@ export default function Header({ session, notificationCount, money, params}) {
 
     const profileiconRef = useRef();
     const pathname = usePathname();
-    console.log("%%%%%%%%%%%%")
-    console.log(pathname)
+
     useEffect(()=> { isHamburgerClicked ? setIsHamburgerClicked(false): null}, [pathname])
+    useEffect(()=> { isUserinfoClicked ? setIsUserinfoClicked(false): null}, [pathname])
     return (
         // <div className="navbar bg-base-100 min-[1300px]:w-[1290px] min-[800px]:w-[780px]  mx-auto">
         //     <div className="navbar-start">

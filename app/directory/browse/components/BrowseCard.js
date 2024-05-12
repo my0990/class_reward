@@ -13,7 +13,7 @@ export default function BrowseCard({data}) {
                 <div className="flex flex-col items-center justify-center w-[150px]">
                     <div className="flex  w-[100%]">
                         <div className="dark:text-black">{data.userName}</div>
-                        <div className="opacity-50 dark:text-gray-600">({data.nickname})</div>
+                        <div className="opacity-50 dark:text-gray-600">({data.profileNickname})</div>
                     </div>
                     <div className="flex w-[100%] ">
                         <div className="w-[24px] h-[24px] mr-[8px]"><Image src={gold} alt="gold"/></div>
