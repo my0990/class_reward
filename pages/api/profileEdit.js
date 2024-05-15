@@ -10,14 +10,7 @@ export default async function handler(req, res) {
     let {userId,role,teacher} = session.user;
     const {nickname, state} = req.body;
     // MongoDB 연결
-    console.log(userId,role,teacher)
-    console.log(req.body)
-    console.log(req.body)
-    console.log(req.body)
-    console.log(req.body)
-    console.log(req.body)
-    console.log(req.body)
-    console.log(req.body)
+
     const db = (await connectDB).db('data');
 
     const response = await db.collection(role).updateOne({userId: userId},{$set : {profileNickname: nickname, profileState: state}},{upsert:true})

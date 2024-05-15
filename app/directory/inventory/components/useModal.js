@@ -24,7 +24,7 @@ export default function UseModal({item, userId, teacher, userName}) {
             }
         })}
     return (
-        <dialog id="my_modal_3" className="modal sm:modal-bottom modal-middle">
+        <dialog id="my_modal_3" className="modal  modal-middle">
             <div className="modal-box">
                 <div className=" flex  p-0 justify-center">
                     <div className="overflow-x-auto w-[512px]">
