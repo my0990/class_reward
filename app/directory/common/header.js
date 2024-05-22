@@ -77,20 +77,21 @@ export default function Header({ session, notificationCount, money, params}) {
                 <div className="p-[24px] max-[600px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
                     <div className="flex items-center">
                         <div className="min-[601px]:mr-[5vw]">
-                            <Link href="./dashboard" replace><div className="w-[48px] h-[48px] rounded-lg bg-orange-500 align-middle"></div></Link>
+                            <Link href="/directory/dashboard" replace><div className="w-[48px] h-[48px] rounded-lg bg-orange-500 align-middle"></div></Link>
                             {/* <div className="w-[48px] h-[48px] rounded-lg bg-orange-500 align-middle" onClick={()=> router.replace("./dashboard")}></div> */}
                         </div>
                         <div>
                             {session.role === 'teacher' ?
                                 <ul className="flex max-[600px]:hidden">
-                                    <Link href="./manage"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
-                                    <Link href="./market"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
+                                    <Link href="/directory/manage"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
+                                    <Link href="/directory/market"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
                                     {/* <Link href="./log"><li className="mr-[5vw]">기록 보기</li></Link> */}
-                                    <Link href="./qrcode"><li className={`dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>학생 초대</li></Link>
+                                    <Link href="/directory/qrcode"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>학생 초대</li></Link>
+                                    <Link href="/directory/quest"><li className={`dark:text-white ${pathname === "/directory/quest" ? "border-b-8 border-orange-400" : null}`}>퀘스트 관리</li></Link>
                                 </ul> :
                                 <ul className="flex max-[600px]:hidden">
                                     {/* <Link href="./qrcode"><li className="mr-[5vw]">기록보기</li></Link> */}
-                                    <Link href="./browse"><li className={`dark:text-white ${pathname === "/directory/browse" ? "border-b-8 border-orange-400" : null}`}>둘러보기</li></Link>
+                                    <Link href="/directory/browse"><li className={`dark:text-white ${pathname === "/directory/browse" ? "border-b-8 border-orange-400" : null}`}>둘러보기</li></Link>
                                 </ul>
                             }
 
@@ -100,7 +101,7 @@ export default function Header({ session, notificationCount, money, params}) {
                     <div className="flex">
                     {session.role === "teacher" && notificationCount > 0 &&
                             <div className="mr-[8px] min-[600px]:mr-[16px]">
-                                <Link href="./notification"><Notification /></Link>
+                                <Link href="/directory/notification"><Notification /></Link>
                             </div>
 
                         }

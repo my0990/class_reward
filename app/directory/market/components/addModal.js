@@ -10,7 +10,7 @@ export default function AddModal({ itemList, setItemList }) {
     const [isError, setIsError] = useState(false);
     const onSubmit = (e) => {
         e.preventDefault();
-        if (nameRef.current.value === "" || priceRef.current.value === "" || quantityRef.current.value === ""  || explanationRef.current.value === "" ) {
+        if (nameRef.current.value === "" || priceRef.current.value === "" || quantityRef.current.value === "" || explanationRef.current.value === "") {
             setIsError(true)
             return
         }
@@ -44,32 +44,6 @@ export default function AddModal({ itemList, setItemList }) {
     }
     return (
         <dialog id="my_modal_2" className="modal  modal-middle ">
-            {/* <div className="modal-box px-0">
-                <div className=" flex justify-center p-0">
-                    <div className="overflow-x-auto w-[1024px]">
-                        <form onSubmit={onSubmit}>
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th className="">아이템 <br />이름</th>
-                                        <th className="">가격</th>
-                                        <th className="">수량</th>
-
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th><input className="border-2 w-[50px]" ref={nameRef}></input></th>
-                                        <td><input className="border-2 w-[50px]" ref={priceRef}></input></td>
-                                        <td><input className="border-2 w-[50px]" ref={quantityRef}></input></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <button className="btn bg-orange-300 w-full">추가</button>
-                        </form>
-                    </div>
-                </div>
-            </div> */}
 
             <div className="modal-box  p-[16px] min-[600px]:p-[32px] dark:bg-orange-200">
                 <div className="text-right absolute top-5 right-5 text-[1.2rem] cursor-pointer leading-none max-[600px]:top-3 min-[600px]:right-3 hover:bg-gray-300 hover:rounded-full w-[34px] h-[34px] flex justify-center items-center" onClick={onCloseModal}>x</div>
