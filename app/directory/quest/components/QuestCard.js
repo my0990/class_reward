@@ -1,8 +1,8 @@
+'use client'
 import Link from "next/link";
-
-
 export default function QuestCard(props) {
-    const date = props.data.time;
+    const date = new Date(props.data.time);
+    
 
     return (
         <div className="p-[16px] border-4 border-orange-500 rounded-xl mt-[24px] w-[100%]">
@@ -12,13 +12,13 @@ export default function QuestCard(props) {
             <div className="flex justify-end ">
                 <div className="flex items-center">
                     <div className="flex mr-[16px] text-orange-500">
-                        <svg class="feather feather-user" fill="none" height="24" stroke="orange" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                        <svg className="feather feather-user" fill="none" height="24" stroke="orange" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
-                        <span>{props.data.doneCount}/{props.studentNumber}</span>
+                        <span>{Object.values(props.data.done).filter(value => value === true).length}/{Object.keys(props.data.done).length}</span>
                     </div>
-                    <Link href={`./questDetail/${props.userId}/${props.data.id}`}><button className="btn bg-orange-500 border-0 text-white">상세보기</button></Link>
+                    <Link href={`./questDetail/${props.teacherId}/${props.data._id}`} key={props.data.id}><button className="btn bg-orange-500 border-0 text-white">상세보기</button></Link>
                 </div>
             </div>
         </div>

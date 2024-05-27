@@ -83,11 +83,12 @@ export default function Header({ session, notificationCount, money, params}) {
                         <div>
                             {session.role === 'teacher' ?
                                 <ul className="flex max-[600px]:hidden">
-                                    <Link href="/directory/manage"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
-                                    <Link href="/directory/market"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
+                                    <Link href="/directory/manage" key="manage"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
+                                    <Link href="/directory/market" key="market"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
                                     {/* <Link href="./log"><li className="mr-[5vw]">기록 보기</li></Link> */}
                                     <Link href="/directory/qrcode"><li className={`mr-[5vw] dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>학생 초대</li></Link>
-                                    <Link href="/directory/quest"><li className={`dark:text-white ${pathname === "/directory/quest" ? "border-b-8 border-orange-400" : null}`}>퀘스트 관리</li></Link>
+                                    <Link href="/directory/quest" key="quest"><li className={`dark:text-white ${pathname === "/directory/quest" ? "border-b-8 border-orange-400" : null}`}>퀘스트 관리</li></Link>
+                                    {/* <li className={`cursor-pointer dark:text-white ${pathname === "/directory/quest" ? "border-b-8 border-orange-400" : null}`} onClick={()=>router.replace("/directory/quest")}>퀘스트 관리</li> */}
                                 </ul> :
                                 <ul className="flex max-[600px]:hidden">
                                     {/* <Link href="./qrcode"><li className="mr-[5vw]">기록보기</li></Link> */}
