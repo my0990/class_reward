@@ -22,6 +22,7 @@ export const useValidateForm = ({
         ...form,
         [name]: value
       });
+      console.log(form)
     };
   
     const blurHandler = (e) => {
@@ -37,6 +38,7 @@ export const useValidateForm = ({
         e.preventDefault();
         const errors = validate(form);
         setErrors(errors);
+        console.log(errors);
         if (Object.values(errors).some(v => v)) return;
         switch (type) {
           case 'logIn': // 로그인 로직, 로그인 시에도 이 hook 을 사용한다.
@@ -55,6 +57,11 @@ export const useValidateForm = ({
             }
             break;
           case 'register': // 회원가입 로직
+            console.log('form')
+            console.log('form')
+            console.log('form')
+            console.log('form')
+            console.log('form')
             console.log(form)
             const registerResponse = await CreateUser(
               form.name,
@@ -62,7 +69,8 @@ export const useValidateForm = ({
               form.pwd,
               form.admin,
               form.teacher,
-              form.nickname
+              form.nickname,
+              form.gender
             );
   
             if (registerResponse) {

@@ -10,18 +10,24 @@ export default async function RootLayout({children}){
     const db = (await connectDB).db('data');
     let notificationCount = 0
     let money = 0
+    let gender = ""
     if (role === "teacher") {
-        const response = await db.collection('teacher').findOne({ user: session.user.id })
+        const response = await db.collection('teacher').findOne({ userId: session.user.userId })
         notificationCount = response.notificationCount;
     } else {
-        const response = await db.collection('student').findOne({user: session.user.Id})
+        const response = await db.collection('student').findOne({userId: session.user.userId})
         money = response.money
+        gender = response.gender
+        console.log(response)
+        console.log(session)
     }
-
+    console.log(gender)
+    console.log(gender)
+    console.log(gender)
     
     return(
         <div className="dark:text-black">
-            <Header session={session.user} notificationCount={notificationCount} money={money}/>
+            <Header session={session.user} notificationCount={notificationCount} money={money} gender={gender}/>
             {children}
             <SpeedInsights />
         </div>

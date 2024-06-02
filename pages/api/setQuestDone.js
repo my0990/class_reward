@@ -12,12 +12,15 @@ export default async function handler(req, res) {
     // MongoDB 연결
     console.log(req.body);
     const db = (await connectDB).db('data');
-    const questId =  ObjectId.createFromHexString(req.body.id);
+    console.log('**************')
+    console.log('**************')
+    console.log('**************')
+    console.log('**************')
+    console.log('**************')
+    console.log('**************')
+    console.log(req.body._id)
+    const questId =  ObjectId.createFromHexString(req.body._id);
     const response2 = await db.collection('quest').findOne({'_id': questId})
-    console.log('------')
-    console.log(response2)
-    console.log(response2)
-    console.log(response2)
     const checkedStudent = "done." + req.body.name;
     // const response = await db.collection('quest').updateOne({_id: req.body.id},{$bit: {"done.이명권":{xor: 1}}})
     const response = await db.collection('quest').updateOne({_id: questId},[{$set:{[checkedStudent]:{$eq: [false,`$${checkedStudent}`]}}}])

@@ -26,12 +26,8 @@ export default async function handler(req, res) {
     studentList.forEach(key => {
       tmp[key.userName] = false
     });
-    const response = await db.collection('quest').insertOne({ userId: userId, questName: name, questContent: content, questReward: reward, done: tmp, time: new Date(), doneCount: 0, id: questId }, { upsert: true })
+    const response = await db.collection('quest').insertOne({ userId: userId, questName: name, questContent: content, questReward: reward, done: tmp, time: new Date(), doneCount: 0, id: questId, finished: false }, { upsert: true })
 
-    console.log('------')
-    console.log('------')
-    console.log('------')
-    console.log(studentList)
 
 
     res.status(201).json({ result: true, message: 'quest 추가 성공' });

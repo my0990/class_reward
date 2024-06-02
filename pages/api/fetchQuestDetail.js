@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     // MongoDB 연결
 
     const db = (await connectDB).db('data');
-    console.log(req.body)
     const { id, code } = req.body;
 
     const questId = ObjectId.createFromHexString(code);

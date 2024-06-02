@@ -17,11 +17,12 @@ export default function BrowseCard({data}) {
                     </div>
                     <div className="flex w-[100%] ">
                         <div className="w-[24px] h-[24px] mr-[8px]"><Image src={gold} alt="gold"/></div>
-                        <div>{data.money}원</div>
+                        <div>{data.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>
                     </div>
                 </div>
             </div>
-            <div className="px-[24px] pb-[8px] text-[1.2rem] font-bold">보유아이템</div>
+            <div className="mx-[24px] flex">"{data.profileState}"</div>
+            <div className="px-[24px] pt-[12px] pb-[8px] text-[1.2rem] font-bold">보유아이템</div>
             <div className="flex px-[24px] pb-[24px] flex-wrap">
                 {data.itemList.map((a,i)=>{
                     console.log(a.state)

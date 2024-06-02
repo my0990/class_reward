@@ -6,7 +6,7 @@ const uri = process.env.MONGODB_URI;
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { id, password, name, admin, teacher, nickname } = req.body;
+    const { id, password, name, admin, teacher, nickname, gender } = req.body;
     // MongoDB 연결
     const client = await MongoClient.connect(uri);
     const db = client.db('user');
@@ -27,6 +27,7 @@ export default async function handler(req, res) {
         teacher,
         role: 'student',
         userName:name,
+        gender: gender
 
       });
       const db2 = (await connectDB).db('data')
@@ -37,7 +38,8 @@ export default async function handler(req, res) {
         teacher: teacher,
         itemList: [],
         lv: 0,
-        profileNickname: nickname
+        profileNickname: nickname,
+        gender: gender
         
       })
       res.status(201).json({result: true, message: 'User created'})

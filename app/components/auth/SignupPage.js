@@ -1,7 +1,7 @@
 'use client'
 import AuthInput from "./components/authInput"
 import AuthBtn from "./components/authBtn"
-import { useState } from "react"
+import Link from "next/link"
 import { useValidateForm } from "@/app/lib/useValidateForm"
 export default function SignUpPage(){
     const onChange = (e) => {
@@ -43,12 +43,13 @@ export default function SignUpPage(){
                     <AuthInput placeholder="아이디를 입력해주세요" name="id" onChange={onChange}/>
                     <AuthInput placeholder="비밀번호를 입력해주세요" type="password" name="pwd" onChange={onChange}/>
                     <AuthInput placeholder="비밀번호를 한번 더 입력해주세요" type="password" name="pwdCheck" onChange={onChange}/>
+                    <div className="text-red-500 text-center mb-[16px]">{errors.name || errors.id || errors.pwd || errors.pwdCheck}</div>
                     <AuthBtn className="text-blue-100 mb-[0px]">회원가입</AuthBtn>
                     <div className="flex flex-col w-full border-opacity-50">
                         <div className="divider">OR</div>
                     </div>
-                    <div className="text-red-200">{errors.pwd}</div>
-                    <AuthBtn className="text-blue-100">로그인</AuthBtn>
+                    <Link href="../"><button className={`btn btn-block bg-orange-500 dark:hover:bg-orange-300  mb-4 text-lg  border-0 text-white`}>로그인</button></Link>
+
                 </div>
             </div>
         </form>

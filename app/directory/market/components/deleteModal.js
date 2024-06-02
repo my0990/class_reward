@@ -40,10 +40,10 @@ export default function DeleteModal({ deleteId, itemList, setItemList, buyList }
                 </div> */}
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
 
-                <div className="flex items-center">
-                    <h1 className="text-[1.5rem] font-bold mb-[8px]">{buyList?.itemName}</h1>
+                <div className="flex items-center mb-[8px]">
+                    <h1 className="text-[1.5rem] font-bold ">{buyList?.itemName}</h1>
                     <div className="mx-[8px]">-</div>
-                    <div className="text-[1.1rem] ">{buyList?.itemPrice}원</div>
+                    <div className="text-[1.1rem] ">{buyList?.itemPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>
                 </div>
                 <div className="text-gray-500 mb-[8px]">
                     {buyList?.itemExplanation}
