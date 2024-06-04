@@ -1,13 +1,15 @@
 import Image from "next/image"
 import gold from "@/public/gold.png"
 import character from "@/public/character.jpeg"
+import female from "@/public/female.png"
+import male from "@/public/male.png"
 export default function BrowseCard({data}) {
     return (
         <div className="w-[640px] dark:text-black max-[640px]:w-[100%] max-[640px]:mx-[16px] max-[640px]:my-[8px] bg-orange-200 box-content rounded-2xl my-[16px] mx-[16px]">
             <div className="flex p-[24px]">
                 <div className="avatar mr-[24px]">
                     <div className="w-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2">
-                        <Image src={character} alt="character" />
+                        <Image src={data.gender === "male" ? male : female} alt="character" />
                     </div>
                 </div>
                 <div className="flex flex-col items-center justify-center w-[150px]">
