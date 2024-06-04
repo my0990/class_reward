@@ -27,7 +27,7 @@ export default async function Page() {
                     <Image src={response.gender === "male" ? male : female} alt="character" fill={true} priority={true} />
 
                 </div>
-                <div className="flex justify-center my-[8px] ">"{response.profileState}"</div>
+                <div className="flex justify-center my-[8px] ">&ldquo; {response.profileState}&rdquo;</div>
                 {/* <div className="flex justify-center mb-5">
                     <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold"/></div>
                     <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>
