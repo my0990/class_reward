@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     // const response = await db.collection('quest').find({userId:userId}).toArray();
     // const data = response; 
 
-    res.status(201).json({ result: true, message: 'delete 성공',data: response});
+    res.status(201).json({ result: true, message: 'delete 성공',data: response, role: session.user.role});
   }
 }
 

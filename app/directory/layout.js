@@ -21,9 +21,6 @@ export default async function RootLayout({children}){
         console.log(response)
         console.log(session)
     }
-    console.log(gender)
-    console.log(gender)
-    console.log(gender)
     
     return(
         <div className="dark:text-black">

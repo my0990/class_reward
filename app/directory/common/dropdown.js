@@ -39,8 +39,9 @@ export default function DropDown({ session, money }) {
                         <Link href="/directory/manage"><li className={`py-[0.5rem] px-[16px] mt-[1rem] text-[1.2rem] ${pathname === "/directory/manage" ? "text-orange-400" : null}`}>학생 관리</li></Link>
                         <Link href="/directory/market"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/market" ? "text-orange-400" : null}`}>아이템 관리</li></Link>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">기록 보기</li></Link> */}
-                        <Link href="/directory/qrcode"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/qrcode" ? "text-orange-400" : null}`}>학생 초대</li></Link>
-                        <Link href="/directory/quest"><li className={`py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem] ${pathname === "/directory/quest" ? "text-orange-400" : null}`}>퀘스트 관리</li></Link>
+                        <Link href="/directory/quest"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/quest" ? "text-orange-400" : null}`}>퀘스트 관리</li></Link>
+                        <Link href="/directory/qrcode"><li className={`py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem] ${pathname === "/directory/qrcode" ? "text-orange-400" : null}`}>학생 초대</li></Link>
+
                     </> :
                     <>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[8px] ml-[8px] text-[1.2rem]">기록보기</li></Link> */}

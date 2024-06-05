@@ -9,6 +9,7 @@ export default function Quest() {
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState([]);
     const [teacherId, setTeacherId] = useState(null);
+    const [role, setRole] = useState(null);
     useEffect(() => {
         const fetchData = async () => {
             const response = await fetch('/api/fetchQuestList', {
@@ -17,19 +18,18 @@ export default function Quest() {
                     "Content-Type": "application/json",
                 },
             })
-
             const result = await response.json();
-            console.log(result)
             setData(result.data);
             setTeacherId(result.teacher)
             setIsLoading(false);
+            setRole(result.role);
         };
         fetchData();
     }, []);
 
     return (
         isLoading
-            ? <div>loading</div>
+            ? <div></div>
             : <div className="flex justify-center ">
                 <div className="flex justify-center flex-col items-center bg-yellow-100 my-[32px] max-[600px]:my-0 p-[64px] max-[600px]:p-[16px] py-[40px] rounded-xl w-[600px] max-[600px]:w-[100%]">
                     <div className="w-[100%] text-[2rem] text-red-900 font-bold ">
@@ -41,10 +41,10 @@ export default function Quest() {
                                 <QuestCard key={i} data={a} teacherId={teacherId} />
                             )
                         })}
-                        <AddQuestBtn />
+                        {role==="teacher" && <AddQuestBtn />}
                     </div>
                 </div>
-                <AddQuestModal />
+                {role==="teacher" && <AddQuestModal />}
             </div>
     )
 }

@@ -39,7 +39,7 @@ export default function Home({data}) {
             <div className="grid min-[1300px]:grid-cols-10  min-[800px]:grid-cols-6  min-[550px]:grid-cols-4 min-[400px]:grid-cols-3  grid-cols-2  gap-[10px]  ">            
             {data.map((a,i)=>{
                 return(
-                    <StudentInfoCard key={i} onClick={(e)=>onClick(a)}>{a.userName}</StudentInfoCard>
+                    <StudentInfoCard key={i} onClick={(e)=>onClick(a)} data={a}>{a.userName}</StudentInfoCard>
                 )
             })}</div>
             <Modal modalData = {modalData}/>

@@ -1,5 +1,7 @@
 'use client'
 import character from "@/public/character.jpeg"
+import male from "@/public/male.png"
+import female from "@/public/female.png"
 import Image from "next/image"
 import ResetModal from "./ResetModal"
 import { useState } from "react"
@@ -30,7 +32,7 @@ export default function ManageTemplate({ data, teacher }) {
                                     <td className="p-[8px]">
                                         <div className="avatar">
                                             <div className="mask mask-squircle w-12 h-12">
-                                                <Image src={character} alt="character" width={180} height={160} priority={true} />
+                                                <Image src={a.gender ==="male" ? male : female} alt="character" width={180} height={160} priority={true} />
                                             </div>
                                         </div>
                                     </td>
