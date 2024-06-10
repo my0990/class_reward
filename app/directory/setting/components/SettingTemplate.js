@@ -2,7 +2,8 @@
 import Password from "./Password";
 import Profile from "./Profile"
 import { useState } from "react"
-export default function SettingTemplate({profileNickname, profileState}) {
+
+export default function SettingTemplate({profileNickname, profileState, gender}) {
     const [isProfile, setIsProfile] = useState(true);
     return (
         <div className="flex ">
@@ -13,7 +14,7 @@ export default function SettingTemplate({profileNickname, profileState}) {
                     <h2 onClick={()=>setIsProfile(false)} className={`cursor-pointer text-[1.1rem] mt-[16px] max-[600px]:mb-[40px] `}><span className={`${!isProfile ? "border-b-4 border-orange-500" : null}`}>Account</span></h2>
                 </div>
                 <div className="max-[600px]:w-[100%] flex justify-center">
-                    {isProfile ? <Profile profileNickname={profileNickname} profileState={profileState}/> : <Password />}
+                    {isProfile ? <Profile profileNickname={profileNickname} profileState={profileState} gender={gender}/> : <Password />}
 
                 </div>
             </div>

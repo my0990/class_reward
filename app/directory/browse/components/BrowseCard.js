@@ -23,7 +23,7 @@ export default function BrowseCard({data}) {
                     </div>
                 </div>
             </div>
-            <div className="mx-[24px] flex">&ldquo; {data.profileState}&rdquo;</div>
+            <div className="mx-[24px] flex">&ldquo; {data.profileState ? data.profileState : "...."}&rdquo;</div>
             <div className="px-[24px] pt-[12px] pb-[8px] text-[1.2rem] font-bold">보유아이템</div>
             <div className="flex px-[24px] pb-[24px] flex-wrap">
                 {data.itemList.map((a,i)=>{

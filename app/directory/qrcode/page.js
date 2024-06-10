@@ -17,17 +17,19 @@ export default async function Qrcode() {
     return (
         <div className="w-lg flex flex-col justify-center items-center mt-5">
             {response?.code ?
-                <>
-                    {/* <div className="flex justify-center items-center flex-col w-[400px] h-[400px] bg-gray-300 rounded-full bg-orange-200 mt-[80px]">
-                        <div className="bg-white w-[272px] h-[272px] rounded-3xl flex justify-center items-center">
-                            <QRCode value={`localhost:3000/qrcode/${id}/${response.code}`} style={{ height: "auto", maxWidth: "100%", width: "65%" }} />
-                        </div>
-                    </div> */}
-                    <Qr id={userId} code={response.code}/>
-                    <div className="mt-[56px] text-[2rem] dark:text-white">학생 회원가입 페이지로 이동합니다</div>
-                </>
+                <div className="flex flex-wrap justify-evenly w-full">
+                    <div className="flex flex-col items-center">
+                        <Qr id={userId} code={response.code} isLogin={false} />
+                        <div className="mt-[56px] text-[2rem] dark:text-white">학생 회원가입 페이지로 이동합니다</div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <Qr id={userId} code={response.code} isLogin={true} />
+                        <div className="mt-[56px] text-[2rem] dark:text-white">로그인 페이지로 이동합니다</div>
+                    </div>
+                </div>
                 :
                 <CreateQr />
+
             }
         </div>
     )

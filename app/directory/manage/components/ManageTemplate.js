@@ -5,10 +5,15 @@ import female from "@/public/female.png"
 import Image from "next/image"
 import ResetModal from "./ResetModal"
 import { useState } from "react"
+import DeleteModal from "./DeleteModal"
 export default function ManageTemplate({ data, teacher }) {
-    const [picked,setPicked] = useState(null);
-    const onClick = (a) => {
+    const [picked, setPicked] = useState(null);
+    const onResetClick = (a) => {
         document.getElementById('my_modal_2').showModal();
+        setPicked(a)
+    }
+    const onDeleteClick = (a) => {
+        document.getElementById('my_modal_3').showModal();
         setPicked(a)
     }
     return (
@@ -18,7 +23,7 @@ export default function ManageTemplate({ data, teacher }) {
                     <thead>
 
                         <tr className="text-center">
-                            <th></th>
+                            <th className="max-[400px]:hidden"></th>
                             <th className="p-[8px]">이름</th>
                             <th className="p-[8px]">아이디</th>
                             <th className="p-[8px]"></th>
@@ -29,10 +34,10 @@ export default function ManageTemplate({ data, teacher }) {
                         {data.map((a, i) => {
                             return (
                                 <tr key={i}>
-                                    <td className="p-[8px]">
+                                    <td className="p-[8px] max-[400px]:hidden">
                                         <div className="avatar">
                                             <div className="mask mask-squircle w-12 h-12">
-                                                <Image src={a.gender ==="male" ? male : female} alt="character" width={180} height={160} priority={true} />
+                                                <Image src={a.gender === "male" ? male : female} alt="character" width={180} height={160} priority={true} />
                                             </div>
                                         </div>
                                     </td>
@@ -47,9 +52,11 @@ export default function ManageTemplate({ data, teacher }) {
                                     <td className="p-[8px]">
                                         {a.userId}
                                     </td>
-                                    <th className="p-[8px]">
-                                        <button onClick={(e) => onClick(a)} className="btn bg-red-500 border-0 text-white text-[0.8rem]">비밀번호<br />초기화</button>
+                                    <th className="p-[8px] flex">
+                                        <button onClick={(e) => onResetClick(a)} className="btn bg-green-500 border-0 text-white text-[0.8rem] mr-[8px]">비밀번호<br />초기화</button>
+                                        <button onClick={(e) => onDeleteClick(a)} className="btn bg-red-500 border-0 text-white text-[0.8rem]">계정<br/>삭제</button>
                                     </th>
+
                                 </tr>
                             )
                         })}
@@ -60,8 +67,8 @@ export default function ManageTemplate({ data, teacher }) {
 
                 </table>
             </div>
-
-            <ResetModal picked={picked} teacher={teacher}/>
+            <DeleteModal picked={picked} teacher={teacher}/>
+            <ResetModal picked={picked} teacher={teacher} />
         </div>
     )
 }

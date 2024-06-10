@@ -27,11 +27,11 @@ export default async function Page() {
                     <Image src={response.gender === "male" ? male : female} alt="character" fill={true} priority={true} />
 
                 </div>
-                <div className="flex justify-center my-[8px] ">&ldquo;{response.profileState}&rdquo;</div>
-                {/* <div className="flex justify-center mb-5">
-                    <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold"/></div>
-                    <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>
-                </div> */}
+                <div className="flex justify-center my-[8px]">
+                    <div className="chat-bubble w-[264px] m-[0px]">&ldquo;{response.profileState ? response.profileState : "...."}&rdquo;</div>
+                </div>
+                {/* <div className="flex justify-center my-[8px] ">&ldquo;{response.profileState ? response.profileState : "...."}&rdquo;</div> */}
+
                 <div>
                     <Link href="./inventory"><button className="btn w-full bg-blue-700 text-white dark:hover:bg-orange-300 border-0">보유 아이템 보러가기</button></Link>
                 </div>

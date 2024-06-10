@@ -7,7 +7,7 @@ export default async function StudentManage() {
     //     { userName: '이명권', userId: 'mu0990' },
     //     { userName: '이재철', userId: 't0990' }
     // ]
-    const db = (await connectDB).db('user')
+    const db = (await connectDB).db('data')
 
     const session = await getServerSession(authOptions); //{user: {name: '아이묭', id: 'my0990}}
     let {userId, role, teacher} = session.user;
@@ -18,7 +18,7 @@ export default async function StudentManage() {
             </div>
         )
     }
-    const response = await db.collection('users').find({teacher:userId}).toArray();
+    const response = await db.collection('student').find({teacher:userId}).sort({userName: 1}).toArray();
     return (
         <div>
             <ManageTemplate data={response} teacher={userId}/>

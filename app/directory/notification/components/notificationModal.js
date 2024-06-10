@@ -24,16 +24,21 @@ export default function NotificationModal({item, userId}) {
             }
         })}
     return (
-        <dialog id="my_modal_3" className="modal sm:modal-bottom modal-middle">
+        <dialog id="my_modal_3" className="modal  modal-middle">
             <div className="modal-box">
                 <div className=" flex  p-0 justify-center">
                     <div className="overflow-x-auto w-[512px]">
-                        <div className="flex justify-between pb-5">
+                        <div className="flex justify-between pb-5 flex-col">
                             <div className="text-[1.5rem] ">{item?.itemName}</div>
-                            <div className="text-red-400  text-[1.5rem]">{item?.itemPrice}원</div>
+
+                        </div>
+                        <div className="flex   text-[1.5rem] mb-5">
+                            <div>사용자</div>
+                            <div className="mr-[8px]">:</div>
+                            <div className=" text-[1.5rem]">{item?.userName}</div>
                         </div>
                         <form onSubmit={onSubmit}>
-                            <button className="btn w-full bg-orange-500">승인하기</button>
+                            <button className="btn w-full bg-orange-500 text-white">승인하기</button>
                         </form>
                     </div>
                 </div>

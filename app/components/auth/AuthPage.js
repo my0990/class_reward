@@ -15,13 +15,12 @@ export default function AuthPage(){
         
         if (!values.id) errors.id = "아이디를 입력하세요"
         if (!values.pwd) errors.pwd = "비밀번호를 입력하세요"
-        
         return errors
       }
 
     const { form, errors, isTouched, submitHandler, getFieldProps } = useValidateForm({
-    initialForm: { id: "", pwd: "",},
-    initialError: { id: "", pwd: "", },
+    initialForm: { id: "", pwd: ""},
+    initialError: { id: "", pwd: "" },
     initialIsTouched: { id: false, pwd: false,  },
     validate,
     type: 'logIn'
@@ -58,7 +57,9 @@ export default function AuthPage(){
                 </div>
                 <AuthInput placeholder="아이디를 입력해주세요" name="id" onChange={onChange} />
                 <AuthInput placeholder="비밀번호를 입력해주세요" name="pwd" type="password"  onChange={onChange}/>
+
                 <div className="text-red-500 text-center mb-3">{errors[Object.keys(errors).find((element)=> errors[element] !== '')]}</div>
+                <div className="text-red-500 text-center mb-3">{errors.id || errors.pwd}</div>
                 <AuthBtn className="text-blue-100 mb-[0px]" type="submit">로그인</AuthBtn>
                 <div className="flex flex-col w-full border-opacity-50">
                     <div className="divider dark:before:bg-white dark:after:bg-white dark:text-white">OR</div>

@@ -8,15 +8,14 @@ export default async function Setting(){
     let {userId,role,teacher} = session.user;
 
     // MongoDB 연결
-    console.log(userId,role,teacher)
 
     const db = (await connectDB).db('data');
     const response = await db.collection(role).findOne({userId:userId})
-    const {profileNickname, profileState} = response;
+    const {profileNickname, profileState, gender} = response;
 
     return(
         <div>
-            <SettingTemplate profileNickname={profileNickname} profileState={profileState}/>
+            <SettingTemplate profileNickname={profileNickname} profileState={profileState} gender={gender}/>
         </div>
     )
 }

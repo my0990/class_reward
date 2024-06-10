@@ -1,7 +1,9 @@
 'use client'
-
+import male from "@/public/male.png"
+import female from "@/public/female.png"
 import { useState, useMemo } from "react";
-export default function Profile({ profileNickname, profileState }) {
+import Image from "next/image";
+export default function Profile({ profileNickname, profileState, gender }) {
 
     const [profileContent, setProfileContent] = useState({ nickname: profileNickname, state: profileState })
     const onChange = (e) => {
@@ -31,7 +33,7 @@ export default function Profile({ profileNickname, profileState }) {
                     {useMemo(() => {
                         return (
                             <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                                <Image src={gender === "male" ? male : female}/>
                             </div>
                         )
                     }, [])}

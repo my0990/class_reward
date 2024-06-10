@@ -11,14 +11,9 @@ export default async function handler(req, res) {
     const { id, password } = req.body;
 	
     // MongoDB 연결
-    console.log('test')
     const db = (await connectDB).db('user');
-    console.log('db')
-
     // 기존의 가입된 아이디 체크하기
-    const response = await db.collection('users').findOne({ id });
-    console.log('sign in API')
-    console.log(response)
+    const response = await db.collection('users').findOne({ userId: id });
     if (!response) {
         res.status(422).json({ result: false, error: '아이디나 비밀번호가 일치하지 않습니다' });
         return;
@@ -34,7 +29,7 @@ export default async function handler(req, res) {
 	
     // 성공시 response
     if(isCorrectPassword){
-        res.status(201).json({ result: true, message: '로그인 성공',name: response.name });
+        res.status(201).json({ result: true, message: '로그인 성공',name: response.name});
     }
 
 

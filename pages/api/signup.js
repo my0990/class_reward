@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 	
     // 기존의 가입된 아이디 체크하기
     const checkExisting = await db.collection('users').findOne({ userId: id });
-
+    
     if (checkExisting) {
       client.close();
       res.status(422).json({ result: false, error: '이미 가입된 계정이에요!' });
