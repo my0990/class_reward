@@ -35,7 +35,7 @@ export default function AuthPage() {
 
     return (
         <form type="POST" onSubmit={submitHandler}>
-            <div className="w-full h-screen flex flex-col items-center justify-center">
+            <div className="w-full h-screen flex flex-col items-center justify-center h-[750px] ">
                 <div className="w-10/12 min-[500px]:w-[400px] mx-5 ">
                     <div className="text-[1.8rem] min-[500px]:text-[2rem] text-center caret-orange-500">
                         <Typewriter
