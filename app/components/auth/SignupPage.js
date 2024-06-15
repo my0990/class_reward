@@ -10,7 +10,7 @@ export default function SignUpPage(){
 
     }
     const validate = (values) => {
-        const errors = { id: "", pwd: "", pwdCheck: "", name: "", hasBlank: "" }
+        const errors = { id: "", pwd: "", pwdCheck: "",  hasBlank: "" }
         
         if (!values.id) errors.id = "아이디를 입력하세요"
         // if (!regExp.email.test(values.email)) errors.email = "이메일은 aws@snaps.com 형식으로 입력해주세요"
@@ -18,7 +18,6 @@ export default function SignUpPage(){
         // if (!regExp.pwd.test(values.pwd)) errors.pwd = "비밀번호는 8자 이상 영문, 숫자, 특수문자 조합으로 입력해주세요"
         if (!values.pwdCheck) errors.pwdCheck = "비밀번호를 입력해주세요"
         if (values.pwd !== values.pwdCheck) errors.pwdCheck = "비밀번호가 일치하지 않습니다"
-        if (!values.name) errors.name = "이름을 입력하세요"
         if (!values.code) errors.code = "선생님 코드를 입력하세요"
         if (values.code !== "말잇닿을련") errors.code = "선생님 코드를 정확히 입력하세요"
         if (values.id.includes(" ")) errors.hasBlank = "아이디에 공백이 있습니다"
@@ -26,9 +25,9 @@ export default function SignUpPage(){
       }
 
     const { form, errors, isTouched, submitHandler, getFieldProps } = useValidateForm({
-    initialForm: { id: "", pwd: "", pwdCheck: "", name: "", admin: true, code: "" },
-    initialError: { id: "", pwd: "", pwdCheck: "", name: "", code: "", hasBlank: ""  },
-    initialIsTouched: { id: false, pwd: false, pwdCheck: false, name: false, code: "" },
+    initialForm: { id: "", pwd: "", pwdCheck: "",  admin: true, code: "" },
+    initialError: { id: "", pwd: "", pwdCheck: "",  code: "", hasBlank: ""  },
+    initialIsTouched: { id: false, pwd: false, pwdCheck: false,  code: "" },
     validate,
     type: 'register'
     });
@@ -43,12 +42,11 @@ export default function SignUpPage(){
                     <div className="mb-5 text-[1.2rem] text-gray-400">
                         선생님만 가입해주세요
                     </div>
-                    <AuthInput placeholder="이름을 입력해주세요" name="name" onChange={onChange}/>
                     <AuthInput placeholder="아이디를 입력해주세요" name="id" onChange={onChange}/>
                     <AuthInput placeholder="비밀번호를 입력해주세요" type="password" name="pwd" onChange={onChange}/>
                     <AuthInput placeholder="비밀번호를 한번 더 입력해주세요" type="password" name="pwdCheck" onChange={onChange}/>
                     <AuthInput placeholder="선생님 코드를 입력해주세요" name="code"  onChange={onChange}/>
-                    <div className="text-red-500 text-center mb-[16px]">{errors.name || errors.id ||errors.hasBlank ||  errors.pwd || errors.pwdCheck || errors.code }</div>
+                    <div className="text-red-500 text-center mb-[16px]">{ errors.id ||errors.hasBlank ||  errors.pwd || errors.pwdCheck || errors.code }</div>
                     <AuthBtn className="text-blue-100 mb-[0px]">회원가입</AuthBtn>
                     <div className="flex flex-col w-full border-opacity-50">
                         <div className="divider">OR</div>
