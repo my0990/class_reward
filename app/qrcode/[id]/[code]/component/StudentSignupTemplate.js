@@ -52,7 +52,7 @@ export default function StudentSignupTemplate({ id, code }) {
             <div className=" text-[2rem] mt-[16px] font-bold w-[400px] max-[400px]:w-[100%] m-auto">학생 회원가입🍊</div>
             {step == 0 
             ? <SignupId onChange={onChange} errors={errors} setStep={setStep}/>
-            : <SignupPwd onChange={onChange} errors={errors}/>}
+            : <SignupPwd onChange={onChange} errors={errors} setStep={setStep} submitHandler={submitHandler}/>}
             {/* <div className="w-full flex flex-col items-center mt-[40px]">
                 <div className="w-10/12 min-[500px]:w-[400px] mx-5 ">
                     <div className="text-[3rem] mb-5">

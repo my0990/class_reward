@@ -1,7 +1,7 @@
 import AuthInput from "@/app/components/auth/components/authInput"
 import AuthBtn from "@/app/components/auth/components/authBtn"
 import { useState, useRef } from "react"
-export default function SignupPwd({ onChange, setStep }) {
+export default function SignupPwd({ onChange, setStep, submitHandler }) {
     const pwdRef = useRef();
     const pwdCheckRef = useRef();
     const [error, setError] = useState({ pwd: '', pwdCheck: '' })
