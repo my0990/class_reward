@@ -11,6 +11,7 @@ export default function GuideTemplate() {
                     loop
                     animationData={lottieJson}
                     play
+                    
                 />
                 <div className="absolute top-0">
                 <Typewriter

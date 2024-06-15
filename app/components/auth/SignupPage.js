@@ -54,6 +54,7 @@ export default function SignUpPage(){
                         <div className="divider">OR</div>
                     </div>
                     <Link href="../"><button className={`btn btn-block bg-orange-500 dark:hover:bg-orange-300  mb-4 text-lg  border-0 text-white`}>로그인</button></Link>
+
                 </div>
             </div>
         </form>
