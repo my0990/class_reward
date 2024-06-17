@@ -11,11 +11,10 @@ import { useState } from "react";
 import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
 import { useRef, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import path from "path";
+import { usePathname } from "next/navigation";
 
-export default function Header({ session, notificationCount, money, gender }) {
-    const router = useRouter();
+
+export default function Header({ session, notificationCount, data }) {
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {
         setIsHamburgerClicked(props => !props)
@@ -25,10 +24,9 @@ export default function Header({ session, notificationCount, money, gender }) {
     const userinfoClicked = () => {
         setIsUserinfoClicked(props => !props)
     }
-    console.log('gender: ', gender)
     const profileiconRef = useRef();
     const pathname = usePathname();
-
+    const {role, money} = data;
     useEffect(() => { isHamburgerClicked ? setIsHamburgerClicked(false) : null }, [pathname])
     useEffect(() => { isUserinfoClicked ? setIsUserinfoClicked(false) : null }, [pathname])
 
@@ -72,7 +70,7 @@ export default function Header({ session, notificationCount, money, gender }) {
                         <div className="avatar cursor-pointer max-[700px]:hidden flex items-center justify-center" onClick={userinfoClicked} ref={profileiconRef}>
 
                             <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2 ">
-                                <Image src={gender === "male" ? male : gender === "female" ? female : character} alt="character" />
+                                <Image src={data?.userGender === "male" ? male : data?.userGender === "female" ? female : character} alt="character" />
                             </div>
 
                         </div>
@@ -87,7 +85,7 @@ export default function Header({ session, notificationCount, money, gender }) {
                 </div>
             </div>
             {isHamburgerClicked ? <DropDown session={session} money={money} /> : null}
-            {isUserinfoClicked ? <UserInfo session={session} money={money} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} /> : null}
+            {isUserinfoClicked ? <UserInfo session={session} role={role} userName={data?.userName} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money}/> : null}
             {/* <UserInfo ref={dropDownRef}/> */}
 
         </>

@@ -7,6 +7,7 @@ export default async function Browse() {
     const session = await getServerSession(authOptions); 
     console.log(session)
     const response = await db.collection('student').find({ teacher: session.user.teacher}).sort({userName: 1}).toArray()
+    console.log(response)
     return (
         <div className="flex justify-center mt-[8px]">
             <div className="flex  flex-wrap  w-[1344px] max-[1344px]:w-[640px]">

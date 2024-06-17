@@ -8,51 +8,59 @@ import female from "@/public/female.png"
 import male from "@/public/male.png"
 import SignupId from "./SignupId"
 import SignupPwd from "./SignupPwd"
+import SignupName from "./SignupName"
+import SignupGender from "./SignupGender"
 export default function StudentSignupTemplate({ id, code }) {
     const [step,setStep] = useState(0);
+    const [userId,setUserId] = useState('');
+    const [userName,setUserName] = useState('');
+    const [userGender,setUserGender] = useState('');
     const [gender, setGender] = useState('');
-    const onChange = (e) => {
-        const { changeHandler, value, blurHandler } = getFieldProps(e.target.name);
-        changeHandler(e);
+    // const onChange = (e) => {
+    //     const { changeHandler, value, blurHandler } = getFieldProps(e.target.name);
+    //     changeHandler(e);
 
-    }
-    const onGenderChange = (e) => {
-        onChange(e);
-        setGender(e.target.value)
+    // }
+    // const onGenderChange = (e) => {
+    //     onChange(e);
+    //     setGender(e.target.value)
 
-    }
-    const validate = (values) => {
-        const errors = { id: "", pwd: "", pwdCheck: "", name: "", teacher: "", nickname: "", admin: false, gender: "", hasBlank: "" }
+    // }
+    // const validate = (values) => {
+    //     const errors = { id: "", pwd: "", pwdCheck: "", name: "", teacher: "", nickname: "", admin: false, gender: "", hasBlank: "" }
 
-        if (!values.id) errors.id = "아이디를 입력하세요"
-        // if (!regExp.email.test(values.email)) errors.email = "이메일은 aws@snaps.com 형식으로 입력해주세요"
-        if (!values.pwd) errors.pwd = "비밀번호를 입력하세요"
-        // if (!regExp.pwd.test(values.pwd)) errors.pwd = "비밀번호는 8자 이상 영문, 숫자, 특수문자 조합으로 입력해주세요"
-        if (!values.pwdCheck) errors.pwdCheck = "비밀번호를 입력해주세요"
-        if (values.pwd !== values.pwdCheck) errors.pwdCheck = "비밀번호가 일치하지 않습니다"
-        if (!values.name) errors.name = "이름을 입력하세요"
-        if (!values.nickname) errors.nickname = "별명을 입력하세요"
-        if (!values.gender) errors.gender = "성별을 선택해주세요"
-        if (values.id.includes(" ")) errors.hasBlank = "아이디에 공백이 있습니다"
+    //     if (!values.id) errors.id = "아이디를 입력하세요"
+    //     if (!values.pwd) errors.pwd = "비밀번호를 입력하세요"
+    //     if (!values.pwdCheck) errors.pwdCheck = "비밀번호를 입력해주세요"
+    //     if (values.pwd !== values.pwdCheck) errors.pwdCheck = "비밀번호가 일치하지 않습니다"
+    //     if (!values.name) errors.name = "이름을 입력하세요"
+    //     if (!values.nickname) errors.nickname = "별명을 입력하세요"
+    //     if (!values.gender) errors.gender = "성별을 선택해주세요"
+    //     if (values.id.includes(" ")) errors.hasBlank = "아이디에 공백이 있습니다"
 
 
-        return errors
-    }
+    //     return errors
+    // }
 
-    const { form, errors, isTouched, submitHandler, getFieldProps } = useValidateForm({
-        initialForm: { id: "", pwd: "", pwdCheck: "", name: "", admin: false, nickname: "", teacher: id, gender: "" },
-        initialError: { id: "", pwd: "", pwdCheck: "", name: "", admin: false, nickname: "", teacher: "", gender: "", hasBlank: "" },
-        initialIsTouched: { id: false, pwd: false, pwdCheck: false, name: false, gender: false },
-        validate,
-        type: 'register'
-    });
+    // const { form, errors, isTouched, submitHandler, getFieldProps } = useValidateForm({
+    //     initialForm: { id: "", pwd: "", pwdCheck: "", name: "", admin: false, nickname: "", teacher: id, gender: "" },
+    //     initialError: { id: "", pwd: "", pwdCheck: "", name: "", admin: false, nickname: "", teacher: "", gender: "", hasBlank: "" },
+    //     initialIsTouched: { id: false, pwd: false, pwdCheck: false, name: false, gender: false },
+    //     validate,
+    //     type: 'register'
+    // });
 
     return (
-        <form type="POST" onSubmit={submitHandler}>
+        <form>
+            {step}
             <div className=" text-[2rem] mt-[16px] font-bold w-[400px] max-[400px]:w-[100%] m-auto">학생 회원가입🍊</div>
             {step == 0 
-            ? <SignupId onChange={onChange} errors={errors} setStep={setStep}/>
-            : <SignupPwd onChange={onChange} errors={errors} setStep={setStep} submitHandler={submitHandler}/>}
+            ? <SignupId   setStep={setStep} setUserId={setUserId}/>
+            : step == 1
+            ? <SignupName setUserName={setUserName} setStep={setStep}/>
+            : step == 2
+            ? <SignupGender setUserGender={setUserGender} userGender={userGender} setStep={setStep}/>
+            : <SignupPwd   setStep={setStep} teacher={id} userId={userId} userName={userName} userGender={userGender}/>}
             {/* <div className="w-full flex flex-col items-center mt-[40px]">
                 <div className="w-10/12 min-[500px]:w-[400px] mx-5 ">
                     <div className="text-[3rem] mb-5">

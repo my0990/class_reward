@@ -29,10 +29,12 @@ export const authOptions = {
 
       async authorize(credentials, req) {
         const {id, password} = credentials;
+        console.log(id,password)
         const db = (await connectDB).db('user');
         // 기존의 가입된 아이디 체크하기
         const user = await db.collection('users').findOne({ userId: id });
         if(!user){
+          console.log('no user')
           return null
         } 
         const isCorrectPassword = await compare(

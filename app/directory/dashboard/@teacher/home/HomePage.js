@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Modal from "./components/Modal";
 import InstallPrompt from "../../component/InstallPrompt";
 
-export default function Home({ data, data2 }) {
+export default function Home({ data }) {
     const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
     const [modalData, setModalData] = useState('data');
 

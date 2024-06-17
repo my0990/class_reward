@@ -7,8 +7,9 @@ import lottieJson from "@/public/tangerine.json"
 import dynamic from 'next/dynamic';
 import Typewriter from 'typewriter-effect';
 import Link from "next/link"
+import { useMemo } from "react"
 export default function AuthPage() {
-    const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
+    const Lottie = useMemo(()=> dynamic(() => import('react-lottie-player'), { ssr: false }),[])
     const onChange = (e) => {
         const { changeHandler, value, blurHandler } = getFieldProps(e.target.name);
         changeHandler(e);
@@ -61,12 +62,8 @@ export default function AuthPage() {
                     </div>
                     <AuthInput placeholder="아이디를 입력해주세요" name="id" onChange={onChange} />
                     <AuthInput placeholder="비밀번호를 입력해주세요" name="pwd" type="password" onChange={onChange} />
-                    {errors.id || errors.pwd ? <div className="text-red-500 text-center mb-3">{errors.id || errors.pwd}</div> : null }
+                    {errors.id || errors.pwd || errors.pwdCheck ? <div className="text-red-500 text-center mb-3">{errors.id || errors.pwd || errors.pwdCheck}</div> : null }
                     <AuthBtn className="text-blue-100 mb-[0px]" type="submit">로그인</AuthBtn>
-                    {/* <div className="flex flex-col w-full border-opacity-50">
-                        <div className="divider dark:before:bg-white dark:after:bg-white dark:text-white">OR</div>
-                    </div>
-                    <AuthBtn className="text-blue-100" type="button" onClick={() => route.push("./signup")}>회원가입</AuthBtn> */}
                     <div className="text-center mt-[8px]">아이디가 없으세요? <Link href="/signup"><span className="text-orange-500 cursor-pointer hover:underline">회원가입</span></Link></div>
                 </div>
             </div>
