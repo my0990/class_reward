@@ -6,8 +6,9 @@ import DeleteQuestCardModal from "./components/deleteQuestCardModal"
 export default function QuestDetail({ params }) {
 
     const [data, setData] = useState([]);
-    const [nameList, setNameList] = useState([]);
+    const [studentList, setStudentList] = useState([]);
     const [role, setRole] = useState(null);
+
     useEffect(() => {
         const fetchData = async () => {
             const response = await fetch('/api/fetchQuestDetail', {
@@ -18,10 +19,11 @@ export default function QuestDetail({ params }) {
                 },
             })
             const result = await response.json();
+            console.log(result)
             setData(result.data);
             setRole(result.role);
+            setStudentList(result.data.studentList)
 
-            setNameList(Object.keys(result.data.done))
 
         };
 
@@ -33,18 +35,18 @@ export default function QuestDetail({ params }) {
 
     const onChange = (e) => {
         const { name, value } = e.target;
-        let tmp = data.done;
-        tmp[name] = !data.done[name]
-        setData({ ...data, done: tmp })
+        setStudentList(prev =>
+            prev.map(a =>
+              a.userId === name ? { ...a, done: a.done ^ 1 } : a
+            ))
+        console.log(studentList)
+        // setData({ ...data, done: tmp })
         fetch("/api/setQuestDone", {
             method: "POST",
-            body: JSON.stringify({ name: name, _id: data._id }),
+            body: JSON.stringify({ userId: name, _id: data._id }),
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then((res) => res.json()).then((data) => {
-            if (data.result === true) {
-            }
         })
     }
 
@@ -60,23 +62,23 @@ export default function QuestDetail({ params }) {
                     <h2 className="text-orange-300">{data.questContent}</h2>
 
                     <div className="flex flex-wrap justify-start gap-[16px] mt-[48px]">
-                        {nameList.map((a, i) => {
+                        {studentList.map((a, i) => {
                             return (
                                 <label className="swap swap-flip text-9xl" key={i}>
-                                    {role === "teacher"
-                                        ? <input type="checkbox" checked={data.done[a]} onChange={onChange} name={a} />
-                                        : <input type="checkbox" checked={data.done[a]} name={a} />}
+                                    {role === "teacher" 
+                                        ? <input type="checkbox" checked={a.done} onChange={onChange} name={a['userId']} />
+                                        : <input type="checkbox" checked={a.done} name={a['userId']} />}
 
 
                                     <div className="swap-on relative">
                                         <div className="bg-orange-200 text-gray-600 font-bold text-[1.5rem] flex justify-center items-center  w-[136px] h-[180px] opacity-30">
-                                            {a}
+                                            {a['userName']}
                                         </div>
                                         <div className="text-red-500 w-[136px] h-[180px] absolute flex justify-center top-0 items-center font-bold text-[1.7rem]">Checked</div>
                                     </div>
                                     <div className="swap-off">
                                         <div className="bg-orange-200 text-gray-600 font-bold text-[1.5rem] flex justify-center items-center  w-[136px] h-[180px]">
-                                            {a}
+                                            {a['userName']}
                                         </div>
                                     </div>
                                 </label>
@@ -92,7 +94,7 @@ export default function QuestDetail({ params }) {
                     }
 
                 </div>
-                <FinishQuestModal data={data} />
+                <FinishQuestModal userData={studentList} questData={data}/>
                 <DeleteQuestCardModal data={data} />
             </div>
             : <div></div>

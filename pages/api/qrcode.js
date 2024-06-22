@@ -9,10 +9,10 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     // MongoDB 연결
     const randomString = Math.random().toString(16).substr(2, 8);
-    const db = (await connectDB).db('user');
+    const db = (await connectDB).db('data');
     const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
     const {userName, userId} = session.user;
-    const response = await db.collection('users').updateOne({ userId: userId},{$set: { code: randomString }});
+    const response = await db.collection('user_data').updateOne({ userId: userId},{$set: { code: randomString }});
 
 
     

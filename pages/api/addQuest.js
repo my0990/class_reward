@@ -12,21 +12,21 @@ export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
     const { userId } = session.user;
     // MongoDB 연결
-    let questId = (new ObjectId()).toString();
+    // let questId = (new ObjectId()).toString();
     const db = (await connectDB).db('data');
 
     // const tmp = await db.collection('teacher').find({userId:userId})
     // tmp = tmp.studentNumber
-    const response2 = await db.collection('student').find({ teacher: userId }).toArray();
+    const response2 = await db.collection('user_data').find({ teacher: userId }).toArray();
     let studentList = response2.map((a, i) => {
-      return { userId: a.userId, userName: a.userName, done: false }
+      return { userId: a.userId, userName: a.userName, done: 0 }
     })  
 
     let tmp = {}
     studentList.forEach(key => {
       tmp[key.userName] = false
     });
-    const response = await db.collection('quest').insertOne({ userId: userId, questName: name, questContent: content, questReward: reward, done: tmp, time: new Date(), doneCount: 0, id: questId, finished: false }, { upsert: true })
+    const response = await db.collection('quest').insertOne({ userId: userId, questName: name, questContent: content, questReward: reward, studentList: studentList, time: new Date(), doneCount: 0,  finished: false }, { upsert: true })
 
 
 

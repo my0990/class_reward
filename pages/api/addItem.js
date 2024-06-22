@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     const db = (await connectDB).db('data');
 
 
-    const response = await db.collection('teacher').updateOne({userId:userId},{$push: {"itemList": {itemId: itemId, itemPrice: parseInt(itemPrice), itemName: itemName, itemQuantity: parseInt(itemQuantity), itemExplanation: itemExplanation}}},{upsert: true})
+    const response = await db.collection('user_data').updateOne({userId:userId},{$push: {"itemList": {itemId: itemId, itemPrice: parseInt(itemPrice), itemName: itemName, itemQuantity: parseInt(itemQuantity), itemExplanation: itemExplanation}}},{upsert: true})
 
 
 

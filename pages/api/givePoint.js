@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     const db = (await connectDB).db('data');
 
 
-    const response = await db.collection('student').updateOne({userId:userId},{$inc: {money: parseInt(point)}})
+    const response = await db.collection('user_data').updateOne({userId:userId},{$inc: {money: parseInt(point)}})
 
 
 

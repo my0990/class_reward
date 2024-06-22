@@ -1,6 +1,4 @@
 'use client'
-
-import Logout from "./logout"
 import Link from "next/link";
 import Notification from "./notification";
 import character from "@/public/character.jpeg"
@@ -14,7 +12,7 @@ import { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 
-export default function Header({ session, notificationCount, data }) {
+export default function Header({ session, data }) {
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {
         setIsHamburgerClicked(props => !props)
@@ -26,10 +24,10 @@ export default function Header({ session, notificationCount, data }) {
     }
     const profileiconRef = useRef();
     const pathname = usePathname();
-    const {role, money} = data;
+    const { role, money } = data;
     useEffect(() => { isHamburgerClicked ? setIsHamburgerClicked(false) : null }, [pathname])
     useEffect(() => { isUserinfoClicked ? setIsUserinfoClicked(false) : null }, [pathname])
-
+    const notificationCount = data.notification?.filter(obj => obj.state !== "사용완료").length;
     return (
 
         <>
@@ -69,8 +67,8 @@ export default function Header({ session, notificationCount, data }) {
                         }
                         <div className="avatar cursor-pointer max-[700px]:hidden flex items-center justify-center" onClick={userinfoClicked} ref={profileiconRef}>
 
-                            <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2 ">
-                                <Image src={data?.userGender === "male" ? male : data?.userGender === "female" ? female : character} alt="character" />
+                            <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2 bg-orange-500">
+                                {/* <Image src={data?.userGender === "male" ? male : data?.userGender === "female" ? female : character} alt="character" /> */}
                             </div>
 
                         </div>
@@ -85,9 +83,7 @@ export default function Header({ session, notificationCount, data }) {
                 </div>
             </div>
             {isHamburgerClicked ? <DropDown session={session} money={money} /> : null}
-            {isUserinfoClicked ? <UserInfo session={session} role={role} userName={data?.userName} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money}/> : null}
-            {/* <UserInfo ref={dropDownRef}/> */}
-
+            {isUserinfoClicked ? <UserInfo session={session} role={role} userName={data?.userName} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} /> : null}
         </>
     )
 }

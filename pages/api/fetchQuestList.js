@@ -1,7 +1,7 @@
 import { connectDB } from '@/app/lib/database'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
-import { ObjectId } from 'mongodb';
+
 
 
 export default async function handler(req, res) {
@@ -16,18 +16,11 @@ export default async function handler(req, res) {
     } else {
       userId = session.user.teacher;
     }
-    // const { userId } = session.user;
-    // MongoDB 연결
-
     const db = (await connectDB).db('data');
-
-
-    // const questId = ObjectId.createFromHexString(code);
     const response = await db.collection('quest').find({ $and: [{ userId: userId }] }).toArray();
-    // const tmp = await db.collection('teacher').find({userId:userId})
-    // tmp = tmp.studentNumber
-    // const response = await db.collection('quest').find({userId:userId}).toArray();
-    // const data = response; 
+
+
+    let studentsCount = response.done;
 
     res.status(201).json({ result: true, message: 'delete 성공',data: response, teacher: userId, role: session.user.role});
   }

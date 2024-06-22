@@ -19,48 +19,20 @@ export default async function handler(req, res) {
       res.status(422).json({ result: false, error: '이미 가입된 계정이에요!' });
       return;
     }
-    if(!admin){
-      const status = await db.collection('users').insertOne({
-        userId: id,
-        // 비밀번호 암호화
-        password: await hash(password, 12),
-        teacher,
-        role: 'student',
-        userName:name,
-        gender: gender
-
-      });
-      const db2 = (await connectDB).db('data')
-      const status2 = await db2.collection('student').insertOne({
-        userId: id,
-        userName: name,
-        money: 0,
-        teacher: teacher,
-        itemList: [],
-        lv: 0,
-        profileNickname: nickname,
-        gender: gender
-        
-      })
-      res.status(201).json({result: true, message: 'User created'})
-      return
-    }
     const status = await db.collection('users').insertOne({
       userId: id,
       // 비밀번호 암호화
       password: await hash(password, 12),
       role: 'teacher',
-      userName: name
 
     });
     const db2 = (await connectDB).db('data')
-    const status2 = await db2.collection('teacher').insertOne({
+    const status2 = await db2.collection('user_data').insertOne({
       userId: id,
-      userName: name,
-      money: 0,
+      money: 9999,
       itemList: [],
       notification: [],
-      notificationCount: 0
+      studentsCount: 0,
     })
     // 성공시 response
     res.status(201).json({ result: true, message: 'User created', ...status });

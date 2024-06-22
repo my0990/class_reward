@@ -6,11 +6,12 @@ import { redirect } from "next/navigation";
 export default async function StudentSignup({params}) {
     const session = await getServerSession(authOptions);
     const {id, code} = params
-    const db = (await connectDB).db('user')
-    const response = await db.collection('users').findOne({userId: id})
+    const db = (await connectDB).db('data')
+    const response = await db.collection('user_data').findOne({userId: id})
     if(session){
         redirect("/directory/dashboard")
     }
+    console.log(code, response.code)
     if(code === response.code){
         return(
             <StudentSignupTemplate id={id} code={code}/>

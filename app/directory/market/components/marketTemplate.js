@@ -9,8 +9,7 @@ import {
     TransitionGroup,
 } from 'react-transition-group';
 
-export default function MarketTemplate({ data, role, money }) {
-
+export default function MarketTemplate({ data, role }) {
     const onDelete = (picked) => {
         setDeleteId(picked.itemId)
         setBuyList(picked)
@@ -24,7 +23,7 @@ export default function MarketTemplate({ data, role, money }) {
     }
 
     const [deleteId, setDeleteId] = useState();
-    const [itemList, setItemList] = useState([...data]);
+    const [itemList, setItemList] = useState([...data.itemList]);
     const [buyList, setBuyList] = useState();
     const nodeRef = useRef();
     return (
@@ -49,10 +48,12 @@ export default function MarketTemplate({ data, role, money }) {
                 </TransitionGroup>
 
                 {role === 'teacher' ? <div className="h-[73px] dark:bg-gray-700  w-full flex justify-center items-center bg-white  cursor-pointer" onClick={() => document.getElementById('my_modal_2').showModal()}>
-                    <div ><svg  xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path style={{fill:"orange"}} d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z" /></svg></div>
+                    <div ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path style={{ fill: "orange" }} d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z" /></svg></div>
                 </div> : null}
                 <AddModal itemList={itemList} setItemList={setItemList} />
-                {role === 'teacher' ? <DeleteModal deleteId={deleteId} itemList={itemList} setItemList={setItemList} buyList={buyList} /> : <BuyModal buyList={buyList} setItemList={setItemList} itemList={itemList} money={money} />}
+                {role === 'teacher'
+                    ? <DeleteModal deleteId={deleteId} itemList={itemList} setItemList={setItemList} buyList={buyList} />
+                    : <BuyModal buyList={buyList} setItemList={setItemList} itemList={itemList} money={data?.money} />}
             </div>
 
         </div>

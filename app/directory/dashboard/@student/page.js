@@ -12,7 +12,7 @@ export default async function Page() {
     const { user } = await getServerSession(authOptions)
     const { userId } = user
     const db = (await connectDB).db('data')
-    const response = await db.collection('student').findOne({ userId: userId })
+    const response = await db.collection('user_data').findOne({ userId: userId })
     if (response === null) {
         return
     }
@@ -24,13 +24,12 @@ export default async function Page() {
                 <h2 className="text-center dark:text-white">{response.userName}<span className="text-gray-400">({response.profileNickname})</span></h2>
 
                 <div className="w-[120px] h-[160px] bg-gray-300 mx-auto  rounded-lg rounded-[48px] relative">
-                    <Image src={response.gender === "male" ? male : female} alt="character" fill={true} priority={true} />
+                    <Image src={response.userGender === "male" ? male : female} alt="character" fill={true} priority={true} />
 
                 </div>
                 <div className="flex justify-center my-[8px]">
-                    <div className="chat-bubble w-[264px] m-[0px]">&ldquo;{response.profileState ? response.profileState : "...."}&rdquo;</div>
+                    <div className="bg-[#2b3440] h-[48px] rounded-lg text-white flex justify-center items-center w-[100%] m-[0px]">&ldquo;{response.profileState ? response.profileState : "...."}&rdquo;</div>
                 </div>
-                {/* <div className="flex justify-center my-[8px] ">&ldquo;{response.profileState ? response.profileState : "...."}&rdquo;</div> */}
 
                 <div>
                     <Link href="./inventory"><button className="btn w-full bg-blue-700 text-white dark:hover:bg-orange-300 border-0">보유 아이템 보러가기</button></Link>

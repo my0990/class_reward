@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     console.log('req')
     console.log(req.body)
     const db = (await connectDB).db('data');
-    const response = await db.collection('teacher').updateOne(
+    const response = await db.collection('user_data').updateOne(
       { userId : userId },
       { $pull : { "itemList": { "itemId": deleteId} } }
   );

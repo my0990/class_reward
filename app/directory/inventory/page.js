@@ -8,7 +8,7 @@ export default async function Inventory(){
     let {userId, role, teacher} = session.user;
     console.log(session)
     const db = (await connectDB).db('data')
-    const data = await db.collection('student').findOne({userId: userId})
+    const data = await db.collection('user_data').findOne({userId: userId})
     console.log(data.userName)
     return(
         <InventoryTemplate data={data?.itemList} userId={userId} teacher={teacher} userName={data.userName}/>

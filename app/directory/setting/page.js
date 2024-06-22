@@ -10,7 +10,7 @@ export default async function Setting(){
     // MongoDB 연결
 
     const db = (await connectDB).db('data');
-    const response = await db.collection(role).findOne({userId:userId})
+    const response = await db.collection('user_data').findOne({userId:userId})
     const {profileNickname, profileState, gender} = response;
 
     return(

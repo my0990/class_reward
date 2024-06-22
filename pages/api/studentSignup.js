@@ -22,25 +22,25 @@ export default async function handler(req, res) {
     const status = await db.collection('users').insertOne({
       userId: userId,
       // 비밀번호 암호화
-      userName: userName,
       password: await hash(password, 12),
-      teacher,
       role: 'student',
-      userGender: userGender
+      teacher,
     });
     const db2 = (await connectDB).db('data');
-    const response = await db2.collection('student').insertOne({
+    const response = await db2.collection('user_data').insertOne({
       userId: userId,
       userName: userName,
-      teacher,
-      role: 'student',
       userGender: userGender,
       money: 0,
       itemList: [],
       lv: 1,
       profileNickname: '',
       profileState: '',
+      teacher,
     })
+    const response2 = await db2.collection('user_data').updateOne({
+      userId: teacher
+    },{$inc: {'studentsCount': 1}})
     if(status && response){
       res.status(201).json({ result: true, message: 'User created', ...status });
     } else {

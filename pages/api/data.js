@@ -7,16 +7,7 @@ export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
-    console.log('!!!!!!!!!!!')
-    console.log('!!!!!!!!!!!')
-    console.log('!!!!!!!!!!!')
-    console.log('!!!!!!!!!!!')
-    console.log('!!!!!!!!!!!')
-    console.log('!!!!!!!!!!!')
-    console.log(req.body);
-    console.log(req.body);
-    console.log(req.body);
-    console.log(req.body);
+
     const session = await getServerSession(req,res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
     const {userId} = session.user;
     // MongoDB 연결

@@ -17,12 +17,13 @@ export default async function handler(req, res) {
 
     const questId = ObjectId.createFromHexString(code);
     const response = await db.collection('quest').findOne({ $and: [{ userId: id }, { _id: questId }] })
+    const response2 = await db.collection('user_data').findOne({userId:id})
     // const tmp = await db.collection('teacher').find({userId:userId})
     // tmp = tmp.studentNumber
     // const response = await db.collection('quest').find({userId:userId}).toArray();
     // const data = response; 
 
-    res.status(201).json({ result: true, message: 'delete 성공',data: response, role: session.user.role});
+    res.status(201).json({ result: true, message: 'delete 성공',data: response, role: session.user.role, students: response2.students});
   }
 }
 

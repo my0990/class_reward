@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     const db2 = (await connectDB).db('data')
 
     const response = await db.collection('users').deleteOne({userId:student})
-    const response2 = await db2.collection('student').deleteOne({userId:student})
+    const response2 = await db2.collection('user_data').deleteOne({userId:student})
 
 
 
