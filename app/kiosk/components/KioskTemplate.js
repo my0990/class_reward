@@ -41,84 +41,19 @@ export default function Kiosk() {
 
 
 
-    const askPermissionAndEnterFullscreen = () => {
-        const userConfirmed = confirm("전체화면 모드로 전환하시겠습니까?");
-        if (userConfirmed) {
-            enterFullscreen();
-        }
-    };
-
-    const enterFullscreen = () => {
-        if (elementRef.current.requestFullscreen) {
-            elementRef.current.requestFullscreen().catch(err => {
-                console.log('Error attempting to enable full-screen mode:', err);
-            });
-        } else if (elementRef.current.mozRequestFullScreen) { /* Firefox */
-            elementRef.current.mozRequestFullScreen().catch(err => {
-                console.log('Error attempting to enable full-screen mode:', err);
-            });
-        } else if (elementRef.current.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-            elementRef.current.webkitRequestFullscreen().catch(err => {
-                console.log('Error attempting to enable full-screen mode:', err);
-            });
-        } else if (elementRef.current.msRequestFullscreen) { /* IE/Edge */
-            elementRef.current.msRequestFullscreen().catch(err => {
-                console.log('Error attempting to enable full-screen mode:', err);
-            });
-        }
-        setIsFullscreen(true);
-    };
-
-    const askPasswordAndExitFullscreen = () => {
-        const password = prompt("비밀번호를 입력하세요:");
-        if (password === "1234") {  // Replace "your_password" with the desired password
-            exitFullscreen();
-        } else {
-            alert("비밀번호가 잘못되었습니다.");
-            // 비밀번호가 잘못되었을 경우 다시 전체화면 모드로 전환
-            enterFullscreen();
-        }
-    };
-
-    const exitFullscreen = () => {
-        if (document.exitFullscreen) {
-            document.exitFullscreen().catch(err => {
-                console.log('Error attempting to disable full-screen mode:', err);
-            });
-        } else if (document.mozCancelFullScreen) { /* Firefox */
-            document.mozCancelFullScreen().catch(err => {
-                console.log('Error attempting to disable full-screen mode:', err);
-            });
-        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-            document.webkitExitFullscreen().catch(err => {
-                console.log('Error attempting to disable full-screen mode:', err);
-            });
-        } else if (document.msExitFullscreen) { /* IE/Edge */
-            document.msExitFullscreen().catch(err => {
-                console.log('Error attempting to disable full-screen mode:', err);
-            });
-        }
-        setIsFullscreen(false);
-    };
+   
 
 
 
     return (
         <div ref={elementRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
             <button
-                onClick={askPermissionAndEnterFullscreen}
+
                 style={{ position: 'absolute', top: 20, left: 20, zIndex: 1000 }}
             >
                 Enter Fullscreen
             </button>
-            {isFullscreen && (
-                <button
-                    onClick={exitFullscreen}
-                    style={{ position: 'absolute', top: 20, left: 150, zIndex: 1000 }}
-                >
-                    Exit Fullscreen
-                </button>
-            )}
+
             {/* 전체화면 콘텐츠 */}
             <div style={{ width: '100%', height: '100%', backgroundColor: '#f0f0f0' }}>
                 <h1>Fullscreen Content</h1>
