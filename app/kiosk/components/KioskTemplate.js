@@ -1,10 +1,24 @@
 'use client'
 import { useRef, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 // import {createBrowserHistory} from 'history';
 export default function Kiosk() {
     const elementRef = useRef(null);
+    const router = useRouter();
 
-
+    useEffect(() => {
+        const preventGoBack = () => {
+          // change start
+          history.pushState(null, '', location.href);
+          // change end
+          console.log('prevent go back!');
+        };
+        
+        history.pushState(null, '', location.href);
+        window.addEventListener('popstate', preventGoBack);
+        
+        return () => window.removeEventListener('popstate', preventGoBack);
+      }, []);   
 
     // const history = createBrowserHistory();
     // // 1. history라는 상수에 createBrowerHistory 함수를 할당한다.
