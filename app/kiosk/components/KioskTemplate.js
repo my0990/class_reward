@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useState, useEffect } from 'react';
-import {createBrowserHistory} from 'history';
+// import {createBrowserHistory} from 'history';
 export default function Kiosk() {
     const elementRef = useRef(null);
 
