@@ -14,11 +14,11 @@ export default async function Home() {
     console.log('response: ',response)
     if(!response){
       signOut()
-    } else {
-      redirect("/directory/dashboard")
-    }
+    // } else {
+    //   redirect("/directory/dashboard")
+    // }
     // redirect("/directory/dashboard")
-  }
+    }}
 
 
 
