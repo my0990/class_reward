@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
     const response = await db.collection('users').deleteOne({userId:student})
     const response2 = await db2.collection('user_data').deleteOne({userId:student})
-
+    const response3 = await db2.collection('user_data').updateOne({userId: teacher},{$inc: {"studentsCount": -1}})
 
 
     res.status(201).json({ result: true, message: '로그인 성공', itemId: itemId });

@@ -7,7 +7,7 @@ export default async function Notification(){
     const session = await getServerSession(authOptions); //{user: {name: '아이묭', id: 'my0990}}
     let {userId, role, teacher} = session.user;
     const db = (await connectDB).db('data')
-    const data = await db.collection('teacher').findOne({userId: userId})
+    const data = await db.collection('user_data').findOne({userId: userId})
 
     return(
         <NotificationTemplate data={data?.notification} userId={userId}/>

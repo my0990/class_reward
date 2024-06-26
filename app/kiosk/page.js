@@ -1,7 +1,7 @@
-import GuideTemplate from "./components/GuideTemplate";
+import KioskTemplate from "./components/KioskTemplate"
 
-export default function Guide(){
+export default function Kiosk(){
     return(
-        <GuideTemplate />
+        <div><KioskTemplate /></div>
     )
 }

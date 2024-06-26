@@ -1,32 +1,38 @@
 import { useRouter } from "next/navigation";
 import gold from "@/public/gold.png";
 import Image from "next/image";
+import { useState } from "react";
 export default function BuyModal({ buyList, setItemList, itemList, money }) {
     const router = useRouter();
-
+    const [isLoading,setIsLoading] = useState(false);
     const onSubmit = (e) => {
         e.preventDefault();
-        console.log(money, buyList.itemPrice)
-        if (money < buyList.itemPrice) {
-            alert('돈이 모자랍니다')
-            document.getElementById('my_modal_3').close()
-            return
-        }
-        fetch("/api/buyItem", {
-            method: "POST",
-            body: JSON.stringify({ itemId: buyList.itemId, itemName: buyList.itemName, itemPrice: buyList.itemPrice }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => res.json()).then((data) => {
-            if (data.result === true) {
-                alert('구매완료')
-                const newItemList = itemList.map((a, i) => a.itemId === buyList.itemId ? { ...a, 'itemQuantity': a.itemQuantity - 1 } : a)
-                setItemList(newItemList);
+        if(isLoading){
+            return 
+        } else {
+            setIsLoading(true)
+            if (money < buyList.itemPrice) {
+                alert('돈이 모자랍니다')
                 document.getElementById('my_modal_3').close()
-                router.refresh();
+                return
             }
-        })
+            fetch("/api/buyItem", {
+                method: "POST",
+                body: JSON.stringify({ itemId: buyList.itemId, itemName: buyList.itemName, itemPrice: buyList.itemPrice }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json()).then((data) => {
+                if (data.result === true) {
+                    alert('구매완료')
+                    const newItemList = itemList.map((a, i) => a.itemId === buyList.itemId ? { ...a, 'itemQuantity': a.itemQuantity - 1 } : a)
+                    setItemList(newItemList);
+                    document.getElementById('my_modal_3').close()
+                    router.refresh();
+                }
+            })
+        }
+       
     }
 
 

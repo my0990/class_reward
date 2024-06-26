@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 export default function SignupPwd({ setStep, teacher, userId, userGender, userName }) {
+    const [isLoading,setIsLoading] = useState(false);
     const MySwal = withReactContent(Swal)
     const router = useRouter();
     const pwdRef = useRef();
@@ -12,37 +13,38 @@ export default function SignupPwd({ setStep, teacher, userId, userGender, userNa
     const [error, setError] = useState({ pwd: '', pwdCheck: '' })
     const onClick = (e) => {
         e.preventDefault();
-        if (!pwdRef.current.value) setError(prev => ({ pwd: "비밀번호를 입력하세요", pwdCheck: '' }))
-        else if (pwdRef.current.value !== pwdCheckRef.current.value) setError(prev => ({ pwd: '', pwdCheck: "비밀번호가 일치하지 않습니다" }))
-        else fetch("/api/studentSignup", {
-            method: "POST",
-            body: JSON.stringify({ userId: userId, teacher: teacher, password: pwdRef.current.value, userGender: userGender, userName: userName }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => res.json()).then((data) => {
-
-            if (data.result === true) {
-                console.log(userId)
-                console.log(userId)
-                console.log(userId)
-                console.log(userId)
-                console.log(userId)
-                console.log(userId)
-                MySwal.fire({
-                    title: '회원가입에 성공하였습니다. <br> 생성된 아이디로 로그인하여 주세요.',
-                    text: '아이디: ' + userId,
-                    icon: "success"
-
-                    
-                }).then(() => router.replace('/'))
-
-            } else {
-                alert('에러가 발생하였습니다. 처음부터 다시 시도하여 주십시오')
-                location.reload()
-
-            }
-        })
+        if(isLoading){
+            return
+        } else {
+            setIsLoading(true)
+            if (!pwdRef.current.value) setError(prev => ({ pwd: "비밀번호를 입력하세요", pwdCheck: '' }))
+            else if (pwdRef.current.value !== pwdCheckRef.current.value) setError(prev => ({ pwd: '', pwdCheck: "비밀번호가 일치하지 않습니다" }))
+            else fetch("/api/studentSignup", {
+                method: "POST",
+                body: JSON.stringify({ userId: userId, teacher: teacher, password: pwdRef.current.value, userGender: userGender, userName: userName }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json()).then((data) => {
+    
+                if (data.result === true) {
+     
+                    MySwal.fire({
+                        title: '회원가입에 성공하였습니다. <br> 생성된 아이디로 로그인하여 주세요.',
+                        text: '아이디: ' + userId,
+                        icon: "success"
+    
+                        
+                    }).then(() => router.replace('/'))
+    
+                } else {
+                    alert('에러가 발생하였습니다. 처음부터 다시 시도하여 주십시오')
+                    location.reload()
+    
+                }
+            })
+        }
+        
     }
     return (
         <div>

@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
     const db = (await connectDB).db('data');
 
-    const response = await db.collection(role).updateOne({userId: userId},{$set : {profileNickname: nickname, profileState: state}},{upsert:true})
+    const response = await db.collection("user_data").updateOne({userId: userId},{$set : {profileNickname: nickname, profileState: state}},{upsert:true})
 
     res.status(201).json({ result: true, message: 'profile 변경 성공' });
 }}

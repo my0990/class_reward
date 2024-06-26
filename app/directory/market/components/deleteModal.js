@@ -1,24 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 export default function DeleteModal({ deleteId, itemList, setItemList, buyList }) {
-
+    const [isLoading,setIsLoading] = useState(false);
     const onSubmit = (e) => {
         e.preventDefault();
-
-        fetch("/api/deleteItem", {
-            method: "POST",
-            body: JSON.stringify({ itemId: deleteId }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => res.json()).then((data) => {
-
-            if (data.result === true) {
-                alert('성공했습니다.')
-                const newItemList = itemList.filter((it) => it.itemId !== deleteId);
-                setItemList(newItemList);
-                document.getElementById('my_modal_3').close()
-            }
-        })
+        if(isLoading){
+            return
+        } else {
+            setIsLoading(true)
+            fetch("/api/deleteItem", {
+                method: "POST",
+                body: JSON.stringify({ itemId: deleteId }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json()).then((data) => {
+    
+                if (data.result === true) {
+                    alert('성공했습니다.')
+                    const newItemList = itemList.filter((it) => it.itemId !== deleteId);
+                    setItemList(newItemList);
+                    document.getElementById('my_modal_3').close()
+                }
+            })
+        }
+    
     }
 
     useEffect(() => {
@@ -26,18 +31,6 @@ export default function DeleteModal({ deleteId, itemList, setItemList, buyList }
     }, [itemList, setItemList])
     return (
         <dialog id="my_modal_3" className="modal  modal-middle">
-            {/* <div className="modal-box">
-                    <div className=" flex  p-0 justify-center">
-                        <div className="overflow-x-auto w-[512px]">
-                            <div className="flex justify-between pb-5">
-                                <div className="text-[1.5rem] ">삭제하시겠습니까?</div>
-                            </div>
-                            <form onSubmit={onSubmit}>
-                            <button className="btn w-full bg-orange-500">확인</button>
-                            </form>
-                        </div>
-                    </div>
-                </div> */}
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
 
                 <div className="flex items-center mb-[8px]">

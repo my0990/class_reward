@@ -11,7 +11,7 @@ export default function SignupId({ onChange, setStep, setUserId }) {
         e.preventDefault();
         if (!idRef.current.value) setError(prev => ({ hasBlank: '', idExist: '', id: "아이디를 입력하세요", emoji: '' }))
         else if (idRef.current.value.includes(" ")) setError(prev => ({ idExist: '', id: "", hasBlank: "아이디에 공백이 있습니다", emoji: '' }))
-        else if (specialCharPattern.test(idRef.current.value) || emojiPattern.test(idRef.current.value)) setError(prev => ({ idExist: '', id: "", hasBlank: "", emoji: '특수문자나 이모지는 사용 불가합니다' }))
+        else if (specialCharPattern.test(idRef.current.value) || emojiPattern.test(idRef.current.value)) setError(prev => ({ idExist: '', id: "", hasBlank: "", emoji: '특수문자나 이모지, 한글은 사용 불가합니다' }))
         else fetch("/api/checkId", {
             method: "POST",
             body: JSON.stringify({ userId: idRef.current.value }),

@@ -1,37 +1,43 @@
 import { useRef } from "react";
-import { useRouter } from "next/navigation"
 import { useState } from "react";
-import exp from "constants";
+
 export default function AddModal({ itemList, setItemList }) {
     const nameRef = useRef();
     const priceRef = useRef();
     const quantityRef = useRef();
     const explanationRef = useRef();
     const [isError, setIsError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const onSubmit = (e) => {
         e.preventDefault();
-        if (nameRef.current.value === "" || priceRef.current.value === "" || quantityRef.current.value === "" || explanationRef.current.value === "") {
-            setIsError(true)
+        if (isLoading) {
             return
-        }
-        fetch("/api/addItem", {
-            method: "POST",
-            body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemExplanation: explanationRef.current.value }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => res.json()).then((data) => {
-
-            if (data.result === true) {
-                alert('추가하였습니다.');
-                document.getElementById('my_modal_2').close()
-                setItemList(() => [...itemList, { itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemId: data.itemId, itemExplanation: explanationRef.current.value }])
-                nameRef.current.value = ""
-                priceRef.current.value = ""
-                quantityRef.current.value = ""
-                explanationRef.current.value = ""
+        } else {
+            setIsLoading(true);
+            if (nameRef.current.value === "" || priceRef.current.value === "" || quantityRef.current.value === "" || explanationRef.current.value === "") {
+                setIsError(true)
+                return
             }
-        })
+            fetch("/api/addItem", {
+                method: "POST",
+                body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemExplanation: explanationRef.current.value }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json()).then((data) => {
+
+                if (data.result === true) {
+                    alert('추가하였습니다.');
+                    document.getElementById('my_modal_2').close()
+                    setItemList(() => [...itemList, { itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemId: data.itemId, itemExplanation: explanationRef.current.value }])
+                    nameRef.current.value = ""
+                    priceRef.current.value = ""
+                    quantityRef.current.value = ""
+                    explanationRef.current.value = ""
+                }
+            })
+        }
+
     }
 
     const onCloseModal = () => {

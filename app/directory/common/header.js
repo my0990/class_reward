@@ -1,10 +1,7 @@
 'use client'
 import Link from "next/link";
 import Notification from "./notification";
-import character from "@/public/character.jpeg"
-import male from "@/public/male.png"
-import female from "@/public/female.png"
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
@@ -13,6 +10,7 @@ import { usePathname } from "next/navigation";
 
 
 export default function Header({ session, data }) {
+    const router = useRouter();
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {
         setIsHamburgerClicked(props => !props)
@@ -44,7 +42,8 @@ export default function Header({ session, data }) {
                                     <Link href="/directory/manage" key="manage"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
                                     <Link href="/directory/market" key="market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
                                     <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트 관리</li></Link>
-                                    <Link href="/directory/qrcode"><li className={` dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>학생 초대</li></Link>
+                                    <Link href="/directory/qrcode"><li className={` mr-[3vw] dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>학생 초대</li></Link>
+                                    <div onClick={()=>router.replace("../kiosk")}><li className={` dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>키오스크 모드</li></div>
 
 
                                 </ul> :

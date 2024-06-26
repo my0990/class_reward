@@ -38,7 +38,7 @@ export default function GuideTemplate() {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f0f0f0', flexDirection: "column" }}>
         <h1>Welcome to the Kiosk</h1>
-        <button onClick={enterFullscreen}>Enter Fullscreen Mode</button>
+        <button onClick={enterFullscreen} classname="">Enter Fullscreen Mode</button>
       </div>
     )
 }
