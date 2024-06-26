@@ -10,7 +10,9 @@ export default async function RootLayout({ children }) {
     const response = await db.collection('user_data').findOne({ userId: session.user.userId })
     if(!response){
         console.log('user denied')
-        signOut();
+        signOut({ callbackUrl: '/' });
+        return <div>ddd</div>
+
     }
     response._id = response._id.toString();
     return (
