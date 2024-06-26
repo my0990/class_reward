@@ -29,7 +29,11 @@ export default async function handler(req, res) {
     const response = await db.collection('quest').insertOne({ userId: userId, questName: name, questContent: content, questReward: reward, studentList: studentList, time: new Date(), doneCount: 0,  finished: false }, { upsert: true })
 
 
+    if(response){
+      res.status(201).json({ result: true, message: 'quest 추가 성공' });
+    } else {
+      res.status(402).json({result: false})
+    }
 
-    res.status(201).json({ result: true, message: 'quest 추가 성공' });
   }
 }

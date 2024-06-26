@@ -7,25 +7,21 @@ export default async function Market(){
     const session = await getServerSession(authOptions); //{user: {name: '아이묭', id: 'my0990}}
     let {userId, role, teacher} = session.user;
     const db = (await connectDB).db('data')
-    let response = null;
-    let itemList = null;
+    let response = null;    
+    let itemListInit = null
     if(role === 'student'){
-        itemList = await db.collection('user_data').findOne({userId:teacher})
         response = await db.collection('user_data').findOne({userId: userId})
+        const response2 = await db.collection('user_data').findOne({userId:teacher})
+        itemListInit = response2.itemList;
+
     } else {
         response = await db.collection('user_data').findOne({userId: userId})
+        itemListInit = response.itemList
     }
-
-
-
-
-
-    // data = data.map((a)=>{
-    //   a.id = a.id.toString()
-    //   return a})
+    response._id = response._id.toString()
     return(
         <div>
-            <MarketTemplate data={response} role={role}/>
+            <MarketTemplate userData={response} itemListInit={itemListInit} role={role}/>
         </div>
     )
 }

@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function QuestCard(props) {
     const date = new Date(props.data.time);
     
-    console.log(props.data._id)
+    console.log('data: ', props.data)
     return (
         <div className={`${props.data.finished ? 'opacity-40' : null}`}>
         <div className="relative p-[16px] border-4 border-orange-500 rounded-xl mt-[24px] w-[100%] ">
@@ -18,7 +18,7 @@ export default function QuestCard(props) {
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
-                        <span>{Object.values(props.data.studentList).filter(value => value === true).length}/{props.studentsCount}</span>
+                        <span>{Object.values(props.data.studentList).filter(value => value.done === 1).length}/{props.studentsCount}</span>
                     </div>
                     <Link href={`./questDetail/${props.teacherId}/${props.data._id}`} key={props.data.id}><button className="btn bg-orange-500 border-0 text-white">상세보기</button></Link>
                 </div>

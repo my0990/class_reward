@@ -19,7 +19,6 @@ export default function QuestDetail({ params }) {
                 },
             })
             const result = await response.json();
-            console.log(result)
             setData(result.data);
             setRole(result.role);
             setStudentList(result.data.studentList)
@@ -39,7 +38,6 @@ export default function QuestDetail({ params }) {
             prev.map(a =>
               a.userId === name ? { ...a, done: a.done ^ 1 } : a
             ))
-        console.log(studentList)
         // setData({ ...data, done: tmp })
         fetch("/api/setQuestDone", {
             method: "POST",
@@ -67,7 +65,7 @@ export default function QuestDetail({ params }) {
                                 <label className="swap swap-flip text-9xl" key={i}>
                                     {role === "teacher" 
                                         ? <input type="checkbox" checked={a.done} onChange={onChange} name={a['userId']} />
-                                        : <input type="checkbox" checked={a.done} name={a['userId']} />}
+                                        : <input type="checkbox" checked={a.done} readOnly name={a['userId']} />}
 
 
                                     <div className="swap-on relative">

@@ -10,8 +10,6 @@ export default async function Page() {
     const db = (await connectDB).db('data')
     const response = await db.collection('user_data').find({ teacher: userId }).sort({ userName: 1 }).toArray()
     const tmp = response.map((a) => { a._id = a._id.toString(); return a })
-
-    console.log(response)
     return (
         <>
             <HomePage data={tmp} />

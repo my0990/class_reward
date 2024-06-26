@@ -8,7 +8,7 @@ export default async function RootLayout({ children }) {
     const session = await getServerSession(authOptions);
     const db = (await connectDB).db('data');
     const response = await db.collection('user_data').findOne({ userId: session.user.userId })
-
+    response._id = response._id.toString();
     return (
         <div className="dark:text-black">
             <Header session={session.user} data={response} />

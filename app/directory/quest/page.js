@@ -20,7 +20,6 @@ export default function Quest() {
                 },
             })
             const result = await response.json();
-            console.log(result)
             setData(result.data);
             setTeacherId(result.teacher)
             setIsLoading(false);

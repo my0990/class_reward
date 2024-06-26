@@ -18,10 +18,14 @@ export default async function StudentManage() {
             </div>
         )
     }
-    const response = await db.collection('student').find({teacher:userId}).sort({userName: 1}).toArray();
+    const response = await db.collection('user_data').find({teacher:userId}).sort({userName: 1}).toArray();
+    let data = response.map((a)=>{
+        a._id = a._id.toString()
+        return a
+      })
     return (
         <div>
-            <ManageTemplate data={response} teacher={userId}/>
+            <ManageTemplate data={data} teacher={userId}/>
         </div>
     )
 }

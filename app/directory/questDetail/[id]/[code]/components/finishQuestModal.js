@@ -1,11 +1,7 @@
 'use client'
-import { useState, useEffect } from "react"
+
 export default function AddQuestModal({ userData, questData }) {
-
-
-    console.log('data: ',userData)
     let rewarded = userData.filter(obj => obj.done === 1);
-    console.log('rewarded: ', rewarded)
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/finishQuest", {
