@@ -52,7 +52,6 @@ export default function StudentSignupTemplate({ id, code }) {
 
     return (
         <form>
-            {step}
             <div className=" text-[2rem] mt-[16px] font-bold w-[400px] max-[400px]:w-[100%] m-auto">학생 회원가입🍊</div>
             {step == 0 
             ? <SignupId   setStep={setStep} setUserId={setUserId}/>
