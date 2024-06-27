@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 export default function DropDown({ session, money }) {
     const pathname = usePathname();
     return (
-        <div className="border-b-2 min-[601px]:hidden dark:text-white">
+        <div className="border-b-2 min-[701px]:hidden dark:text-white">
             <ul>
                 <li className="mt-[1rem]">
                     <div className="flex items-center justify-space ">
@@ -25,7 +25,7 @@ export default function DropDown({ session, money }) {
                     <div className="flex">
                         <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold" /></div>
                         {/* <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div> */}
-                        {session.role === "teacher" ? <div>- 원 </div> : <div>{money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>}
+                        <div>{money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>
                     </div>
                 </li>
                 <Link href="/directory/setting"><li className="py-[0.5rem] px-[16px] pb-[1rem] text-[1.2rem] border-b-2 flex">
@@ -40,7 +40,8 @@ export default function DropDown({ session, money }) {
                         <Link href="/directory/market"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/market" ? "text-orange-400" : null}`}>아이템 관리</li></Link>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">기록 보기</li></Link> */}
                         <Link href="/directory/quest"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/quest" ? "text-orange-400" : null}`}>퀘스트 관리</li></Link>
-                        <Link href="/directory/qrcode"><li className={`py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem] ${pathname === "/directory/qrcode" ? "text-orange-400" : null}`}>학생 초대</li></Link>
+                        <Link href="/directory/qrcode"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/qrcode" ? "text-orange-400" : null}`}>학생 초대</li></Link>
+                        <Link href="../kiosk"><li className={`py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem] mb-[1rem]`}>키오스크 모드</li></Link>
 
                     </> :
                     <>

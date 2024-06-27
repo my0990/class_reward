@@ -34,6 +34,7 @@ export default function AddModal({ itemList, setItemList }) {
                     priceRef.current.value = ""
                     quantityRef.current.value = ""
                     explanationRef.current.value = ""
+                    setIsLoading(false)
                 }
             })
         }

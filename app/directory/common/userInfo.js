@@ -42,8 +42,7 @@ export default function UserInfo({ userName, role, isUserinfoClicked, setIsUseri
                         <div className="flex">
                             <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold" /></div>
                             {/* <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div> */}
-                            {role === "teacher" ? <div>- 원 </div> : <div>{money?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원 </div>}
-
+                            <div>{money?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원 </div>
                         </div>
                     </li>
                     <Link href="./setting">
