@@ -14,7 +14,7 @@ const APP_DESCRIPTION = "학급 보상을 관리합니다";
 
 export const metadata = {
   icons: {
-		icon: "/favicon.ico",
+		icon: "/favicon.png",
 	},
   applicationName: APP_NAME,
   title: {
