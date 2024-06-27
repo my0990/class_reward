@@ -13,12 +13,17 @@ const APP_DESCRIPTION = "학급 보상을 관리합니다";
 
 
 export const metadata = {
+  icons: {
+		icon: "/favicon.ico",
+	},
   applicationName: APP_NAME,
   title: {
     default: APP_DEFAULT_TITLE,
     template: APP_TITLE_TEMPLATE,
   },
+
   description: APP_DESCRIPTION,
+
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
