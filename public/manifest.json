@@ -9,6 +9,11 @@
     "description": "class economy reward",
     "icons": [
         {
+			"src": "/icons/favicon.png",
+			"type": "image/x-icon",
+			"sizes": "48x48"
+		},
+        {
             "src": "/icons/icon-144x144.png",
             "sizes": "144x144",
             "type": "image/png",
