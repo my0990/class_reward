@@ -35,7 +35,7 @@ export default function Kiosk({itemData,studentData}) {
     return (
         <div ref={elementRef} className='h-[100%] min-h-[100vh] bg-orange-100'>
 
-            {step === 'home' ? <KioskHomeTemplate setStep={setStep} enterFullscreen={enterFullscreen}/> : step === 'use' ? <ItemUse setStep={setStep} itemData={itemData.itemList} studentData={studentData}/> : <ItemBuyTemplate setStep={setStep} itemData={itemData.itemList} studentData={studentData}/>}
+            {step === 'home' ? <KioskHomeTemplate setStep={setStep} enterFullscreen={enterFullscreen}/> : step === 'use' ? <ItemUseTemplate setStep={setStep} itemData={itemData.itemList} studentData={studentData}/> : <ItemBuyTemplate setStep={setStep} itemData={itemData.itemList} studentData={studentData}/>}
             
         </div>
     );

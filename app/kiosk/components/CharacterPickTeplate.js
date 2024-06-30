@@ -12,7 +12,6 @@ export default function CharacterPick(props){
                     <CharacterCard key={i} onClick={e => onClick(a)} user={a}/>
                 )
             })}
-            <button onClick={()=>console.log(props.requestData)}>ttt</button>
         </div>
     )
 }
