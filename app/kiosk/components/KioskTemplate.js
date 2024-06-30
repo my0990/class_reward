@@ -1,8 +1,12 @@
 'use client'
 import { useRef, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-// import {createBrowserHistory} from 'history';
-export default function Kiosk() {
+import KioskHomeTemplate from './KioskHomeTemplate';
+import ItemUseTemplate from './ItemUseTemplate';
+import ItemBuyTemplate from './ItemBuy';
+import CharacterPick from './CharacterPickTeplate';
+
+export default function Kiosk({itemData,studentData}) {
+    const [step,setStep] = useState('home');
     const elementRef = useRef(null);
 
 
@@ -19,10 +23,7 @@ export default function Kiosk() {
     };
     useEffect(() => {
         const preventGoBack = () => {
-            // change start
             history.pushState(null, '', location.href);
-            // change end
-            console.log('prevent go back!');
         };
 
         history.pushState(null, '', location.href);
@@ -32,14 +33,10 @@ export default function Kiosk() {
     }, []);
 
     return (
-        <div ref={elementRef} className='bg-white'>
-            <button
-                onClick={enterFullscreen}
-            >
-                Enter Fullscreen
-            </button>
+        <div ref={elementRef} className='h-[100%] min-h-[100vh] bg-orange-100'>
 
-
+            {step === 'home' ? <KioskHomeTemplate setStep={setStep} enterFullscreen={enterFullscreen}/> : step === 'use' ? <ItemUse setStep={setStep} itemData={itemData.itemList} studentData={studentData}/> : <ItemBuyTemplate setStep={setStep} itemData={itemData.itemList} studentData={studentData}/>}
+            
         </div>
     );
 };

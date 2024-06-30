@@ -8,16 +8,17 @@
     "short_name": "class",
     "description": "class economy reward",
     "icons": [
+
         {
-			"src": "/icons/favicon.png",
-			"type": "image/x-icon",
-			"sizes": "48x48"
-		},
+            "src": "/icons/favicon.png",
+            "type": "image/x-icon",
+            "sizes": "48x48",
+            "purpose": "any"
+        },
         {
             "src": "/icons/icon-144x144.png",
             "sizes": "144x144",
-            "type": "image/png",
-            "purpose": "any"
+            "type": "image/png"
         },
         {
             "src": "/icons/icon-192x192.png",
