@@ -47,6 +47,7 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
 
     }
     const pwdRef = useRef();
+    pwdRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     return (
         <dialog id="my_modal_3" className="modal  modal-middle">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200 flex flex-col">
