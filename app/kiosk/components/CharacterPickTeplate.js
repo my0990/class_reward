@@ -1,17 +1,23 @@
 import CharacterCard from "./CharacterCard"
+import CheckPwdModal from "./CheckPwdModal"
 
-export default function CharacterPick(props){
-    console.log(props.studentData)
+export default function CharacterPickTemplate(props) {
     const onClick = (a) => {
-        props.setRequestData(prev => ({...prev, requestUserId: a.userId}))
+
+        document.getElementById('my_modal_3').showModal()
+        props.setRequestData(prev => ({ ...prev, userId: a.userId, userMoney: a.money, userName: a.userName }))
     }
-    return(
-        <div className="flex flex-wrap">
-            {props.studentData.map((a,i)=>{
-                return(
-                    <CharacterCard key={i} onClick={e => onClick(a)} user={a}/>
-                )
-            })}
+    return (
+        <div className="">
+            <h1 className="text-[3rem] text-center">자신의 캐릭터를 선택해주세요</h1>
+            <div className="flex flex-wrap">
+                {props.studentData.map((a, i) => {
+                    return (
+                        <CharacterCard key={i} onClick={e => onClick(a)} user={a} />
+                    )
+                })}
+            </div>
+            <CheckPwdModal requestData={props.requestData} setIsPwdChecked={props.setIsPwdChecked} isPwdChecked={props.isPwdChecked} />
         </div>
     )
 }

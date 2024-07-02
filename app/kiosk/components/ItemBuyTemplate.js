@@ -1,8 +1,14 @@
 import ItemBuyCard from "./ItemBuyCard";
 
 export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData }) {
-    console.log(itemData)
+
     const onClick = (a) => {
+        console.log(a)
+        console.log(requestData)
+        if(a.itemPrice>requestData.userMoney){
+            alert('돈이 모자랍니다')
+            return
+        }
         setRequestData(prev => ({ ...prev, requestItemData: a }))
     }
     return (

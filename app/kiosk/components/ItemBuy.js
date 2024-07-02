@@ -1,15 +1,18 @@
 import CharacterPickTemplate from "./CharacterPickTeplate";
-import ItemBuyCard from "./ItemBuyCard";
+import ConfirmItemBuy from "./ConfirmItemBuy";
 import ItemBuyTemplate from "./ItemBuyTemplate";
 import { useState } from "react";
 export default function ItemBuy({ setStep, itemData, studentData }) {
-    console.log(itemData)
     const [isItemPicked, setIsItemPicked] = useState(false);
-    const [requestData,setRequestData] = useState({requestItemData: null,  requestUserId: null})
+    const [requestData, setRequestData] = useState({ ItemData: null, UserId: null, userMoney: null , userName: null})
+    const [isPwdChecked, setIsPwdChecked] = useState(false);
     return (
-        isItemPicked
-            ? <CharacterPickTemplate studentData={studentData} setRequestData={setRequestData} requestData={requestData}/>
-            : <ItemBuyTemplate itemData={itemData} setStep={setStep} setIsItemPicked={setIsItemPicked} setRequestData={setRequestData} requestData={requestData}/>
+        !isPwdChecked
+            ? <CharacterPickTemplate studentData={studentData} setRequestData={setRequestData} requestData={requestData} setIsPwdChecked={setIsPwdChecked} isPwdChecked={isPwdChecked} />
+            : !isItemPicked
+                ? <ItemBuyTemplate itemData={itemData} setStep={setStep} setIsItemPicked={setIsItemPicked} setRequestData={setRequestData} requestData={requestData} />
+                : <ConfirmItemBuy requestData={requestData} />
+
     )
 
 
