@@ -1,12 +1,15 @@
 import CharacterCard from "./CharacterCard"
 import CheckPwdModal from "./CheckPwdModal"
-
+import { useState } from "react"
 export default function CharacterPickTemplate(props) {
     const onClick = (a) => {
 
         document.getElementById('my_modal_3').showModal()
-        props.setRequestData(prev => ({ ...prev, userId: a.userId, userMoney: a.money, userName: a.userName }))
+        props.setRequestData(prev => ({ ...prev, userId: a.userId, userMoney: a.money, userName: a.userName, checked: true }))
+       
     }
+    // const [studentData,setStudentData] = useState(props.studentData);
+
     return (
         <div className="">
             <h1 className="text-[3rem] text-center mb-[16px]">자신의 캐릭터를 선택해주세요</h1>
@@ -17,7 +20,7 @@ export default function CharacterPickTemplate(props) {
                     )
                 })}
             </div>
-            <CheckPwdModal requestData={props.requestData} setIsPwdChecked={props.setIsPwdChecked} isPwdChecked={props.isPwdChecked} />
+            <CheckPwdModal requestData={props.requestData} setIsPwdChecked={props.setIsPwdChecked} isPwdChecked={props.isPwdChecked}/>
         </div>
     )
 }
