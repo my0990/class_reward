@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
     const [isLoading, setIsLoading] = useState(false);
     console.log(requestData)
@@ -47,7 +47,10 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
 
     }
     const pwdRef = useRef();
-    pwdRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    useEffect(()=>{
+        pwdRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    },[])
+
     return (
         <dialog id="my_modal_3" className="modal  modal-middle">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200 flex flex-col">
