@@ -9,7 +9,7 @@ export default function CharacterPickTemplate(props) {
     }
     return (
         <div className="">
-            <h1 className="text-[3rem] text-center">자신의 캐릭터를 선택해주세요</h1>
+            <h1 className="text-[3rem] text-center mb-[16px]">자신의 캐릭터를 선택해주세요</h1>
             <div className="flex flex-wrap">
                 {props.studentData.map((a, i) => {
                     return (
