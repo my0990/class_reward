@@ -3,10 +3,12 @@ import { useState } from "react";
 export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData }) {
     const tmp = itemData.map((a) => { a.checked = false; return a })
     const [itemList, setItemList] = useState(tmp)
+    const [isSelected,setIsSelected] = useState(false);
     const onClick = (a) => {
-        console.log(a)
-        console.log(itemList)
-
+        
+        if(isSelected === false){
+            setIsSelected(true)
+        }
         if (a.itemPrice > requestData.userMoney) {
             alert('돈이 모자랍니다')
             return
@@ -24,7 +26,13 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
         // 업데이트된 사용자 리스트를 상태로 설정
         setItemList(updatedItems);
     }
-
+    const onNext = () => {
+        if(isSelected){
+            setIsItemPicked(true)
+        } else {
+            alert('아이템을 선택해주세요')
+        }
+    }
     return (
         <div className="flex flex-col justify-center items-center">
             <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
@@ -37,7 +45,7 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
             </div>
             <div className="flex">
                 <button className="mr-[16px] btn" onClick={() => setStep('home')} >처음으로</button>
-                <button className="btn" onClick={() => setIsItemPicked(true)}>다음</button>
+                <button className="btn" onClick={onNext}>다음</button>
             </div>
         </div>
     )

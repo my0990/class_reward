@@ -5,7 +5,7 @@ export default function CharacterPickTemplate(props) {
     const onClick = (a) => {
 
         document.getElementById('my_modal_3').showModal()
-        props.setRequestData(prev => ({ ...prev, userId: a.userId, userMoney: a.money, userName: a.userName, checked: true }))
+        props.setRequestData(prev => ({ ...prev, userId: a.userId, userMoney: a.money, userName: a.userName, checked: true, itemList: [...a.itemList] }))
        
     }
     // const [studentData,setStudentData] = useState(props.studentData);

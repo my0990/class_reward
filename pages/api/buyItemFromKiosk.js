@@ -15,10 +15,10 @@ export default async function handler(req, res) {
     // MongoDB 연결
     // const ItemId = req.body.itemId
     const db = (await connectDB).db('data');
-
+    let itemId = (new ObjectId()).toString();
 
     const response = await db.collection('user_data').updateOne({userId: teacherId, "itemList.itemId": itemData.ItemId},{$inc : {'itemList.$.itemQuantity': -1}})
-    const response2 = await db.collection('user_data').updateOne({userId: userId},{$push: {itemList: {itemName: itemData.itemName, itemPrice: itemData.itemPrice, state: '사용 가능', itemId: itemData.itemId, teacher: teacherId}}}, {upsert: true})
+    const response2 = await db.collection('user_data').updateOne({userId: userId},{$push: {itemList: {itemName: itemData.itemName, itemPrice: itemData.itemPrice, state: '사용 가능', itemId: itemId, teacher: teacherId}}}, {upsert: true})
     const response3 = await db.collection('user_data').updateOne({userId: userId},{$inc: {money: -itemData.itemPrice}})
-    res.status(201).json({ result: true, message: 'delete 성공' });
+    res.status(201).json({ result: true, message: 'buy 성공' });
 }}
