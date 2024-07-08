@@ -16,6 +16,8 @@ export default function SignupPwd({ setStep, teacher, userId, userGender, userNa
         if(isLoading){
             return
         } else {
+            alert('아직 준비중입니다')
+            return
             setIsLoading(true)
             if (!pwdRef.current.value) setError(prev => ({ pwd: "비밀번호를 입력하세요", pwdCheck: '' }))
             else if (pwdRef.current.value !== pwdCheckRef.current.value) setError(prev => ({ pwd: '', pwdCheck: "비밀번호가 일치하지 않습니다" }))
