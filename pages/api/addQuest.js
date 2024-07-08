@@ -26,7 +26,10 @@ export default async function handler(req, res) {
     studentList.forEach(key => {
       tmp[key.userName] = false
     });
-    const response = await db.collection('quest').insertOne({ userId: userId, questName: name, questContent: content, questReward: reward, studentList: studentList, time: new Date(), doneCount: 0,  finished: false }, { upsert: true })
+
+    let sortedStudentList = studentList.sort((a, b) => a.userName.localeCompare(b.userName))
+    console.log(sortedStudentList)
+    const response = await db.collection('quest').insertOne({ userId: userId, questName: name, questContent: content, questReward: reward, studentList: sortedStudentList, time: new Date(), doneCount: 0,  finished: false }, { upsert: true })
 
 
     if(response){

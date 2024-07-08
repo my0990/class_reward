@@ -13,7 +13,7 @@ export default async function Page() {
     const tmp = response.map((a) => { a._id = a._id.toString(); return a })
     return (
         <>
-            <HomePage data={tmp} />
+            <HomePage data={tmp} /> 
         </>
     )
 }

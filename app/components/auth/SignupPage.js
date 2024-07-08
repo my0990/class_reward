@@ -35,9 +35,12 @@ export default function SignUpPage() {
         validate,
         type: 'register'
     });
-
+    const onSubmitFake = (e) => {
+        e.preventDefault();
+        alert('준비중입니다')
+    }
     return (
-        <form type="POST" onSubmit={submitHandler}>
+        <form type="POST" onSubmit={onSubmitFake}>
             <div className="w-full flex flex-col items-center mt-[80px]">
                 <div className="w-10/12 min-[500px]:w-[400px] mx-5 ">
                     <div className="text-[3rem] ">

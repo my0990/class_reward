@@ -19,6 +19,7 @@ export default function QuestDetail({ params }) {
                 },
             })
             const result = await response.json();
+            console.log(result)
             setData(result.data);
             setRole(result.role);
             setStudentList(result.data.studentList)
