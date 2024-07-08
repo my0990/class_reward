@@ -61,21 +61,10 @@ export default function ConfirmItemUse({ requestData }) {
                 <div className="text-gray-500 mb-[32px]">
                     {itemExplanation}
                 </div>
-                <div className="mb-[8px]">남는금액: </div>
-                <div className="flex mb-[32px] flex-wrap">
-                    <div>{userMoney}원</div>
-                    <div className="mx-[8px]">-</div>
-                    <div>{itemPrice}원</div>
-                    <div className="mx-[8px]">=</div>
-
-                    <div className="text-green-500">{userMoney - itemPrice}원</div>
-
-
-                </div>
                 {/* <div className="mb-[32px]">남은 수량: {itemData?.itemQuantity}</div> */}
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
                     <div onClick={onClick} className="w-[48%] max-[600px]:w-[100%]">
-                <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
+                <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">사용</button>
             </div>
                     <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
                 </div>
