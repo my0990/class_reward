@@ -11,7 +11,7 @@ export default function CharacterPickTemplate(props) {
     // const [studentData,setStudentData] = useState(props.studentData);
 
     return (
-        <div className="">
+        <div className="flex justify-center flex-col items-center">
             <h1 className="text-[3rem] text-center mb-[16px]">자신의 캐릭터를 선택해주세요</h1>
             <div className="flex flex-wrap">
                 {props.studentData.map((a, i) => {
@@ -20,6 +20,7 @@ export default function CharacterPickTemplate(props) {
                     )
                 })}
             </div>
+            <button className="btn text-center mt-[18px]" onClick={() => props.setStep('home')} >처음으로</button>
             <CheckPwdModal requestData={props.requestData} setIsPwdChecked={props.setIsPwdChecked} isPwdChecked={props.isPwdChecked}/>
         </div>
     )

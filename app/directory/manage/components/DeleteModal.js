@@ -1,6 +1,8 @@
 import { useState } from "react";
 export default function DeleteModal({picked, teacher}) {
     const onSubmit = (e) => {
+        alert('삭제하지 말아주세요')
+        return
         e.preventDefault();
         fetch("/api/deleteAccount", {
             method: "POST",
