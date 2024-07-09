@@ -28,7 +28,7 @@ export default function ConfirmItemUse({ requestData, setStep }) {
 
                 if (data.result === true) {
                     document.getElementById('my_modal_2').showModal()
-                    // location.reload();
+                    location.reload();
 
 
                 } else {

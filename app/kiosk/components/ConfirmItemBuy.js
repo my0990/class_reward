@@ -22,8 +22,9 @@ export default function ConfirmItemBuy({ requestData, setStep }) {
 
                 if (data.result === true) {
                     // alert('구입하였습니다')
-                    // location.reload();
+
                     document.getElementById('my_modal_2').showModal()
+                    location.reload();
 
                 } else {
                     setIsLoading(false)
@@ -74,12 +75,12 @@ export default function ConfirmItemBuy({ requestData, setStep }) {
                 {/* <div className="mb-[32px]">남은 수량: {itemData?.itemQuantity}</div> */}
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
                     <div onClick={onClick} className="w-[48%] max-[600px]:w-[100%]">
-                <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
-            </div>
+                        <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
+                    </div>
                     <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
                 </div>
             </div>
-            <Alert setStep={setStep}/>
+            <Alert setStep={setStep} />
         </div>
     )
 }
