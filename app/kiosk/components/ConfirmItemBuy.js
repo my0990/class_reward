@@ -1,11 +1,12 @@
 import { useState } from "react";
 import gold from "@/public/gold.png"
 import Image from "next/image";
-export default function ConfirmItemBuy({ requestData }) {
+import Alert from "./Alert";
+export default function ConfirmItemBuy({ requestData, setStep }) {
     console.log(requestData)
     const [isLoading, setIsLoading] = useState(false);
     const { itemData, userId, userMoney } = requestData;
-    console.log(requestData)
+
     const onClick = (e) => {
         if (isLoading) {
             return
@@ -20,11 +21,11 @@ export default function ConfirmItemBuy({ requestData }) {
             }).then((res) => res.json()).then((data) => {
 
                 if (data.result === true) {
-                    alert('구입하였습니다')
-                    location.reload();
+                    // alert('구입하였습니다')
+                    // location.reload();
+                    document.getElementById('my_modal_2').showModal()
 
                 } else {
-                    document.getElementById('my_modal_3').close()
                     setIsLoading(false)
                 }
             })
@@ -78,6 +79,7 @@ export default function ConfirmItemBuy({ requestData }) {
                     <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
                 </div>
             </div>
+            <Alert setStep={setStep}/>
         </div>
     )
 }

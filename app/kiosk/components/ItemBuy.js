@@ -11,7 +11,7 @@ export default function ItemBuy({ setStep, itemData, studentData }) {
             ? <CharacterPickTemplate setStep={setStep} studentData={studentData} setRequestData={setRequestData} requestData={requestData} setIsPwdChecked={setIsPwdChecked} isPwdChecked={isPwdChecked} />
             : !isItemPicked
                 ? <ItemBuyTemplate itemData={itemData} setStep={setStep} setIsItemPicked={setIsItemPicked} setRequestData={setRequestData} requestData={requestData} />
-                : <ConfirmItemBuy requestData={requestData} />
+                : <ConfirmItemBuy requestData={requestData} setStep={setStep}/>
 
     )
 

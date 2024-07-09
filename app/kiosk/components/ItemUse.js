@@ -11,7 +11,7 @@ export default function ItemUse({ setStep, itemData, studentData }) {
             ? <CharacterPickTemplate setStep={setStep} studentData={studentData} setRequestData={setRequestData} requestData={requestData} setIsPwdChecked={setIsPwdChecked} isPwdChecked={isPwdChecked} />
             : !isItemPicked
                 ? <ItemUseTemplate itemData={itemData} setStep={setStep} setIsItemPicked={setIsItemPicked} setRequestData={setRequestData} requestData={requestData} />
-                : <ConfirmItemUse requestData={requestData} />
+                : <ConfirmItemUse requestData={requestData} setStep={setStep}/>
 
     )
 

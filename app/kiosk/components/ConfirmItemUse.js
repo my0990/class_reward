@@ -1,8 +1,13 @@
 import { useState } from "react";
 import gold from "@/public/gold.png"
 import Image from "next/image";
-export default function ConfirmItemUse({ requestData }) {
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import Alert from "./Alert";
+export default function ConfirmItemUse({ requestData, setStep }) {
     console.log(requestData)
+    const MySwal = withReactContent(Swal)
+    
     const [isLoading, setIsLoading] = useState(false);
     const { userName, userId, userMoney } = requestData;
     const {itemId,itemName,itemPrice,teacher, itemExplanation} = requestData.itemData;
@@ -22,11 +27,11 @@ export default function ConfirmItemUse({ requestData }) {
             }).then((res) => res.json()).then((data) => {
 
                 if (data.result === true) {
-                    alert('아이템 사용을 신청하였습니다')
-                    location.reload();
+                    document.getElementById('my_modal_2').showModal()
+                    // location.reload();
+
 
                 } else {
-                    document.getElementById('my_modal_3').close()
                     setIsLoading(false)
                 }
             })
@@ -69,6 +74,7 @@ export default function ConfirmItemUse({ requestData }) {
                     <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
                 </div>
             </div>
+            <Alert setStep={setStep}/>
         </div>
     )
 }

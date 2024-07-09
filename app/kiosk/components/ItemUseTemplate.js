@@ -10,10 +10,7 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
         if(isSelected === false){
             setIsSelected(true)
         }
-        if (a.itemPrice > requestData.userMoney) {
-            alert('돈이 모자랍니다')
-            return
-        }
+
         setRequestData(prev => ({ ...prev, itemData: a }))
         const updatedItems = itemList.map(item => {
             // 대상 사용자를 찾으면 비밀번호를 변경
