@@ -1,4 +1,4 @@
-export default function Alert({setStep}) {
+export default function Alert(props) {
     return (
         <dialog id="my_modal_2" className="modal  modal-middle ">
             <div className="modal-box p-0 dark:bg-orange-200 flex flex-col bg-orange-100">
@@ -14,8 +14,8 @@ export default function Alert({setStep}) {
                             strokeWidth="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>완료하였습니다</span>
-                    <button className="btn" onClick={() => setStep("home")}>확인</button>
+                    <span>{props.children}</span>
+                    <button className="btn" onClick={() => props.setStep("home")}>확인</button>
                 </div>
             </div>
 

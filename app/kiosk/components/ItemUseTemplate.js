@@ -1,5 +1,6 @@
 import ItemBuyCard from "./ItemBuyCard";
 import { useState } from "react";
+import Alert from "./Alert";
 export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData }) {
     console.log(requestData)
     const tmp = requestData.itemList.map((a) => { a.checked = false; return a })
@@ -28,8 +29,11 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
         if(isSelected){
             setIsItemPicked(true)
         } else {
-            alert('아이템을 선택해주세요')
+            document.getElementById('my_modal_2').showModal();
         }
+    }
+    const onModalClick = () => {
+        document.getElementById('my_modal_2').close();
     }
     return (
         <div className="flex flex-col justify-center items-center">
@@ -47,6 +51,7 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
                 <button className="mr-[16px] btn" onClick={() => setStep('home')} >처음으로</button>
                 <button className="btn" onClick={onNext}>다음</button>
             </div>
+            <Alert setStep={onModalClick}>아이템을 선택해주세요</Alert>
         </div>
     )
 }

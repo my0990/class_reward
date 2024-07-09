@@ -28,7 +28,7 @@ export default function ConfirmItemUse({ requestData, setStep }) {
 
                 if (data.result === true) {
                     document.getElementById('my_modal_2').showModal()
-                    location.reload();
+                    
 
 
                 } else {
@@ -71,10 +71,10 @@ export default function ConfirmItemUse({ requestData, setStep }) {
                     <div onClick={onClick} className="w-[48%] max-[600px]:w-[100%]">
                 <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">사용</button>
             </div>
-                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
+                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => setStep('home')}>취소</button>
                 </div>
             </div>
-            <Alert setStep={setStep}/>
+            <Alert setStep={setStep} >아이템 사용을 신청하였습니다</Alert>
         </div>
     )
 }

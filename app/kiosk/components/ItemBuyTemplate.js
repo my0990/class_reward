@@ -1,3 +1,4 @@
+import Alert from "./Alert";
 import ItemBuyCard from "./ItemBuyCard";
 import { useState } from "react";
 export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData }) {
@@ -10,7 +11,7 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
             setIsSelected(true)
         }
         if (a.itemPrice > requestData.userMoney) {
-            alert('돈이 모자랍니다')
+            document.getElementById('my_modal_2').showModal()
             return
         }
         setRequestData(prev => ({ ...prev, itemData: a }))
@@ -30,8 +31,11 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
         if(isSelected){
             setIsItemPicked(true)
         } else {
-            alert('아이템을 선택해주세요')
+            document.getElementById('my_modal_2').showModal()
         }
+    }
+    const onModalClick= () => {
+        document.getElementById('my_modal_2').close()
     }
     return (
         <div className="flex flex-col justify-center items-center">
@@ -47,6 +51,7 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
                 <button className="mr-[16px] btn" onClick={() => setStep('home')} >처음으로</button>
                 <button className="btn" onClick={onNext}>다음</button>
             </div>
+            <Alert setStep={onModalClick}>{isSelected ? '돈이 모자랍니다' : '아이템을 선택해주세요'}</Alert>
         </div>
     )
 }

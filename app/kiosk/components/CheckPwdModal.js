@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
+import Alert from "./Alert";
 export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
     const [isLoading, setIsLoading] = useState(false);
-    console.log(requestData)
     // {
     //     data: {
     //       requestItemData: {
@@ -37,10 +37,10 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
                     setIsPwdChecked(true);
 
                 } else {
-                    alert('비밀번호를 다시 확인해주세요')
-                    document.getElementById('my_modal_3').close()
+                    document.getElementById('my_modal_2').showModal()
+                    pwdRef.current.value = ""
                     setIsLoading(false)
-                    onCloseModal()
+                    // onCloseModal()
                 }
             })
         }
@@ -50,7 +50,9 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
     useEffect(()=>{
         pwdRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     },[])
-
+    const setStep = () => {
+        document.getElementById('my_modal_2').close()
+    }
     return (
         <dialog id="my_modal_3" className="modal  modal-middle">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200 flex flex-col">
@@ -63,7 +65,7 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
             <form method="dialog" className="modal-backdrop" onClick={onCloseModal}>
                 <button>close</button>
             </form>
-
+            <Alert setStep={setStep} >비밀번호를 확인해주세요</Alert>
         </dialog>
 
     )
