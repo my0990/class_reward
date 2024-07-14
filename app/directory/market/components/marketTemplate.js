@@ -9,7 +9,7 @@ import {
     TransitionGroup,
 } from 'react-transition-group';
 
-export default function MarketTemplate({ userData, role, itemListInit }) {
+export default function MarketTemplate({ userData, role, itemListInit, currencyName }) {
     const onDelete = (picked) => {
         setDeleteId(picked.itemId)
         setBuyList(picked)
@@ -52,8 +52,8 @@ export default function MarketTemplate({ userData, role, itemListInit }) {
                 </div> : null}
                 <AddModal itemList={itemList} setItemList={setItemList} />
                 {role === 'teacher'
-                    ? <DeleteModal deleteId={deleteId} itemList={itemList} setItemList={setItemList} buyList={buyList} />
-                    : <BuyModal buyList={buyList} setItemList={setItemList} itemList={itemList} money={userData?.money} />}
+                    ? <DeleteModal deleteId={deleteId} itemList={itemList} setItemList={setItemList} buyList={buyList} currencyName={currencyName}/>
+                    : <BuyModal buyList={buyList} setItemList={setItemList} itemList={itemList} money={userData?.money} currencyName={currencyName}/>}
             </div>
 
         </div>

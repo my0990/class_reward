@@ -4,7 +4,7 @@ import Image from "next/image"
 import gold from "@/public/gold.png";
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
-export default function UserInfo({ userName, role, isUserinfoClicked, setIsUserinfoClicked, profileiconRef, money }) {
+export default function UserInfo({ userName, role, isUserinfoClicked, setIsUserinfoClicked, profileiconRef, money, currencyName }) {
     const dropDownRef = useRef();
     useEffect(() => {
 
@@ -38,11 +38,12 @@ export default function UserInfo({ userName, role, isUserinfoClicked, setIsUseri
                     </button>
                 </div>
                 <ul>
-                    <li className="pb-[1rem] px-[16px]   border-b-2">
+                    <li className="pb-[1rem] px-[16px]  border-b-2">
                         <div className="flex">
-                            <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold" /></div>
+                            {/* <div className="mr-3"><Image src={gold} width={24} height={24} alt="gold" /></div> */}
+                            <div className="mr-3">🥇</div>
                             {/* <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div> */}
-                            <div>{money?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원 </div>
+                            <div>{money?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{currencyName} </div>
                         </div>
                     </li>
                     <Link href="./setting">

@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 import gold from "@/public/gold.png";
 import Image from "next/image";
 import { useState } from "react";
-export default function BuyModal({ buyList, setItemList, itemList, money }) {
+export default function BuyModal({ buyList, setItemList, itemList, money, currencyName }) {
     const router = useRouter();
     const [isLoading,setIsLoading] = useState(false);
     const onSubmit = (e) => {
@@ -44,27 +44,27 @@ export default function BuyModal({ buyList, setItemList, itemList, money }) {
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
                 <div className="flex justify-end">
                     <div className="w-[20px] h-[20px] mr-[8px]">
-                        <Image src={gold} alt="money" />
+                        {/* <Image src={gold} alt="money" /> */}
                     </div>
-                    <div className="text-[0.9rem]">{currentMoney}원</div>
+                    <div className="text-[0.9rem]">{currentMoney} {currencyName}</div>
                 </div>
                 <div className="flex items-center">
                     <h1 className="text-[1.5rem] font-bold">{buyList?.itemName}</h1>
                     <div className="mx-[8px]">-</div>
-                    <div className="text-[1.1rem] ">{itemPrice}원</div>
+                    <div className="text-[1.1rem] ">{itemPrice} {currencyName}</div>
                 </div>
                 <div className="text-gray-500 mb-[32px]">
                     {buyList?.itemExplanation}
                 </div>
-                <div className="mb-[8px]">남는금액: </div>
+                <div className="mb-[8px]">남는{currencyName}: </div>
                 <div className="flex mb-[32px] flex-wrap">
-                    <div>{currentMoney}원</div>
+                    <div>{currentMoney}{currencyName}</div>
                     <div className="mx-[8px]">-</div>
-                    <div>{itemPrice}원</div>
+                    <div>{itemPrice}{currencyName}</div>
                     <div className="mx-[8px]">=</div>
                     {money - buyList?.itemPrice >= 0 ?
-                        <div className="text-green-500">{left}원</div> :
-                        <div className="text-red-500">{left}원</div>}
+                        <div className="text-green-500">{left}{currencyName}</div> :
+                        <div className="text-red-500">{left}{currencyName}</div>}
 
                 </div>
                 <div className="mb-[32px]">남은 수량: {buyList?.itemQuantity}</div>

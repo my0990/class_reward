@@ -9,14 +9,14 @@ export default function CharacterPickTemplate(props) {
        
     }
     // const [studentData,setStudentData] = useState(props.studentData);
-
+    const currencyName = props.currencyName;
     return (
         <div className="flex justify-center flex-col items-center">
             <h1 className="text-[3rem] text-center mb-[16px]">자신의 캐릭터를 선택해주세요</h1>
             <div className="flex flex-wrap">
                 {props.studentData.map((a, i) => {
                     return (
-                        <CharacterCard key={i} onClick={e => onClick(a)} user={a} />
+                        <CharacterCard key={i} onClick={e => onClick(a)} user={a} currencyName={currencyName}/>
                     )
                 })}
             </div>

@@ -15,9 +15,11 @@ export default async function RootLayout({ children }) {
 
     }
     response._id = response._id.toString();
+    console.log(response.currencyName)
+    const currencyName = response.currencyName
     return (
         <div className="dark:text-black">
-            <Header session={session.user} data={response} />
+            <Header session={session.user} data={response} currencyName={currencyName}/>
             {children}
             <SpeedInsights /> 
         </div>

@@ -11,10 +11,11 @@ export default function CharacterCard(props) {
                 <Image src={props.user.userGender === "male" ? male : female} fill={true} alt="characther" />
             </div>
             <div className="mt-[8px] flex items-center justify-center">
-                <div className="relative w-[24px] h-[24px] mr-[8px]">
+                {/* <div className="relative w-[24px] h-[24px] mr-[8px]">
                     <Image src={gold} alt="gold" fill={true} ></Image>
-                </div>
-                <div>{props.user.money}</div>
+                </div> */}
+                <div className="mr-[4px]">{props.user.money}</div>
+                <div>{props.currencyName}</div>
             </div>
         </div>
         </div>

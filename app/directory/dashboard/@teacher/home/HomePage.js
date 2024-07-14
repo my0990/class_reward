@@ -3,22 +3,52 @@
 import lottieJson from "@/public/pig.json"
 import dynamic from 'next/dynamic';
 import StudentInfoCard from "./components/StudentInfoCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "./components/Modal";
 import InstallPrompt from "../../component/InstallPrompt";
+import SetCurrencyNameModal from "./components/SetCurrencyNameModal";
 
-export default function Home({ data }) {
+export default function Home({ data, currencyName }) {
     const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
-    const [modalData, setModalData] = useState('data');
-
+    let tmpData = data.map(obj => {
+        return { ...obj, isActive: false }; // 새로운 키-값 쌍 추가하여 새로운 객체 반환
+    });
+    const [isSend,setIsSend] = useState(false);
+    const [studentData,setStudentData] = useState(tmpData);
     const onClick = (a) => {
-        document.getElementById('my_modal_2').showModal()
-        setModalData(a)
+        // document.getElementById('my_modal_2').showModal()
+        setStudentData((prev) => {
+            return prev.map(obj=> 
+                obj._id === a._id ? { ...obj, isActive: !a.isActive } : obj
+            );
+        });
+        console.log(studentData)
     }
+    useEffect(()=>{
+        if(!currencyName){
+            document.getElementById('my_modal_1').showModal();
 
+        }
+    })
     const route = useRouter();
-
+    const onSend = () => {
+        if(targetStudent.length === 0){
+            alert('학생을 선택해주세요')
+            return
+        }
+        setIsSend(true);
+        document.getElementById('my_modal_2').showModal();
+    }
+    const onTake = () => {
+        if(targetStudent.length === 0){
+            alert('학생을 선택해주세요')
+            return
+        }
+        setIsSend(false);
+        document.getElementById('my_modal_2').showModal();
+    }
+    const targetStudent = studentData.filter((a) => a.isActive === true)
     if (data.length === 0) {
         return (
             <div className="w-full">
@@ -36,15 +66,22 @@ export default function Home({ data }) {
         )
     } else {
         return (
-            <div className="p-[32px]">
-                <div className="grid min-[1300px]:grid-cols-10  min-[800px]:grid-cols-6  min-[550px]:grid-cols-4 min-[400px]:grid-cols-3  grid-cols-2  gap-[10px]  ">
-                    {data.map((a, i) => {
+            <div className="p-[32px] pt-0">
+                <div className="flex py-[16px] justify-end">
+                    <button className="btn btn-success text-white mr-[16px] " onClick={onSend}>{currencyName} 보내기</button>
+                    <button className="btn bg-red-500 text-white" onClick={onTake}>{currencyName} 빼앗기</button>
+                </div>
+                <div className="grid min-[1300px]:grid-cols-10  min-[800px]:grid-cols-6  min-[550px]:grid-cols-4 min-[400px]:grid-cols-3  grid-cols-2  gap-[10px]">
+                    {studentData.map((a, i) => {
                         return (
-                            <StudentInfoCard key={i} onClick={(e) => onClick(a)} data={a}>{a.userName}</StudentInfoCard>
+                            <StudentInfoCard key={i} isActive={a.isActive}  onClick={(e) => onClick(a)} data={a}>{a.userName}</StudentInfoCard>
                         )
                     })}</div>
-                <Modal modalData={modalData} />
+                {/* {modalData.length !== 0 ? <Modal modalData={modalData} /> : null} */}
+                <Modal targetStudent = {targetStudent } isSend={isSend} setStudentData={setStudentData} studentData={studentData} currencyName={currencyName}/>
                 <InstallPrompt />
+                {currencyName ? null : <SetCurrencyNameModal />}
+
             </div>
         )
     }

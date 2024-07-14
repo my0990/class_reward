@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-export default function DeleteModal({ deleteId, itemList, setItemList, buyList }) {
+export default function DeleteModal({ deleteId, itemList, setItemList, buyList, currencyName }) {
     const [isLoading,setIsLoading] = useState(false);
     const onSubmit = (e) => {
         e.preventDefault();
@@ -39,7 +39,7 @@ export default function DeleteModal({ deleteId, itemList, setItemList, buyList }
                 <div className="flex items-center mb-[8px]">
                     <h1 className="text-[1.5rem] font-bold ">{buyList?.itemName}</h1>
                     <div className="mx-[8px]">-</div>
-                    <div className="text-[1.1rem] ">{buyList?.itemPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div>
+                    <div className="text-[1.1rem] ">{buyList?.itemPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {currencyName}</div>
                 </div>
                 <div className="text-gray-500 mb-[8px]">
                     {buyList?.itemExplanation}

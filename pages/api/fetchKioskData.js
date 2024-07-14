@@ -16,8 +16,10 @@ export default async function handler(req, res) {
     const response2 = await db.collection('user_data').find({teacher: userId}).toArray()
     const tmp = response2.map((a) => { a._id = a._id.toString(); return a })
     response._id = response._id.toString();
-
-    res.status(201).json({ result: true, message: 'delete 성공',itemData: response,  studentData:tmp});
+    console.log('response!!!')
+    console.log(response2)
+    const currencyName = response.currencyName;
+    res.status(201).json({ result: true, message: 'delete 성공',itemData: response,  studentData:tmp, currencyName: currencyName});
   }
 }
 

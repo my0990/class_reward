@@ -2,7 +2,7 @@ import { useState } from "react";
 import gold from "@/public/gold.png"
 import Image from "next/image";
 import Alert from "./Alert";
-export default function ConfirmItemBuy({ requestData, setStep }) {
+export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
     console.log(requestData)
     const [isLoading, setIsLoading] = useState(false);
     const { itemData, userId, userMoney } = requestData;
@@ -48,27 +48,27 @@ export default function ConfirmItemBuy({ requestData, setStep }) {
         <div className="flex justify-center items-center h-[100vh]">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
                 <div className="flex justify-end">
-                    <div className="w-[20px] h-[20px] mr-[8px]">
+                    {/* <div className="w-[20px] h-[20px] mr-[8px]">
                         <Image src={gold} alt="money" />
-                    </div>
-                    <div className="text-[0.9rem]">{userMoney}원</div>
+                    </div> */}
+                    <div className="text-[0.9rem]">{userMoney} {currencyName}</div>
                 </div>
                 <div className="flex items-center">
                     <h1 className="text-[1.5rem] font-bold">{itemData?.itemName}</h1>
                     <div className="mx-[8px]">-</div>
-                    <div className="text-[1.1rem] ">{itemData.itemPrice}원</div>
+                    <div className="text-[1.1rem] ">{itemData.itemPrice} {currencyName}</div>
                 </div>
                 <div className="text-gray-500 mb-[32px]">
                     {itemData?.itemExplanation}
                 </div>
                 <div className="mb-[8px]">남는금액: </div>
                 <div className="flex mb-[32px] flex-wrap">
-                    <div>{userMoney}원</div>
+                    <div>{userMoney} {currencyName}</div>
                     <div className="mx-[8px]">-</div>
-                    <div>{itemData.itemPrice}원</div>
+                    <div>{itemData.itemPrice} {currencyName}</div>
                     <div className="mx-[8px]">=</div>
 
-                    <div className="text-green-500">{userMoney - itemData?.itemPrice}원</div>
+                    <div className="text-green-500">{userMoney - itemData?.itemPrice} {currencyName}</div>
 
 
                 </div>

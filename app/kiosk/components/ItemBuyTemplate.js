@@ -1,7 +1,7 @@
 import Alert from "./Alert";
 import ItemBuyCard from "./ItemBuyCard";
 import { useState } from "react";
-export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData }) {
+export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData, currencyName }) {
     const tmp = itemData.map((a) => { a.checked = false; return a })
     const [itemList, setItemList] = useState(tmp)
     const [isSelected,setIsSelected] = useState(false);
@@ -43,7 +43,7 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
             <div className="flex flex-wrap">
                 {itemList.map((a, i) => {
                     return (
-                        <ItemBuyCard onClick={e => onClick(a)} key={i} itemname={a.itemName} itemdetail={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked} />
+                        <ItemBuyCard onClick={e => onClick(a)} key={i} itemname={a.itemName} itemdetail={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked}  currencyName={currencyName}/>
                     )
                 })}
             </div>

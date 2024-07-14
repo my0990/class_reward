@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import DialBtn from "./DialBtn";
-export default function Modal({ modalData }) {
+export default function Modal({  isSend, setStudentData, studentData, currencyName, targetStudent }) {
     const [point, setPoint] = useState(null);
     const [fontSize, setFontSize] = useState(1.7);
     const [activeKey, setActiveKey] = useState(null);
+
+
     const onClick = (e) => {
         if (point === null) {
             setPoint(e.target.value.toString())
@@ -19,20 +21,33 @@ export default function Modal({ modalData }) {
     }
     const onSubmit = (e) => {
         e.preventDefault();
-        if(point === null || point === ''){
+
+        if (point === null || point === '') {
             alert('숫자를 입력해주세요')
             return;
         }
-        fetch("/api/givePoint", {
+        fetch("/api/handlePoint", {
             method: "POST",
-            body: JSON.stringify({ userId: modalData.userId, point: point }),
+            body: JSON.stringify({ targetStudent: targetStudent, point: point, isSend: isSend }),
             headers: {
                 "Content-Type": "application/json",
             },
         }).then((res) => res.json()).then((data) => {
             if (data.result === true) {
-                alert(modalData.userName + '에게 포인트 ' + point + '개를 지급하였습니다.');
+                const message = targetStudent.map((a,i)=> a.userName)
+                if(isSend){
+                    alert(message+ '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
+                } else {
+                    alert(message+ '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
+                }
+
                 setPoint(null);
+                const updatedUsers = studentData.map(user => {
+
+                      return { ...user, isActive: false }; // age 속성 증가
+
+                  });
+                  setStudentData(updatedUsers)
                 document.getElementById('my_modal_2').close()
             }
         })
@@ -84,18 +99,20 @@ export default function Modal({ modalData }) {
         window.addEventListener('keyup', handleKeyUp);
 
         return () => {
-          window.removeEventListener('keydown', handleKeyDown);
-          window.removeEventListener('keyup', handleKeyUp);
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
         };
-      }, [point]);
+    }, [point]);
     return (
         <dialog id="my_modal_2" className="modal " tabIndex="-1">
-            <div className="modal-box w-[320px] flex justify-center dark:bg-gray-400" >
+            <div className={`modal-box w-[320px] flex justify-center dark:bg-gray-400 ${isSend ? "bg-green-500" : "bg-red-500"}`} >
                 <div className="w-[272px]">
-                    <h3 className="font-bold text-lg mb-5 ml-[10px]">받는 사람: <span className="text-[1.4rem] ml-[4px]">{modalData.userName}</span></h3>
+                    <h3 className="font-bold text-lg mb-5 ml-[10px] ">
+                        {isSend ? "받는" : "잃는"} 사람: {targetStudent.map((a, i) => <span className="text-[1.4rem] ml-[4px]" key={i}><span className="bg-orange-200">{a.userName}</span><span className="">{i < targetStudent.length - 1 && ', '}</span></span>)}
+                    </h3>
                     <div className="h-[64px] bg-gray-200 mb-5 rounded-2xl flex justify-between items-center px-[16px]">
-                        <div className="text-gray-500">받는 금액</div>
-                        <div style={{ fontSize: fontSize + "rem" }} className={` w-[170px] break-all flex justify-end`}>{point ? point : 0}원</div>
+                        <div className="text-gray-500">{isSend ? "받는" : "잃는"} 금액</div>
+                        <div style={{ fontSize: fontSize + "rem" }} className={` w-[170px] break-all flex justify-end`}>{point ? point : 0} {currencyName}</div>
                     </div>
                     <ul className="flex justify-between">
                         <DialBtn value={'1'} onClick={onClick} isActive={activeKey === "1"}>1</DialBtn>

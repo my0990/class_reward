@@ -5,7 +5,7 @@ export default function ItemBuyCard(props) {
                 <h1 className="text-[1.2rem] font-bold">{props.itemname}</h1>
                 <div className="text-gray-500">{props.itemdetail}</div>
             </div>
-            <div className="text-red-500 text-right">{props.itemprice}</div>
+            <div className="text-red-500 text-right">{props.itemprice} {props.currencyName}</div>
         </div>
     )
 }

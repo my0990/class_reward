@@ -9,7 +9,7 @@ const InstallPrompt = () => {
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [isDenied,setIsDenied] = useState(false);
     useEffect(()=>{
-        console.log('isDenied: ', JSON.parse(localStorage.getItem('a2hsDenied')))
+        // console.log('isDenied: ', JSON.parse(localStorage.getItem('a2hsDenied')))
         setIsDenied(JSON.parse(localStorage.getItem('a2hsDenied')));
     },[])
 
@@ -63,7 +63,7 @@ const InstallPrompt = () => {
     if (!isIOS && !isShown) {
         return null;
     }
-    console.log(isDenied)
+    // console.log(isDenied)
     return (
         /* 설치 프롬프트 컴포넌트 */
         isDenied  ? null : isIOS  ? <IosPrompt iosCancelClicked={iosCancelClicked}/> : <AndroidPrompt handleClick={handleClick} handleCancelClicked={handleCancelClicked}/>

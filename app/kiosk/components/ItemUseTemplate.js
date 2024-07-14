@@ -1,7 +1,7 @@
 import ItemBuyCard from "./ItemBuyCard";
 import { useState } from "react";
 import Alert from "./Alert";
-export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData }) {
+export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData, currencyName }) {
     console.log(requestData)
     const tmp = requestData.itemList.map((a) => { a.checked = false; return a })
     const [itemList, setItemList] = useState(tmp)
@@ -42,7 +42,7 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
                 {itemList.map((a, i) => {
                     return (
                         a.state === "사용 가능"
-                        ? <ItemBuyCard onClick={e => onClick(a)} key={i} itemname={a.itemName} itemdetail={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked} />
+                        ? <ItemBuyCard onClick={e => onClick(a)} currencyName={currencyName} key={i} itemname={a.itemName} itemdetail={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked}/>
                         : null
                         )
                 })}

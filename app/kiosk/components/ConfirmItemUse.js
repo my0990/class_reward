@@ -4,7 +4,7 @@ import Image from "next/image";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import Alert from "./Alert";
-export default function ConfirmItemUse({ requestData, setStep }) {
+export default function ConfirmItemUse({ requestData, setStep, currencyName }) {
     console.log(requestData)
     const MySwal = withReactContent(Swal)
     
@@ -53,15 +53,15 @@ export default function ConfirmItemUse({ requestData, setStep }) {
         <div className="flex justify-center items-center h-[100vh]">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
                 <div className="flex justify-end">
-                    <div className="w-[20px] h-[20px] mr-[8px]">
+                    {/* <div className="w-[20px] h-[20px] mr-[8px]">
                         <Image src={gold} alt="money" />
-                    </div>
-                    <div className="text-[0.9rem]">{userMoney}원</div>
+                    </div> */}
+                    <div className="text-[0.9rem]">{userMoney} {currencyName}</div>
                 </div>
                 <div className="flex items-center">
                     <h1 className="text-[1.5rem] font-bold">{itemName}</h1>
                     <div className="mx-[8px]">-</div>
-                    <div className="text-[1.1rem] ">{itemPrice}원</div>
+                    <div className="text-[1.1rem] ">{itemPrice} {currencyName}</div>
                 </div>
                 <div className="text-gray-500 mb-[32px]">
                     {itemExplanation}

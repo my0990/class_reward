@@ -19,9 +19,10 @@ export default async function Market(){
         itemListInit = response.itemList
     }
     response._id = response._id.toString()
+    const currencyName = response.currencyName;
     return(
         <div>
-            <MarketTemplate userData={response} itemListInit={itemListInit} role={role}/>
+            <MarketTemplate userData={response} itemListInit={itemListInit} role={role} currencyName={currencyName}/>
         </div>
     )
 }

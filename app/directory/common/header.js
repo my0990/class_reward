@@ -9,7 +9,7 @@ import { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 
-export default function Header({ session, data }) {
+export default function Header({ session, data, currencyName }) {
     const router = useRouter();
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {
@@ -82,7 +82,7 @@ export default function Header({ session, data }) {
                 </div>
             </div>
             {isHamburgerClicked ? <DropDown session={session} money={money} /> : null}
-            {isUserinfoClicked ? <UserInfo session={session} role={role} userName={data?.userName} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} /> : null}
+            {isUserinfoClicked ? <UserInfo session={session} role={role} userName={data?.userName} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} currencyName={currencyName}/> : null}
         </>
     )
 }
