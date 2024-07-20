@@ -67,7 +67,7 @@ export default function AddModal({ itemList, setItemList }) {
                 <div className="flex justify-evenly flex-wrap">
                     <div className="mb-[16px]">
                         <h1 className="w-full outline-none" tabIndex={99}>아이템 이미지</h1>
-                        {!emoji ? <div className="flex justify-center  overflow-hidden" tabIndex={-1}>
+                        {!emoji ? <div className="flex justify-center  overflow-hidden w-[352px]" tabIndex={-1}>
                             <Picker
                                 style={{ height: '300px', width: '400px' }}
                                 data={data}
