@@ -9,7 +9,7 @@ import Modal from "./components/Modal";
 import InstallPrompt from "../../component/InstallPrompt";
 import SetCurrencyNameModal from "./components/SetCurrencyNameModal";
 
-export default function Home({ data, currencyName }) {
+export default function Home({ data, classData}) {
     const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
     let tmpData = data.map(obj => {
         return { ...obj, isActive: false }; // 새로운 키-값 쌍 추가하여 새로운 객체 반환
@@ -26,7 +26,7 @@ export default function Home({ data, currencyName }) {
         console.log(studentData)
     }
     useEffect(()=>{
-        if(!currencyName){
+        if(!classData){
             document.getElementById('my_modal_1').showModal();
 
         }
@@ -68,8 +68,8 @@ export default function Home({ data, currencyName }) {
         return (
             <div className="p-[32px] pt-0">
                 <div className="flex py-[16px] justify-end">
-                    <button className="btn btn-success text-white mr-[16px] " onClick={onSend}>{currencyName} 보내기</button>
-                    <button className="btn bg-red-500 text-white" onClick={onTake}>{currencyName} 빼앗기</button>
+                    <button className="btn btn-success text-white mr-[16px] " onClick={onSend}>{classData?.currencyName} 보내기</button>
+                    <button className="btn bg-red-500 text-white" onClick={onTake}>{classData?.currencyName} 빼앗기</button>
                 </div>
                 <div className="grid min-[1300px]:grid-cols-10  min-[800px]:grid-cols-6  min-[550px]:grid-cols-4 min-[400px]:grid-cols-3  grid-cols-2  gap-[10px]">
                     {studentData.map((a, i) => {
@@ -78,9 +78,9 @@ export default function Home({ data, currencyName }) {
                         )
                     })}</div>
                 {/* {modalData.length !== 0 ? <Modal modalData={modalData} /> : null} */}
-                <Modal targetStudent = {targetStudent } isSend={isSend} setStudentData={setStudentData} studentData={studentData} currencyName={currencyName}/>
+                <Modal targetStudent = {targetStudent } isSend={isSend} setStudentData={setStudentData} studentData={studentData} currencyName={classData?.currencyName}/>
                 <InstallPrompt />
-                {currencyName ? null : <SetCurrencyNameModal />}
+                {classData ? null : <SetCurrencyNameModal />}
 
             </div>
         )

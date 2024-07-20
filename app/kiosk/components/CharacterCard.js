@@ -14,6 +14,7 @@ export default function CharacterCard(props) {
                 {/* <div className="relative w-[24px] h-[24px] mr-[8px]">
                     <Image src={gold} alt="gold" fill={true} ></Image>
                 </div> */}
+                <div className="mr-[4px]">{props.currencyEmoji}</div>
                 <div className="mr-[4px]">{props.user.money}</div>
                 <div>{props.currencyName}</div>
             </div>

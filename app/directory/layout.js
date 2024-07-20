@@ -15,11 +15,11 @@ export default async function RootLayout({ children }) {
 
     }
     response._id = response._id.toString();
-    console.log(response.currencyName)
-    const currencyName = response.currencyName
+    const currencyName = response.classData?.currencyName
+    const currencyEmoji = response.classData?.currencyEmoji
     return (
         <div className="dark:text-black">
-            <Header session={session.user} data={response} currencyName={currencyName}/>
+            <Header session={session.user} data={response} currencyName={currencyName} currencyEmoji={currencyEmoji}/>
             {children}
             <SpeedInsights /> 
         </div>

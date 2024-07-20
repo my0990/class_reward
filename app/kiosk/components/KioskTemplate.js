@@ -10,6 +10,7 @@ export default function Kiosk() {
     const [itemData, setItemData] = useState({});
     const [studentData, setStudentData] = useState([]);
     const [currencyName,setCurrencyName] = useState(null);
+    const [currencyEmoji, setCurrencyEmoji] = useState(null);
     const elementRef = useRef(null);
 
 
@@ -50,7 +51,8 @@ export default function Kiosk() {
                 console.log(result)
                 setItemData(result.itemData);
                 setStudentData(result.studentData);
-                setCurrencyName(result.currencyName);
+                setCurrencyName(result.classData?.currencyName);
+                setCurrencyEmoji(result.classData?.currencyEmoji);
 
 
             };
@@ -62,7 +64,7 @@ export default function Kiosk() {
     return (
         <div ref={elementRef} className='h-[100%] min-h-[100vh] overflow-auto bg-orange-100'>
 
-            {step === 'home' ? <KioskHomeTemplate setStep={setStep} enterFullscreen={enterFullscreen} /> : step === 'use' ? <ItemUse setStep={setStep} itemData={itemData.itemList} studentData={studentData} currencyName={currencyName}/> : <ItemBuy setStep={setStep} itemData={itemData.itemList} studentData={studentData} currencyName={currencyName}/>}
+            {step === 'home' ? <KioskHomeTemplate setStep={setStep} enterFullscreen={enterFullscreen} /> : step === 'use' ? <ItemUse setStep={setStep} itemData={itemData.itemList} studentData={studentData} currencyName={currencyName} currencyEmoji={currencyEmoji}/> : <ItemBuy setStep={setStep} itemData={itemData.itemList} studentData={studentData} currencyName={currencyName} currencyEmoji={currencyEmoji}/>}
 
         </div>
     );

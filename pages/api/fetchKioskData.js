@@ -18,8 +18,8 @@ export default async function handler(req, res) {
     response._id = response._id.toString();
     console.log('response!!!')
     console.log(response2)
-    const currencyName = response.currencyName;
-    res.status(201).json({ result: true, message: 'delete 성공',itemData: response,  studentData:tmp, currencyName: currencyName});
+    const classData = response.classData;
+    res.status(201).json({ result: true, message: 'delete 성공',itemData: response,  studentData:tmp, classData: classData});
   }
 }
 
