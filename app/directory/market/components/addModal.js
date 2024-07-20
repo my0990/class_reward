@@ -65,9 +65,9 @@ export default function AddModal({ itemList, setItemList }) {
                 <div className="text-right absolute top-5 right-5 text-[1.2rem] cursor-pointer leading-none max-[600px]:top-3 min-[600px]:right-3 hover:bg-gray-300 hover:rounded-full w-[34px] h-[34px] flex justify-center items-center" onClick={onCloseModal}>x</div>
                 <h1 className="text-[1.5rem] mb-[32px]">학급 아이템 추가하기</h1>
                 <div className="flex justify-evenly flex-wrap">
-                    <div className="mb-[16px]">
+                    <div className="mb-[16px] w-[352px]">
                         <h1 className="w-full outline-none" tabIndex={99}>아이템 이미지</h1>
-                        {!emoji ? <div className="flex justify-center  overflow-hidden w-[352px]" tabIndex={-1}>
+                        {!emoji ? <div className="flex justify-center  overflow-hidden " tabIndex={-1}>
                             <Picker
                                 style={{ height: '300px', width: '400px' }}
                                 data={data}
