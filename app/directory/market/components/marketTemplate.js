@@ -8,7 +8,7 @@ import {
     CSSTransition,
     TransitionGroup,
 } from 'react-transition-group';
-
+import ItemCard from "./ItemCard"
 export default function MarketTemplate({ userData, role, itemListInit, currencyName }) {
     const onDelete = (picked) => {
         setDeleteId(picked.itemId)
@@ -37,10 +37,11 @@ export default function MarketTemplate({ userData, role, itemListInit, currencyN
                             timeout={600}
                             classNames="item"
                         >
-                            <div className="m-[16px] flex justify-center items-center relative bg-orange-100  rounded-lg" ref={nodeRef}>
-                                {role === 'teacher' ? <>
+                            <div className="m-[16px] flex justify-center items-center relative bg-orange-200  rounded-lg" ref={nodeRef}>
+                                {/* {role === 'teacher' ? <>
                                     <button className="text-[1.2rem] cursor-pointer p-[16px]" onClick={() => onDelete(a)}>{a.itemName}</button></> :
-                                    <button className="text-[1.2rem] cursor-pointer p-[16px]" onClick={() => onBuy(a)}>{a.itemName}</button>}
+                                    <button className="text-[1.2rem] cursor-pointer p-[16px]" onClick={() => onBuy(a)}>{a.itemName}</button>} */}
+                                <ItemCard data={a} currencyName={currencyName}/>
                             </div>
                         </CSSTransition>
                     )

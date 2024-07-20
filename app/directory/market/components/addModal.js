@@ -19,11 +19,12 @@ export default function AddModal({ itemList, setItemList }) {
             setIsLoading(true);
             if (nameRef.current.value === "" || priceRef.current.value === "" || quantityRef.current.value === "" || explanationRef.current.value === "") {
                 setIsError(true)
+                setIsLoading(false);
                 return
             }
             fetch("/api/addItem", {
                 method: "POST",
-                body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemExplanation: explanationRef.current.value }),
+                body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemExplanation: explanationRef.current.value, emoji: emoji }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -32,7 +33,7 @@ export default function AddModal({ itemList, setItemList }) {
                 if (data.result === true) {
                     alert('추가하였습니다.');
                     document.getElementById('my_modal_2').close()
-                    setItemList(() => [...itemList, { itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemId: data.itemId, itemExplanation: explanationRef.current.value }])
+                    setItemList(() => [...itemList, { itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemId: data.itemId, itemExplanation: explanationRef.current.value, emoji: emoji }])
                     nameRef.current.value = ""
                     priceRef.current.value = ""
                     quantityRef.current.value = ""
