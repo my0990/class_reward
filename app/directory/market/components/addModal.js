@@ -38,6 +38,7 @@ export default function AddModal({ itemList, setItemList }) {
                     priceRef.current.value = ""
                     quantityRef.current.value = ""
                     explanationRef.current.value = ""
+                    setEmoji(null)
                     setIsLoading(false)
                 }
             })
@@ -87,10 +88,10 @@ export default function AddModal({ itemList, setItemList }) {
                                     // 'flags',
                                     'foods',
                                     // 'frequent',
-                                    'nature',
-                                    // 'objects',
-                                    'people',
-                                    'places',
+                                    // 'nature',
+                                    'objects',
+                                    // 'people',
+                                    // 'places',
                                     // 'symbols',
                                 ]}
                             />

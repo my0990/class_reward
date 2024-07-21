@@ -2,13 +2,13 @@ import { useRouter } from "next/navigation";
 import gold from "@/public/gold.png";
 import Image from "next/image";
 import { useState } from "react";
-export default function BuyModal({ buyList, setItemList, itemList, money, currencyName }) {
+export default function BuyModal({ buyList, setItemList, itemList, money, currencyName, currencyEmoji }) {
     const router = useRouter();
-    const [isLoading,setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const onSubmit = (e) => {
         e.preventDefault();
-        if(isLoading){
-            return 
+        if (isLoading) {
+            return
         } else {
             setIsLoading(true)
             if (money < buyList.itemPrice) {
@@ -32,7 +32,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                 }
             })
         }
-       
+
     }
 
 
@@ -46,12 +46,15 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                     <div className="w-[20px] h-[20px] mr-[8px]">
                         {/* <Image src={gold} alt="money" /> */}
                     </div>
-                    <div className="text-[0.9rem]">{currentMoney} {currencyName}</div>
+                    <div className="text-[0.9rem]">보유 {currencyName}: {currentMoney}{currencyEmoji} </div>
                 </div>
                 <div className="flex items-center">
                     <h1 className="text-[1.5rem] font-bold">{buyList?.itemName}</h1>
                     <div className="mx-[8px]">-</div>
                     <div className="text-[1.1rem] ">{itemPrice} {currencyName}</div>
+                </div>
+                <div>
+                    <div className="text-[10rem] leading-none text-center my-[32px]">{buyList?.emoji}</div>
                 </div>
                 <div className="text-gray-500 mb-[32px]">
                     {buyList?.itemExplanation}
@@ -70,7 +73,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                 <div className="mb-[32px]">남은 수량: {buyList?.itemQuantity}</div>
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
                     <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
-                        <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
+                        <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] outline-none">구입</button>
                     </form>
                     <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
                 </div>
