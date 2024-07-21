@@ -3,7 +3,7 @@ import Link from "next/link"
 import gold from "@/public/gold.png";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-export default function DropDown({ session, money }) {
+export default function DropDown({ session, money, userName }) {
     const pathname = usePathname();
     return (
         <div className="border-b-2 min-[701px]:hidden dark:text-white">
@@ -11,7 +11,7 @@ export default function DropDown({ session, money }) {
                 <li className="mt-[1rem]">
                     <div className="flex items-center justify-space ">
                         <div className="py-[0.5rem] px-[8px] text-[1.2rem] ml-[8px]">
-                            {session.userName}님, 환영합니다
+                            {userName ? userName : '관리자'}님, 환영합니다
                         </div>
 
                         <button className="rounded-[20px]  py-[4px] px-[8px] text-gray-700 border-gray-300 flex  bg-orange-200 border-0" onClick={() => signOut()}>로그아웃
@@ -40,7 +40,7 @@ export default function DropDown({ session, money }) {
                         <Link href="/directory/market"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/market" ? "text-orange-400" : null}`}>아이템 관리</li></Link>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">기록 보기</li></Link> */}
                         <Link href="/directory/quest"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/quest" ? "text-orange-400" : null}`}>퀘스트 관리</li></Link>
-                        <Link href="/directory/qrcode"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/qrcode" ? "text-orange-400" : null}`}>학생 초대</li></Link>
+                        {/* <Link href="/directory/qrcode"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/qrcode" ? "text-orange-400" : null}`}>학생 초대</li></Link> */}
                         <Link href="../kiosk"><li className={`py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem] mb-[1rem]`}>키오스크 모드</li></Link>
 
                     </> :

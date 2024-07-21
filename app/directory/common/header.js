@@ -42,7 +42,7 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                                     <Link href="/directory/manage" key="manage"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
                                     <Link href="/directory/market" key="market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
                                     <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트 관리</li></Link>
-                                    <Link href="/directory/qrcode"><li className={` mr-[3vw] dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>학생 초대</li></Link>
+                                    {/* <Link href="/directory/qrcode"><li className={` mr-[3vw] dark:text-white ${pathname === "/directory/qrcode" ? "border-b-8 border-orange-400" : null}`}>학생 초대</li></Link> */}
                                     <Link href="../kiosk"><li className={` dark:text-white`}>키오스크 모드</li></Link>
 
 
@@ -81,7 +81,7 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                     </div>
                 </div>
             </div>
-            {isHamburgerClicked ? <DropDown session={session} money={money} /> : null}
+            {isHamburgerClicked ? <DropDown session={session} money={money} userName={data?.userName}/> : null}
             {isUserinfoClicked ? <UserInfo session={session} role={role} userName={data?.userName} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} currencyName={currencyName} currencyEmoji={currencyEmoji}/> : null}
         </>
     )

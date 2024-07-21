@@ -84,15 +84,15 @@ export default function AddModal({ itemList, setItemList }) {
                                     'rgba(211,209,255,.7)',
                                 ]}
                                 categories={[
-                                    // 'activity',
-                                    // 'flags',
                                     'foods',
-                                    // 'frequent',
-                                    // 'nature',
+                                    'activity',
+                                    'flags',
+                                    'frequent',
+                                    'nature',
                                     'objects',
-                                    // 'people',
-                                    // 'places',
-                                    // 'symbols',
+                                    'people',
+                                    'places',
+                                    'symbols',
                                 ]}
                             />
                         </div>
