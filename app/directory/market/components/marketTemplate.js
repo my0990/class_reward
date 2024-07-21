@@ -37,7 +37,7 @@ export default function MarketTemplate({ userData, role, itemListInit, currencyN
                             timeout={600}
                             classNames="item"
                         >
-                            <div className="m-[16px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg hover:scale-110 transition-all" ref={nodeRef}>
+                            <div className="m-[16px] w-[192px]  flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg hover:scale-110 transition-all" ref={nodeRef}>
                                 {/* {role === 'teacher' ? <>
                                     <button className="text-[1.2rem] cursor-pointer p-[16px]" onClick={() => onDelete(a)}>{a.itemName}</button></> :
                                     <button className="text-[1.2rem] cursor-pointer p-[16px]" onClick={() => onBuy(a)}>{a.itemName}</button>} */}
