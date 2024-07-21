@@ -28,7 +28,7 @@ export default function MarketTemplate({ userData, role, itemListInit, currencyN
     const nodeRef = useRef();
     return (
         <div className="flex justify-center">
-            <div className="overflow-x-auto w-[1024px]">
+            <div className=" w-[1024px]">
                 <TransitionGroup noderef={nodeRef} className="flex p-[8px] flex-wrap">
                     {itemList?.map((a, i) =>
                     (

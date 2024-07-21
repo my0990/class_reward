@@ -22,7 +22,7 @@ export default function ItemCard(props) {
             {/* <div className="flex justify-end">
                 <div>남은수량: {data.itemQuantity}</div>
             </div> */}
-            <div className="text-[10rem] leading-none">
+            <div className="text-[160px] leading-none">
                 {data.emoji}
             </div>
             <div className="text-[1.5rem]  mt-[16px] whitespace-nowrap overflow-hidden text-ellipsis">
