@@ -51,12 +51,17 @@ export default function MarketTemplate({ userData, role, itemListInit, currencyN
                     )
                     )}
                     {role === 'teacher'
-                        ? <div className="p-[16px] w-[192px] h-[344px]  cursor-pointer font-bold rounded-lg m-[16px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg hover:scale-110 transition-all" onClick={() => document.getElementById('my_modal_2').showModal()}>
-                            <div>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        ? <div className="p-[16px] w-[192px]  cursor-pointer font-bold rounded-lg m-[16px]  relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg hover:scale-110 transition-all" onClick={() => document.getElementById('my_modal_2').showModal()}>
+                            <div className="text-[160px] text-center leading-none">
+                                {/* <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <path style={{ fill: "orange" }} d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z" />
-                                </svg>
+                                </svg> */}
+                                🌶️
                             </div>
+                            <div className="text-[150px] text-center leading-none">가</div>
+                            <div className="text-[150px] text-center leading-none">🌶️</div>
+                            <div className="text-[140px] text-center leading-none">🌶️</div>
+                            <div className="text-[130px] text-center leading-none">🌶️</div>
                         </div>
                         : null}
                 </TransitionGroup>
