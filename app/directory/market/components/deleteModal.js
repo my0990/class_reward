@@ -42,7 +42,7 @@ export default function DeleteModal({ deleteId, itemList, setItemList, buyList, 
                     <div className="text-[1.1rem] ">{buyList?.itemPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {currencyName}</div>
                 </div>
                 <div>
-                    <div className="text-[10rem] leading-none text-center my-[32px]">{buyList?.emoji}</div>
+                    <div className="text-[160px] leading-none text-center my-[32px]">{buyList?.emoji}</div>
                 </div>
                 <div className="text-gray-500 mb-[8px]">
                     {buyList?.itemExplanation}

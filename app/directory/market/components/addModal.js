@@ -99,7 +99,7 @@ export default function AddModal({ itemList, setItemList }) {
                             : <div >
                                 <div className="relative w-full flex justify-center w-[352px] h-[430px] items-center bg-orange-100 p-[16px] rounded-lg">
                                     <div className="absolute top-3 right-4" onClick={() => setEmoji(null)}>뒤로가기</div>
-                                    <div className="text-[10rem]">
+                                    <div className="text-[160px]">
                                         {emoji}
                                     </div>
                                 </div>

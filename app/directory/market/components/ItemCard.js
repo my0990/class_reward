@@ -18,11 +18,11 @@ export default function ItemCard(props) {
       };
     
     return (
-        <div className="p-[16px] w-[192px] cursor-pointer font-bold rounded-lg" onClick={() => props.onClick(data)}>
+        <div className="p-[16px] w-[192px] h-[344px]  cursor-pointer font-bold rounded-lg relative" onClick={() => props.onClick(data)}>
             {/* <div className="flex justify-end">
                 <div>남은수량: {data.itemQuantity}</div>
             </div> */}
-            <div className="text-[160px] leading-none">
+            <div className="text-[130px] text-center leading-none">
                 {data.emoji}
             </div>
             <div className="text-[1.5rem]  mt-[16px] whitespace-nowrap overflow-hidden text-ellipsis">
@@ -32,7 +32,7 @@ export default function ItemCard(props) {
                 {truncateText(data.itemExplanation,26)}
 
             </div>
-            <div className="text-[1.5rem] text-red-500 text-end mt-[16px]">
+            <div className="text-[1.5rem] text-red-500 text-end mt-[16px] absolute bottom-2 right-3">
                 {data.itemPrice}<span className="ml-[4px]">{props.currencyName}</span>
             </div>
         </div>
