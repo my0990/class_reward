@@ -23,7 +23,7 @@ export default function ItemCard(props) {
                 <div>남은수량: {data.itemQuantity}</div>
             </div> */}
             <div className="text-[160px] text-center leading-none">
-                {data.emoji}
+                가
             </div>
             <div className="text-[1.5rem]  mt-[16px] whitespace-nowrap overflow-hidden text-ellipsis">
                 {data.itemName}
