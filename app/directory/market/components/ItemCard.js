@@ -18,11 +18,11 @@ export default function ItemCard(props) {
       };
     
     return (
-        <div className=" p-[16px] w-[192px] h-[344px] cursor-pointer font-bold rounded-lg relative" onClick={() => props.onClick(data)}>
+        <div className=" p-[16px] w-[192px] h-[300px] cursor-pointer font-bold rounded-lg relative" onClick={() => props.onClick(data)}>
             {/* <div className="flex justify-end">
                 <div>남은수량: {data.itemQuantity}</div>
             </div> */}
-            <div className="text-[130px] text-center leading-none max-[464px]:text-[70px]">
+            <div className="text-[130px] text-center leading-none">
                 {data.emoji}
             </div>
             <div className="text-[1.5rem]  mt-[16px] whitespace-nowrap overflow-hidden text-ellipsis">
