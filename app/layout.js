@@ -1,6 +1,5 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Metadata, Viewport } from "next";
 // import Head from "next/head";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +22,7 @@ export const metadata = {
   },
 
   description: APP_DESCRIPTION,
-
+  
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -55,6 +54,7 @@ export const metadata = {
 
 export const viewport = {
   themeColor: "#FFFFFF",
+  initialScale: 1,
 };
 export default function RootLayout({ children }) {
 
