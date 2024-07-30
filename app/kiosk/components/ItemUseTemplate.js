@@ -36,13 +36,19 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
     const onModalClick = () => {
         document.getElementById('my_modal_2').close();
     }
-    const [width, setWidth] = useState(window.innerWidth * 0.01);
+    let tmpWidth = 0;
+    if (window.innerHeight * 1.3 < window.innerWidth ) {
+        tmpWidth = window.innerHeight * 1.3
+    } else {
+        tmpWidth = window.innerWidth
+    }
+    const [width, setWidth] = useState(tmpWidth * 0.01);
 
     useEffect(() => {
         const handleResize = () => {
             let tmp = 0;
-            if (window.innerHeight < window.innerWidth) {
-                tmp = window.innerHeight
+            if (window.innerHeight  * 1.3 < window.innerWidth ) {
+                tmp = window.innerHeight * 1.3
             } else {
                 tmp = window.innerWidth
             }
@@ -104,8 +110,6 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
                     </div>
                 </div>
             </div>
-
-            {/* <div className={`bg-orange-300  h-[100px]`} style={{width: width + 'px'}}></div> */}
         </div>
     )
 }
