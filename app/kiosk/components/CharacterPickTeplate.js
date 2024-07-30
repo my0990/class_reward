@@ -1,9 +1,10 @@
 import CharacterCard from "./CharacterCard"
 import CheckPwdModal from "./CheckPwdModal"
-import { useState } from "react"
+
 export default function CharacterPickTemplate(props) {
     const onClick = (a) => {
-
+        console.log('character picked')
+        console.log(a)
         document.getElementById('my_modal_3').showModal()
         props.setRequestData(prev => ({ ...prev, userId: a.userId, userMoney: a.money, userName: a.userName, checked: true, itemList: [...a.itemList] }))
        

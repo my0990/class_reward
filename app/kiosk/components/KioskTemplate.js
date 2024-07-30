@@ -48,7 +48,6 @@ export default function Kiosk() {
                     },
                 })
                 const result = await response.json();
-                console.log(result)
                 setItemData(result.itemData);
                 setStudentData(result.studentData);
                 setCurrencyName(result.classData?.currencyName);

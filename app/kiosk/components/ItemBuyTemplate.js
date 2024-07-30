@@ -4,10 +4,10 @@ import { useState } from "react";
 export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData, currencyName, currencyEmoji }) {
     const tmp = itemData.map((a) => { a.checked = false; return a })
     const [itemList, setItemList] = useState(tmp)
-    const [isSelected,setIsSelected] = useState(false);
+    const [isSelected, setIsSelected] = useState(false);
     const onClick = (a) => {
-        
-        if(isSelected === false){
+
+        if (isSelected === false) {
             setIsSelected(true)
         }
         if (a.itemPrice > requestData.userMoney) {
@@ -28,22 +28,24 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
         setItemList(updatedItems);
     }
     const onNext = () => {
-        if(isSelected){
+        if (isSelected) {
             setIsItemPicked(true)
         } else {
             document.getElementById('my_modal_2').showModal()
         }
     }
-    const onModalClick= () => {
+    const onModalClick = () => {
         document.getElementById('my_modal_2').close()
     }
     return (
         <div className="flex flex-col justify-center items-center">
             <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
-            <div className="flex flex-wrap">
+            <div className="flex flex-wrap min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                 {itemList.map((a, i) => {
                     return (
-                        <ItemBuyCard onClick={e => onClick(a)} key={i} itemname={a.itemName} itemdetail={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked}  currencyName={currencyName} currencyEmoji={currencyEmoji}/>
+                        <div key={i}  className="m-[16px] w-[192px]   flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg hover:scale-110 transition-all">
+                            <ItemBuyCard onClick={e => onClick(a)} itemname={a.itemName} itemexplanation={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked} currencyname={currencyName} currencyemoji={currencyEmoji} emoji={a.emoji} />
+                        </div>
                     )
                 })}
             </div>

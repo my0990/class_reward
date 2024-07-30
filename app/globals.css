@@ -15,6 +15,20 @@
     --background-end-rgb: 0, 0, 0;
   }
 } */
+
+::-webkit-scrollbar {
+  width: 12px; /* 스크롤바 너비 */
+}
+::-webkit-scrollbar-track {
+  background: transparent; /* 트랙 배경색 */
+}
+::-webkit-scrollbar-thumb {
+  background:  rgb(250, 170, 80);/* 스크롤바 색상 */
+  border-radius: 6px; /* 스크롤바 모서리 둥글게 */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(247, 145, 29); /* 스크롤바 호버 색상 */
+} 
 .item-enter {
   opacity: 0;
 }
