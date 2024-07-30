@@ -56,51 +56,29 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
             </div>
             <Alert setStep={onModalClick}>아이템을 선택해주세요</Alert> */}
 
-            <div className="bg-orange-200 p-[32px]  h-[552px] rounded-2xl flex justify-center">
-                <div className="bg-orange-200 p-[8px]">
-                    <h1 className="text-[3rem] ml-[16px]">
+            <div className="bg-orange-200 p-[1vw]  h-[50vw] w-[90vw]  rounded-2xl flex justify-center">
+                <div className="bg-orange-200 p-[1vw] w-[40vw]">
+                    <h1 className="text-[3vw] ml-[1vw]">
                         창고
                     </h1>
                     <div className="flex justify-center">
-                        <div className="flex flex-wrap w-[360px] h-[400px]  overflow-scroll overflow-x-hidden">
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg">🍪</div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                            <div className="w-[64px] h-[64px] bg-white m-[8px] hover:bg-yellow-300 text-[56px]   flex justify-center items-center cursor-pointer hover:scale-110 transition-all rounded-lg"></div>
-                          
+                        <div className="flex flex-wrap h-[38vw] w-[40vw] overflow-scroll overflow-x-hidden">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1].map((a, i) => {
+                                return (
+                                    <div className="w-[6vw] h-[6vw]  bg-white m-[1vw] hover:bg-yellow-300 text-[3vw]   flex justify-center items-center cursor-pointer hover:scale-110  rounded-lg">🍪</div>
+                                )
+                            })}
+
+
                         </div>
                     </div>
                 </div>
-                <div className="bg-orange-200 w-[320px] flex justify-center items-center p-[16px]  ">
-                    <div className="bg-white  h-[100%] p-[16px] flex flex-col justify-evenly rounded-xl">
-                        <div className="text-[160px] leading-none text-center">🍪</div>
+                <div className="bg-orange-200 w-[40vw]  flex justify-center items-center p-[1vw]  ">
+                    <div className="bg-white  h-[100%] p-[1vw] flex flex-col justify-evenly rounded-xl">
+                        <div className="text-[20vw] leading-none text-center">🍪</div>
                         <div>
-                            <h1 className="text-[2.5rem]">쿠키</h1>
-                            <div className="text-[1rem]">식사는 없어~~ 배고파도 음료도 없어~~ 목말라도</div>
+                            <h1 className="text-[2.5vw]">쿠키</h1>
+                            <div className="text-[1vw]">식사는 없어~~ 배고파도 음료도 없어~~ 목말라도</div>
                         </div>
                         <button className="btn">사용하기</button>
                     </div>
