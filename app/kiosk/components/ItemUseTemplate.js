@@ -77,15 +77,15 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
             <Alert setStep={onModalClick}>아이템을 선택해주세요</Alert> */}
 
             <div className="bg-orange-200 rounded-2xl flex justify-center" style={{width: 90 * width + 'px', height: 50* width + 'px', padding: width + 'px'}}>
-                <div className="bg-orange-200" style={{padding: width + 'px', width: 40 * width + 'px'}}>
-                    <h1 className="" style={{fontSize: 3 * width + 'px', marginLeft: width + 'px'}}>
+                <div className="bg-orange-200" style={{ width: 45 * width + 'px'}}>
+                    <h1 className="" style={{fontSize: 5 * width + 'px'}}>
                         창고
                     </h1>
                     <div className="flex justify-center">
-                        <div className="flex flex-wrap h-[38${width}px] w-[40${width}px] overflow-scroll overflow-x-hidden" style={{height: 38 * width + 'px', width: 40 * width + 'px'}}>
+                        <div className="flex flex-wrap overflow-scroll overflow-x-hidden" style={{height: 38 * width + 'px', width:  45 * width + 'px'}}>
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1].map((a, i) => {
                                 return (
-                                    <div style={{width: 6* width + 'px', height: 6* width + 'px', margin: width + 'px', fontSize: 3 * width }} className="bg-white  hover:bg-yellow-300    flex justify-center items-center cursor-pointer hover:scale-110  rounded-lg">🍪</div>
+                                    <div key ={i} style={{width: 8* width + 'px', height: 8* width + 'px', margin: width * 0.8 + 'px', fontSize: 3 * width }} className="bg-white  hover:bg-yellow-300    flex justify-center items-center cursor-pointer hover:scale-110  rounded-lg">🍪</div>
                                 )
                             })}
 
