@@ -6,7 +6,7 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
     console.log(requestData)
     const [isLoading, setIsLoading] = useState(false);
     const { itemData, userId, userMoney } = requestData;
-
+    console.log(requestData)
     const onClick = (e) => {
         if (isLoading) {
             return

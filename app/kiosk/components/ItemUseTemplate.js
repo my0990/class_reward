@@ -4,9 +4,14 @@ import Alert from "./Alert";
 
 export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData, currencyName }) {
     const tmp = requestData.itemList.map((a) => { a.checked = false; return a })
+    for (let index = tmp.length; index < 32; index++) {
+        tmp.push({ itemId: null })
+
+    }
     const [itemList, setItemList] = useState(tmp)
     const [isSelected, setIsSelected] = useState(false);
-    let test = 30;
+    const [itemDetail, setItemDetail] = useState({ itemName: null, itemExplanation: null, itemEmoji: null })
+
     const onClick = (a) => {
 
         if (isSelected === false) {
@@ -37,17 +42,19 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
         document.getElementById('my_modal_2').close();
     }
     let tmpWidth = 0;
-    if (window.innerHeight * 1.3 < window.innerWidth ) {
+    if (window.innerHeight * 1.3 < window.innerWidth) {
         tmpWidth = window.innerHeight * 1.3
     } else {
         tmpWidth = window.innerWidth
     }
     const [width, setWidth] = useState(tmpWidth * 0.01);
-
+    const onItemClick = (a) => {
+        setItemDetail({itemName: a.itemName, itemExplanation: a.itemExplanation, itemEmoji: a.itemEmoji})
+    }
     useEffect(() => {
         const handleResize = () => {
             let tmp = 0;
-            if (window.innerHeight  * 1.3 < window.innerWidth ) {
+            if (window.innerHeight * 1.3 < window.innerWidth) {
                 tmp = window.innerHeight * 1.3
             } else {
                 tmp = window.innerWidth
@@ -64,7 +71,7 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
         };
     }, []);
     return (
-        <div className="flex justify-center items-center h-[100vh] bg-orange-100">
+        <div className="flex justify-center items-center h-[100vh] bg-orange-100" style={{ scrollbarWidth: 'auto' }}>
 
             {/* <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
             <div className="flex flex-wrap">
@@ -82,16 +89,18 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
             </div>
             <Alert setStep={onModalClick}>아이템을 선택해주세요</Alert> */}
 
-            <div className="bg-orange-200 rounded-2xl flex justify-center" style={{width: 90 * width + 'px', height: 50* width + 'px', padding: width + 'px'}}>
-                <div className="bg-orange-200" style={{ width: 45 * width + 'px'}}>
-                    <h1 className="" style={{fontSize: 5 * width + 'px'}}>
+            <div className="bg-orange-200 rounded-2xl flex justify-center" style={{ height: 50 * width + 'px', padding: 2 * width + 'px' }}>
+                <div className="bg-orange-200" style={{ width: 43 * width + 'px' }}>
+                    <h1 className="" style={{ fontSize: 5 * width + 'px', marginLeft: 1.5 * width + 'px' }}>
                         창고
                     </h1>
                     <div className="flex justify-center">
-                        <div className="flex flex-wrap overflow-scroll overflow-x-hidden" style={{height: 38 * width + 'px', width:  45 * width + 'px'}}>
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1].map((a, i) => {
+                        <div className="flex flex-wrap overflow-scroll overflow-x-hidden" style={{ height: 38 * width + 'px', width: 45 * width + 'px' }}>
+                            {itemList.map((a, i) => {
                                 return (
-                                    <div key ={i} style={{width: 8* width + 'px', height: 8* width + 'px', margin: width * 0.8 + 'px', fontSize: 3 * width }} className="bg-white  hover:bg-yellow-300    flex justify-center items-center cursor-pointer hover:scale-110  rounded-lg">🍪</div>
+                                    a.itemId === null 
+                                    ?  <div key={i} style={{ width: 8 * width + 'px', height: 8 * width + 'px', margin: width * 0.8 + 'px', fontSize: 4 * width }} className="bg-white  flex justify-center items-center  rounded-lg"></div>
+                                    : <div onClick={()=> onItemClick(a)} key={i} style={{ width: 8 * width + 'px', height: 8 * width + 'px', margin: width * 0.8 + 'px', fontSize: 4 * width }} className="bg-white  hover:bg-yellow-300    flex justify-center items-center cursor-pointer hover:scale-110  rounded-lg">{a.itemEmoji}</div>
                                 )
                             })}
 
@@ -99,16 +108,20 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
                         </div>
                     </div>
                 </div>
-                <div className="bg-orange-200 flex justify-center items-center" style={{width: 40* width + 'px', padding: width + 'px'}}>
-                    <div className="bg-white  h-[100%] flex flex-col justify-evenly rounded-xl" style={{padding: width + 'px'}}>
-                        <div className="leading-none text-center" style={{fontSize: 20 * width + 'px'}}>🍪</div>
-                        <div>
-                            <h1 className="" style={{fontSize: 2.5 * width + 'px'}}>쿠키</h1>
-                            <div className="" style={{fontSize: width + 'px'}}>식사는 없어~~ 배고파도 음료도 없어~~ 목말라도</div>
+                <div className="bg-orange-200 flex justify-center items-center" style={{ width: 30 * width + 'px', padding: width + 'px', marginLeft: 5 * width + 'px' }}>
+
+                    {itemDetail.itemName
+                        ? <div className="bg-white  h-[100%] flex flex-col justify-evenly rounded-xl" style={{ width: 30 * width + 'px', padding: width + 'px' }}>
+                            <div className="leading-none text-center hover:cursor-default" style={{ fontSize: 20 * width + 'px' }}>{itemDetail.itemEmoji}</div>
+                            <div>
+                                <h1 className="" style={{ fontSize: 3.5 * width + 'px' }}>{itemDetail.itemName}</h1>
+                                <div className="" style={{ fontSize: 1.5 * width + 'px' }}>{itemDetail.itemExplanation}</div>
+                            </div>
+                            <button className="bg-orange-300 rounded-lg hover:bg-orange-500" style={{ fontSize: 2 * width + 'px', height: 5 * width + 'px' }}>사용하기</button>
                         </div>
-                        <button className="btn" style={{fontSize: 2 * width + 'px'}}>사용하기</button>
-                    </div>
+                        : <div className="text-center">아이템을 선택하세요</div>}
                 </div>
+
             </div>
         </div>
     )
