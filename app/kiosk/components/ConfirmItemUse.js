@@ -5,13 +5,13 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import Alert from "./Alert";
 export default function ConfirmItemUse({ requestData, setStep, currencyName }) {
-    console.log(requestData)
+
     const MySwal = withReactContent(Swal)
     
     const [isLoading, setIsLoading] = useState(false);
     const { userName, userId, userMoney } = requestData;
     const {itemId,itemName,itemPrice,teacher, itemExplanation} = requestData.itemData;
-    console.log(requestData)
+
     const onClick = (e) => {
         if (isLoading) {
             return

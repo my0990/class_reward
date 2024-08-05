@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const db = (await connectDB).db('data');
     const {itemName, userId, itemId, teacher, userName, itemPrice} = req.body;
-
+    console.log(req.body)
     // const response = await db.collection('student').updateOne({userId:req.body.userId},{$push: {"itemList": {id: itemId, price: parseInt(price), name: name, quantity: parseInt(quantity)}}},{upsert: true})
     const response = await db.collection('user_data').updateOne({ userId: userId,"itemList.itemId": itemId},{$set : {'itemList.$.state': '대기중'}})
     const response2 = await db.collection('user_data').updateOne({userId:teacher},{$push: {"notification": {itemId: itemId, userId: userId, itemName: itemName, state: '대기중', userName: userName, itemPrice: itemPrice}}},{upsert: true})

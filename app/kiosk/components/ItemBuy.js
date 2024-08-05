@@ -4,7 +4,7 @@ import ItemBuyTemplate from "./ItemBuyTemplate";
 import { useState } from "react";
 export default function ItemBuy({ setStep, itemData, studentData, currencyName, currencyEmoji}) {
     const [isItemPicked, setIsItemPicked] = useState(false);
-    const [requestData, setRequestData] = useState({ itemData: null, userId: null, userMoney: null , userName: null, checked: false})
+    const [requestData, setRequestData] = useState({ itemData: null, userId: null, userMoney: null , userName: null, checked: false, itemEmoji: null})
     const [isPwdChecked, setIsPwdChecked] = useState(false);
     return (
         !isPwdChecked
