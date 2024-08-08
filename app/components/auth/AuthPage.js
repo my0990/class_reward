@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 import Typewriter from 'typewriter-effect';
 import Link from "next/link"
 import { useMemo } from "react"
-export default function AuthPage() {
+export default function AuthPage({role}) {
     const Lottie = useMemo(()=> dynamic(() => import('react-lottie-player'), { ssr: false }),[])
     const onChange = (e) => {
         const { changeHandler, value, blurHandler } = getFieldProps(e.target.name);
@@ -23,7 +23,7 @@ export default function AuthPage() {
     }
 
     const { form, errors, isTouched, submitHandler, getFieldProps } = useValidateForm({
-        initialForm: { id: "", pwd: "" },
+        initialForm: { id: "", pwd: "", role: role},
         initialError: { id: "", pwd: "" },
         initialIsTouched: { id: false, pwd: false, },
         validate,

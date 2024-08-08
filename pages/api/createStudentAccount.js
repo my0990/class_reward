@@ -6,12 +6,65 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const { accountArr, data } = req.body;
-    console.log(accountArr, data)
+    const nicknameData = {
+      "determiners" : [
+         "예쁜",
+         "화난",
+         "귀여운",
+         "배고픈",
+         "슬픈",
+         "푸른",
+         "비싼",
+         "밝은",
+         "부유한",
+         "귀여운",
+         "화난",
+         "똑똑한",
+         "게으른",
+         "배부른",
+         "신난"
+       ],
+      
+      "animals" : [
+         "호랑이",
+         "비버",
+         "강아지",
+         "부엉이",
+         "여우",
+         "치타",
+         "문어",
+         "고양이",
+         "미어캣",
+         "다람쥐",
+         "치와와",
+         "비글",
+         "오징어",
+         "하마",
+         "기린",
+         "판다",
+         "토끼",
+         "돌고래",
+       ]
+      }
 
     const session = await getServerSession(req,res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
     const {userId} = session.user;
     const accountInfo = accountArr.map((a)=> {return (
-      {userId: data.uniqueNickname + a, money: 0, itemList: [],lv: 1,profileNickname: '', profileState: '', teacher: userId, classData: data.classData })})
+      {userId: data.uniqueNickname + a, 
+        money: 0, 
+        itemList: [],
+        lv: 1,
+        profileNickname: nicknameData.determiners[
+          Math.floor(Math.random() * nicknameData.determiners.length)
+        ] +
+          " " +
+          nicknameData.animals[
+            Math.floor(Math.random() * nicknameData.animals.length)
+          ], 
+        profileState: '', 
+        teacher: userId, 
+        classData: data.classData,
+        classNumber: Number(a) })})
     // MongoDB 연결
     const pwd = await hash('1234',12)
     const accountUserInfo = accountArr.map((a)=> {return ({

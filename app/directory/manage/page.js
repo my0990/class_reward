@@ -1,31 +1,50 @@
-import ManageTemplate from "./components/ManageTemplate"
-import { connectDB } from "@/app/lib/database"
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-export default async function StudentManage() {
-    // let data = [
-    //     { userName: '이명권', userId: 'mu0990' },
-    //     { userName: '이재철', userId: 't0990' }
-    // ]
-    const db = (await connectDB).db('data')
+'use client'
+import { useState, useEffect } from "react"
+import CreateUniqueNickname from "./component/CreateUniqueNickname"
+import CreateStudentAccount from "./component/CreateStudentAccount";
+export default function CreateAccount() {
+    const [uniqueNickname, setUniqueNickname] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [result, setResult] = useState(null);
+    let tmp = {}
+    const [arr, setArr] = useState(tmp);
 
-    const session = await getServerSession(authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    let {userId, role, teacher} = session.user;
-    if(role !== "teacher"){
-        return (
-            <div>
-                잘못된 접근입니다.
-            </div>
-        )
-    }
-    const response = await db.collection('user_data').find({teacher:userId}).sort({userName: 1}).toArray();
-    let data = response.map((a)=>{
-        a._id = a._id.toString()
-        return a
-      })
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            const response = await fetch('/api/fetchUniqueNickname', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            const result = await response.json();   
+            if (result.result) {
+                setResult(result);
+                setUniqueNickname(result.data.uniqueNickname);
+            }
+            setIsLoading(false);
+            for (let index = 1; index < 31; index++) {
+                tmp[index] = false;
+            }
+            for (let index = 0; index < result?.data?.generatedNumber?.length; index++) {
+                tmp[result?.data?.generatedNumber[index]] = '생성됨';
+            }
+            setArr(tmp)
+        };
+        fetchData();
+    }, []);
     return (
-        <div>
-            <ManageTemplate data={data} teacher={userId}/>
+        <div className="flex justify-center  p-[32px]">
+
+            <div className=" bg-orange-100 p-[32px] rounded-xl">
+                <h1 className="text-[2.5rem] font-bold">학생 계정 관리😊</h1>
+                {isLoading
+                    ? <div>loading... </div>
+                    : uniqueNickname
+                        ? <CreateStudentAccount  result={result.data} studentData={result.studentData} arr={arr} setArr={setArr}/>
+                        : <CreateUniqueNickname />}
+            </div>
         </div>
     )
 }

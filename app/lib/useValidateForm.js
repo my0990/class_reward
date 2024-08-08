@@ -44,6 +44,7 @@ export const useValidateForm = ({
             const logInResponse = await signIn("credentials", {
               id: form.id,
               password: form.pwd,
+              role: form.role,
               redirect: false,
               // callbackUrl: "/directory/market",
               // callbackUrl: "/directory/market"

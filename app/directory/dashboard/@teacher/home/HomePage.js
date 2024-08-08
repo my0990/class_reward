@@ -74,7 +74,7 @@ export default function Home({ data, classData}) {
                 <div className="grid min-[1300px]:grid-cols-10  min-[800px]:grid-cols-6  min-[550px]:grid-cols-4 min-[400px]:grid-cols-3  grid-cols-2  gap-[10px]">
                     {studentData.map((a, i) => {
                         return (
-                            <StudentInfoCard key={i} isActive={a.isActive}  onClick={(e) => onClick(a)} data={a}>{a.userName}</StudentInfoCard>
+                            <StudentInfoCard key={i} isActive={a.isActive}  onClick={(e) => onClick(a)} data={a}>{a.classNumber}. {a.profileNickname}</StudentInfoCard>
                         )
                     })}</div>
                 {/* {modalData.length !== 0 ? <Modal modalData={modalData} /> : null} */}
