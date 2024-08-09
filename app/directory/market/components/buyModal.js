@@ -1,6 +1,4 @@
 import { useRouter } from "next/navigation";
-import gold from "@/public/gold.png";
-import Image from "next/image";
 import { useState } from "react";
 export default function BuyModal({ buyList, setItemList, itemList, money, currencyName, currencyEmoji }) {
     const router = useRouter();
@@ -14,11 +12,11 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
             if (money < buyList.itemPrice) {
                 alert('돈이 모자랍니다')
                 document.getElementById('my_modal_3').close()
-                return
+                return 
             }
             fetch("/api/buyItem", {
                 method: "POST",
-                body: JSON.stringify({ itemId: buyList.itemId, itemName: buyList.itemName, itemPrice: buyList.itemPrice }),
+                body: JSON.stringify({ itemData: buyList}),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -28,6 +26,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                     const newItemList = itemList.map((a, i) => a.itemId === buyList.itemId ? { ...a, 'itemQuantity': a.itemQuantity - 1 } : a)
                     setItemList(newItemList);
                     document.getElementById('my_modal_3').close()
+                    setIsLoading(false)
                     router.refresh();
                 }
             })
@@ -73,9 +72,9 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                 <div className="mb-[32px]">남은 수량: {buyList?.itemQuantity}</div>
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
                     <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
-                        <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] outline-none">구입</button>
+                        <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] outline-none hover:bg-orange-500">구입</button>
                     </form>
-                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
+                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px] hover:bg-gray-300" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
                 </div>
             </div>
             <form method="dialog" className="modal-backdrop">

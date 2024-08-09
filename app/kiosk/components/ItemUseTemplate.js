@@ -101,19 +101,6 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
     }
     return (
         <div className="flex justify-center items-center h-[100vh] bg-orange-100" style={{ scrollbarWidth: 'auto' }}>
-
-            {/* <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
-            <div className="flex flex-wrap">
-                {itemList.map((a, i) => {
-                    return (
-                        a.state === "사용 가능"
-                        ? <ItemBuyCard onClick={e => onClick(a)} currencyname={currencyName} key={i} itemname={a.itemName} itemexplanation={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked}/>
-                        : null
-                        )
-                })}
-            </div>
-
-            <Alert setStep={onModalClick}>아이템을 선택해주세요</Alert> */}
             <div>
                 <div className="flex">
                     <button className="mr-[16px] btn" onClick={() => setStep('home')} >처음으로</button>

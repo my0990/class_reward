@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 
 
 export default function Header({ session, data, currencyName, currencyEmoji }) {
+    console.log(data)
     const router = useRouter();
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {
@@ -81,7 +82,7 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                 </div>
             </div>
             {isHamburgerClicked ? <DropDown session={session} money={money} userName={data?.userName}/> : null}
-            {isUserinfoClicked ? <UserInfo session={session} role={role} userName={data?.userName} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} currencyName={currencyName} currencyEmoji={currencyEmoji}/> : null}
+            {isUserinfoClicked ? <UserInfo session={session} role={role} userNickname={data?.profileNickname} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} currencyName={currencyName} currencyEmoji={currencyEmoji}/> : null}
         </>
     )
 }

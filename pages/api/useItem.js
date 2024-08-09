@@ -1,7 +1,4 @@
 import { connectDB } from '@/app/lib/database'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getServerSession } from 'next-auth/next';
-import { ObjectId } from 'mongodb';
 export default async function handler(req, res) {
 
 

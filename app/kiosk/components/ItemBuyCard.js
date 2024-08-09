@@ -1,3 +1,5 @@
+import soldOut from "@/public/soldOut.png"
+import Image from "next/image";
 export default function ItemBuyCard(props) {
 
     function getByteB(str) {
@@ -25,21 +27,29 @@ export default function ItemBuyCard(props) {
         //     <div className="text-red-500 text-right">{props.currencyEmoji} {props.itemprice} {props.currencyName}</div>
         // </div>
         <div {...props} className={` p-[16px] w-[192px] h-[300px] cursor-pointer font-bold rounded-lg relative ${props.checked ? "bg-orange-300" : "bg-white"}`}>
-            {/* <div className="flex justify-end">
-            <div>남은수량: {data.itemQuantity}</div>
-        </div> */}
-            <div className="text-[130px] text-center leading-none">
-                {props.emoji}
-            </div>
-            <div className="text-[1.5rem]  mt-[16px] whitespace-nowrap overflow-hidden text-ellipsis">
-                {props.itemname}
-            </div>
-            <div className="text-gray-500 h-[48px]">
-                {truncateText(props.itemexplanation, 26)}
+            {props.itemquantity <= 0
+                ? <div className="absolute z-50 top-[50px]">
+                    <Image src={soldOut} />
+                </div>
+                : null}
 
-            </div>
-            <div className="text-[1.5rem] text-red-500 text-end mt-[16px] absolute bottom-2 right-3">
-                {props.itemprice}<span className="ml-[4px]">{props.currencyname}</span>
+            <div className={`${props.itemquantity <= 0 ? "opacity-40" : null}`}>
+                <div className={`flex justify-end ${props.itemquantity <= 3 ? "text-red-500" : null}`}>
+                    <div>남은수량: {props.itemquantity}</div>
+                </div>
+                <div className="text-[130px] text-center leading-none">
+                    {props.emoji}
+                </div>
+                <div className="text-[1.5rem]  mt-[16px] whitespace-nowrap overflow-hidden text-ellipsis">
+                    {props.itemname}
+                </div>
+                <div className="text-gray-500 h-[48px]">
+                    {truncateText(props.itemexplanation, 26)}
+
+                </div>
+                <div className="text-[1.5rem] text-red-500 text-end mt-[16px] absolute bottom-2 right-3">
+                    {props.itemprice}<span className="ml-[4px]">{props.currencyname}</span>
+                </div>
             </div>
         </div>
     )

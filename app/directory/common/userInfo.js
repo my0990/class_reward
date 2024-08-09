@@ -4,7 +4,7 @@ import Image from "next/image"
 import gold from "@/public/gold.png";
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
-export default function UserInfo({ userName, role, isUserinfoClicked, setIsUserinfoClicked, profileiconRef, money, currencyName, currencyEmoji }) {
+export default function UserInfo({ userNickname, role, isUserinfoClicked, setIsUserinfoClicked, profileiconRef, money, currencyName, currencyEmoji }) {
     const dropDownRef = useRef();
     useEffect(() => {
 
@@ -29,7 +29,7 @@ export default function UserInfo({ userName, role, isUserinfoClicked, setIsUseri
             <div className={styles.speechBubble}>
                 <div className="flex items-center justify-space text-[1rem]">
                     <div className="py-[1rem] px-[8px]  ml-[8px]">
-                        {userName ? userName : '관리자'}님, 환영합니다
+                        {userNickname ? userNickname : '관리자'}님, 환영합니다
                     </div>
                     <button className="rounded-[20px] border-2 py-[4px] px-[8px] text-gray-500 border-gray-300 flex" onClick={() => signOut()}>로그아웃
                         <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" className="ml-[4px] text-gray-500">

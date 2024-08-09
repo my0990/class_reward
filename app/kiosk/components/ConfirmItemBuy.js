@@ -12,7 +12,7 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
             return
         } else {
             setIsLoading(true)
-            fetch("/api/buyItemFromKiosk", {
+            fetch("/api/buyItem", {
                 method: "POST",
                 body: JSON.stringify({ itemData: itemData, userId: userId }),
                 headers: {

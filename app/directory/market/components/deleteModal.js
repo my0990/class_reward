@@ -3,8 +3,6 @@ export default function DeleteModal({ deleteId, itemList, setItemList, buyList, 
     const [isLoading,setIsLoading] = useState(false);
     const onSubmit = (e) => {
         e.preventDefault();
-        alert('삭제하지 말아주세요')
-        return
         if(isLoading){
             return
         } else {

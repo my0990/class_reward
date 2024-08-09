@@ -6,7 +6,7 @@ export default function CharacterCard(props) {
     return (
         <div>
         <div {...props} className="w-[160px] h-[192px] p-[16px] m-[8px] bg-[#cc93ac] rounded-xl cursor-pointer ">
-            <h1 className="text-[1.2rem] font-bold text-center">{props.user.userName}</h1>
+            <h1 className="text-[1.1rem] font-bold text-center">{props.user.classNumber}. {props.user.profileNickname}</h1>
             <div className="relative w-[128px] h-[100px] ">
                 <Image src={props.user.userGender === "male" ? male : female} fill={true} alt="characther" />
             </div>
