@@ -27,7 +27,7 @@ export default function Home({ data, classData}) {
     }
     useEffect(()=>{
         if(!classData){
-            document.getElementById('my_modal_1').showModal();
+            document.getElementById('my_modal_1')?.showModal();
 
         }
     })
@@ -49,22 +49,23 @@ export default function Home({ data, classData}) {
         document.getElementById('my_modal_2').showModal();
     }
     const targetStudent = studentData.filter((a) => a.isActive === true)
-    if (data.length === 0) {
-        return (
-            <div className="w-full">
-                <div className="flex flex-col items-center w-[60vw] h-[60vw] min-[600px]:w-[400px] min-[600px]:h-[300px]  mx-auto">
-                    <Lottie
-                        loop
-                        animationData={lottieJson}
-                        play
-                    />
-                    <span className=" text-[3vw] mt-[2vw] min-[600px]:text-[20px] dark:text-white">
-                        등록된 학생이 없습니다. <button className="cursor-pointer z-0 text-blue-600 dark:text-blue-300" onClick={() => route.push("../directory/qrcode")}>학생 등록하기</button>
-                    </span>
-                </div>
-            </div>
-        )
-    } else {
+    // if (data.length === 0) {
+    //     return (
+    //         <div className="w-full">
+    //             <div className="flex flex-col items-center w-[60vw] h-[60vw] min-[600px]:w-[400px] min-[600px]:h-[300px]  mx-auto">
+    //                 <Lottie
+    //                     loop
+    //                     animationData={lottieJson}
+    //                     play
+    //                 />
+    //                 <span className=" text-[3vw] mt-[2vw] min-[600px]:text-[20px] dark:text-white">
+    //                     등록된 학생이 없습니다. 
+    //                 </span>
+    //             </div>
+    //             <SetCurrencyNameModal />
+    //         </div>
+    //     )
+    // } else {
         return (
             <div className="p-[32px] pt-0">
                 <div className="flex py-[16px] justify-end">
@@ -85,4 +86,4 @@ export default function Home({ data, classData}) {
             </div>
         )
     }
-}
+// }

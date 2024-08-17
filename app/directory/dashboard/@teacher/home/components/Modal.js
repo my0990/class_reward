@@ -37,8 +37,10 @@ export default function Modal({  isSend, setStudentData, studentData, currencyNa
                 const message = targetStudent.map((a,i)=> a.userName)
                 if(isSend){
                     alert(message+ '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
+                    location.reload();
                 } else {
                     alert(message+ '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
+                    location.reload();
                 }
 
                 setPoint(null);

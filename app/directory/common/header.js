@@ -10,7 +10,6 @@ import { usePathname } from "next/navigation";
 
 
 export default function Header({ session, data, currencyName, currencyEmoji }) {
-    console.log(data)
     const router = useRouter();
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
     const hamburgerClicked = () => {

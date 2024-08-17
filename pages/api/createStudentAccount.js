@@ -6,6 +6,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const { accountArr, data } = req.body;
+    console.log(accountArr)
     const nicknameData = {
       "determiners" : [
          "예쁜",

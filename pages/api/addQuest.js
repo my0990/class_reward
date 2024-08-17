@@ -17,9 +17,9 @@ export default async function handler(req, res) {
 
     // const tmp = await db.collection('teacher').find({userId:userId})
     // tmp = tmp.studentNumber
-    const response2 = await db.collection('user_data').find({ teacher: userId }).toArray();
+    const response2 = await db.collection('user_data').find({ teacher: userId }).sort({classNumber:1}).toArray();
     let studentList = response2.map((a, i) => {
-      return { userId: a.userId, userName: a.userName, done: 0 }
+      return { userId: a.userId, userNickname: a.profileNickname, done: 0 }
     })  
 
     let tmp = {}
@@ -27,9 +27,10 @@ export default async function handler(req, res) {
       tmp[key.userName] = false
     });
 
-    let sortedStudentList = studentList.sort((a, b) => a.userName.localeCompare(b.userName))
-    console.log(sortedStudentList)
-    const response = await db.collection('quest').insertOne({ userId: userId, questName: name, questContent: content, questReward: reward, studentList: sortedStudentList, time: new Date(), doneCount: 0,  finished: false }, { upsert: true })
+    // let sortedStudentList = studentList.sort((a, b) => a.userNickname.localeCompare(b.userNickname))
+    console.log(studentList)
+    const db2 = (await connectDB).db('quest');
+    const response = await db2.collection(userId).insertOne({ questName: name, questContent: content, questReward: reward, studentList: studentList, time: new Date(), doneCount: 0,  finished: false }, { upsert: true })
 
 
     if(response){

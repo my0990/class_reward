@@ -12,12 +12,15 @@ export default async function handler(req, res) {
     const { userId } = session.user;
     // MongoDB 연결
 
-    const db = (await connectDB).db('data');
+    const db = (await connectDB).db('quest');
     const { id, code } = req.body;
 
+    const db2 = (await connectDB).db('data');
     const questId = ObjectId.createFromHexString(code);
-    const response = await db.collection('quest').findOne({ $and: [{ userId: id }, { _id: questId }] })
-    const response2 = await db.collection('user_data').findOne({userId:id})
+    const response = await db.collection(id).findOne({   _id: questId});
+    const response2 = await db2.collection('user_data').findOne({userId:id})
+    console.log('------')
+    console.log(response)
     // const tmp = await db.collection('teacher').find({userId:userId})
     // tmp = tmp.studentNumber
     // const response = await db.collection('quest').find({userId:userId}).toArray();

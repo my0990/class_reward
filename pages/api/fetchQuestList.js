@@ -9,15 +9,14 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    console.log(session)
     let userId = null;
     if(session.user.role === 'teacher'){
       userId = session.user.userId;
     } else {
       userId = session.user.teacher;
     }
-    const db = (await connectDB).db('data');
-    const response = await db.collection('quest').find({ $and: [{ userId: userId }] }).toArray();
+    const db = (await connectDB).db('quest');
+    const response = await db.collection(userId).find({}).toArray();
 
 
     let studentsCount = response.done;

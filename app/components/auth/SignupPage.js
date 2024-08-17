@@ -40,7 +40,7 @@ export default function SignUpPage() {
         alert('준비중입니다')
     }
     return (
-        <form type="POST" onSubmit={onSubmitFake}>
+        <form type="POST" onSubmit={submitHandler}>
             <div className="w-full flex flex-col items-center mt-[80px]">
                 <div className="w-10/12 min-[500px]:w-[400px] mx-5 ">
                     <div className="text-[3rem] ">

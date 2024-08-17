@@ -14,7 +14,7 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
             setIsLoading(true)
             fetch("/api/buyItem", {
                 method: "POST",
-                body: JSON.stringify({ itemData: itemData, userId: userId }),
+                body: JSON.stringify({ itemData: itemData, userId: userId, balance:  userMoney - itemData?.itemPrice}),
                 headers: {
                     "Content-Type": "application/json",
                 },

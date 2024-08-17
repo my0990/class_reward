@@ -20,12 +20,15 @@ export default async function handler(req, res) {
 
     // MongoDB 연결
     const itemData = req.body.itemData;
+    const balance = req.body.balance
     console.log(itemData)
+    console.log(req.body)
     const db = (await connectDB).db('data');
     let itemId = (new ObjectId()).toString();
     const ItemId = itemData.itemId;
     const response = await db.collection('user_data').updateOne({userId: teacherId, "itemList.itemId": ItemId},{$inc : {'itemList.$.itemQuantity': -1}})
     const response2 = await db.collection('user_data').updateOne({userId: userId},{$push: {itemList: {itemName: itemData.itemName, itemPrice: itemData.itemPrice, state: '사용 가능', itemId: itemId, teacher: teacherId, itemEmoji: itemData.emoji, itemExplanation: itemData.itemExplanation}}}, {upsert: true})
     const response3 = await db.collection('user_data').updateOne({userId: userId},{$inc: {money: -itemData.itemPrice}})
+    const response4 = await db.collection('history').insertOne({userId: userId,balance: balance, type: 'withDrawal', amount: itemData.itemPrice, date: new Date(),expiresAfter: new Date(), name: itemData.itemName + ' 구입'})
     res.status(201).json({ result: true, message: 'delete 성공' });
 }}

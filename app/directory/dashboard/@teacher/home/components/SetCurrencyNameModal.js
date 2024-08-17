@@ -62,15 +62,15 @@ export default function SetCurrencyNameModal() {
                                         'rgba(211,209,255,.7)',
                                     ]}
                                     categories={[
-                                        // 'activity',
-                                        // 'flags',
+                                        'activity',
+                                        'flags',
                                         'foods',
-                                        // 'frequent',
+                                        'frequent',
                                         'nature',
-                                        // 'objects',
+                                        'objects',
                                         'people',
                                         'places',
-                                        // 'symbols',
+                                        'symbols',
                                     ]}
                                 />
                             </div>

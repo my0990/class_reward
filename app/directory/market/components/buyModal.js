@@ -3,6 +3,7 @@ import { useState } from "react";
 export default function BuyModal({ buyList, setItemList, itemList, money, currencyName, currencyEmoji }) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const left = (money - buyList?.itemPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     const onSubmit = (e) => {
         e.preventDefault();
         if (isLoading) {
@@ -12,11 +13,11 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
             if (money < buyList.itemPrice) {
                 alert('돈이 모자랍니다')
                 document.getElementById('my_modal_3').close()
-                return 
+                return
             }
             fetch("/api/buyItem", {
                 method: "POST",
-                body: JSON.stringify({ itemData: buyList}),
+                body: JSON.stringify({ itemData: buyList, balance: left }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -37,7 +38,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
 
     const itemPrice = buyList?.itemPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     const currentMoney = money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    const left = (money - buyList?.itemPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
     return (
         <dialog id="my_modal_3" className="modal  modal-middle ">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
@@ -67,7 +68,6 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                     {money - buyList?.itemPrice >= 0 ?
                         <div className="text-green-500">{left}{currencyName}</div> :
                         <div className="text-red-500">{left}{currencyName}</div>}
-
                 </div>
                 <div className="mb-[32px]">남은 수량: {buyList?.itemQuantity}</div>
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
