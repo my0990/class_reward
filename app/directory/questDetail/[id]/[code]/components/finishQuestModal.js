@@ -27,7 +27,7 @@ export default function AddQuestModal({ userData, questData }) {
                     <h1 className="text-[1.8rem] mb-[16px] font-bold"><span>퀘스트</span>를 종료하고</h1>
                     <div className="flex flex-wrap">{rewarded.map((a,i)=>{
                         return(
-                            <div key={i} className=" mr-[4px]"><span className="bg-orange-200">{a.userName}</span>{i < rewarded.length - 1 && ', '}</div>
+                            <div key={i} className=" mr-[4px]"><span className="bg-orange-200">{a['userNumber']}. {a.userNickname}</span>{i < rewarded.length - 1 && ', '}</div>
                         )
                     })}에게</div>
                     <div className="mt-[16px]"><span className="font-bold text-orange-500">{questData?.questReward?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</span>을 지급합니다.</div>

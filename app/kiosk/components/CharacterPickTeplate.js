@@ -6,7 +6,7 @@ export default function CharacterPickTemplate(props) {
         console.log('character picked')
         console.log(a)
         document.getElementById('my_modal_3').showModal()
-        props.setRequestData(prev => ({ ...prev, userId: a.userId, userMoney: a.money, userName: a.userName, checked: true, itemList: [...a.itemList] }))
+        props.setRequestData(prev => ({ ...prev, userId: a.userId, userMoney: a.money, userName: a.userName, checked: true, itemList: [...a.itemList], userNumber: a.classNumber, userNickname: a.profileNickname }))
        
     }
     // const [studentData,setStudentData] = useState(props.studentData);
@@ -14,8 +14,8 @@ export default function CharacterPickTemplate(props) {
     const currencyEmoji = props.currencyEmoji;
     return (
         <div className="flex justify-center flex-col items-center">
-            <h1 className="text-[3rem] text-center mb-[16px]">자신의 캐릭터를 선택해주세요</h1>
-            <div className="flex flex-wrap">
+            <h1 className="text-[3rem] text-center mb-[16px]">자신의 계정을 선택해주세요</h1>
+            <div className="flex flex-wrap w-[1410px] max-[1410px]:w-[1235px] max-[1235px]:w-[1060px] max-[1060px]:w-[885px] max-[885px]:w-[710px] max-[710px]:w-[535px] max-[535px]:w-[360px]">
                 {props.studentData.map((a, i) => {
                     return (
                         <CharacterCard key={i} onClick={e => onClick(a)} user={a} currencyName={currencyName} currencyEmoji={currencyEmoji}/>

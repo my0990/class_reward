@@ -8,7 +8,7 @@ export default function QuestDetail({ params }) {
     const [data, setData] = useState([]);
     const [studentList, setStudentList] = useState([]);
     const [role, setRole] = useState(null);
-    console.log(data)
+
     useEffect(() => {
         const fetchData = async () => {
             const response = await fetch('/api/fetchQuestDetail', {
@@ -19,14 +19,9 @@ export default function QuestDetail({ params }) {
                 },
             })
             const result = await response.json();
-            console.log('test')
-            console.log('test')
-            console.log('test')
-            console.log('test')
-            console.log('test')
             setData(result.data);
             setRole(result.role);
-            setStudentList(result.data.studentList)
+            setStudentList(result?.data.studentList)
 
 
         };
@@ -74,14 +69,14 @@ export default function QuestDetail({ params }) {
 
 
                                     <div className="swap-on relative">
-                                        <div className="bg-orange-200 text-gray-600 font-bold text-[1.3rem] flex justify-center items-center  w-[136px] h-[180px] opacity-30">
-                                            {a['userNickname']}
+                                        <div className="bg-orange-200 text-gray-600 font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px] opacity-30">
+                                            {a['userNumber']}. {a['userNickname']}
                                         </div>
                                         <div className="text-red-500 w-[136px] h-[180px] absolute flex justify-center top-0 items-center font-bold text-[1.7rem]">Checked</div>
                                     </div>
                                     <div className="swap-off">
-                                        <div className="bg-orange-200 text-gray-600 font-bold text-[1.3rem] flex justify-center items-center  w-[136px] h-[180px]">
-                                            {a['userNickname']}
+                                        <div className="bg-orange-200 text-gray-600 font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px]">
+                                        {a['userNumber']}. {a['userNickname']}
                                         </div>
                                     </div>
                                 </label>
@@ -90,7 +85,7 @@ export default function QuestDetail({ params }) {
 
                     </div>
                     {role === "teacher"
-                        ? data.finished
+                        ? data?.finished
                             ? <button className="w-[100%] btn mt-[48px] mb-[16px] shadow-none text-white hover:bg-red-600 bg-red-400 border-0  font-bold text-[1.4rem]" onClick={() => document.getElementById('my_modal_3').showModal()}>삭제</button>
                             : <button className="w-[100%] btn mt-[48px] mb-[16px] shadow-none text-white hover:bg-orange-500 bg-orange-300 border-0  font-bold text-[1.4rem]" onClick={() => document.getElementById('my_modal_2').showModal()}>종료</button>
                         : null

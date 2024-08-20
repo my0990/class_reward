@@ -81,7 +81,7 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
             fetch("/api/useItem", {
                 method: "POST",
                 // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemDetail.itemName, userId: userId, teacher: itemDetail.teacher, itemPrice: itemDetail.itemPrice, itemId: itemDetail.itemId, userName: userName }),
+                body: JSON.stringify({ itemName: itemDetail.itemName, userId: userId, teacher: itemDetail.teacher, itemPrice: itemDetail.itemPrice, itemId: itemDetail.itemId, userName: userName, userMoney: userMoney }),
                 headers: {
                     "Content-Type": "application/json",
                 },

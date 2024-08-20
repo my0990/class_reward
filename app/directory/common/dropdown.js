@@ -46,8 +46,10 @@ export default function DropDown({ session, money, userName }) {
                     </> :
                     <>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[8px] ml-[8px] text-[1.2rem]">기록보기</li></Link> */}
+                        <Link href="/directory/inventory"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/inventory" ? "text-orange-400" : null}`}>창고 가기</li></Link>
+                        <Link href="/directory/market"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/market" ? "text-orange-400" : null}`}>상점 가기</li></Link>
                         <Link href="/directory/quest"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/quest" ? "text-orange-400" : null}`}>퀘스트 관리</li></Link>
-                        <Link href="/directory/browse"><li className={`py-[1.5rem] px-[8px] ml-[8px] text-[1.2rem] ${pathname === "/directory/browse" ? "text-orange-400" : null}`}>둘러보기</li></Link>
+                        {/* <Link href="/directory/browse"><li className={`py-[1.5rem] px-[8px] ml-[8px] text-[1.2rem] ${pathname === "/directory/browse" ? "text-orange-400" : null}`}>둘러보기</li></Link> */}
                     </>
                 }
 

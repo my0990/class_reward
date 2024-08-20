@@ -43,8 +43,8 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
             <div className="flex flex-wrap min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                 {itemList.map((a, i) => {
                     return (
-                        <div key={i}  className="m-[16px] w-[192px]   flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg hover:scale-110 transition-all">
-                            <ItemBuyCard onClick={e => onClick(a)} itemquantity={a.itemQuantity} itemname={a.itemName} itemexplanation={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked} currencyname={currencyName} currencyemoji={currencyEmoji} emoji={a.emoji} />
+                        <div key={i}  className={`m-[16px] w-[192px]   flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "" : "hover:scale-110 transition-all"} `}>
+                            <ItemBuyCard onClick={e => a.itemQuantity <= 0 ? null : onClick(a)} itemquantity={a.itemQuantity} itemname={a.itemName} itemexplanation={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked} currencyname={currencyName} currencyemoji={currencyEmoji} emoji={a.emoji} />
                         </div>
                     )
                 })}

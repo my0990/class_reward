@@ -30,5 +30,5 @@ export default async function handler(req, res) {
     const response2 = await db.collection('user_data').updateOne({userId: userId},{$push: {itemList: {itemName: itemData.itemName, itemPrice: itemData.itemPrice, state: '사용 가능', itemId: itemId, teacher: teacherId, itemEmoji: itemData.emoji, itemExplanation: itemData.itemExplanation}}}, {upsert: true})
     const response3 = await db.collection('user_data').updateOne({userId: userId},{$inc: {money: -itemData.itemPrice}})
     const response4 = await db.collection('history').insertOne({userId: userId,balance: balance, type: 'withDrawal', amount: itemData.itemPrice, date: new Date(),expiresAfter: new Date(), name: itemData.itemName + ' 구입'})
-    res.status(201).json({ result: true, message: 'delete 성공' });
+    res.status(201).json({ result: true, message: 'delete 성공', itemId: itemId });
 }}

@@ -10,8 +10,7 @@ export default function Password() {
     }
     const onSubmit = (e) => {
         e.preventDefault();
-        alert('비밀번호를 바꾸지 말아주세요')
-        return
+
         if(password.currentPassword === '' || password.nextPassword === '' || password.nextPasswordConfirm === ''){
             setError('비밀번호를 모두 입력해주세요')
             return

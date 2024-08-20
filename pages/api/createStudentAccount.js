@@ -65,7 +65,8 @@ export default async function handler(req, res) {
         profileState: '', 
         teacher: userId, 
         classData: data.classData,
-        classNumber: Number(a) })})
+        classNumber: Number(a),
+        profileUrl: "https://i.postimg.cc/HLXdVT11/orange.png" })})
     // MongoDB 연결
     const pwd = await hash('1234',12)
     const accountUserInfo = accountArr.map((a)=> {return ({

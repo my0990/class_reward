@@ -1,12 +1,10 @@
 import { useState } from "react";
-import gold from "@/public/gold.png"
-import Image from "next/image";
-import Alert from "./Alert";
-export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
+import FinishBuyModal from "./FinishBuyModal";
+export default function ConfirmItemBuy({ requestData, setStep, currencyName, teacher }) {
     console.log(requestData)
     const [isLoading, setIsLoading] = useState(false);
     const { itemData, userId, userMoney } = requestData;
-    console.log(requestData)
+    const [itemId,setItemId] = useState(null);
     const onClick = (e) => {
         if (isLoading) {
             return
@@ -14,7 +12,7 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
             setIsLoading(true)
             fetch("/api/buyItem", {
                 method: "POST",
-                body: JSON.stringify({ itemData: itemData, userId: userId, balance:  userMoney - itemData?.itemPrice}),
+                body: JSON.stringify({ itemData: itemData, userId: userId, balance: userMoney - itemData?.itemPrice }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -22,9 +20,9 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
 
                 if (data.result === true) {
                     // alert('구입하였습니다')
+                    setItemId(data.itemId)
+                    document.getElementById('my_modal_3').showModal()
 
-                    document.getElementById('my_modal_2').showModal()
-                    
 
                 } else {
                     setIsLoading(false)
@@ -33,6 +31,8 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
         }
 
     }
+
+   
     return (
         // <div className="h-[100vh] flex justify-center items-center">
         // <div className="border-4 p-[30px] border-red-900 rounded-xl">
@@ -80,7 +80,8 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName }) {
                     <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => setStep('home')}>취소</button>
                 </div>
             </div>
-            <Alert setStep={setStep} >아이템을 구매하였습니다</Alert>
+            {/* itemName, userId, itemId, teacher, userName, itemPrice, userMoney */}
+            <FinishBuyModal setStep={setStep} data={requestData} teacher={teacher} itemId={itemId}/>
         </div>
     )
 }

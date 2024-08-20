@@ -11,6 +11,6 @@ export default async function Inventory(){
     const data = await db.collection('user_data').findOne({userId: userId})
     console.log(data.userName)
     return(
-        <InventoryTemplate data={data?.itemList} userId={userId} teacher={teacher} userName={data.userName}/>
+        <InventoryTemplate data={data?.itemList} userId={userId} teacher={teacher} userName={data.userName} userMoney={data.money}/>
     )
 }

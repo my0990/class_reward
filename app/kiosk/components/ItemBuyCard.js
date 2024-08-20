@@ -26,7 +26,7 @@ export default function ItemBuyCard(props) {
         //     </div>
         //     <div className="text-red-500 text-right">{props.currencyEmoji} {props.itemprice} {props.currencyName}</div>
         // </div>
-        <div {...props} className={` p-[16px] w-[192px] h-[300px] cursor-pointer font-bold rounded-lg relative ${props.checked ? "bg-orange-300" : "bg-white"}`}>
+        <div {...props} className={`${props.itemquantity <= 0 ? "cursor-default" : "cursor-pointer"} p-[16px] w-[192px] h-[300px]  font-bold rounded-lg relative ${props.checked ? "bg-orange-300" : "bg-white"}`}>
             {props.itemquantity <= 0
                 ? <div className="absolute z-50 top-[50px]">
                     <Image src={soldOut} />

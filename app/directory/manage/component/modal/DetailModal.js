@@ -65,7 +65,7 @@ export default function DetailModal({ picked }) {
                                             <td>{a.name}</td>
                                             <td>
                                                 <span className={`${a.type === 'deposit' ? "text-green-500" : "text-red-500"}`}>
-                                                    {a.type === 'deposit' ? "+" : "-"}{a.amount}
+                                                    {a.amount === 0 ? null : a.type === 'deposit' ? "+" : "-"}{a.amount === 0 ? null : a.amount}
                                                 </span>
                                             </td>
                                             <td>{a.balance}</td>

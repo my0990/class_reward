@@ -52,13 +52,11 @@ export default function NotificationTemplate({ data, userId }) {
                                     <th>{a.itemName}</th>
                                     <td>{a.userName}</td>
                                     <td className="flex justify-center">
-                                        {a.state === '대기중'
-                                            ? <button className="btn bg-green-500 text-white" onClick={() => onClick(a)}>승인</button>
-                                            :
+
                                             <form onSubmit={(e) => onSubmit(e,a)}>
-                                                <button className="btn bg-red-500 text-white">삭제</button>
+                                                <button className="btn bg-red-500 text-white">확인</button>
                                             </form>
-                                        }
+                                        
                                     </td>
                                 </tr>
                             )

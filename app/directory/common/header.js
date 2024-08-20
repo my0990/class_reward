@@ -47,8 +47,11 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
 
                                 </ul> :
                                 <ul className="flex max-[700px]:hidden">
+                                     <Link href="/directory/inventory"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/inventory" ? "border-b-8 border-orange-400" : null}`}>창고 가기</li></Link>
+                                    <Link href="/directory/market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>상점 가기</li></Link>
                                     <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트</li></Link>
-                                    <Link href="/directory/browse"><li className={`dark:text-white ${pathname === "/directory/browse" ? "border-b-8 border-orange-400" : null}`}>둘러보기</li></Link>
+                                    {/* <Link href="/directory/browse"><li className={`dark:text-white ${pathname === "/directory/browse" ? "border-b-8 border-orange-400" : null}`}>둘러보기</li></Link> */}
+                                   
 
                                 </ul>
                             }

@@ -2,7 +2,7 @@
 
 import UseModal from "./useModal"
 import { useState } from "react"
-export default function Inventory({data, userId, teacher, userName}) {
+export default function Inventory({data, userId, teacher, userName, userMoney}) {
     const [item,setItem] = useState();
     const onClick = (a) => {
         document.getElementById('my_modal_3').showModal()
@@ -31,11 +31,7 @@ export default function Inventory({data, userId, teacher, userName}) {
                                     <td className="dark:text-white">{a.itemPrice}</td>
                                     <td className="dark:text-white">1개</td>
                                     <td className="flex justify-center">
-                                        {a.state === "사용 가능"?
                                         <button className="btn bg-red-500 text-white border-0" onClick={()=>onClick(a)}>사용</button>
-                                    :<button className={`${a.state === "대기중" ? "bg-green-500 hover:bg-green-400 cursor-default" : 'btn-disabled'} btn `}>{a.state}</button>
-                                }
-
                                     </td>
                                 </tr>
                             )
@@ -45,7 +41,7 @@ export default function Inventory({data, userId, teacher, userName}) {
                     </tbody>
 
                 </table>
-                <UseModal item={item} userId={userId} teacher={teacher} userName={userName}/>
+                <UseModal item={item} userId={userId} teacher={teacher} userName={userName} userMoney={userMoney}/>
             </div>
         </div>
     )

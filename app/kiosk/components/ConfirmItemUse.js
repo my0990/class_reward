@@ -10,6 +10,7 @@ export default function ConfirmItemUse({ requestData, setStep, currencyName }) {
     
     const [isLoading, setIsLoading] = useState(false);
     const { userName, userId, userMoney } = requestData;
+
     const {itemId,itemName,itemPrice,teacher, itemExplanation} = requestData.itemData;
 
     const onClick = (e) => {
@@ -20,7 +21,7 @@ export default function ConfirmItemUse({ requestData, setStep, currencyName }) {
             fetch("/api/useItem", {
                 method: "POST",
                 // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemName, userId: userId, teacher: teacher, itemPrice: itemPrice, itemId: itemId, userName: userName }),
+                body: JSON.stringify({ itemName: itemName, userId: userId, teacher: teacher, itemPrice: itemPrice, itemId: itemId, userName: userName, userMoney: userMoney }),
                 headers: {
                     "Content-Type": "application/json",
                 },

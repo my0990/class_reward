@@ -34,7 +34,7 @@ export default function Modal({  isSend, setStudentData, studentData, currencyNa
             },
         }).then((res) => res.json()).then((data) => {
             if (data.result === true) {
-                const message = targetStudent.map((a,i)=> a.userName)
+                const message = targetStudent.map((a,i)=> a.userId)
                 if(isSend){
                     alert(message+ '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
                     location.reload();
@@ -110,7 +110,7 @@ export default function Modal({  isSend, setStudentData, studentData, currencyNa
             <div className={`modal-box w-[320px] flex justify-center dark:bg-gray-400 ${isSend ? "bg-green-500" : "bg-red-500"}`} >
                 <div className="w-[272px]">
                     <h3 className="font-bold text-lg mb-5 ml-[10px] ">
-                        {isSend ? "받는" : "잃는"} 사람: {targetStudent.map((a, i) => <span className="text-[1.4rem] ml-[4px]" key={i}><span className="bg-orange-200">{a.userName}</span><span className="">{i < targetStudent.length - 1 && ', '}</span></span>)}
+                        {isSend ? "받는" : "잃는"} 사람: {targetStudent.map((a, i) => <span className="text-[1.4rem] ml-[4px]" key={i}><span className="bg-orange-200">{a.userId}</span><span className="">{i < targetStudent.length - 1 && ', '}</span></span>)}
                     </h3>
                     <div className="h-[64px] bg-gray-200 mb-5 rounded-2xl flex justify-between items-center px-[16px]">
                         <div className="text-gray-500">{isSend ? "받는" : "잃는"} 금액</div>
