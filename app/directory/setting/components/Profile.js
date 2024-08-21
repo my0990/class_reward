@@ -3,7 +3,7 @@ import male from "@/public/male.png"
 import female from "@/public/female.png"
 import { useState, useMemo } from "react";
 import Image from "next/image";
-export default function Profile({ profileNickname, profileState, gender }) {
+export default function Profile({ profileNickname, profileState, profileUrl }) {
 
     const [profileContent, setProfileContent] = useState({ nickname: profileNickname, state: profileState })
     const onChange = (e) => {
@@ -32,8 +32,8 @@ export default function Profile({ profileNickname, profileState, gender }) {
                 <div className="avatar w-[100%] justify-center cursor-pointer">
                     {useMemo(() => {
                         return (
-                            <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                <Image src={gender === "male" ? male : female}/>
+                            <div className="w-24 rounded-full ring ring-primary cursor-default ring-offset-base-100 ring-offset-2">
+                                <img src="https://i.postimg.cc/HLXdVT11/orange.png" width="90" height="90" alt="characther" />
                             </div>
                         )
                     }, [])}

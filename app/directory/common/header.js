@@ -33,8 +33,11 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                 <div className="p-[24px] max-[700px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
                     <div className="flex items-center">
                         <div className="min-[601px]:mr-[5vw]">
-                            <Link href="/directory/dashboard" replace><div className="w-[48px] h-[48px] rounded-lg text-orange-500 text-[40px] bg-orange-500 hover:bg-white transition-all duration-500 align-middle flex justify-center items-center font-bold">뀰</div></Link>
-
+                            <Link href="/directory/dashboard" replace>
+                                <div className="w-[56px] h-[56px] font-medium rounded-full border-4  bg-orange-500 text-[32px] transition-all hover:scale-110 bg-orange-500 text-white transition-all duration-500 align-middle flex justify-center items-center">
+                                    뀰
+                                </div>
+                            </Link>
                         </div>
                         <div>
                             {session.role === 'teacher' ?
@@ -47,11 +50,11 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
 
                                 </ul> :
                                 <ul className="flex max-[700px]:hidden">
-                                     <Link href="/directory/inventory"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/inventory" ? "border-b-8 border-orange-400" : null}`}>창고 가기</li></Link>
+                                    <Link href="/directory/inventory"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/inventory" ? "border-b-8 border-orange-400" : null}`}>창고 가기</li></Link>
                                     <Link href="/directory/market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>상점 가기</li></Link>
                                     <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트</li></Link>
                                     {/* <Link href="/directory/browse"><li className={`dark:text-white ${pathname === "/directory/browse" ? "border-b-8 border-orange-400" : null}`}>둘러보기</li></Link> */}
-                                   
+
 
                                 </ul>
                             }
@@ -68,7 +71,8 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                         }
                         <div className="avatar cursor-pointer max-[700px]:hidden flex items-center justify-center" onClick={userinfoClicked} ref={profileiconRef}>
 
-                            <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2 bg-orange-500">
+                            <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2 ">
+                                <img src="https://i.postimg.cc/HLXdVT11/orange.png" width="90" height="90" alt="characther" />
                                 {/* <Image src={data?.userGender === "male" ? male : data?.userGender === "female" ? female : character} alt="character" /> */}
                             </div>
 
@@ -83,8 +87,8 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                     </div>
                 </div>
             </div>
-            {isHamburgerClicked ? <DropDown session={session} money={money} userName={data?.userName}/> : null}
-            {isUserinfoClicked ? <UserInfo session={session} role={role} userNickname={data?.profileNickname} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} currencyName={currencyName} currencyEmoji={currencyEmoji}/> : null}
+            {isHamburgerClicked ? <DropDown session={session} money={money} userName={data?.userName} /> : null}
+            {isUserinfoClicked ? <UserInfo session={session} role={role} userNickname={data?.profileNickname} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} currencyName={currencyName} currencyEmoji={currencyEmoji} /> : null}
         </>
     )
 }

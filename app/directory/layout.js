@@ -11,7 +11,7 @@ export default async function RootLayout({ children }) {
     if(!response){
         console.log('user denied')
         signOut({ callbackUrl: '/' });
-        return <div>ddd</div>
+        return <div>user denied</div>
 
     }
     response._id = response._id.toString();
