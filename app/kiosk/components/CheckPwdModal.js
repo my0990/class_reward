@@ -56,7 +56,7 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
     console.log(requestData)
     return (
         <dialog id="my_modal_3" className="modal  modal-middle">
-            <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200 flex flex-col">
+            <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200 flex flex-col pb-[50vh]">
                 <div className="text-[2rem]">선택된 사용자: <span className="bg-orange-200">{requestData.userNumber}. {requestData.userNickname}</span></div>
                 {/* <div className="text-[1.5rem]">로그인 비밀번호를 입력해주세요</div> */}
                 <input type="password" ref={pwdRef} className="input input-bordered input-warning my-[16px]" placeholder="로그인 비밀번호를 입력해주세요" autoComplete='off'></input>
