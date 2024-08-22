@@ -5,6 +5,7 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
     const tmp = itemData.map((a) => { a.checked = false; return a })
     const [itemList, setItemList] = useState(tmp)
     const [isSelected, setIsSelected] = useState(false);
+    console.log(requestData)
     const onClick = (a) => {
 
         if (isSelected === false) {
@@ -38,12 +39,16 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
         document.getElementById('my_modal_2').close()
     }
     return (
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-center relative">
             <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
+            <div className="absolute top-0 right-0">
+                <div>{requestData.userNumber}. {requestData.userNickname}</div>
+                <div>{currencyEmoji} {requestData.userMoney}{currencyName}</div>
+            </div>
             <div className="flex flex-wrap min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                 {itemList.map((a, i) => {
                     return (
-                        <div key={i}  className={`m-[16px] w-[192px]   flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "" : "hover:scale-110 transition-all"} `}>
+                        <div key={i} className={`m-[16px] w-[192px]   flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "" : "hover:scale-110 transition-all"} `}>
                             <ItemBuyCard onClick={e => a.itemQuantity <= 0 ? null : onClick(a)} itemquantity={a.itemQuantity} itemname={a.itemName} itemexplanation={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked} currencyname={currencyName} currencyemoji={currencyEmoji} emoji={a.emoji} />
                         </div>
                     )

@@ -58,7 +58,7 @@ export default function SignUpPage() {
                     <div className="flex flex-col w-full border-opacity-50">
                         <div className="divider">OR</div>
                     </div>
-                    <Link href="../"><button className={`btn btn-block bg-orange-500 dark:hover:bg-orange-300  mb-4 text-lg  border-0 text-white`}>로그인</button></Link>
+                    <Link href="../login/teacher"><button className={`btn btn-block bg-orange-500 dark:hover:bg-orange-300  mb-4 text-lg  border-0 text-white`}>로그인</button></Link>
 
                 </div>
             </div>
