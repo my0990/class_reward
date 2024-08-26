@@ -2,12 +2,13 @@
 import { useState } from "react";
 import Alert from "./Alert";
 export default function FinishBuyModal(props) {
+    console.log('finish buy modal')
     console.log(props)
     const { itemName, itemPrice, } = props.data.itemData;
     const { userId, userName, userMoney } = props.data;
     const [isLoading, setIsLoading] = useState(false);
     const itemId = props.itemId;
-    const { teacher } = props.teacher;
+    const { teacher } = props.data;
     const onItemUse = (e) => {
         if (isLoading) {
             return

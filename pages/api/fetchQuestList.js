@@ -16,8 +16,8 @@ export default async function handler(req, res) {
       userId = session.user.teacher;
     }
     const db = (await connectDB).db('data');
-    const response = await db.collection('quest').find({userId: userId}).toArray();
-    
+    const response = await db.collection('quest').find({userId: userId}).sort({time:'-1'}).toArray();
+
 
     let studentsCount = response.done;
 
