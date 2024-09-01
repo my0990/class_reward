@@ -18,7 +18,6 @@ import { useRecoilState } from "recoil";
 export default function MarketTemplate() {
     const [data, setData] = useRecoilState(userData);
     const [sessionState, setSessionState] = useRecoilState(sessionData);
-
     const {role} = sessionState.user
     const {currencyEmoji, currencyName} = data.classData;
     const onDelete = (picked) => {
