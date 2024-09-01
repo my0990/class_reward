@@ -50,7 +50,7 @@ export default function NotificationTemplate({ data, userId }) {
                                 <tr className="hover" key={i}>
                                     <th className="max-[443px]:hidden">{i}</th>
                                     <th>{a.itemName}</th>
-                                    <td>{a.userName}</td>
+                                    <td>{a.userId}</td>
                                     <td className="flex justify-center">
 
                                             <form onSubmit={(e) => onSubmit(e,a)}>

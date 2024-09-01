@@ -27,7 +27,7 @@ export default function ItemCard(props) {
             </div> */}
             {data.itemQuantity <= 0
                 ? <div className="absolute z-50 top-[60px]" >
-                    <Image src={soldOut} />
+                    <Image src={soldOut} alt="soldout"/>
                 </div>
                 : null}
             <div className={`${data.itemQuantity <= 0 ? "opacity-30" : null}`}>

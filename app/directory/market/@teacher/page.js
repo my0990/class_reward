@@ -1,23 +1,25 @@
 'use client'
 
-import AddModal from "./addModal"
-import BuyModal from "./buyModal"
-import DeleteModal from "./deleteModal"
+import AddModal from "../components/addModal"
+import BuyModal from "../components/buyModal"
+import DeleteModal from "../components/deleteModal"
 import { useState, useRef } from "react"
 import {
     CSSTransition,
     TransitionGroup,
 } from 'react-transition-group';
-import ItemCard from "./ItemCard"
-import { userData } from '@/store/atoms';
+import ItemCard from "../components/ItemCard"
+import { userData, sessionData } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 
 
 
 
-export default function MarketTemplate({ role }) {
+export default function MarketTemplate() {
     const [data, setData] = useRecoilState(userData);
-    console.log(data)
+    const [sessionState, setSessionState] = useRecoilState(sessionData);
+
+    const {role} = sessionState.user
     const {currencyEmoji, currencyName} = data.classData;
     const onDelete = (picked) => {
         setDeleteId(picked.itemId)

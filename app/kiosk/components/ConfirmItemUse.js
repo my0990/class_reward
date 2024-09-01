@@ -10,7 +10,7 @@ export default function ConfirmItemUse({ requestData, setStep, currencyName }) {
     
     const [isLoading, setIsLoading] = useState(false);
     const { userName, userId, userMoney } = requestData;
-
+    
     const {itemId,itemName,itemPrice,teacher, itemExplanation} = requestData.itemData;
 
     const onClick = (e) => {

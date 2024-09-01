@@ -32,6 +32,7 @@ export default function CreateStudentAccount({ result, arr, setArr, studentData 
                             <thead>
                                 <tr className="text-[1.2rem] text-center">
                                     <th>아이디</th>
+                                    <th>닉네임</th>
                                     {/* <th>닉네임</th> */}
                                     <th>{currencyEmoji} 소지{currencyName}</th>
                                     <th>계정 관리</th>
@@ -42,7 +43,7 @@ export default function CreateStudentAccount({ result, arr, setArr, studentData 
                                     return (
                                         <tr key={i}>
                                             <td onClick={(e) => onDetailClick(a)} className="cursor-pointer transition-all hover:bg-orange-200 rounded-xl">{a.userId}</td>
-                                            {/* <td>{a.profileNickname}</td> */}
+                                            <td>{a.profileNickname}</td>
                                             <td>{a.money}{currencyName}</td>
                                             <td className="p-[8px] flex">
                                                 <div className="flex justify-center w-full">

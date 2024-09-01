@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+
 // import Head from "next/head";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,8 +14,8 @@ const APP_DESCRIPTION = "학급 보상을 관리합니다";
 
 export const metadata = {
   icons: {
-		icon: "/favicon.png",
-	},
+    icon: "/favicon.png",
+  },
   applicationName: APP_NAME,
   title: {
     default: APP_DEFAULT_TITLE,
@@ -22,7 +23,7 @@ export const metadata = {
   },
 
   description: APP_DESCRIPTION,
-  
+
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -56,13 +57,13 @@ export const viewport = {
   themeColor: "#FFFFFF",
   initialScale: 1,
 };
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+
 
   return (
-    <html lang="en" className="w-full dark:bg-gray-700" >
-
+    <html lang="en" className="w-full dark:bg-gray-700">
       <body className={inter.className}>
-        <div>{children}</div>
+        {children}
       </body>
     </html>
   );

@@ -6,7 +6,7 @@ import Picker from '@emoji-mart/react'
 
 export default function SetCurrencyNameModal() {
     const [step, setStep] = useState('name');
-    const [classData, setClassData] = useState({ currencyName: null, currencyEmoji: null })
+    const [classData, setClassData] = useState({ currencyName: undefined, currencyEmoji: null })
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/setCurrencyName", {
@@ -18,7 +18,7 @@ export default function SetCurrencyNameModal() {
         }).then((res) => res.json()).then((data) => {
             if (data.result === true) {
 
-                document.getElementById('my_modal_1').close()
+                document.getElementById('setting').close()
                 location.reload();
             }
         })
@@ -30,7 +30,7 @@ export default function SetCurrencyNameModal() {
     }
 
     return (
-        <dialog id="my_modal_1" className="modal " tabIndex="-1">
+        <dialog id="setting" className="modal " tabIndex="-1">
             <div className={`modal-box p-[32px]`} >
                 {step === "name"
                     ? <div>
@@ -47,7 +47,6 @@ export default function SetCurrencyNameModal() {
                                 <div className="text-[1.5rem]">우리 반 화폐의 모양을 설정해 주세요 - <span className="text-[1.5rem]">{classData.currencyEmoji}</span></div>
 
                             </div>
-                            {/* <EmojiPicker onEmojiClick={onEmojiClick} /> */}
                             <div className="flex justify-center my-[16px]">
                                 <Picker
                                     data={data}

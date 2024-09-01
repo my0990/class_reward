@@ -4,18 +4,6 @@ export default function PickNumber({ result, arr, setArr}) {
     let tmp = {}
 
     const [isLoading, setIsLoading] = useState(false);
-    // useEffect(() => {
-    //     console.log('render test1')
-    //     for (let index = 1; index < 31; index++) {
-    //         tmp[index] = false;
-    //     }
-    //     for (let index = 0; index < result?.generatedNumber?.length; index++) {
-    //         tmp[result?.generatedNumber[index]] = '생성됨';
-    //     }
-    //     setArr(tmp)
-    // }, [])
-
-
     const onCloseModal = () => {
 
         document.getElementById('my_modal_2').close();

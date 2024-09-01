@@ -1,4 +1,4 @@
-import ItemBuyCard from "./ItemBuyCard";
+
 import { useState, useEffect } from "react";
 import Alert from "./Alert";
 
@@ -114,7 +114,7 @@ export default function ItemUseTemplate({ setStep, itemData, setIsItemPicked, se
                         <div className="flex justify-center">
                             <div className="flex flex-wrap overflow-scroll overflow-x-hidden" style={{ height: 38 * width + 'px', width: 45 * width + 'px' }}>
                                 {itemList.map((a, i) => {
-                                    return (
+                                    return (    
                                         a.itemId === null || a.state === "대기중"
                                             ? <div key={i} style={{ width: 8 * width + 'px', height: 8 * width + 'px', margin: width * 0.8 + 'px', fontSize: 4 * width }} className="bg-white  flex justify-center items-center  rounded-lg"></div>
                                             : <div onClick={() => onItemClick(a)} key={i} style={{ width: 8 * width + 'px', height: 8 * width + 'px', margin: width * 0.8 + 'px', fontSize: 4 * width }} className="bg-white  hover:bg-yellow-300    flex justify-center items-center cursor-pointer hover:scale-110  rounded-lg">{a.itemEmoji}</div>

@@ -1,17 +1,24 @@
 'use client'
 import Link from "next/link";
 import Notification from "./notification";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
 import { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { userData } from '@/store/atoms';
+import { useRecoilState } from "recoil";
+
+export default function Header({session}) {
 
 
-export default function Header({ session, data, currencyName, currencyEmoji }) {
-    const router = useRouter();
+    const [data, setData] = useRecoilState(userData);
+    const [isClient, setIsClient] = useState(false)
+    const {role} = session
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
+    const profileiconRef = useRef();
+    const pathname = usePathname();
+
     const hamburgerClicked = () => {
         setIsHamburgerClicked(props => !props)
     }
@@ -20,12 +27,17 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
     const userinfoClicked = () => {
         setIsUserinfoClicked(props => !props)
     }
-    const profileiconRef = useRef();
-    const pathname = usePathname();
-    const { role, money } = data;
+
+
+
     useEffect(() => { isHamburgerClicked ? setIsHamburgerClicked(false) : null }, [pathname])
     useEffect(() => { isUserinfoClicked ? setIsUserinfoClicked(false) : null }, [pathname])
-    const notificationCount = data.notification?.filter(obj => obj.state !== "사용완료").length;
+
+ 
+    useEffect(() => {
+      setIsClient(true)
+    }, [])
+
     return (
 
         <>
@@ -53,7 +65,7 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                                     <Link href="/directory/inventory"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/inventory" ? "border-b-8 border-orange-400" : null}`}>창고 가기</li></Link>
                                     <Link href="/directory/market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>상점 가기</li></Link>
                                     <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트</li></Link>
-                                    {/* <Link href="/directory/browse"><li className={`dark:text-white ${pathname === "/directory/browse" ? "border-b-8 border-orange-400" : null}`}>둘러보기</li></Link> */}
+                               
 
 
                                 </ul>
@@ -63,19 +75,16 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                     </div>
                     {/* 아이콘 */}
                     <div className="flex">
-                        {session.role === "teacher" && notificationCount > 0 &&
-                            <div className="mr-[8px] min-[700px]:mr-[16px]">
+                        {isClient && session.role === "teacher" && data && data?.notification?.length > 0 
+                        ?<div className="mr-[8px] min-[700px]:mr-[16px]">
                                 <Link href="/directory/notification"><Notification /></Link>
                             </div>
-
+                            : null
                         }
                         <div className="avatar cursor-pointer max-[700px]:hidden flex items-center justify-center" onClick={userinfoClicked} ref={profileiconRef}>
-
                             <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2 ">
                                 <img src="https://i.postimg.cc/HLXdVT11/orange.png" width="90" height="90" alt="characther" />
-                                {/* <Image src={data?.userGender === "male" ? male : data?.userGender === "female" ? female : character} alt="character" /> */}
                             </div>
-
                         </div>
 
                         {/* 메뉴창 */}
@@ -87,8 +96,8 @@ export default function Header({ session, data, currencyName, currencyEmoji }) {
                     </div>
                 </div>
             </div>
-            {isHamburgerClicked ? <DropDown session={session} money={money} userName={data?.userName} /> : null}
-            {isUserinfoClicked ? <UserInfo session={session} role={role} userNickname={data?.profileNickname} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} money={money} currencyName={currencyName} currencyEmoji={currencyEmoji} /> : null}
+            {isHamburgerClicked ? <DropDown role={role} /> : null}
+            {isUserinfoClicked ? <UserInfo  role={role}  profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} /> : null}
         </>
     )
 }
