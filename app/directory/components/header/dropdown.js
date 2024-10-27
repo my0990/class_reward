@@ -3,15 +3,15 @@ import Link from "next/link"
 import gold from "@/public/gold.png";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { userData } from '@/store/atoms';
+import { userDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 
 
 export default function DropDown({ role }) {
     const pathname = usePathname();
 
-    const [data, setData] = useRecoilState(userData);
-    const {money, profileNickname} = data;
+    const [userData, setUserData] = useRecoilState(userDataState);
+    const {money, profileNickname} = userData;
     return (
         <div className="border-b-2 min-[701px]:hidden dark:text-white">
             <ul>
@@ -30,9 +30,9 @@ export default function DropDown({ role }) {
                 </li>
                 <li className="py-[0.5rem] px-[16px]  text-[1.2rem]">
                     <div className="flex">
-                        <div className="mr-3">{data.classData.currencyEmoji}</div>
+                        <div className="mr-3">{userData.classData.currencyEmoji}</div>
                         {/* <div>{response.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</div> */}
-                        <div>{money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{data.classData.currencyName}</div>
+                        <div>{money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{userData.classData.currencyName}</div>
                     </div>
                 </li>
                 <Link href="/directory/setting"><li className="py-[0.5rem] px-[16px] pb-[1rem] text-[1.2rem] border-b-2 flex">
@@ -45,16 +45,18 @@ export default function DropDown({ role }) {
                     <>
                         <Link href="/directory/manage"><li className={`py-[0.5rem] px-[16px] mt-[1rem] text-[1.2rem] ${pathname === "/directory/manage" ? "text-orange-400" : null}`}>학생 관리</li></Link>
                         <Link href="/directory/market"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/market" ? "text-orange-400" : null}`}>아이템 관리</li></Link>
+                        <Link href="/directory/thermometer"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/thermometer" ? "text-orange-400" : null}`}>학급온도계</li></Link>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[16px]  text-[1.2rem]">기록 보기</li></Link> */}
                         <Link href="/directory/quest"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/quest" ? "text-orange-400" : null}`}>퀘스트 관리</li></Link>
                         {/* <Link href="/directory/qrcode"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/qrcode" ? "text-orange-400" : null}`}>학생 초대</li></Link> */}
-                        <Link href="../kiosk"><li className={`py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem] mb-[1rem]`}>키오스크 모드</li></Link>
+                        <Link href="/directory/kiosk"><li className={`py-[0.5rem] px-[16px] mb-[1rem] text-[1.2rem] mb-[1rem]`}>키오스크 모드</li></Link>
 
                     </> :
                     <>
                         {/* <Link href="./"><li className="py-[0.5rem] px-[8px] ml-[8px] text-[1.2rem]">기록보기</li></Link> */}
                         <Link href="/directory/inventory"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/inventory" ? "text-orange-400" : null}`}>창고 가기</li></Link>
                         <Link href="/directory/market"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/market" ? "text-orange-400" : null}`}>상점 가기</li></Link>
+                        <Link href="/directory/thermometer"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/thermometer" ? "text-orange-400" : null}`}>학급온도계</li></Link>
                         <Link href="/directory/quest"><li className={`py-[0.5rem] px-[16px]  text-[1.2rem] ${pathname === "/directory/quest" ? "text-orange-400" : null}`}>퀘스트 관리</li></Link>
                         {/* <Link href="/directory/browse"><li className={`py-[1.5rem] px-[8px] ml-[8px] text-[1.2rem] ${pathname === "/directory/browse" ? "text-orange-400" : null}`}>둘러보기</li></Link> */}
                     </>

@@ -12,6 +12,8 @@ export default async function RootLayout({ children }) {
       const db = (await connectDB).db('data');
       response = await db.collection('user_data').findOne({ userId: session.user.userId })
     }
+
+
     // const db = (await connectDB).db('data');
     // const response = await db.collection('user_data').findOne({ userId: session.user.userId })
     // if (!response) {
@@ -29,7 +31,7 @@ export default async function RootLayout({ children }) {
     return (
         <div className="dark:text-black flex flex-col h-screen">
             <RecoilRootProvider>
-                <Layout data={response} session={session} />
+                <Layout fetchedUserData={response} fetchedSessionData={session} />
                     <Header session={session.user} />
                     {children}
                     <SpeedInsights />

@@ -6,13 +6,13 @@ import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
 import { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { userData } from '@/store/atoms';
+import { userDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 
 export default function Header({session}) {
 
 
-    const [data, setData] = useRecoilState(userData);
+    const [data, setData] = useRecoilState(userDataState);
     const [isClient, setIsClient] = useState(false)
     const {role} = session
     const [isHamburgerClicked, setIsHamburgerClicked] = useState(false);
@@ -37,12 +37,16 @@ export default function Header({session}) {
     useEffect(() => {
       setIsClient(true)
     }, [])
-
+    if(pathname === "/directory/kiosk"){
+        return(
+            null
+        )
+    }
     return (
 
         <>
-            <div className="border-b-2" >
-                <div className="p-[24px] max-[700px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
+            <div className="border-b-2 " >
+                <div className="p-[24px]  max-[700px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
                     <div className="flex items-center">
                         <div className="min-[601px]:mr-[5vw]">
                             <Link href="/directory/dashboard" replace>
@@ -56,14 +60,16 @@ export default function Header({session}) {
                                 <ul className="flex max-[700px]:hidden">
                                     <Link href="/directory/manage" key="manage"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
                                     <Link href="/directory/market" key="market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
+                                    <Link href="/directory/thermometer" key="thermometer"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/thermometer" ? "border-b-8 border-orange-400" : null}`}>학급 온도계</li></Link>
                                     <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트 관리</li></Link>
-                                    <Link href="../kiosk"><li className={` dark:text-white`}>키오스크 모드</li></Link>
+                                    <Link href="/directory/kiosk"><li className={` dark:text-white`}>키오스크 모드</li></Link>
 
 
                                 </ul> :
                                 <ul className="flex max-[700px]:hidden">
                                     <Link href="/directory/inventory"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/inventory" ? "border-b-8 border-orange-400" : null}`}>창고 가기</li></Link>
                                     <Link href="/directory/market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>상점 가기</li></Link>
+                                    <Link href="/directory/thermometer"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/thermometer" ? "border-b-8 border-orange-400" : null}`}>학급온도계</li></Link>
                                     <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트</li></Link>
                                
 

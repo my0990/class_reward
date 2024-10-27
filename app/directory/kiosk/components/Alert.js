@@ -1,4 +1,7 @@
+import { useRecoilState } from 'recoil';
+import { thermometerDataState, userDataState, sessionDataState, stepDataState } from '@/store/atoms';
 export default function Alert(props) {
+
     return (
         <dialog id="my_modal_2" className="modal  modal-middle ">
             <div className="modal-box p-0 dark:bg-orange-200 flex flex-col bg-orange-100">
@@ -15,7 +18,7 @@ export default function Alert(props) {
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>{props.children}</span>
-                    <button className="btn" onClick={() => props.setStep("home")}>확인</button>
+                    <button className="btn" onClick={() => props.onModalFinish()}>확인</button>
                 </div>
             </div>
 

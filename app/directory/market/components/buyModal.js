@@ -12,7 +12,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
             setIsLoading(true)
             if (money < buyList.itemPrice) {
                 alert('돈이 모자랍니다')
-                document.getElementById('my_modal_3').close()
+                document.getElementById('buy').close()
                 return
             }
             fetch("/api/buyItem", {
@@ -23,12 +23,13 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                 },
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
-                    alert('구매완료')
-                    const newItemList = itemList.map((a, i) => a.itemId === buyList.itemId ? { ...a, 'itemQuantity': a.itemQuantity - 1 } : a)
-                    setItemList(newItemList);
-                    document.getElementById('my_modal_3').close()
-                    setIsLoading(false)
-                    router.refresh();
+                    alert('구매완료');
+                    setIsLoading(false);
+                    location.reload();
+                    // const newItemList = itemList.map((a, i) => a.itemId === buyList.itemId ? { ...a, 'itemQuantity': a.itemQuantity - 1 } : a)
+                    // setItemList(newItemList);
+                    document.getElementById('buy').close()
+
                 }
             })
         }
@@ -40,7 +41,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
     const currentMoney = money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
     return (
-        <dialog id="my_modal_3" className="modal  modal-middle ">
+        <dialog id="buy" className="modal  modal-middle ">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
                 <div className="flex justify-end">
                     <div className="w-[20px] h-[20px] mr-[8px]">
@@ -74,7 +75,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                     <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
                         <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] outline-none hover:bg-orange-500">구입</button>
                     </form>
-                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px] hover:bg-gray-300" onClick={() => document.getElementById('my_modal_3').close()}>취소</button>
+                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px] hover:bg-gray-300" onClick={() => document.getElementById('buy').close()}>취소</button>
                 </div>
             </div>
             <form method="dialog" className="modal-backdrop">

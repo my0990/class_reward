@@ -8,11 +8,12 @@ import { useRouter } from "next/navigation";
 import Modal from "./components/Modal";
 import InstallPrompt from "../../component/InstallPrompt";
 import SetCurrencyNameModal from "./components/SetCurrencyNameModal";
-import { userData } from '@/store/atoms';
+import { userDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 export default function Home({ studentData }) {
 
-    const [data, setClassData] = useRecoilState(userData);
+    const [data, setClassData] = useRecoilState(userDataState);
+    console.log(data)
     const { classData } = data;
     const [isSend, setIsSend] = useState(false);
 

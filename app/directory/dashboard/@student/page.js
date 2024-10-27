@@ -2,13 +2,13 @@
 // import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 // import { getServerSession } from "next-auth"
 'use client'
-import { userData } from '@/store/atoms';
+import { userDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 export default async function Page() {
 
 
 
-    const [data, setClassData] = useRecoilState(userData);
+    const [data, setClassData] = useRecoilState(userDataState);
     // const { user } = await getServerSession(authOptions)
     // const { userId } = user
     // const db = (await connectDB).db('data')

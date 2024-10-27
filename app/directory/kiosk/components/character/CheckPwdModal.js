@@ -1,19 +1,12 @@
 import { useRef, useState, useEffect } from "react";
-import Alert from "./Alert";
-export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
+import Alert from "../Alert";
+import {stepDataState, requestDataState,} from '@/store/atoms';
+import { useRecoilState } from 'recoil';
+export default function CheckPwdModal({ type }) {
+    const [requestData, setRequestData] = useRecoilState(requestDataState);
+    const [stepData, setStepData] = useRecoilState(stepDataState);
     const [isLoading, setIsLoading] = useState(false);
-    // {
-    //     data: {
-    //       requestItemData: {
-    //         itemId: '667cb2aa13782ba6f19de623',
-    //         itemPrice: 1500,
-    //         itemName: '운동장 이용권',
-    //         itemQuantity: 5,
-    //         itemExplanation: '점심 시간에 운동장을 이용할 수 있다(3명 같이)'
-    //       },
-    //       requestUserId: 'HAMIN'
-    //     }
-    //   }
+
     const onCloseModal = () => {
         pwdRef.current.value = ""
 
@@ -34,7 +27,14 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
             }).then((res) => res.json()).then((data) => {
 
                 if (data.result === true) {
-                    setIsPwdChecked(true);
+                    if (type === "buy") {
+                        setStepData({ menu: "buy", step: 'confirmBuy' })
+                    } else if(type === "use") {
+                        setStepData({ menu: "use", step: 'useItemPick' })
+                    } else {
+                        setStepData({menu: "thermometer", step: 'thermometerDonation'})
+                    }
+
 
                 } else {
                     document.getElementById('my_modal_2').showModal()
@@ -47,18 +47,17 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
 
     }
     const pwdRef = useRef();
-    useEffect(()=>{
+    useEffect(() => {
         pwdRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    },[])
-    const setStep = () => {
+    }, [])
+    const onModalFinish = () => {
         document.getElementById('my_modal_2').close()
     }
-    console.log(requestData)
+
     return (
-        <dialog id="my_modal_3" className="modal  modal-middle pb-[30vh]">
+        <dialog id="my_modal_3" className="modal  modal-middle">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200 flex flex-col">
                 <div className="text-[2rem]">선택된 사용자: <span className="bg-orange-200">{requestData.userNumber}. {requestData.userNickname}</span></div>
-                {/* <div className="text-[1.5rem]">로그인 비밀번호를 입력해주세요</div> */}
                 <input type="password" ref={pwdRef} className="input input-bordered input-warning my-[16px]" placeholder="로그인 비밀번호를 입력해주세요" autoComplete='off'></input>
                 <button onClick={onClick} className="btn text-[1.3rem] bg-orange-500 text-white mt-[8px]">확인</button>
             </div>
@@ -66,7 +65,7 @@ export default function CheckPwdModal({ requestData, setIsPwdChecked}) {
             <form method="dialog" className="modal-backdrop" onClick={onCloseModal}>
                 <button>close</button>
             </form>
-            <Alert setStep={setStep} >비밀번호를 확인해주세요</Alert>
+            <Alert onModalFinish={onModalFinish}>비밀번호를 확인해주세요</Alert>
         </dialog>
 
     )

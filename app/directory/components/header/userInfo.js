@@ -3,12 +3,13 @@ import styles from './userinfo.module.css'
 import { signOut } from "next-auth/react"
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { userData } from '@/store/atoms';
+import { userDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 
 export default function UserInfo({  role, isUserinfoClicked, setIsUserinfoClicked, profileiconRef  }) {
     const dropDownRef = useRef();
-    const [data, setData] = useRecoilState(userData);
+    const [data, setData] = useRecoilState(userDataState);
+    console.log(data)
     const {profileNickname, money} = data;
     useEffect(() => {
         const outSideClick = (e) => {

@@ -31,15 +31,19 @@ export default function AddModal({ itemList, setItemList }) {
             }).then((res) => res.json()).then((data) => {
 
                 if (data.result === true) {
+  
                     alert('추가하였습니다.');
-                    document.getElementById('my_modal_2').close()
-                    setItemList(() => [...itemList, { itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemId: data.itemId, itemExplanation: explanationRef.current.value, emoji: emoji }])
-                    nameRef.current.value = ""
-                    priceRef.current.value = ""
-                    quantityRef.current.value = ""
-                    explanationRef.current.value = ""
-                    setEmoji(null)
-                    setIsLoading(false)
+                    setIsLoading(false);
+
+                    document.getElementById('add').close()
+                    location.reload();
+                    // setItemList(() => [...itemList, { itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemId: data.itemId, itemExplanation: explanationRef.current.value, emoji: emoji }])
+                    // nameRef.current.value = ""
+                    // priceRef.current.value = ""
+                    // quantityRef.current.value = ""
+                    // explanationRef.current.value = ""
+                    // setEmoji(null)
+
                 }
             })
         }
@@ -52,7 +56,7 @@ export default function AddModal({ itemList, setItemList }) {
         quantityRef.current.value = ""
         explanationRef.current.value = ""
 
-        document.getElementById('my_modal_2').close()
+        document.getElementById('add').close()
         setTimeout(() => {
             setEmoji(null);
         }, 200)
@@ -61,7 +65,7 @@ export default function AddModal({ itemList, setItemList }) {
 
     }
     return (
-        <dialog id="my_modal_2" className="modal  modal-middle ">
+        <dialog id="add" className="modal  modal-middle ">
 
             <div className=" max-w-[800px] modal-box  p-[16px] min-[600px]:p-[32px] dark:bg-orange-200">
                 <div className="text-right absolute top-5 right-5 text-[1.2rem] cursor-pointer leading-none max-[600px]:top-3 min-[600px]:right-3 hover:bg-gray-300 hover:rounded-full w-[34px] h-[34px] flex justify-center items-center" onClick={onCloseModal}>x</div>
@@ -98,7 +102,7 @@ export default function AddModal({ itemList, setItemList }) {
                         </div>
                             : <div >
                                 <div className="relative w-full flex justify-center w-[352px] h-[430px] items-center bg-orange-100 p-[16px] rounded-lg">
-                                    <div className="absolute top-3 right-4" onClick={() => setEmoji(null)}>뒤로가기</div>
+                                    <div className="absolute top-3 right-4 cursor-pointer hover:scale-110 transition-all" onClick={() => setEmoji(null)}>뒤로가기</div>
                                     <div className="text-[160px]">
                                         {emoji}
                                     </div>

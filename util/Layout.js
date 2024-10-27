@@ -1,18 +1,14 @@
 'use client';
 
 import { useRecoilState } from 'recoil';
-import { useEffect } from 'react';
-import { userData, sessionData } from '@/store/atoms';
+import { userDataState, sessionDataState, thermometerDataState } from '@/store/atoms';
 
-export default function Layout({ data, session, children }) {
-    const [stateData, setStateData] = useRecoilState(userData);
-    const [stateSession, setStateSession] = useRecoilState(sessionData);
-    // useEffect(() => {
-    //     setStateData(data);
-    // }, [data, setStateData]);
-    setStateData(data);
-    setStateSession(session);
-
+export default function Layout({ fetchedUserData, fetchedThermometerData, fetchedSessionData, children }) {
+    const [userData, setUserData] = useRecoilState(userDataState);
+    const [sessionData, setSessionData] = useRecoilState(sessionDataState);
+    setUserData(fetchedUserData);
+    setSessionData(fetchedSessionData);
+    
     return (
         <div>
             {children}

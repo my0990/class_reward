@@ -1,11 +1,11 @@
 'use client'
 import { useState, useEffect } from "react";
 // import Alert from "./Alert";
-import { userData } from '@/store/atoms';
+import { userDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 import Alert from "./Alert";
 export default function ItemUseTemplate({ setIsItemPicked, setRequestData }) {
-    const [data, setData] = useRecoilState(userData);
+    const [data, setData] = useRecoilState(userDataState);
     const tmp = data.itemList.map((a) => {
         const acopy = { ...a }
         { acopy.checked = false; return acopy }

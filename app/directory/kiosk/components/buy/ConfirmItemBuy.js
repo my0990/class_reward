@@ -1,10 +1,15 @@
 import { useState } from "react";
 import FinishBuyModal from "./FinishBuyModal";
-export default function ConfirmItemBuy({ requestData, setStep, currencyName, teacher }) {
-    console.log(requestData)
+import { useRecoilState } from 'recoil';
+import { thermometerDataState, userDataState, sessionDataState, stepDataState, requestDataState } from '@/store/atoms';
+export default function ConfirmItemBuy({ teacher }) {
+    const [requestData, setRequestData] = useRecoilState(requestDataState);
+    const [userData, setUserData] = useRecoilState(userDataState);
+    const [stepData, setStepData] = useRecoilState(stepDataState);
+    const { currencyName, currencyEmoji } = userData.classData;
     const [isLoading, setIsLoading] = useState(false);
     const { itemData, userId, userMoney } = requestData;
-    const [itemId,setItemId] = useState(null);
+    const [itemId, setItemId] = useState(null);
     const onClick = (e) => {
         if (isLoading) {
             return
@@ -19,7 +24,6 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName, tea
             }).then((res) => res.json()).then((data) => {
 
                 if (data.result === true) {
-                    // alert('구입하였습니다')
                     setItemId(data.itemId)
                     document.getElementById('my_modal_3').showModal()
 
@@ -32,28 +36,16 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName, tea
 
     }
 
-   
-    return (
-        // <div className="h-[100vh] flex justify-center items-center">
-        // <div className="border-4 p-[30px] border-red-900 rounded-xl">
 
-        //     <div>{itemData.itemName}</div>
-        //     <div>{itemData.itemExplanation}</div>
-        //     <div>아이템 가격: {itemData.itemPrice}</div>
-        //     <h1 className="text-[2.5rem] mb-[8px]">아이템을 구입하시겠습니까?</h1>
-        //     <button className="btn" onClick={onClick}>구입</button>
-        //     <button className="btn" onClick={() => location.reload()}>취소</button>
-        // </div>
-        // </div>
+    return (
         <div className="flex justify-center items-center h-[100vh]">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
                 <div className="flex justify-end">
-                    {/* <div className="w-[20px] h-[20px] mr-[8px]">
-                        <Image src={gold} alt="money" />
-                    </div> */}
                     <div className="text-[0.9rem]">{userMoney} {currencyName}</div>
                 </div>
+
                 <div className="flex items-center">
+                    <div className="text-[1.5rem]">{itemData.emoji}</div>
                     <h1 className="text-[1.5rem] font-bold">{itemData?.itemName}</h1>
                     <div className="mx-[8px]">-</div>
                     <div className="text-[1.1rem] ">{itemData.itemPrice} {currencyName}</div>
@@ -72,16 +64,15 @@ export default function ConfirmItemBuy({ requestData, setStep, currencyName, tea
 
 
                 </div>
-                {/* <div className="mb-[32px]">남은 수량: {itemData?.itemQuantity}</div> */}
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
                     <div onClick={onClick} className="w-[48%] max-[600px]:w-[100%]">
                         <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
                     </div>
-                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => setStep('home')}>취소</button>
+                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px]" onClick={() => setStepData({menu:'home', step: null})}>취소</button>
                 </div>
             </div>
             {/* itemName, userId, itemId, teacher, userName, itemPrice, userMoney */}
-            <FinishBuyModal setStep={setStep} data={requestData} teacher={teacher} itemId={itemId}/>
+            <FinishBuyModal data={requestData} teacher={teacher} itemId={itemId} />
         </div>
     )
 }

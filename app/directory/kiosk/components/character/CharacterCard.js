@@ -1,7 +1,4 @@
-import male from "@/public/male.png"
-import female from "@/public/female.png"
-import gold from "@/public/gold.png"
-import Image from "next/image"
+
 export default function CharacterCard(props) {
     return (
         <div>
@@ -11,12 +8,6 @@ export default function CharacterCard(props) {
                 <img src={props.user.profileUrl} width="90" height="90" alt="characther" />
             </div>
             <div className="mt-[8px] flex items-center justify-center">
-                {/* <div className="relative w-[24px] h-[24px] mr-[8px]">
-                    <Image src={gold} alt="gold" fill={true} ></Image>
-                </div> */}
-                {/* <div className="mr-[4px]">{props.currencyEmoji}</div>
-                <div className="mr-[4px]">{props.user.money}</div>
-                <div>{props.currencyName}</div> */}
             </div>
         </div>
         </div>

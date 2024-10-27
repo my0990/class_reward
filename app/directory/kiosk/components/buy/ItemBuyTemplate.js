@@ -1,19 +1,24 @@
-import Alert from "./Alert";
+import Alert from "../Alert";
 import ItemBuyCard from "./ItemBuyCard";
 import { useState } from "react";
-export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, setRequestData, requestData, currencyName, currencyEmoji }) {
-    const tmp = itemData.map((a) => { a.checked = false; return a })
-    const [itemList, setItemList] = useState(tmp)
+import { userDataState, stepDataState, requestDataState } from '@/store/atoms';
+import { useRecoilState } from "recoil";
+
+export default function ItemBuyTemplate() {
+
+
     const [isSelected, setIsSelected] = useState(false);
+    const [userData, setUserData] = useRecoilState(userDataState);
+    const [stepData, setStepData] = useRecoilState(stepDataState);
+    const [requestData, setRequestData] = useRecoilState(requestDataState);
     console.log(requestData)
+    const tmp = JSON.parse(JSON.stringify(userData.itemList)).map((a) => { a.checked = false; return a })
+    const [itemList, setItemList] = useState(tmp);
+    const { currencyName, currencyEmoji } = userData.classData;
     const onClick = (a) => {
 
         if (isSelected === false) {
             setIsSelected(true)
-        }
-        if (a.itemPrice > requestData.userMoney) {
-            document.getElementById('my_modal_2').showModal()
-            return
         }
         setRequestData(prev => ({ ...prev, itemData: a }))
         const updatedItems = itemList.map(item => {
@@ -30,35 +35,31 @@ export default function ItemBuyTemplate({ setStep, itemData, setIsItemPicked, se
     }
     const onNext = () => {
         if (isSelected) {
-            setIsItemPicked(true)
+            setStepData({ ...stepData, step: "buyCharacterPick" })
         } else {
             document.getElementById('my_modal_2').showModal()
         }
     }
-    const onModalClick = () => {
+    const onModalFinish = () => {
         document.getElementById('my_modal_2').close()
     }
     return (
-        <div className="flex flex-col justify-center items-center relative">
+        <div className="flex flex-col justify-center items-center relative overflow-hidden">
             <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
-            <div className="absolute top-0 right-0">
-                <div>{requestData.userNumber}. {requestData.userNickname}</div>
-                <div>{currencyEmoji} {requestData.userMoney}{currencyName}</div>
-            </div>
             <div className="flex flex-wrap min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                 {itemList.map((a, i) => {
                     return (
                         <div key={i} className={`m-[16px] w-[192px]   flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "" : "hover:scale-110 transition-all"} `}>
-                            <ItemBuyCard onClick={e => a.itemQuantity <= 0 ? null : onClick(a)} itemquantity={a.itemQuantity} itemname={a.itemName} itemexplanation={a.itemExplanation} itemprice={a.itemPrice} checked={a.checked} currencyname={currencyName} currencyemoji={currencyEmoji} emoji={a.emoji} />
+                            <ItemBuyCard onChecked={onClick} itemData={a} currencyname={currencyName} currencyemoji={currencyEmoji} />
                         </div>
                     )
                 })}
             </div>
             <div className="flex">
-                <button className="mr-[16px] btn" onClick={() => setStep('home')} >처음으로</button>
+                <button className="mr-[16px] btn" onClick={() => setStepData({ menu: "home", step: null })} >처음으로</button>
                 <button className="btn" onClick={onNext}>다음</button>
             </div>
-            <Alert setStep={onModalClick}>{isSelected ? '돈이 모자랍니다' : '아이템을 선택해주세요'}</Alert>
+            <Alert onModalFinish={onModalFinish} >아이템을 선택해주세요</Alert>
         </div>
     )
 }

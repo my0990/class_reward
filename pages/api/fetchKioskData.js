@@ -15,9 +15,10 @@ export default async function handler(req, res) {
     const response = await db.collection('user_data').findOne({userId: userId})
     const response2 = await db.collection('user_data').find({teacher: userId}).sort({classNumber:'1'}).toArray()
     const tmp = response2.map((a) => { a._id = a._id.toString(); return a })
+    const response3 = await db.collection('thermometer').findOne({userId:userId});
     response._id = response._id.toString();
     const classData = response.classData;
-    res.status(201).json({ result: true, message: 'delete 성공',itemData: response,  studentData:tmp, classData: classData});
+    res.status(201).json({ result: true, message: 'delete 성공',itemData: response,  studentData:tmp, classData: classData, thermoInfo: response3});
   }
 }
 

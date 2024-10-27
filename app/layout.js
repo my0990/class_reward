@@ -1,6 +1,10 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getServerSession } from "next-auth"
+import { connectDB } from "@/app/lib/database";
+import RecoilRootProvider from "@/util/recoilRootProvider";
+import Layout from "@/util/Layout";
 // import Head from "next/head";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -58,13 +62,35 @@ export const viewport = {
   initialScale: 1,
 };
 export default async function RootLayout({ children }) {
+  // const session = await getServerSession(authOptions);
+  // let response = null;
+  // let response2 = null;
+  // let teacher = null;
+  // console.log(session)
+  // if (session) {
 
 
+  //   if (session.user.role === "teacher") {
+  //     teacher = session.user.userId
+  //   } else {
+  //     teacher = session.user.teacher
+  //   }
+  // }
+  // if (session) {
+  //   const db = (await connectDB).db('data');
+  //   response = await db.collection('user_data').findOne({ userId: session.user.userId })
+  //   response2 = await db.collection('thermometer').findOne({ userId: teacher })
+  // }
+  // console.log(response2)  
   return (
     <html lang="en" className="w-full dark:bg-gray-700">
       <body className={inter.className}>
-        {children}
+        {/* <RecoilRootProvider> */}
+          {/* <Layout fetchedUserData={response} fetchedThermometerData={response2} session={session} /> */}
+          {children}
+        {/* </RecoilRootProvider> */}
       </body>
     </html>
+
   );
 }

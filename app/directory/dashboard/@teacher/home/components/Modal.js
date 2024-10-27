@@ -43,14 +43,6 @@ export default function Modal({  isSend, setStudentArr, studentArr, currencyName
                     location.reload();
                 }
 
-                setPoint(null);
-                const updatedUsers = studentArr.map(user => {
-
-                      return { ...user, isActive: false }; // age 속성 증가
-
-                  });
-                  setStudentArr(updatedUsers)
-                document.getElementById('my_modal_2').close()
             }
         })
     }
