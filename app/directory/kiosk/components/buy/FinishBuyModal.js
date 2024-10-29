@@ -4,14 +4,13 @@ import Alert from "../Alert";
 import { useRecoilState } from 'recoil';
 import { stepDataState, requestDataState } from '@/store/atoms';
 
-export default function FinishBuyModal() {
+export default function FinishBuyModal({itemId}) {
 
     const [stepData, setStepData] = useRecoilState(stepDataState)
     const [requestData,setRequestData] = useRecoilState(requestDataState);
-    const { itemName, itemPrice, itemId} = requestData.itemData;
+    const { itemName, itemPrice} = requestData.itemData;
     const { userId, userName,  teacher } = requestData;
     const [isLoading, setIsLoading] = useState(false);
-
     const onItemUse = (e) => {
         if (isLoading) {
             return
@@ -46,7 +45,7 @@ export default function FinishBuyModal() {
                     <h1 className="text-[1.6rem]"> <span className="text-red-500 font-bold">{itemName}</span> 아이템을 구입하였습니다</h1>
                     <div className="flex justify-between flex-col">
                         <button className="btn my-[16px] font-bold" onClick={onItemUse}>지금 바로 사용할래요</button>
-                        <button className="btn font-bold" onClick={() => setStepData({menu: "home", step: null})}>다음에 사용할래요</button>
+                        <button className="btn font-bold" onClick={() => location.reload()}>다음에 사용할래요</button>
                     </div>
                 </div>
             </div>

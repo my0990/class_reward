@@ -1,10 +1,7 @@
 'use client'
 
-import lottieJson from "@/public/pig.json"
-import dynamic from 'next/dynamic';
 import StudentInfoCard from "./components/StudentInfoCard";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Modal from "./components/Modal";
 import InstallPrompt from "../../component/InstallPrompt";
 import SetCurrencyNameModal from "./components/SetCurrencyNameModal";
@@ -69,7 +66,7 @@ export default function Home({ studentData }) {
                     })}</div>
             </div>
             {/* {modalData.length !== 0 ? <Modal modalData={modalData} /> : null} */}
-            <Modal targetStudent={targetStudent} isSend={isSend} setStudentArr={setStudentArr} studentArr={studentArr} currencyName={classData?.currencyName} />
+            <Modal targetStudent={targetStudent} isSend={isSend} currencyName={classData?.currencyName} />
             <InstallPrompt />
             {classData ? null : <SetCurrencyNameModal />}
         </div>

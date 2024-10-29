@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import DialBtn from "./DialBtn";
-export default function Modal({  isSend, setStudentArr, studentArr, currencyName, targetStudent }) {
+export default function Modal({  isSend, currencyName, targetStudent }) {
     const [point, setPoint] = useState(null);
     const [fontSize, setFontSize] = useState(1.7);
     const [activeKey, setActiveKey] = useState(null);
-
+    const [isLoading,setIsLoading] = useState(false);
 
     const onClick = (e) => {
         if (point === null) {
@@ -26,25 +26,32 @@ export default function Modal({  isSend, setStudentArr, studentArr, currencyName
             alert('숫자를 입력해주세요')
             return;
         }
-        fetch("/api/handlePoint", {
-            method: "POST",
-            body: JSON.stringify({ targetStudent: targetStudent, point: point, isSend: isSend }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => res.json()).then((data) => {
-            if (data.result === true) {
-                const message = targetStudent.map((a,i)=> a.userId)
-                if(isSend){
-                    alert(message+ '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
-                    location.reload();
-                } else {
-                    alert(message+ '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
-                    location.reload();
+        if(isLoading === true){
+            return
+        } else {
+            setIsLoading(true)
+            fetch("/api/handlePoint", {
+                method: "POST",
+                body: JSON.stringify({ targetStudent: targetStudent, point: point, isSend: isSend }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json()).then((data) => {
+                if (data.result === true) {
+                    const message = targetStudent.map((a,i)=> a.userId)
+                    if(isSend){
+                        alert(message+ '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
+                        location.reload();
+                    } else {
+                        alert(message+ '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
+                        location.reload();
+                    }
+                    setIsLoading(false)
+    
                 }
-
-            }
-        })
+            })
+        }
+        
     }
 
     const modalClose = () => {

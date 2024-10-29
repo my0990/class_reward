@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import Alert from "../Alert";
-import {stepDataState, requestDataState } from '@/store/atoms';
+import { stepDataState, requestDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 
 
@@ -65,7 +65,7 @@ export default function ItemUseTemplate() {
         };
     }, []);
     const onSubmit = (e) => {
-        const { itemName, itemPrice, itemId} = requestData.itemData;
+        const { itemName, itemPrice, itemId } = requestData.itemData;
         const { userName, userId, teacher } = requestData;
         if (isLoading) {
             return
@@ -74,7 +74,7 @@ export default function ItemUseTemplate() {
             fetch("/api/useItem", {
                 method: "POST",
                 // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemName, userId: userId, teacher: teacher, itemPrice: itemPrice, itemId: itemId, userName: userName}),
+                body: JSON.stringify({ itemName: itemName, userId: userId, teacher: teacher, itemPrice: itemPrice, itemId: itemId, userName: userName }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -99,8 +99,16 @@ export default function ItemUseTemplate() {
         <div className="flex justify-center items-center h-[100vh] bg-orange-100" style={{ scrollbarWidth: 'auto' }}>
             <div>
                 <div className="flex">
-                    <button className="mr-[16px] btn" onClick={() => setStepData({ menu: "home", step: null })} >처음으로</button>
+                    <div className="flex cursor-pointer hover:scale-105 transition-all" onClick={() => setStepData({ menu: "home", step: null })}>
+                        <div className="h-[64px] w-[24px] flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M15.293 3.293 6.586 12l8.707 8.707 1.414-1.414L9.414 12l7.293-7.293-1.414-1.414z" /></svg>
+                        </div>
+                        <div className="flex items-center text-[2rem]" >키오스크 홈</div>
+                    </div>
                 </div>
+                {/* <div className="flex">
+                    <button className="mr-[16px] btn" onClick={() => setStepData({ menu: "home", step: null })} >처음으로</button>
+                </div> */}
                 <div className="bg-orange-200 rounded-2xl flex justify-center" style={{ height: 50 * width + 'px', padding: 2 * width + 'px' }}>
 
                     <div className="bg-orange-200" style={{ width: 43 * width + 'px' }}>

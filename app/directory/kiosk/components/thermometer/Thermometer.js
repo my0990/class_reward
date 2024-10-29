@@ -13,7 +13,7 @@ export default function Thermometer(){
         step === "thermometerBoard"
         ? <ThermometerBoard />
         : step === "thermometerCharacterPick"
-        ? <CharacterPickTemplate />
+        ? <CharacterPickTemplate type="thermometer"/>
         : <ThermometerDonation />
 
     )

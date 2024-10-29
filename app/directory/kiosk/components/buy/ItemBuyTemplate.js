@@ -11,7 +11,6 @@ export default function ItemBuyTemplate() {
     const [userData, setUserData] = useRecoilState(userDataState);
     const [stepData, setStepData] = useRecoilState(stepDataState);
     const [requestData, setRequestData] = useRecoilState(requestDataState);
-    console.log(requestData)
     const tmp = JSON.parse(JSON.stringify(userData.itemList)).map((a) => { a.checked = false; return a })
     const [itemList, setItemList] = useState(tmp);
     const { currencyName, currencyEmoji } = userData.classData;
@@ -21,21 +20,20 @@ export default function ItemBuyTemplate() {
             setIsSelected(true)
         }
         setRequestData(prev => ({ ...prev, itemData: a }))
-        const updatedItems = itemList.map(item => {
-            // 대상 사용자를 찾으면 비밀번호를 변경
-            if (item.itemId === a.itemId) {
-                return { ...item, checked: true };
-            } else {
-                return { ...item, checked: false }
-            }
-        });
+        // const updatedItems = itemList.map(item => {
+        //     if (item.itemId === a.itemId) {
+        //         return { ...item, checked: true };
+        //     } else {
+        //         return { ...item, checked: false }
+        //     }
+        // });
+        // setItemList(updatedItems);
+        setStepData({ menu: "buy", step: "buyCharacterPick" })
 
-        // 업데이트된 사용자 리스트를 상태로 설정
-        setItemList(updatedItems);
     }
     const onNext = () => {
         if (isSelected) {
-            setStepData({ ...stepData, step: "buyCharacterPick" })
+            setStepData({ menu: "buy", step: "buyCharacterPick" })
         } else {
             document.getElementById('my_modal_2').showModal()
         }
@@ -45,7 +43,21 @@ export default function ItemBuyTemplate() {
     }
     return (
         <div className="flex flex-col justify-center items-center relative overflow-hidden">
-            <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
+            <div className="flex justify-betwen min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
+                <div className="flex mr-auto cursor-pointer hover:scale-110 transition-all" onClick={() => setStepData({ menu: "home", step: null })}>
+                    <div className="h-[64px] w-[24px] flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M15.293 3.293 6.586 12l8.707 8.707 1.414-1.414L9.414 12l7.293-7.293-1.414-1.414z" /></svg>
+                    </div>
+                    <div className="flex items-center text-[2rem]">이전</div>
+                </div>
+                <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
+                <div className=" opacity-0 flex mr-auto cursor-pointer hover:scale-110 transition-all">
+                    <div className="h-[64px] w-[24px] flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M15.293 3.293 6.586 12l8.707 8.707 1.414-1.414L9.414 12l7.293-7.293-1.414-1.414z" /></svg>
+                    </div>
+                    <div className="flex items-center text-[2rem]">이전</div>
+                </div>
+            </div>
             <div className="flex flex-wrap min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                 {itemList.map((a, i) => {
                     return (
@@ -55,10 +67,10 @@ export default function ItemBuyTemplate() {
                     )
                 })}
             </div>
-            <div className="flex">
+            {/* <div className="flex">
                 <button className="mr-[16px] btn" onClick={() => setStepData({ menu: "home", step: null })} >처음으로</button>
                 <button className="btn" onClick={onNext}>다음</button>
-            </div>
+            </div> */}
             <Alert onModalFinish={onModalFinish} >아이템을 선택해주세요</Alert>
         </div>
     )

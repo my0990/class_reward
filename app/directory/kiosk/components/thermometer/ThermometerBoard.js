@@ -27,8 +27,8 @@ export default function ThermometerBoard() {
     const temp = 23 + (sum / thermometerData.requireCurrency) * 3.3;
 
 
-    const {step} = stepData;
-    
+    const { step } = stepData;
+
 
     useEffect(() => {
         if (rewardObj) {
@@ -40,12 +40,18 @@ export default function ThermometerBoard() {
         }
     }, [rewardObj])
 
-    if (step=== "thermometerBoard") {
+    if (step === "thermometerBoard") {
         return (
             <div className="flex justify-center items-center  flex-col">
                 <div className="flex mt-[32px] w-[647px] max-[647px]:w-full  max-[647px]:mt-0 justify-between">
+                    <div className="flex cursor-pointer hover:scale-110 transition-all" onClick={() => setStepData({menu:'home',step:null})}>
+                        <div className="h-[48px] w-[24px] flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M15.293 3.293 6.586 12l8.707 8.707 1.414-1.414L9.414 12l7.293-7.293-1.414-1.414z" /></svg>
+                        </div>
+                        <div className="flex items-center text-[2rem]">이전</div>
+                    </div>
                     <h1 className="text-[2rem] font-bold text-orange-500 ">현재온도 - {(sum / thermometerData.requireCurrency).toFixed(1)}도</h1>
-                    <button onClick={() => setStepData({menu:"thermometer", step: "thermometerCharacterPick"})} className="hover:bg-gray-300 px-[8px] rounded-lg bg-white border-0 outline-none">❤️기부하기</button>
+                    <button onClick={() => setStepData({ menu: "thermometer", step: "thermometerCharacterPick" })} className="hover:scale-110 transition-all  px-[8px] rounded-lg border-0 outline-none">❤️기부하기</button>
                 </div>
                 <div className="bg-orange-200 rounded-2xl pl-[64px] pr-[48px] py-[34px] ">
                     <div className="flex justify-center items-center flex-wrap">
@@ -67,6 +73,6 @@ export default function ThermometerBoard() {
 
             </div>
         )
-    } 
     }
+}
 

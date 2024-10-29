@@ -25,6 +25,8 @@ export default function ConfirmItemBuy({ teacher }) {
 
                 if (data.result === true) {
                     setItemId(data.itemId)
+                    console.log('itemid')
+                    console.log(data.itemId)
                     document.getElementById('my_modal_3').showModal()
 
 

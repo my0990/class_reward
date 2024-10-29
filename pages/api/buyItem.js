@@ -8,7 +8,6 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
     let {userId,role,teacher} = session.user;
-    console.log(session)
     let teacherId = null
     if(role === 'student'){
       teacherId = teacher
@@ -16,15 +15,13 @@ export default async function handler(req, res) {
       userId = req.body.userId
       teacherId = session.user.userId
     }
-    console.log(session.user.userId)
 
     // MongoDB 연결
     const itemData = req.body.itemData;
     const balance = req.body.balance
-    console.log(itemData)
-    console.log(req.body)
     const db = (await connectDB).db('data');
     let itemId = (new ObjectId()).toString();
+    console.log(itemId)
     const ItemId = itemData.itemId;
     const response = await db.collection('user_data').updateOne({userId: teacherId, "itemList.itemId": ItemId},{$inc : {'itemList.$.itemQuantity': -1}})
     const response2 = await db.collection('user_data').updateOne({userId: userId},{$push: {itemList: {itemName: itemData.itemName, itemPrice: itemData.itemPrice, state: '사용 가능', itemId: itemId, teacher: teacherId, itemEmoji: itemData.emoji, itemExplanation: itemData.itemExplanation}}}, {upsert: true})
