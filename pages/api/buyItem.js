@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const balance = req.body.balance
     const db = (await connectDB).db('data');
     let itemId = (new ObjectId()).toString();
-    console.log(itemId)
+
     const ItemId = itemData.itemId;
     const response = await db.collection('user_data').updateOne({userId: teacherId, "itemList.itemId": ItemId},{$inc : {'itemList.$.itemQuantity': -1}})
     const response2 = await db.collection('user_data').updateOne({userId: userId},{$push: {itemList: {itemName: itemData.itemName, itemPrice: itemData.itemPrice, state: '사용 가능', itemId: itemId, teacher: teacherId, itemEmoji: itemData.emoji, itemExplanation: itemData.itemExplanation}}}, {upsert: true})

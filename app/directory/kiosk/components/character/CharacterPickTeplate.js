@@ -30,10 +30,10 @@ export default function CharacterPickTemplate({ type }) {
                     <div className="h-[64px] w-[24px] flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M15.293 3.293 6.586 12l8.707 8.707 1.414-1.414L9.414 12l7.293-7.293-1.414-1.414z" /></svg>
                     </div>  
-                    <div className="flex items-center text-[2rem]" onClick={onPrevious}>이전</div>
+                    <div className="flex items-center text-[2rem]" >이전</div>
                 </div>
                 <h1 className="text-[2rem] flex items-center">계정 선택</h1>
-                <div className=" opacity-0 flex mr-auto cursor-pointer hover:scale-110 transition-all" onClick={() => setStepData({ menu: 'home', step: null })}>
+                <div className=" opacity-0 flex mr-auto cursor-pointer hover:scale-110 transition-all">
                     <div className="h-[64px] w-[24px] flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M15.293 3.293 6.586 12l8.707 8.707 1.414-1.414L9.414 12l7.293-7.293-1.414-1.414z" /></svg>
                     </div>
