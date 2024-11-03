@@ -4,7 +4,6 @@ export default function Donation({ thermoInfo, studentInfo }) {
         acc[user.userId] = user.profileNickname;
         return acc;
     }, {});
-    console.log(donators)
     let sortedDonators
     if (donators) {
         sortedDonators = Object.fromEntries(

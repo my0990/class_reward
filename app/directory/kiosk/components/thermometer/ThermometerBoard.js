@@ -10,21 +10,17 @@ import Modal from "@/app/components/thermometer/Modal";
 
 export default function ThermometerBoard() {
     const [thermometerData, setThermometerData] = useRecoilState(thermometerDataState)
-    const [page, setPage] = useState(1);
-    const [userData, setUserData] = useRecoilState(userDataState);
     const [stepData, setStepData] = useRecoilState(stepDataState);
-    const [requestData, setRequestData] = useRecoilState(requestDataState);
     const [studentData, setStudentData] = useRecoilState(studentDataState);
-
     const [inputWidth, setInputWidth] = useState(Array(11).fill(0));
     const inputMirrorRef = useRef([])
-
-
-
-    const { userId, money, classData, profileNickname, teacher } = userData;
     const [rewardObj, setRewardObj] = useState(thermometerData.reward)
+    let adjustment = 0
+    if(thermometerData.adjustment){
+        adjustment = thermometerData.adjustment
+    }
     const sum = thermometerData.donators ? Object.values(thermometerData.donators).reduce((acc, value) => acc + value, 0) : 0;
-    const temp = 23 + (sum / thermometerData.requireCurrency) * 3.3;
+    const temp =   + 23 + ((sum / thermometerData.requireCurrency) + adjustment) * 3.3;
 
 
     const { step } = stepData;
@@ -50,7 +46,7 @@ export default function ThermometerBoard() {
                         </div>
                         <div className="flex items-center text-[2rem]">이전</div>
                     </div>
-                    <h1 className="text-[2rem] font-bold text-orange-500 ">현재온도 - {(sum / thermometerData.requireCurrency).toFixed(1)}도</h1>
+                    <h1 className="text-[2rem] font-bold text-orange-500 ">현재온도 - {((sum / thermometerData.requireCurrency)+ adjustment).toFixed(1)}도</h1>
                     <button onClick={() => setStepData({ menu: "thermometer", step: "thermometerCharacterPick" })} className="hover:scale-110 transition-all  px-[8px] rounded-lg border-0 outline-none">❤️기부하기</button>
                 </div>
                 <div className="bg-orange-200 rounded-2xl pl-[64px] pr-[48px] py-[34px] ">

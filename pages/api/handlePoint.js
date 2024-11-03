@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     // // MongoDB 연결
     // let itemId = (new ObjectId()).toString();
     const db = (await connectDB).db('data');
-    console.log(targetStudent, point)
     const idArray = targetStudent.map((a) => a.userId)
 
     if (isSend) {

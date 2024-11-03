@@ -37,7 +37,7 @@ export default function ConfirmItemBuy({ teacher }) {
     return (
         <div className="flex justify-center items-center h-[100vh]">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
-            {(userMoney - itemData?.itemPrice) < 0  ? <div><span className="text-red-500 text-[2rem]">{currencyName}가 모자라요😢 </span></div> : null}
+            {(userMoney - itemData?.itemPrice) < 0  ? <div><span className="text-red-500 text-[2rem]">잔액이 부족합니다😢 </span></div> : null}
                 <div className="flex justify-end">
                     <div className="text-[0.9rem]">{userMoney} {currencyName}</div>
                 </div>
