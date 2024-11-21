@@ -22,8 +22,6 @@ export default function QuestDetail({ params }) {
             setData(result.data);
             setRole(result.role);
             setStudentList(result?.data.studentList)
-
-
         };
 
         fetchData();

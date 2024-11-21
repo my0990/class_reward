@@ -1,16 +1,9 @@
 'use client'
 
-import { useState } from "react"
-import NotificationModal from "./notificationModal";
 import { useRouter } from "next/navigation";
 export default function NotificationTemplate({ data, userId }) {
     const router = useRouter();
-    const [item, setItem] = useState();
-    const onClick = (a) => {
-        document.getElementById('my_modal_3').showModal()
-        setItem(a)
-    }
-    const onSubmit = (e,a) => {
+    const onSubmit = (e, a) => {
         e.preventDefault();
         fetch("/api/deleteNotification  ", {
             method: "POST",
@@ -21,12 +14,20 @@ export default function NotificationTemplate({ data, userId }) {
         }).then((res) => res.json()).then((data) => {
             console.log(data)
             if (data.result === true) {
-
-
-                // const newItemList = itemList.map((a,i)=> a.id === buyList.id ? console.log(a.quantity) : null)
-
-
-
+                router.refresh();
+            }
+        })
+    }
+    const onClearAll = (e) => {
+        e.preventDefault();
+        fetch("/api/deleteNotificationAll  ", {
+            method: "POST",
+            body: JSON.stringify({}),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then((res) => res.json()).then((data) => {
+            if (data.result === true) {
                 router.refresh();
             }
         })
@@ -41,7 +42,9 @@ export default function NotificationTemplate({ data, userId }) {
                             <th className="max-[443px]:hidden"></th>
                             <th>아이템 <br></br>이름</th>
                             <th>사용자</th>
-                            <th className="flex justify-center"></th>
+                            <th className="flex justify-center">
+                                <button onClick={onClearAll} className="btn bg-red-500 text-white">모두 확인</button>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,17 +56,16 @@ export default function NotificationTemplate({ data, userId }) {
                                     <td>{a.userId}</td>
                                     <td className="flex justify-center">
 
-                                            <form onSubmit={(e) => onSubmit(e,a)}>
-                                                <button className="btn bg-red-500 text-white">확인</button>
-                                            </form>
-                                        
+                                        <form onSubmit={(e) => onSubmit(e, a)}>
+                                            <button className="btn bg-red-500 text-white">확인</button>
+                                        </form>
+
                                     </td>
                                 </tr>
                             )
                         })}
                     </tbody>
                 </table>
-                <NotificationModal item={item} userId={userId} />
 
             </div>
         </div>
