@@ -1,7 +1,10 @@
 'use client'
-
-export default function AddQuestModal({ userData, questData }) {
-    let rewarded = userData.filter(obj => obj.done === 1);
+import { userDataState } from '@/store/atoms';
+import { useRecoilState } from "recoil";
+export default function AddQuestModal({ rewardedUserData, questData }) {
+    let rewarded = rewardedUserData.filter(obj => obj.done === 1);
+    const [userData, setUserData] = useRecoilState(userDataState);
+    const {classData} = userData;
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/finishQuest", {
@@ -30,7 +33,7 @@ export default function AddQuestModal({ userData, questData }) {
                             <div key={i} className=" mr-[4px]"><span className="bg-orange-200">{a['userNumber']}. {a.userNickname}</span>{i < rewarded.length - 1 && ', '}</div>
                         )
                     })}에게</div>
-                    <div className="mt-[16px]"><span className="font-bold text-orange-500">{questData?.questReward?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</span>을 지급합니다.</div>
+                    <div className="mt-[16px]"><span className="font-bold text-orange-500">{questData?.questReward?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{classData.currencyName}</span>만큼 지급합니다.</div>
                     <form onSubmit={onSubmit} className="mt-[32px]">
                         <button className="btn mt-[16px] w-[100%] bg-orange-500 border-0 text-white m-auto focus:outline-none text-[1.1rem]">확인</button>
                     </form>

@@ -32,6 +32,7 @@ export default function NotificationTemplate({ data, userId }) {
             }
         })
     }
+    console.log(data)
     return (
         <div className=" flex justify-center">
             <div className="overflow-x-auto w-[1024px]">
@@ -43,7 +44,7 @@ export default function NotificationTemplate({ data, userId }) {
                             <th>아이템 <br></br>이름</th>
                             <th>사용자</th>
                             <th className="flex justify-center">
-                                <button onClick={onClearAll} className="btn bg-red-500 text-white">모두 확인</button>
+                                {data.length !== 0 ? <button onClick={onClearAll} className="btn bg-red-500 text-white">모두 확인</button> : <button className="btn bg-red-500 text-white opacity-50 cursor-default hover:bg-red-500">모두 확인</button>}
                             </th>
                         </tr>
                     </thead>

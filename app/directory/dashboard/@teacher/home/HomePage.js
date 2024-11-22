@@ -10,10 +10,9 @@ import { useRecoilState } from "recoil";
 export default function Home({ studentData }) {
 
     const [data, setClassData] = useRecoilState(userDataState);
-    console.log(data)
     const { classData } = data;
     const [isSend, setIsSend] = useState(false);
-
+    const [isSelectedAll, setIsSelectedAll] = useState(false);
     let tmpData = studentData.map(obj => {
         return { ...obj, isactive: false }; // 새로운 키-값 쌍 추가하여 새로운 객체 반환
     });
@@ -27,7 +26,20 @@ export default function Home({ studentData }) {
             );
         });
     }
-
+    const selectAll = () => {
+        setIsSelectedAll(true)
+        setStudentArr((prev) => {
+            return prev.map(obj =>
+                ({ ...obj, isactive: true }))
+        })
+    }
+    const clearAll = () => {
+        setIsSelectedAll(false)
+        setStudentArr((prev) => {
+            return prev.map(obj =>
+                ({ ...obj, isactive: false }))
+        })
+    }
     const onSend = () => {
         if (targetStudent.length === 0) {
             alert('학생을 선택해주세요')
@@ -53,9 +65,15 @@ export default function Home({ studentData }) {
     return (
         <div className=" pt-0 flex justify-center">
             <div className="w-[1360px] max-[1360px]:w-[1224px] max-[1224px]:w-[1088px] max-[1088px]:w-[952px] max-[952px]:w-[816px] max-[816px]:w-[680px] max-[680px]:w-[544px] max-[544px]:w-[408px] max-[408px]:w-[272px]">
-                <div className="flex py-[16px] mr-[8px] justify-end">
-                    <button className="btn btn-success text-white mr-[16px] " onClick={onSend}>{classData?.currencyName} 보내기</button>
-                    <button className="btn bg-red-500 text-white" onClick={onTake}>{classData?.currencyName} 빼앗기</button>
+                <div className="flex py-[16px] mr-[8px] justify-between">
+
+                    {isSelectedAll
+                        ? <button className="btn bg-orange-500 text-white ml-[8px] " onClick={clearAll}>모두 해제</button>
+                        : <button className="btn bg-orange-500 text-white ml-[8px] " onClick={selectAll}>모두 선택</button>}
+                    <div>
+                        <button className="btn btn-success text-white mr-[16px] " onClick={onSend}>{classData?.currencyName} 보내기</button>
+                        <button className="btn bg-red-500 text-white" onClick={onTake}>{classData?.currencyName} 빼앗기</button>
+                    </div>
                 </div>
 
                 <div className=" flex flex-wrap">

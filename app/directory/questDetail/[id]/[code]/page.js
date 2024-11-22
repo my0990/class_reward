@@ -90,7 +90,7 @@ export default function QuestDetail({ params }) {
                     }
 
                 </div>
-                <FinishQuestModal userData={studentList} questData={data} />
+                <FinishQuestModal rewardedUserData={studentList} questData={data} />
                 <DeleteQuestCardModal data={data} />
             </div>
             : <div></div>

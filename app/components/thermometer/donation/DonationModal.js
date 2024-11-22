@@ -1,28 +1,35 @@
 'use client'
 
+import { useState } from "react";
 
 
-
-export default function DonationModal({amount, currencyName, userId,  data, money}) {
-
-    const {teacher}= data
+export default function DonationModal({ amount, currencyName, userId, data, money }) {
+    const [isLoading, setIsLoading] = useState(false);
+    const { teacher } = data
 
     const onSubmit = (e) => {
         e.preventDefault();
-        fetch("/api/setDonation", {
-            method: "POST",
-            body: JSON.stringify({ amount: Number(parseInt(amount).toFixed(1)), userId: userId, teacher: teacher, money: money }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => res.json()).then((data) => {
+        if (isLoading) {
+            return
+        } else {
+            setIsLoading(true)
+            fetch("/api/setDonation", {
+                method: "POST",
+                body: JSON.stringify({ amount: Number(parseInt(amount).toFixed(1)), userId: userId, teacher: teacher, money: money }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json()).then((data) => {
 
-            if (data.result === true) {
-                alert("등록되었습니다");
-                document.getElementById('my_modal_2').close()
-                location.reload();
-            }
-        })
+                if (data.result === true) {
+                    alert("등록되었습니다");
+                    document.getElementById('my_modal_2').close()
+                    setIsLoading(false)
+                    location.reload();
+                }
+            })
+        }
+
     }
     const onClose = () => {
         document.getElementById('my_modal_2').close();
