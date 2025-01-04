@@ -1,6 +1,7 @@
 import Image from "next/image"
 import male from "@/public/male.png"
 export default function CardTemplate({picked}) {
+    console.log(picked)
     return (
         <div className="w-[352px] h-[500px] bg-orange-200 p-[16px] rounded-xl">
             <div >
@@ -10,9 +11,9 @@ export default function CardTemplate({picked}) {
                 </div>
             </div>
             <div className="flex justify-center flex-col items-center my-[16px]">
-                <div className="w-[200px] h-[200px] rounded-full bg-white flex justify-center items-center">
+                <div className="w-[190px] h-[190px] rounded-full bg-white flex justify-center items-center mb-[12px]">
                     {/* <Image src={male}/> */}
-                    <img src="https://i.postimg.cc/HLXdVT11/orange.png" width="100" height="100" alt="orange"/>
+                    <img src={picked?.profileUrl} width="170" height="170" alt="orange" className="rounded-full "/>
                     {/* <img src="https://i.postimg.cc/HLXdVT11/orange.png"></img> */}
                 </div>
                 <div className=" py-[12px] w-full text-center text-[1.2rem] h-[52.8px] bg-green-400 text-white font-bold rounded-xl">초보 오렌지</div>

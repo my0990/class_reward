@@ -5,7 +5,19 @@ import { atom } from "recoil";
 // default는 initial state를 의미한다.
 export const userDataState = atom({
   key: "user data",
-  default: null,
+  default: {
+    classData: { currencyName: '', currencyEmoji: '' },
+    classNumber: 0,
+    itemList: [],
+    lv: 1,
+    money: 10,
+    profileNickname:"",
+    profileState:"",
+    profileUrl:"",
+    profileUrlObj:{ },
+    teacher:"",
+    userId:"",
+  },
 });
 
 export const sessionDataState = atom({
@@ -20,12 +32,12 @@ export const thermometerDataState = atom({
 
 export const stepDataState = atom({
   key: "step data",
-  default: {menu: 'home', step: null}
+  default: { menu: 'home', step: null }
 });
 
 export const requestDataState = atom({
   key: "kiosk request data",
-  default: { itemData: null, userId: null, userMoney: null , userName: null, checked: false, itemEmoji: null}
+  default: { itemData: null, userId: null, userMoney: null, userName: null, checked: false, itemEmoji: null }
 })
 
 export const studentDataState = atom({

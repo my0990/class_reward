@@ -11,7 +11,7 @@ export default async function Setting(){
 
     const db = (await connectDB).db('data');
     const response = await db.collection('user_data').findOne({userId:userId})
-    const {profileNickname, profileState, gender, profileUrl} = response;
+    const {profileNickname, profileState, gender, profileUrl, profileUrlObj} = response;
 
     return(
         <div>

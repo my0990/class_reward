@@ -27,8 +27,8 @@ export default async function Page() {
                     </div>
                 </div>
                 <div className="flex justify-center flex-col items-center my-[16px]">
-                    <div className="w-[200px] h-[200px] rounded-full bg-white flex justify-center items-center">
-                        <img src={data.profileUrl} width="100" height="100" alt="orange" />
+                    <div className="w-[165px] h-[165px] mb-[16px] rounded-full bg-green-400 flex justify-center items-center overflow-hidden">
+                        <img src={data.profileUrl} width="150" height="150" alt="orange" className="rounded-full"/>
                     </div>
                     <div className=" py-[12px] w-full text-center text-[1.2rem] h-[52.8px] bg-green-400 text-white font-bold rounded-xl">초보 오렌지</div>
                 </div>

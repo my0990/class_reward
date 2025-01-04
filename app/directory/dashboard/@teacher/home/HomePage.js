@@ -11,6 +11,7 @@ export default function Home({ studentData }) {
 
     const [data, setClassData] = useRecoilState(userDataState);
     const { classData } = data;
+    console.log(classData)
     const [isSend, setIsSend] = useState(false);
     const [isSelectedAll, setIsSelectedAll] = useState(false);
     let tmpData = studentData.map(obj => {
@@ -57,7 +58,7 @@ export default function Home({ studentData }) {
         document.getElementById('modal').showModal();
     }
     useEffect(() => {
-        if (!classData) {
+        if (classData.currencyEmoji === "" || classData.currencyName === "" ) {
             document.getElementById('setting')?.showModal();
 
         }
@@ -86,7 +87,7 @@ export default function Home({ studentData }) {
             {/* {modalData.length !== 0 ? <Modal modalData={modalData} /> : null} */}
             <Modal targetStudent={targetStudent} isSend={isSend} currencyName={classData?.currencyName} />
             <InstallPrompt />
-            {classData ? null : <SetCurrencyNameModal />}
+            {classData.currencyEmoji === "" || classData.currencyName === "" ?  <SetCurrencyNameModal /> : null}
         </div>
     )
 }
