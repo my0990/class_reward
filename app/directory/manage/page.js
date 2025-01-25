@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from "react"
 import CreateUniqueNickname from "./component/CreateUniqueNickname"
-import CreateStudentAccount from "./component/CreateStudentAccount";
+import ManageStudentAccount from "./component/ManageStudentAccount";
 export default function CreateAccount() {
     const [uniqueNickname, setUniqueNickname] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -12,6 +12,7 @@ export default function CreateAccount() {
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
+            console.log('manage fetch start')
             const response = await fetch('/api/fetchUniqueNickname', {
                 method: "POST",
                 headers: {
@@ -42,7 +43,7 @@ export default function CreateAccount() {
                 {isLoading
                     ? <div>loading... </div>
                     : uniqueNickname
-                        ? <CreateStudentAccount  result={result.data} studentData={result.studentData} arr={arr} setArr={setArr}/>
+                        ? <ManageStudentAccount  result={result.data} studentData={result.studentData} arr={arr} setArr={setArr}/>
                         : <CreateUniqueNickname />}
             </div>
         </div>

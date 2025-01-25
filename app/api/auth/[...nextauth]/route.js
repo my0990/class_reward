@@ -29,10 +29,6 @@ export const authOptions = {
 
       async authorize(credentials, req) {
         const {id, password,role} = credentials;
-        console.log(role)
-        console.log(role)
-        console.log(role)
-        console.log(role)
         const db = (await connectDB).db('user');
         // 기존의 가입된 아이디 체크하기
         const user = await db.collection('users').findOne({$and:[ { role: role, userId: id}] });

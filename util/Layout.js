@@ -7,6 +7,7 @@ export default function Layout({ fetchedUserData, fetchedThermometerData, fetche
     const [userData, setUserData] = useRecoilState(userDataState);
     const [sessionData, setSessionData] = useRecoilState(sessionDataState);
     useEffect(()=>{
+        console.log('lay out ')
         setUserData((prev) => ({...prev, ...fetchedUserData}));
         setSessionData((prev) => ({...prev, ...fetchedSessionData}));
     },[])

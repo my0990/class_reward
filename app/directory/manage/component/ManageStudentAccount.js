@@ -3,8 +3,14 @@ import DetailModal from "./modal/DetailModal";
 import PickNumber from "./modal/PickNumber";
 import ResetModal from "./modal/ResetModal";
 import { useState } from "react";
-export default function CreateStudentAccount({ result, arr, setArr, studentData }) {
-    console.log(studentData)
+
+import { fetchData } from "@/hooks/swrHooks";
+export default function CreateStudentAccount({ result}) {
+
+
+
+    const { swrResult, isLoading, isError, mutateUser } = fetchData('/api/fetchStudentData');
+    console.log('result: ', swrResult)
     const { currencyName, currencyEmoji } = result.classData;
     const [picked, setPicked] = useState(null);
     const onResetClick = (a) => {
@@ -19,14 +25,18 @@ export default function CreateStudentAccount({ result, arr, setArr, studentData 
         document.getElementById('my_modal_4').showModal();
         setPicked(a)
     }
+
+    if (isLoading) return <div>Loading data...</div>;
+    if (isError) return <div>Error loading data</div>;
     return (
         <div>
             <div>
                 <div>
+
                     <div className="overflow-x-auto">
-                        <div className="text-end">
+                        {/* <div className="text-end">
                             <button className="border-2 bg-orange-300 rounded-lg p-[8px] cursor-pointer border-none font-bold hover:bg-orange-400" onClick={() => document.getElementById('my_modal_2').showModal()}>계정 생성</button>
-                        </div>
+                        </div> */}
                         <table className="table text-[1.2rem]">
                             {/* head */}
                             <thead>
@@ -39,7 +49,7 @@ export default function CreateStudentAccount({ result, arr, setArr, studentData 
                                 </tr>
                             </thead>
                             <tbody className="text-center">
-                                {studentData.map((a, i) => {
+                                {swrResult.map((a, i) => {
                                     return (
                                         <tr key={i}>
                                             <td onClick={(e) => onDetailClick(a)} className="cursor-pointer transition-all hover:bg-orange-200 rounded-xl">{a.userId}</td>
@@ -59,10 +69,10 @@ export default function CreateStudentAccount({ result, arr, setArr, studentData 
                     </div>
                 </div>
             </div>
-            <PickNumber result={result} arr={arr} setArr={setArr} />
-            <DeleteModal picked={picked} teacher={result.userId}/>
+            {/* <PickNumber result={result} arr={arr} setArr={setArr} /> */}
+            <DeleteModal picked={picked} teacher={result.userId} />
             <ResetModal picked={picked} teacher={result.userId} />
-            <DetailModal picked={picked}/>
+            <DetailModal picked={picked} />
         </div>
     )
 }

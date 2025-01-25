@@ -5,9 +5,6 @@ import ProfileRegisterTemplate from './component/ProfileRegisterTemplate';
 import { connectDB } from '@/app/lib/database';
 export default async function Page() {
 
-    console.log('admin rendered')
-    console.log('admin rendered')
-    console.log('admin rendered')
 
 
     const db = (await connectDB).db('data')

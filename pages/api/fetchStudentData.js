@@ -6,11 +6,11 @@ import { getServerSession } from 'next-auth/next';
 
 export default async function handler(req, res) {
 
-  if (req.method === 'POST') {
+  if (req.method === 'GET') {
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    const userId = req.body.userId
     const db = (await connectDB).db('data')
-    const response = await db.collection('history').find({userId: userId}).sort({date: '1'}).toArray()
-    res.status(201).json({ result: true, message: 'delete 성공', data: response});
+    const response = await db.collection('user_data').find({ teacher: session.user.userId }).sort({ classNumber: 1 }).toArray()
+    // const tmp = response.map((a) => { a._id = a._id.toString(); return a })
+    res.status(200).json(response);
   }
 }

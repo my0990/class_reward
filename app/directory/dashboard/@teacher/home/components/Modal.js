@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import DialBtn from "./DialBtn";
-export default function Modal({  isSend, currencyName, targetStudent }) {
+export default function Modal({ isSend, currencyName, targetStudent, clearAll }) {
     const [point, setPoint] = useState(null);
     const [fontSize, setFontSize] = useState(1.7);
     const [activeKey, setActiveKey] = useState(null);
-    const [isLoading,setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const onClick = (e) => {
         if (point === null) {
@@ -19,6 +19,11 @@ export default function Modal({  isSend, currencyName, targetStudent }) {
         }
 
     }
+    const modalClose = () => {
+        setPoint(null)
+        setFontSize(1.7)
+    }
+
     const onSubmit = (e) => {
         e.preventDefault();
 
@@ -26,7 +31,7 @@ export default function Modal({  isSend, currencyName, targetStudent }) {
             alert('숫자를 입력해주세요')
             return;
         }
-        if(isLoading === true){
+        if (isLoading === true) {
             return
         } else {
             setIsLoading(true)
@@ -38,26 +43,25 @@ export default function Modal({  isSend, currencyName, targetStudent }) {
                 },
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
-                    const message = targetStudent.map((a,i)=> a.userId)
-                    if(isSend){
-                        alert(message+ '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
-                        location.reload();
+                    const message = targetStudent.map((a, i) => a.userId)
+                    if (isSend) {
+                        alert(message + '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
+                        clearAll();
                     } else {
-                        alert(message+ '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
-                        location.reload();
+                        alert(message + '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
+                        clearAll();
                     }
-                    setIsLoading(false)
-    
+                    modalClose();
+                    document.getElementById('modal').close();
+                    setIsLoading(false);
+
                 }
             })
         }
-        
+
     }
 
-    const modalClose = () => {
-        setPoint(null)
-        setFontSize(1.7)
-    }
+
     const handleKeyDown = (e) => {
         const allowedKeys = [
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',

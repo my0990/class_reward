@@ -4,7 +4,7 @@ import character from "@/public/character.jpeg"
 import female from "@/public/female.png"
 import male from "@/public/male.png"
 export default function BrowseCard({data}) {
-    console.log(data)
+
     return (
         <div className="w-[640px] dark:text-black max-[640px]:w-[100%] max-[640px]:mx-[16px] max-[640px]:my-[8px] bg-orange-200 box-content rounded-2xl my-[16px] mx-[16px]">
             <div className="flex p-[24px]">

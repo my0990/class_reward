@@ -9,7 +9,6 @@ import { useRecoilState } from "recoil";
 export default function UserInfo({  role, isUserinfoClicked, setIsUserinfoClicked, profileiconRef  }) {
     const dropDownRef = useRef();
     const [data, setData] = useRecoilState(userDataState);
-    console.log(data)
     const {profileNickname, money} = data;
     useEffect(() => {
         const outSideClick = (e) => {

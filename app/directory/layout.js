@@ -8,9 +8,9 @@ import Layout from "@/util/Layout";
 export default async function RootLayout({ children }) {
     const session = await getServerSession(authOptions);
     let response = null;
-    if(session){
-      const db = (await connectDB).db('data');
-      response = await db.collection('user_data').findOne({ userId: session.user.userId })
+    if (session) {
+        const db = (await connectDB).db('data');
+        response = await db.collection('user_data').findOne({ userId: session.user.userId })
     }
 
 
@@ -31,10 +31,11 @@ export default async function RootLayout({ children }) {
     return (
         <div className="dark:text-black flex flex-col h-screen">
             <RecoilRootProvider>
-                <Layout fetchedUserData={response} fetchedSessionData={session} />
+                <Layout fetchedUserData={response} fetchedSessionData={session} >
                     <Header session={session.user} />
                     {children}
                     <SpeedInsights />
+                </Layout>
             </RecoilRootProvider>
         </div>
     )

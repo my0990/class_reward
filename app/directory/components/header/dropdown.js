@@ -1,7 +1,5 @@
 import { signOut } from "next-auth/react"
 import Link from "next/link"
-import gold from "@/public/gold.png";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { userDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
