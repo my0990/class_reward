@@ -11,7 +11,12 @@ export default function CreateUniqueNickname() {
         } else {
             setIsLoading(true);
             if (ref.current.value === '') {
+
                 setError("아무것도 입력되어 있지 않습니다")
+                setIsLoading(false);
+                return
+            } else if(/\d/.test(ref.current.value)){
+                setError("숫자는 입력할 수 없습니다")
                 setIsLoading(false);
                 return
             }
@@ -25,7 +30,6 @@ export default function CreateUniqueNickname() {
 
                 if (data.result === true) {
                     alert('고유 별명을 등록하였습니다.')
-                    location.reload();
                 } else {
                     setError(ref.current.value + '은(는) 이미 존재하는 별명입니다.')
                     setIsLoading(false);

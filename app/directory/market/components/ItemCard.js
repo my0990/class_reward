@@ -3,7 +3,6 @@ import Image from "next/image";
 export default function ItemCard(props) {
     // console.log(props.data)
     const { data } = props;
-    console.log(data)
     function getByteB(str) {
         let byte = 0;
         for (let i = 0; i < str.length; ++i) {

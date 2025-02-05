@@ -13,68 +13,33 @@ import { mutate } from "swr";
 import util from './utils/util'
 
 export default function Home() {
-    const { swrResult, isLoading, isError, mutateUser } = fetchData('/api/fetchStudentData');
-    const [data, setClassData] = useRecoilState(userDataState);
-    const { classData } = data;
+    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData('/api/fetchStudentData');
+    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
+
+
     const [isSend, setIsSend] = useState(false);
     const [isSelectedAll, setIsSelectedAll] = useState(false);
     const [studentArr, setStudentArr] = useState([]);
     const {onClick,selectAll,clearAll,onSend,onTake} = util({setStudentArr, setIsSelectedAll, studentArr, setIsSend});
     useEffect(() => {
-        if (swrResult) {
-            const updatedData = swrResult.map(obj => {
+        if (studentData) {
+            const updatedData = studentData.map(obj => {
                 return { ...obj, isactive: false }; // 새로운 키-값 쌍 추가하여 새로운 객체 반환
             });
           // 로컬 캐시 업데이트
           setStudentArr(updatedData)
         }
-      }, [swrResult]);
+      }, [studentData]);
 
-    // const onClick = (a) => {
-    //     setStudentArr((prev) => {
-    //         return prev.map(obj =>
-    //             obj._id === a._id ? { ...obj, isactive: !a.isactive } : obj
-    //         );
-    //     });
-    // }
-    // const selectAll = () => {
-    //     setIsSelectedAll(true)
-    //     setStudentArr((prev) => {
-    //         return prev.map(obj =>
-    //             ({ ...obj, isactive: true }))
-    //     })
-    // }
-    // const clearAll = () => {
-    //     setIsSelectedAll(false)
-    //     setStudentArr((prev) => {
-    //         return prev.map(obj =>
-    //             ({ ...obj, isactive: false }))
-    //     })
-    // }
-    // const onSend = () => {
-    //     if (studentArr.filter((a) => a.isactive === true).length === 0) {
-    //         alert('학생을 선택해주세요')
-    //         return
-    //     }
-    //     setIsSend(true);
-    //     document.getElementById('modal').showModal();
-    // }
-    // const onTake = () => {
-    //     if (studentArr.filter((a) => a.isactive === true).length === 0) {
-    //         alert('학생을 선택해주세요')
-    //         return
-    //     }
-    //     setIsSend(false);
-    //     document.getElementById('modal').showModal();
-    // }
     useEffect(() => {
-        if (classData.currencyEmoji === "" || classData.currencyName === "" ) {
+        if (!classData?.currencyEmoji  || !classData?.currencyName  ) {
+            console.log('open')
             document.getElementById('setting')?.showModal();
-
+            
         }
-    })
-    if (isLoading) return <div>Loading data...</div>;
-    if (isError) return <div>Error loading data</div>;
+    },[classData])
+    if (isStudentLoading) return <div>Loading data...</div>;
+    if (isStudentError) return <div>Error loading data</div>;
     return (
         <div className=" pt-0 flex justify-center">
             <div className="w-[1360px] max-[1360px]:w-[1224px] max-[1224px]:w-[1088px] max-[1088px]:w-[952px] max-[952px]:w-[816px] max-[816px]:w-[680px] max-[680px]:w-[544px] max-[544px]:w-[408px] max-[408px]:w-[272px]">
@@ -99,7 +64,7 @@ export default function Home() {
 
             <Modal targetStudent={studentArr.filter((a) => a.isactive === true)} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll}/>
             <InstallPrompt />
-            {classData.currencyEmoji === "" || classData.currencyName === "" ?  <SetCurrencyNameModal /> : null}
+            {!classData?.currencyEmoji || !classData?.currencyName ?  <SetCurrencyNameModal /> : null}
         </div>
     )
 }

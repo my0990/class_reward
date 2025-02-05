@@ -1,10 +1,10 @@
 import { useState } from "react";
-export default function ResetModal({picked, teacher}) {
+export default function ResetModal({picked}) {
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/resetPassword", {
             method: "POST",
-            body: JSON.stringify({ teacher: teacher, student: picked.userId }),
+            body: JSON.stringify({ student: picked.userId }),
             headers: {
                 "Content-Type": "application/json",
             },

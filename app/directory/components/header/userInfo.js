@@ -3,13 +3,16 @@ import styles from './userinfo.module.css'
 import { signOut } from "next-auth/react"
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { userDataState } from '@/store/atoms';
-import { useRecoilState } from "recoil";
 
-export default function UserInfo({  role, isUserinfoClicked, setIsUserinfoClicked, profileiconRef  }) {
+import { fetchData } from "@/hooks/swrHooks";
+
+export default function UserInfo({ session, isUserinfoClicked, setIsUserinfoClicked, profileiconRef  }) {
+    const { data: classData, isLoading: isClassLoading, isError: isClassError} = fetchData('/api/fetchClassData');
+    const { data: userData, isLoading: isUserLoading, isError: isUserError} = fetchData('/api/fetchUserData');
+    console.log('userData: ', userData)
+    console.log('classData: ', classData)
     const dropDownRef = useRef();
-    const [data, setData] = useRecoilState(userDataState);
-    const {profileNickname, money} = data;
+
     useEffect(() => {
         const outSideClick = (e) => {
             const { target } = e;
@@ -26,12 +29,14 @@ export default function UserInfo({  role, isUserinfoClicked, setIsUserinfoClicke
         document.addEventListener("mousedown", outSideClick);
         return () => document.removeEventListener('mousedown', outSideClick);
     }, [isUserinfoClicked]);
+    if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
+    if (isClassError || isUserError) return <div>Error loading data</div>;
     return (
         <div className="max-[600px]:hidden" ref={dropDownRef}>
             <div className={styles.speechBubble}>
                 <div className="flex items-center justify-space text-[1rem]">
                     <div className="py-[1rem] px-[8px]  ml-[8px]">
-                        {role === "teacher" ? '관리자' : profileNickname}님, 환영합니다
+                        <span className="font-bold">{session.userId}</span>님, 환영합니다
                     </div>
                     <button className="rounded-[20px] border-2 py-[4px] px-[8px] text-gray-500 border-gray-300 flex" onClick={() => signOut()}>로그아웃
                         <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" className="ml-[4px] text-gray-500">
@@ -42,8 +47,8 @@ export default function UserInfo({  role, isUserinfoClicked, setIsUserinfoClicke
                 <ul>
                     <li className="pb-[1rem] px-[16px]  border-b-2">
                         <div className="flex">
-                            <div className="mr-3">{data.classData.currencyEmoji}</div>
-                            <div>{money?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {data.classData.currencyName} </div>
+                            <div className="mr-3">{classData?.currencyEmoji}</div>
+                            <div>{userData?.money?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {classData?.currencyName} </div>
                         </div>
                     </li>
                     <Link href="./setting">

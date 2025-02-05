@@ -7,10 +7,12 @@ import { getServerSession } from 'next-auth/next';
 export default async function handler(req, res) {
 
   if (req.method === 'GET') {
-    const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
-
+    const userId = req.params;
+    // console.log('test')
+    // console.log(req.query)
+    // console.log(userId)
     const db = (await connectDB).db('data')
-    const response = await db.collection('user_data').findOne({userId: session.user.userId})
+    const response = await db.collection('history').find({userId: req.query.id}).sort({date: '1'}).toArray()
     res.status(200).json(response);
   }
 }

@@ -1,7 +1,4 @@
-import Image from "next/image"
-import male from "@/public/male.png"
 export default function CardTemplate({picked}) {
-    console.log(picked)
     return (
         <div className="w-[352px] h-[500px] bg-orange-200 p-[16px] rounded-xl">
             <div >

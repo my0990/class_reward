@@ -1,4 +1,6 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export default function handler(req, res) {
-    console.log('requested')
-    res.status(200).json({ message: 'Hello from Next.js!' })
-  }
+  const uniqueCode = uuidv4();
+  res.status(200).json({ test: uniqueCode })
+}

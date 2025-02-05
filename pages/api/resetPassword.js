@@ -7,8 +7,7 @@ export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
-    const {  teacher,student } = req.body;
-    console.log(req.body)
+    const { student } = req.body;
 
 
     // MongoDB 연결

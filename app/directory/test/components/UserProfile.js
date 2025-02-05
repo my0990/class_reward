@@ -2,8 +2,9 @@
 import { fetchData} from "@/hooks/swrHooks";
 import { useEffect } from "react";
 import { mutate } from "swr";
+import Modal from "./Modal";
 export default function UserProfile() {
-  const { swrResult, isLoading, isError, mutateUser } = fetchData('/api/user');
+  const { swrResult, isLoading, isError, mutateUser } = fetchData('/api/fetchUserData');
   useEffect(()=>{
     console.log('data: ', swrResult)
   },[swrResult])
@@ -36,6 +37,8 @@ export default function UserProfile() {
         )
       })} */}
       <button onClick={updateUserName}>Change Name</button>
+      <button onClick={() => document.getElementById('my_modal_4').showModal()}>모달</button>
+      <Modal />
     </div>
   );
 }

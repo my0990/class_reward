@@ -1,27 +1,23 @@
 'use client'
 
-import AddModal from "./addModal"
+import AddModal from "../@teacher/components/addModal"
 import BuyModal from "./buyModal"
-import DeleteModal from "./deleteModal"
+import DeleteModal from "../@teacher/components/deleteModal"
 import { useState, useRef } from "react"
 import {
     CSSTransition,
     TransitionGroup,
 } from 'react-transition-group';
 import ItemCard from "./ItemCard"
-import { userDataState, sessionDataState } from '@/store/atoms';
-import { useRecoilState } from "recoil";
-
+import { fetchData } from "@/hooks/swrHooks"
 
 
 
 export default function MarketTemplate({ tmpItemList }) {
-    const [userData, setUserData] = useRecoilState(userDataState);
-    const { currencyEmoji, currencyName } = userData.classData;
-    const [sessionData, setSessionData] = useRecoilState(sessionDataState);
-    console.log(sessionData)
-    console.log(userData)
-    const { role } = sessionData.user
+    const { data: classData, isLoading: isClassLoading, isError: isClassError} = fetchData('/api/fetchClassData');
+    const { data: userData, isLoading: isUserLoading, isError: isUserError} = fetchData('/api/fetchUserData');
+
+
     const onDelete = (picked) => {
         setDeleteId(picked.itemId)
         setBuyList(picked)
@@ -37,6 +33,11 @@ export default function MarketTemplate({ tmpItemList }) {
     const [itemList, setItemList] = useState(tmpItemList);
     const [buyList, setBuyList] = useState();
     const nodeRef = useRef();
+    if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
+    if (isClassError || isUserError) return <div>Error loading data</div>;
+
+    const { currencyEmoji, currencyName } = classData;
+    const {role} = userData;
     return (
         <div className="flex justify-center">
             <div className=" min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">

@@ -3,7 +3,7 @@ import { useState } from "react";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 
-export default function AddModal({ itemList, setItemList }) {
+export default function AddModal() {
     const nameRef = useRef();
     const priceRef = useRef();
     const quantityRef = useRef();
@@ -11,6 +11,8 @@ export default function AddModal({ itemList, setItemList }) {
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [emoji, setEmoji] = useState();
+
+
     const onSubmit = (e) => {
         e.preventDefault();
         if (isLoading) {
@@ -24,7 +26,7 @@ export default function AddModal({ itemList, setItemList }) {
             }
             fetch("/api/addItem", {
                 method: "POST",
-                body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemExplanation: explanationRef.current.value, emoji: emoji }),
+                body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemStock: quantityRef.current.value, itemExplanation: explanationRef.current.value, emoji: emoji }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -36,13 +38,11 @@ export default function AddModal({ itemList, setItemList }) {
                     setIsLoading(false);
 
                     document.getElementById('add').close()
-                    location.reload();
-                    // setItemList(() => [...itemList, { itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemQuantity: quantityRef.current.value, itemId: data.itemId, itemExplanation: explanationRef.current.value, emoji: emoji }])
-                    // nameRef.current.value = ""
-                    // priceRef.current.value = ""
-                    // quantityRef.current.value = ""
-                    // explanationRef.current.value = ""
-                    // setEmoji(null)
+                    nameRef.current.value = ""
+                    priceRef.current.value = ""
+                    quantityRef.current.value = ""
+                    explanationRef.current.value = ""
+                    setEmoji(null)
 
                 }
             })
@@ -55,7 +55,7 @@ export default function AddModal({ itemList, setItemList }) {
         priceRef.current.value = ""
         quantityRef.current.value = ""
         explanationRef.current.value = ""
-
+        setEmoji(null)
         document.getElementById('add').close()
         setTimeout(() => {
             setEmoji(null);

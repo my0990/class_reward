@@ -1,6 +1,6 @@
 'use client'
-import AuthInput from "./components/authInput"
-import AuthBtn from "./components/authBtn"
+import AuthInput from "../../components/authInput"
+import AuthBtn from "../../components/authBtn"
 import { useValidateForm } from "@/app/lib/useValidateForm"
 import { useRouter } from "next/navigation"
 import lottieJson from "@/public/tangerine.json"
@@ -69,7 +69,7 @@ export default function AuthPage({ role }) {
                     {errors.id || errors.pwd || errors.pwdCheck ? <div className="text-red-500 text-center mb-3">{errors.id || errors.pwd || errors.pwdCheck}</div> : null}
                     <AuthBtn className="text-blue-100 mb-[0px]" type="submit">로그인</AuthBtn>
                     {role === "teacher"
-                        ? <div className="text-center mt-[8px]">아이디가 없으세요? <Link href="/signup"><span className="text-orange-500 cursor-pointer hover:underline">회원가입</span></Link></div>
+                        ? <div className="text-center mt-[8px]">아이디가 없으세요? <Link href="/auth/signup"><span className="text-orange-500 cursor-pointer hover:underline">회원가입</span></Link></div>
                         : null}
                         </div>
                 </div>

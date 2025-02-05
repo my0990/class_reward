@@ -1,6 +1,6 @@
 'use client'
-import AuthInput from "./components/authInput"
-import AuthBtn from "./components/authBtn"
+import AuthInput from "../../components/authInput"
+import AuthBtn from "../../components/authBtn"
 import Link from "next/link"
 import { useValidateForm } from "@/app/lib/useValidateForm"
 export default function SignUpPage() {

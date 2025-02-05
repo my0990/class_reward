@@ -1,10 +1,10 @@
 import { useState } from "react";
-export default function DeleteModal({picked, teacher}) {
+export default function DeleteModal({picked}) {
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/deleteAccount", {
             method: "POST",
-            body: JSON.stringify({ teacher: teacher, student: picked.userId, classNumber: picked.classNumber }),
+            body: JSON.stringify({ student: picked.userId, classNumber: picked.classNumber }),
             headers: {
                 "Content-Type": "application/json",
             },
@@ -13,7 +13,7 @@ export default function DeleteModal({picked, teacher}) {
             if (data.result === true) {
                 alert("계정을 삭제하였습니다");
                 document.getElementById('my_modal_3').close()
-                location.reload();
+
             }
         })
     }

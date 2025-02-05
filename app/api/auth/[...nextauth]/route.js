@@ -62,15 +62,16 @@ export const authOptions = {
 
       if (user) {
         token.user = {};
-        token.user.userName = user.userName
         token.user.userId = user.userId
         token.user.role = user.role
         token.user.teacher = user.teacher
+        token.code = user.code
       }
       return token;
     },
     session: async ({ session, token }) => {
-      session.user = token.user;  
+      session = token.user;  
+
       return session;
     },
 

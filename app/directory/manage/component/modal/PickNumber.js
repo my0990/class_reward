@@ -1,48 +1,69 @@
 import { useState, useEffect } from "react";
-export default function PickNumber({ result, arr, setArr}) {
-    // const generatedNumber = [1, 2, 3]
-    let tmp = {}
+import { mutate } from "swr";
+export default function PickNumber({ classData }) {
+
 
     const [isLoading, setIsLoading] = useState(false);
+    const [studentArr, setStudentArr] = useState({});
+    useEffect(() => {
+        // console.log(studentData.account)
+        console.log('useEffect')
+        console.log(classData)
+        if (classData?.studentAccount) {
+
+            console.log('classData: ', classData)
+            setStudentArr(JSON.parse(JSON.stringify(classData.studentAccount)));
+        }
+    }, [classData?.studentAccount])
     const onCloseModal = () => {
 
         document.getElementById('my_modal_2').close();
-        for (let index = 1; index < 31; index++) {
-            tmp[index] = false;
-        }
-        for (let index = 0; index < result?.generatedNumber?.length; index++) {
-            tmp[result?.generatedNumber[index]] = '생성됨';
-        }
+
+        // for (let index = 1; index < 31; index++) {
+        //     tmp[index] = false;
+        // }
+        // for (let index = 0; index < result?.generatedNumber?.length; index++) {
+        //     tmp[result?.generatedNumber[index]] = '생성됨';
+        // }
         setTimeout(() => {
-            setArr(tmp)
+            setStudentArr(JSON.parse(JSON.stringify(classData.studentAccount)));
         }, 200)
 
     }
     const onToggle = (i) => {
-        setArr(prev => ({
+        setStudentArr(prev => ({
             ...prev,
-            [i]: !arr[i]
+            [i]: !studentArr[i]
         }));
     }
     const onSubmit = () => {
-        if(isLoading){
+        if (isLoading) {
             return
         }
-        let tmp = Object.keys(arr).filter((a)=> arr[a] === true)
+        let accountArr = Object.keys(studentArr).filter((a) => studentArr[a] === true)
+        const updatedStudentArr = Object.fromEntries(
+            Object.entries(studentArr).map(([key, value]) => [
+                key,
+                value ? "생성됨" : value
+            ])
+        );
+
 
         setIsLoading(true);
         fetch('/api/createStudentAccount', {
             method: "POST",
-            body: JSON.stringify({ accountArr: tmp, data: result }),
+            body: JSON.stringify({ accountArr: accountArr, updatedStudentArr: updatedStudentArr, uniqueNickname: classData.uniqueNickname }),
             headers: {
                 "Content-Type": "application/json",
             },
         })
-
-        // console.log(result);
         setIsLoading(false);
-        alert('성공')
-        location.reload();
+        alert('성공');
+        // mutate('/api/fetchClassData')
+        // console.log('after mutate')
+        onCloseModal();
+
+
     };
 
 
@@ -56,12 +77,12 @@ export default function PickNumber({ result, arr, setArr}) {
                     </div>
                     {/* 😴😆 */}
                     <div className="grid grid-cols-5">
-                        {Object.keys(arr).map((a, i) => {
+                        {Object.keys(studentArr).map((a, i) => {
                             return (
                                 <div key={i} className="text-center  m-[8px] " >
-                                    {arr[i + 1] === '생성됨'
+                                    {studentArr[i + 1] === '생성됨'
                                         ? <div className="text-[3rem] leading-none opacity-50">❤️</div>
-                                        : arr[i + 1] === true
+                                        : studentArr[i + 1] === true
                                             ? <div className="text-[3rem] leading-none cursor-pointer transition-all hover:scale-110" onClick={() => onToggle(i + 1)}>❤️</div>
                                             : <div className="text-[3rem] leading-none cursor-pointer transition-all hover:scale-110" onClick={() => onToggle(i + 1)}>😴</div>
                                     }
