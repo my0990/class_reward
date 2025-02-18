@@ -1,32 +1,33 @@
 'use client'
-import { useState, useRef, useEffect, createRef } from "react";
-import { userDataState } from '@/store/atoms';
-import { useRecoilState } from "recoil";
+import { useState, useRef, useEffect } from "react";
 import Scale from "@/app/components/thermometer/Scale";
 import Degree from "@/app/components/thermometer/Degree";
 
 
 
-export default function Modal({ thermoInfo, rewardObj, setRewardObj, width }) {
-    const [userData, setUserData] = useRecoilState(userDataState);
-    const [isFirstStep, setIsFirstStep] = useState(true);
-    const { currencyEmoji, currencyName } = userData.classData;
-    const ref = useRef();
+export default function Modal({ thermoData, width, classData, inputMirrorRef, setInputWidth, inputWidth, rewardObj, setRewardObj }) {
 
-    let initialRewardObj = {}
+    const [isFirstStep, setIsFirstStep] = useState(true);
+    const { currencyEmoji, currencyName } = classData;
+
     const [requireCurrency, setRequireCurrency] = useState(0);
-    // const [rewardObj, setRewardObj] = useState(initialRewardObj)
 
     useEffect(() => {
-        if (thermoInfo) {
-            setRequireCurrency(thermoInfo.requireCurrency)
-            setRewardObj(thermoInfo.reward);
+        if (thermoData) {
+            setRequireCurrency(thermoData.requireCurrency)
+            setRewardObj(thermoData.reward);
         }
-    }, [])
+    }, [thermoData])
 
-    for (let index = 0; index < 11; index++) {
-        initialRewardObj[index * 10] = ''
-    }
+    useEffect(() => {
+        if (inputMirrorRef) {
+            console.log('input changed')
+            setInputWidth((prev) =>
+                prev.map((a, i) => { return inputMirrorRef?.current[i]?.clientWidth })
+            );
+
+        }
+    }, [rewardObj])
 
     let tmp = []
     let start = 95;
@@ -37,10 +38,6 @@ export default function Modal({ thermoInfo, rewardObj, setRewardObj, width }) {
     }
 
 
-
-    useEffect(() => {
-
-    },)
 
     const onRewardChange = (e, key) => {
         setRewardObj((prev) => ({
@@ -54,26 +51,22 @@ export default function Modal({ thermoInfo, rewardObj, setRewardObj, width }) {
         e.preventDefault();
         fetch("/api/setThermometer", {
             method: "POST",
-            body: JSON.stringify({ rewardObj: rewardObj, requireCurrency: requireCurrency, data: userData }),
+            body: JSON.stringify({ rewardObj: rewardObj, requireCurrency: requireCurrency }),
             headers: {
                 "Content-Type": "application/json",
             },
         }).then((res) => res.json()).then((data) => {
 
             if (data.result === true) {
-                alert("등록되었습니다");
                 document.getElementById('my_modal_3').close()
                 location.reload();
             }
         })
     }
     const onClose = () => {
-        if (thermoInfo) {
-            setRequireCurrency(thermoInfo.requireCurrency);
-            setRewardObj(thermoInfo.reward);
-        } else {
-            setRequireCurrency(0);
-            setRewardObj(initialRewardObj);
+        if (thermoData) {
+            setRequireCurrency(thermoData.requireCurrency);
+            setRewardObj(thermoData.reward);
         }
         document.getElementById('my_modal_3').close();
         setIsFirstStep(true);
@@ -113,7 +106,7 @@ export default function Modal({ thermoInfo, rewardObj, setRewardObj, width }) {
                         </div>
                     </div>
 
-                    : <div className="modal-box bg-orange-200 overflow-hidden">
+                    : <div className="modal-box bg-orange-200 overflow-x-auto overflow-y-hidden">
                         <h3 className="text-[1.5rem]">
                             학급온도계 보상 입력
                         </h3>
@@ -141,7 +134,7 @@ export default function Modal({ thermoInfo, rewardObj, setRewardObj, width }) {
                                         <div key={i} className={`flex absolute h-[30px] left-[100px] z-50 overflow-hidden items-center cursor-default hover:scale-110 transition-all ${rewardObj[i * 10] === '' ? "opacity-50" : null} hover:opacity-100 focus-within:opacity-100`} style={{ bottom: a + 'px' }}>
                                             <div className="w-0 h-0 " style={{ borderTop: "12px solid transparent", borderRight: "16px solid rgb(251 146 60)", borderBottom: "12px solid transparent" }}></div>
                                             <div className="h-[24px]  z-50  w-fit " >
-                                                <input key={i} value={rewardObj[i * 10]} onChange={(e) => { onRewardChange(e, i * 10) }} className="bg-orange-400 px-[8px] min-w-[60px]  outline-none" style={{ width: width[i] + 'px' }} />
+                                                <input key={i} value={rewardObj[i * 10]} onChange={(e) => { onRewardChange(e, i * 10) }} className="bg-orange-400 px-[8px] min-w-[60px]  outline-none" style={{ width: inputWidth[i] + 'px' }} />
                                             </div>
                                         </div>
                                     )

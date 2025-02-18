@@ -1,5 +1,6 @@
 import { useState } from "react";
 export default function ResetModal({picked}) {
+    
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/resetPassword", {

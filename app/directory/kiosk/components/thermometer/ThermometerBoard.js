@@ -1,12 +1,12 @@
 'use client'
 
 import ThermometerObject from "@/app/components/thermometer/ThermometerObject";
-import Donation from "@/app/components/thermometer/donation/Donation";
+import Donation from "@/app/components/thermometer/donation/DonationList";
 import { userDataState, thermometerDataState, stepDataState, requestDataState, studentDataState } from '@/store/atoms';
 import { useRecoilState } from "recoil";
 import { useState, useRef, useEffect } from 'react';
 
-import Modal from "@/app/components/thermometer/Modal";
+import Modal from "@/app/directory/thermometer/components/Modal";
 
 export default function ThermometerBoard() {
     const [thermometerData, setThermometerData] = useRecoilState(thermometerDataState)

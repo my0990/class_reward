@@ -1,15 +1,18 @@
 'use client'
 import { userDataState } from "@/store/atoms";
 import { useRecoilState } from "recoil";
-import StudentProfileCard from "./StudentProfileCard"
-import ProfileBuyModal from "./ProfileBuyModal";
+import StudentProfileCard from "./component/StudentProfileCard"
+import ProfileBuyModal from "./component/ProfileBuyModal";
 import { useState, useEffect } from "react";
 export default function StudentProfileTemplate({data}) {
     const [userData, setUserData] = useRecoilState(userDataState);
     const [profileData,setProfileData] = useState({urlData: undefined, urlId: undefined});
 
     const {profileUrlObj} = userData;
-    console.log(userData)
+    console.log('student template')
+    console.log('student template')
+    console.log('student template')
+    console.log('student template')
     return(
         <div className="flex flex-wrap justify-center">
             {Object.keys(data).map((a,i)=>{

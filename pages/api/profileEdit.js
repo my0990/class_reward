@@ -7,13 +7,15 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    let {userId,role,teacher} = session.user;
-    const {nickname, state, profileUrl} = req.body;
+    let {userId,role} = session;
+    console.log(req.body);
+    const {profileNickname, profileState, profileUrl} = req.body;
+
     // MongoDB 연결
 
     const db = (await connectDB).db('data');
 
-    const response = await db.collection("user_data").updateOne({userId: userId},{$set : {profileNickname: nickname, profileState: state, profileUrl: profileUrl}},{upsert:true})
+    const response = await db.collection("user_data").updateOne({userId: userId, role: role},{$set : {profileNickname: profileNickname, profileState: profileState, profileUrl: profileUrl}},{upsert:true})
 
     res.status(201).json({ result: true, message: 'profile 변경 성공' });
 }}

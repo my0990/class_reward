@@ -2,10 +2,11 @@
 import Password from "./Password";
 import Profile from "./Profile"
 import { useState } from "react"
+import { fetchData } from "@/hooks/swrHooks";
 
-
-export default function SettingTemplate({profileNickname, profileState, gender, profileUrl}) {
+export default function SettingTemplate() {
     const [isProfile, setIsProfile] = useState(true);
+
     return (
         <div className="flex ">
             <div className="flex flex-wrap justify-center ">

@@ -1,7 +1,33 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { mutate } from "swr";
 export default function DeleteModal({ pickedItem, currencyName }) {
     const [isLoading, setIsLoading] = useState(false);
+    const [isEdited, setIsEdited] = useState(false);
+    const [itemStock, setItemStock] = useState('');
+
+
+    const spanRef = useRef(null);
+    const inputRef = useRef(null);
+
+    const onChange = (e) => {
+        if (isEdited === false) {
+            setIsEdited(true)
+        }
+        if (/^[0-9]\d*$/.test(e.target.value) || e.target.value === '') {
+            setItemStock(e.target.value)
+        }
+
+    }
+
+    const onClose = () => {
+
+        document.getElementById('delete').close();
+        setTimeout(() => {
+            setItemStock(pickedItem.itemStock);
+            setIsEdited(false);
+        }, 250)
+    }
+
     const onSubmit = (e) => {
         e.preventDefault();
         if (isLoading) {
@@ -17,6 +43,7 @@ export default function DeleteModal({ pickedItem, currencyName }) {
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
                     alert('성공했습니다.');
+
                     setIsLoading(false);
                     mutate('/api/fetchClassData');
                     document.getElementById('delete').close();
@@ -25,6 +52,41 @@ export default function DeleteModal({ pickedItem, currencyName }) {
         }
 
     }
+    const onSetItemStock = (e) => {
+        e.preventDefault();
+        if (isLoading) {
+            return
+        } else {
+            setIsLoading(true)
+            fetch("/api/setItemStock", {
+                method: "POST",
+                body: JSON.stringify({ updatedItemStock: itemStock, itemId: pickedItem.itemId }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json()).then((data) => {
+                if (data.result === true) {
+                    alert('성공했습니다.');
+                    setIsEdited(false);
+                    setIsLoading(false);
+                    mutate('/api/fetchClassData');
+                    document.getElementById('delete').close();
+                }
+            })
+        }
+    }
+    useEffect(() => {
+        if (pickedItem) {
+
+            setItemStock(pickedItem.itemStock)
+        }
+    }, [pickedItem])
+
+    useEffect(() => {
+        if (spanRef.current && inputRef.current) {
+            inputRef.current.style.width = `${spanRef.current.offsetWidth + 2}px`;
+        }
+    }, [itemStock]);
 
     if (!pickedItem) {
         return (
@@ -33,6 +95,7 @@ export default function DeleteModal({ pickedItem, currencyName }) {
             </dialog>
         )
     }
+
     return (
         <dialog id="delete" className="modal  modal-middle">
             <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
@@ -47,16 +110,24 @@ export default function DeleteModal({ pickedItem, currencyName }) {
                 <div className="text-gray-500 mb-[8px]">
                     {pickedItem.itemExplanation}
                 </div>
-                <div className="mb-[32px]">남은 수량: {pickedItem.itemStock}</div>
+                {/* <div className="mb-[32px]">남은 수량: {pickedItem.itemStock}</div> */}
+                <div className="mb-[32px] ">남은 수량: <input ref={inputRef} className="box-content px-[16px] border-b-4 outline-none hover:cursor-pointer min-w-[12px] border-orange-500" onChange={onChange} value={itemStock} /></div>
+                <span ref={spanRef} style={{ visibility: "hidden", position: "absolute", whiteSpace: "pre" }}>
+                    {itemStock || " "}
+                </span>
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
-                    <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
-                        <button className="w-[100%] max-[600px]:w-[100%] bg-red-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] hover:bg-red-500">삭제</button>
-                    </form>
-                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 hover:bg-gray-300 rounded-[5px] py-[8px]" onClick={() => document.getElementById('delete').close()}>취소</button>
+                    {isEdited
+                        ? <form onSubmit={onSetItemStock} className="w-[48%] max-[600px]:w-[100%]">
+                            <button className="w-[100%] max-[600px]:w-[100%] bg-red-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] hover:bg-red-500">수정</button>
+                        </form>
+                        : <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
+                            <button className="w-[100%] max-[600px]:w-[100%] bg-red-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] hover:bg-red-500">삭제</button>
+                        </form>}
+                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 hover:bg-gray-300 rounded-[5px] py-[8px]" onClick={onClose}>취소</button>
                 </div>
             </div>
             <form method="dialog" className="modal-backdrop">
-                <button>close</button>
+                <button onClick={onClose}>close</button>
             </form>
 
         </dialog>

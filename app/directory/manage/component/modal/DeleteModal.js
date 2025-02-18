@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { mutate } from "swr";
 export default function DeleteModal({picked}) {
     const onSubmit = (e) => {
         e.preventDefault();
@@ -12,6 +13,8 @@ export default function DeleteModal({picked}) {
 
             if (data.result === true) {
                 alert("계정을 삭제하였습니다");
+                mutate("/api/fetchClassData");
+                mutate("/api/fetchStudentData");
                 document.getElementById('my_modal_3').close()
 
             }

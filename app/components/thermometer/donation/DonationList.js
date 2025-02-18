@@ -1,6 +1,7 @@
-export default function Donation({ thermoInfo, studentInfo }) {
-    const { donators } = thermoInfo;
-    const userMap = studentInfo.reduce((acc, user) => {
+export default function DonationList({ thermoData, currencyName, studentData }) {
+    const { donators } = thermoData;
+    console.log(studentData)
+    const userMap = studentData.reduce((acc, user) => {
         acc[user.userId] = user.profileNickname;
         return acc;
     }, {});
@@ -23,8 +24,7 @@ export default function Donation({ thermoInfo, studentInfo }) {
                                 <tr key={i}>
                                     <th className="text-center">{i + 1}위</th>
                                     <td className="text-center">{userMap[a]}<br />&#40;{a}&#41;</td>
-                                    <td className="text-center">{sortedDonators[a]} 쿠키</td>
-
+                                    <td className="text-center">{sortedDonators[a]} {currencyName}</td>
                                 </tr>
                             )
                         }) : null}

@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth/next';
 
 export default async function Setting(){
     const session = await getServerSession(authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    let {userId,role,teacher} = session.user;
+    let {userId,role,teacher} = session;
 
     // MongoDB 연결
 

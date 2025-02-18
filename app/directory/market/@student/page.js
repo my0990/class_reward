@@ -6,6 +6,7 @@ export default async function Market() {
     const { userId, teacher } = await getServerSession(authOptions)
     const db = (await connectDB).db('data')
     const response = await db.collection('user_data').findOne({ userId: teacher })
+
     if (response === null) {
         return
     }

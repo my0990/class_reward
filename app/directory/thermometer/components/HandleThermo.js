@@ -1,6 +1,7 @@
 import { useState } from "react";
-export default function ThermoDec({ thermoInfo, currencyName, userId }) {
-    const { requireCurrency } = thermoInfo;
+import { mutate } from "swr";
+export default function ThermoDec({ thermoData, currencyName, type }) {
+    const { requireCurrency } = thermoData;
     const [amount, setAmount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const onChagne = (e) => {
@@ -18,7 +19,7 @@ export default function ThermoDec({ thermoInfo, currencyName, userId }) {
     }
     const onClose = () => {
         setAmount(0);
-        document.getElementById('dec').close();
+        document.getElementById('handleThermo').close();
     }
 
     const onSubmit = (e) => {
@@ -34,30 +35,32 @@ export default function ThermoDec({ thermoInfo, currencyName, userId }) {
             setIsLoading(true)
             fetch("/api/handleTemp", {
                 method: "POST",
-                body: JSON.stringify({ userId: userId, amount: amount, type: "down" }),
+                body: JSON.stringify({  amount: amount, type: type }),
                 headers: {
                     "Content-Type": "application/json"
                 },
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
-                    alert('완료하였습니다');
-                    location.reload();
-                } else {
+                    setAmount(0);
+                    document.getElementById('handleThermo').close();
+                    mutate("/api/fetchThermometerData")
                     setIsLoading(false)
-                }
+                } 
             })
         }
 
     }
     return (
-        <dialog id="dec" className="modal  modal-middle ">
+        <dialog id="handleThermo" className="modal  modal-middle ">
             <div className="modal-box bg-orange-200">
 
                 <div className="flex relative mt-[16px] h-[40px]">
                     <input type="text"  value={amount === 0 ? "" : amount} onChange={onChagne} className="border-2 pl-[32px] h-full rounded-lg border-orange-300 outline-none focus:border-orange-500 text-right w-[100px] pr-[8px] mr-[8px]" ></input>
-                    <div className="h-full text-[1.5rem]">도를 내립니다</div>
+                    <div className="h-full text-[1.5rem]">도를 {type === "up" ? "올립니다" : "내립니다"}</div>
                     <div className="w-[24px] h-[40px] flex items-center ml-[4px]">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 11V9a1 1 0 0 1 2 0v2a1 1 0 0 1-2 0zm7 1a1 1 0 0 0 1-1V9a1 1 0 0 0-2 0v2a1 1 0 0 0 1 1zm-3 2a6.036 6.036 0 0 0-4.775 2.368 1 1 0 1 0 1.55 1.264 4 4 0 0 1 6.45 0 1 1 0 0 0 1.55-1.264A6.036 6.036 0 0 0 12 14zm11-2A11 11 0 1 1 12 1a11.013 11.013 0 0 1 11 11zm-2 0a9 9 0 1 0-9 9 9.01 9.01 0 0 0 9-9z" /></svg>
+                        {type === "up"
+                        ?   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1a11 11 0 1 0 11 11A11.013 11.013 0 0 0 12 1zm0 20a9 9 0 1 1 9-9 9.01 9.01 0 0 1-9 9zM8 11V9a1 1 0 0 1 2 0v2a1 1 0 0 1-2 0zm8-2v2a1 1 0 0 1-2 0V9a1 1 0 0 1 2 0zm-8 5h8a4 4 0 0 1-8 0z" /></svg>
+                        :  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 11V9a1 1 0 0 1 2 0v2a1 1 0 0 1-2 0zm7 1a1 1 0 0 0 1-1V9a1 1 0 0 0-2 0v2a1 1 0 0 0 1 1zm-3 2a6.036 6.036 0 0 0-4.775 2.368 1 1 0 1 0 1.55 1.264 4 4 0 0 1 6.45 0 1 1 0 0 0 1.55-1.264A6.036 6.036 0 0 0 12 14zm11-2A11 11 0 1 1 12 1a11.013 11.013 0 0 1 11 11zm-2 0a9 9 0 1 0-9 9 9.01 9.01 0 0 0 9-9z" /></svg>}
                     </div>
                 </div>
                 <div className="text-[1.5rem]">

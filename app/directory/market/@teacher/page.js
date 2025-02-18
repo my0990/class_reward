@@ -12,7 +12,7 @@ import { fetchData } from "@/hooks/swrHooks";
 
 export default function MarketTemplate() {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
-    const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');
+
 
     const [pickedItem, setPickedItem] = useState();
     const onDelete = (e) => {
@@ -23,10 +23,10 @@ export default function MarketTemplate() {
     const nodeRef = useRef();
 
 
-    if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
-    if (isClassError || isUserError) return <div>Error loading data</div>;
+    if (isClassLoading ) return <div>Loading data...</div>;
+    if (isClassError ) return <div>Error loading data</div>;
 
-    const { role } = userData;
+
     const { currencyEmoji, currencyName, itemList } = classData;
     return (
         <div className="flex justify-center">

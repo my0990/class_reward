@@ -5,8 +5,7 @@ import { useState, useEffect } from "react";
 import Modal from "./components/Modal";
 import InstallPrompt from "../../component/InstallPrompt";
 import SetCurrencyNameModal from "./components/SetCurrencyNameModal";
-import { userDataState } from '@/store/atoms';
-import { useRecoilState } from "recoil";
+
 
 import { fetchData } from "@/hooks/swrHooks";
 import { mutate } from "swr";

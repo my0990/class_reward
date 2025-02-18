@@ -1,20 +1,13 @@
 'use client'
 import Link from "next/link";
-import Notification from "./notification";
 import { useState } from "react";
 import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
 import { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { userDataState } from '@/store/atoms';
-import { useRecoilState } from "recoil";
-
-
-import { fetchData } from "@/hooks/swrHooks";
 export default function Header({ session }) {
 
 
-    const [data, setData] = useRecoilState(userDataState);
     const [isClient, setIsClient] = useState(false)
     const { role } = session
 

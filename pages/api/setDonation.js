@@ -1,11 +1,12 @@
 import { connectDB } from '@/app/lib/database'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getServerSession } from 'next-auth/next';
-
+import {getToken} from "next-auth/jwt"
 export default async function handler(req, res) {
 
 
     if (req.method === 'POST') {
+        const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+        const code = token.code;
+
         const db = (await connectDB).db('data');
         const { userId, amount, teacher, money } = req.body;
         const response = await db.collection('user_data').updateOne(
@@ -17,7 +18,7 @@ export default async function handler(req, res) {
             }
         )
         const response2 = await db.collection('thermometer').updateOne(
-            { userId: teacher },
+            { code: code },
             {
                 $inc: {
                     [`donators.${userId}`]: amount

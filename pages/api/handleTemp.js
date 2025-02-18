@@ -1,13 +1,15 @@
 import { connectDB } from '@/app/lib/database'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getServerSession } from 'next-auth/next';
+import {getToken} from 'next-auth/jwt'
 
 export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
 
-    const { userId, amount, type } = req.body;
+    const { amount, type } = req.body;
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const code = token.code;
+
     // const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
     // const {id} = session.user;
     // // MongoDB 연결
@@ -16,9 +18,9 @@ export default async function handler(req, res) {
 
 
     if (type === "up") {
-      const response = await db.collection('thermometer').updateOne({ userId: userId }, { $inc: { adjustment: parseFloat(amount) } }, {upsert:true})
+      const response = await db.collection('thermometer').updateOne({ code: code}, { $inc: { adjustment: parseFloat(amount) } }, {upsert:true})
     } else {
-        const response = await db.collection('thermometer').updateOne({ userId: userId }, { $inc: { adjustment: -parseFloat(amount) } },{upsert:true})
+        const response = await db.collection('thermometer').updateOne({ code: code}, { $inc: { adjustment: -parseFloat(amount) } },{upsert:true})
     }
 
 

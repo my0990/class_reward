@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useState } from "react";
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
-
+import { mutate } from "swr";
 export default function AddModal() {
     const nameRef = useRef();
     const priceRef = useRef();
@@ -34,9 +34,11 @@ export default function AddModal() {
 
                 if (data.result === true) {
   
-                    alert('추가하였습니다.');
-                    setIsLoading(false);
 
+                    setIsLoading(false);
+                    mutate(
+                        "/api/fetchClassData",
+                        )
                     document.getElementById('add').close()
                     nameRef.current.value = ""
                     priceRef.current.value = ""

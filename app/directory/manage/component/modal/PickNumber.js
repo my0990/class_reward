@@ -5,29 +5,19 @@ export default function PickNumber({ classData }) {
 
     const [isLoading, setIsLoading] = useState(false);
     const [studentArr, setStudentArr] = useState({});
-    useEffect(() => {
-        // console.log(studentData.account)
-        console.log('useEffect')
-        console.log(classData)
-        if (classData?.studentAccount) {
+    console.log('classData: ', classData)
 
-            console.log('classData: ', classData)
+    useEffect(() => {
+        if (classData?.studentAccount) {
             setStudentArr(JSON.parse(JSON.stringify(classData.studentAccount)));
         }
-    }, [classData?.studentAccount])
+    }, [classData])
+
+
     const onCloseModal = () => {
 
         document.getElementById('my_modal_2').close();
 
-        // for (let index = 1; index < 31; index++) {
-        //     tmp[index] = false;
-        // }
-        // for (let index = 0; index < result?.generatedNumber?.length; index++) {
-        //     tmp[result?.generatedNumber[index]] = '생성됨';
-        // }
-        setTimeout(() => {
-            setStudentArr(JSON.parse(JSON.stringify(classData.studentAccount)));
-        }, 200)
 
     }
     const onToggle = (i) => {
@@ -56,13 +46,17 @@ export default function PickNumber({ classData }) {
             headers: {
                 "Content-Type": "application/json",
             },
-        })
-        setIsLoading(false);
-        alert('성공');
-        // mutate('/api/fetchClassData')
-        // console.log('after mutate')
-        onCloseModal();
+        }).then((res) => res.json()).then((data) => {
 
+            if (data.result === true) {
+                
+                mutate("/api/fetchClassData");
+                mutate("/api/fetchStudentData");
+                alert('성공');
+                onCloseModal();
+            }
+        })
+        setIsLoading(false);    
 
     };
 

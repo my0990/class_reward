@@ -3,7 +3,7 @@ import DetailModal from "./modal/DetailModal";
 import PickNumber from "./modal/PickNumber";
 import ResetModal from "./modal/ResetModal";
 import { useState } from "react";
-
+import { mutate } from "swr";
 import { fetchData } from "@/hooks/swrHooks";
 import CreateUniqueNickname from "./CreateUniqueNickname";
 export default function CreateStudentAccount() {
@@ -15,11 +15,16 @@ export default function CreateStudentAccount() {
     console.log('studentData: ', studentData)
     console.log('classData: ', classData)
 
+
     const [isDetailClicked, setIsDetailClicked] = useState(false);
     const [picked, setPicked] = useState(null);
     const onResetClick = (a) => {
         document.getElementById('my_modal_1').showModal();
         setPicked(a)
+    }
+    const onCreateAccountclick = () => {
+        document.getElementById('my_modal_2').showModal();
+
     }
     const onDeleteClick = (a) => {
         document.getElementById('my_modal_3').showModal();
@@ -42,7 +47,7 @@ export default function CreateStudentAccount() {
                     {classData?.uniqueNickname
                         ? <div className="overflow-x-auto">
                             <div className="text-end">
-                                <button className="border-2 bg-orange-300 rounded-lg p-[8px] cursor-pointer border-none font-bold hover:bg-orange-400" onClick={() => document.getElementById('my_modal_2').showModal()}>계정 생성</button>
+                                <button className="border-2 bg-orange-300 rounded-lg p-[8px] cursor-pointer border-none font-bold hover:bg-orange-400" onClick={onCreateAccountclick}>계정 생성</button>
                             </div>
                             <table className="table text-[1.2rem]">
                                 {/* head */}

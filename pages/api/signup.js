@@ -32,7 +32,11 @@ export default async function handler(req, res) {
     const status2 = await db2.collection('user_data').insertOne({
       userId: id,
       money: 0,
-      role: 'teacher'
+      role: 'teacher',
+      profileNickname: '',
+      profileState: '',
+      profileUrl: 'https://i.postimg.cc/XYzP6hfz/2024-11-22-9-44-07.png',
+      profileUrlObj: []
     })
     // 성공시 response
 
@@ -45,7 +49,15 @@ export default async function handler(req, res) {
       code: uniqueCode,
       studentAccount: studentArr,
       itemList: [],
+    })
 
+    const status4 = await db2.collection('thermometer').insertOne({
+      code: code,
+      isActive: false,
+      requireCurrency: 1,
+      reward: {0: "", 10: "", 20: "", 30: "", 40: "", 50: "", 60: "", 70: "", 80: "", 90: "", 100: ""},
+      donators: {},
+      adjustment: 0,
     })
     res.status(201).json({ result: true, message: 'User created', ...status });
 

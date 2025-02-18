@@ -8,12 +8,12 @@ import Layout from "@/util/Layout";
 
 export default async function RootLayout({ children }) {
     const session = await getServerSession(authOptions);
-    let response = null;
+    // let response = null;
 
-    if (session) {
-        const db = (await connectDB).db('data');
-        response = await db.collection('user_data').findOne({ userId: session.userId })
-    }
+    // if (session) {
+    //     const db = (await connectDB).db('data');
+    //     response = await db.collection('user_data').findOne({ userId: session.userId })
+    // }
 
 
     // const db = (await connectDB).db('data');
@@ -33,13 +33,13 @@ export default async function RootLayout({ children }) {
     return (
         <div className="dark:text-black flex flex-col h-screen">
 
-                <RecoilRootProvider>
-                    <Layout fetchedUserData={response} fetchedSessionData={session} >
+                {/* <RecoilRootProvider> */}
+                    {/* <Layout fetchedUserData={response} fetchedSessionData={session} > */}
                         <Header session={session} />
                         {children}
                         <SpeedInsights />
-                    </Layout>
-                </RecoilRootProvider>
+                    {/* </Layout> */}
+                {/* </RecoilRootProvider> */}
 
         </div>
     )
