@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const { name, content, reward } = req.body;
 
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    const { userId } = session.user;
+    const { userId } = session;
     // MongoDB 연결
     // let questId = (new ObjectId()).toString();
     const db = (await connectDB).db('data');

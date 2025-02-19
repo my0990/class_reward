@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    const { userId } = session.user;
+    const { userId } = session;
     // MongoDB 연결
 
     const db = (await connectDB).db('data');
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     // const response = await db.collection('quest').find({userId:userId}).toArray();
     // const data = response; 
 
-    res.status(201).json({ result: true, message: 'delete 성공',data: response, role: session.user.role, students: response2.students});
+    res.status(201).json({ result: true, message: 'delete 성공',data: response, role: session.role, students: response2.students});
   }
 }
 

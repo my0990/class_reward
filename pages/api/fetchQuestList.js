@@ -10,10 +10,10 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
     let userId = null;
-    if(session.user.role === 'teacher'){
-      userId = session.user.userId;
+    if(session.role === 'teacher'){
+      userId = session.userId;
     } else {
-      userId = session.user.teacher;
+      userId = session.teacher;
     }
     const db = (await connectDB).db('data');
     const response = await db.collection('quest').find({userId: userId}).sort({time:'-1'}).toArray();
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
     let studentsCount = response.done;
 
-    res.status(201).json({ result: true, message: 'delete 성공',data: response, teacher: userId, role: session.user.role});
+    res.status(201).json({ result: true, message: 'delete 성공',data: response, teacher: userId, role: session.role});
   }
 }
 
