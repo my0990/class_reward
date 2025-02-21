@@ -101,7 +101,7 @@ export default function QuestDetail({ params, role }) {
                         {studentArr.map((a, i) => {
                             if (questDetailData.finished.includes(a.userId)) {
                                 return (
-                                    <div className="relative">
+                                    <div className="relative" key={a}>
                                         <div className="bg-orange-200 text-gray-600 rounded-lg font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px] opacity-30">
                                             {a['classNumber']}. {a['profileNickname']}
                                         </div>
