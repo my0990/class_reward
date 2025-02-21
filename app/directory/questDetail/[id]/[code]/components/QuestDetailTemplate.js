@@ -101,7 +101,7 @@ export default function QuestDetail({ params, role }) {
                         {studentArr.map((a, i) => {
                             if (questDetailData.finished.includes(a.userId)) {
                                 return (
-                                    <div className="relative" key={a}>
+                                    <div className="relative" key={a._id}>
                                         <div className="bg-orange-200 text-gray-600 rounded-lg font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px] opacity-30">
                                             {a['classNumber']}. {a['profileNickname']}
                                         </div>
@@ -123,7 +123,7 @@ export default function QuestDetail({ params, role }) {
                                 //         <div className="text-red-500 w-[136px] h-[180px] absolute flex justify-center top-0 items-center font-bold text-[1.7rem]">Checked</div>
                                 //     </div>
 
-                                <div onClick={(e) => onClick(a)} className={` ${a.isactive ? "bg-orange-400" : undefined} bg-orange-200 cursor-pointer text-gray-600 rounded-lg font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px]`}>
+                                <div key={a._id} onClick={(e) => onClick(a)} className={` ${a.isactive ? "bg-orange-400" : undefined} bg-orange-200 cursor-pointer text-gray-600 rounded-lg font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px]`}>
                                     {a['classNumber']}. {a['profileNickname']}
                                 </div>
 
