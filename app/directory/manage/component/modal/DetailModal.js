@@ -3,9 +3,9 @@ import CardTemplate from "../card/CardTemplate";
 
 import { fetchData } from "@/hooks/swrHooks";
 
-export default function DetailModal({ picked, isDetailClicked }) {
+export default function DetailModal({ picked }) {
 
-    const [data, setData] = useState([]);
+
     const userId = picked?.userId;
 
     const { data: historyData, isLoading: isHistoryLoading, isError: isHistoryError } = fetchData(userId ? `/api/fetchHistory/${userId}` : null);

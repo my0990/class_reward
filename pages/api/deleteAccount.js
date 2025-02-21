@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
     // MongoDB 연결
     let itemId = (new ObjectId()).toString();
-    const db = (await connectDB).db('user');
+    const db = (await connectDB).db('user');  
     const db2 = (await connectDB).db('data')
 
     const response = await db.collection('users').deleteOne({userId:student})

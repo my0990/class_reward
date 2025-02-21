@@ -7,25 +7,21 @@ import { ObjectId } from 'mongodb';
 export default async function handler(req, res) {
 
 
-  if (req.method === 'POST') {
+  if (req.method === 'GET') {
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    const { userId } = session;
+
     // MongoDB 연결
 
     const db = (await connectDB).db('data');
-    const { id, code } = req.body;
-
-    const questId = ObjectId.createFromHexString(code);
+    const questId = ObjectId.createFromHexString(req.query.code);
     const response = await db.collection('quest').findOne({_id: questId});
-    const response2 = await db.collection('user_data').findOne({userId:id})
-    console.log('------')
-    console.log(response)
+
     // const tmp = await db.collection('teacher').find({userId:userId})
     // tmp = tmp.studentNumber
     // const response = await db.collection('quest').find({userId:userId}).toArray();
     // const data = response; 
 
-    res.status(201).json({ result: true, message: 'delete 성공',data: response, role: session.role, students: response2.students});
+    res.status(200).json(response);
   }
 }
 

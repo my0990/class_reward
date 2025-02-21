@@ -1,7 +1,7 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getServerSession } from "next-auth"
 import TeacherProfileTemplate from "./teacher/TeacherProfileTemplate"
-export default async function Layout({ teacher }) {
+export default async function Layout({  }) {
   const session = await getServerSession(authOptions)
   // console.log("Student:", student);
   // console.log("Teacher:", teacher);

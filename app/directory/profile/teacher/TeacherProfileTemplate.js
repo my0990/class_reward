@@ -10,6 +10,7 @@ import EditProfileImgModal from "./component/EditProfileImgModal";
 export default function TeacherProfileTemplate({ urlObj }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
     const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');
+
     const [url, setUrl] = useState([]);
     const [modalData, setModalData] = useState({ isActive: null, price: null, url: null, urlId: null });
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
