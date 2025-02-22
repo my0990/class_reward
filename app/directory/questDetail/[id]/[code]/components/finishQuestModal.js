@@ -1,22 +1,22 @@
 'use client'
-import { userDataState } from '@/store/atoms';
-import { useRecoilState } from "recoil";
-export default function AddQuestModal({ rewardedUserData, questData }) {
-    let rewarded = rewardedUserData.filter(obj => obj.done === 1);
-    const [userData, setUserData] = useRecoilState(userDataState);
-    const {classData} = userData;
+
+import { mutate } from "swr";
+
+export default function FinishQuestModal({ rewardedUserData, questData, currencyName, clearAll, code }) {
+
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/finishQuest", {
             method: "POST",
-            body: JSON.stringify({ questData: questData, rewarded: rewarded }),
+            body: JSON.stringify({ questData: questData, rewarded: rewardedUserData }),
             headers: {
                 "Content-Type": "application/json",
             },
         }).then((res) => res.json()).then((data) => {
             if (data.result === true) {
-                alert('성공하였습니다.')
-                location.reload();
+                document.getElementById('my_modal_2').close()
+                clearAll();
+                mutate(`/api/fetchQuestDetail/${code}`)
             }
         })
     }
@@ -27,13 +27,19 @@ export default function AddQuestModal({ rewardedUserData, questData }) {
 
             <div className="modal-box max-w-[600px] border-0 p-[32px]">
                 <div className="flex justify-center flex-col text-[1.3rem]">
-                    <h1 className="text-[1.8rem] mb-[16px] font-bold"><span>퀘스트</span>를 종료하고</h1>
-                    <div className="flex flex-wrap">{rewarded.map((a,i)=>{
-                        return(
-                            <div key={i} className=" mr-[4px]"><span className="bg-orange-200">{a['userNumber']}. {a.userNickname}</span>{i < rewarded.length - 1 && ', '}</div>
-                        )
-                    })}에게</div>
-                    <div className="mt-[16px]"><span className="font-bold text-orange-500">{questData?.questReward?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{classData.currencyName}</span>만큼 지급합니다.</div>
+                    <div className="flex flex-wrap">
+                        {rewardedUserData.map((a, i) => {
+                            return (
+                                <div key={i} className=" mr-[4px]"><span className="bg-orange-200">{a.classNumber}. {a.profileNickname}</span>{i < rewardedUserData.length - 1 && ', '}</div>
+                            )
+                        })}에게 지급합니다
+                    </div>
+                    <div className="mt-[16px]">
+                        {questData?.questReward && <div>- {questData?.questReward?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{currencyName}</div>}
+                        {questData?.questExp && <div>- {questData.questExp}경험치 </div>}
+                        {questData?.questTitle && <div>- 칭호: {questData.questTitle}  </div>}
+                    </div>
+
                     <form onSubmit={onSubmit} className="mt-[32px]">
                         <button className="btn mt-[16px] w-[100%] bg-orange-500 border-0 text-white m-auto focus:outline-none text-[1.1rem]">확인</button>
                     </form>
