@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import Alert from "../Alert";
+import Alert from "../../../components/Alert";
 import { useRecoilState } from 'recoil';
 import { stepDataState, requestDataState } from '@/store/atoms';
 

@@ -24,7 +24,6 @@ export default async function handler(req, res) {
         {
           userId: uniqueNickname + a,
           money: 0,
-          lv: 1,
           profileNickname: nicknameData.determiners[
             Math.floor(Math.random() * nicknameData.determiners.length)
           ] +
@@ -36,8 +35,11 @@ export default async function handler(req, res) {
           teacher: userId,
           classNumber: Number(a),
           profileUrl: "https://i.postimg.cc/HLXdVT11/orange.png",
+          profileUrlStorage: {},
           inventory: [],
-          role: 'student'
+          role: 'student',
+          exp: 0,
+          title: []
         })
     })
     // MongoDB 연결

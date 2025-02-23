@@ -49,6 +49,7 @@ export default async function handler(req, res) {
       code: uniqueCode,
       studentAccount: studentArr,
       itemList: [],
+      expTable: {startExp: 100, commonDifference: 10}
     })
 
     const status4 = await db2.collection('thermometer').insertOne({
@@ -59,7 +60,7 @@ export default async function handler(req, res) {
       donators: {},
       adjustment: 0,
     })
-    res.status(201).json({ result: true, message: 'User created', ...status });
+    res.status(200).json({ result: true, message: 'User created', ...status });
 
   } else {
     res.status(500).json({ result: false, error: 'Route not valid' });

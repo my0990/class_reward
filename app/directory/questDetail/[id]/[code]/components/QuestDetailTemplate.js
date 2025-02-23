@@ -14,21 +14,7 @@ export default function QuestDetail({ params, role }) {
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
     const [isSelectedAll, setIsSelectedAll] = useState(false);
     const [studentArr, setStudentArr] = useState([]);
-    const onChange = (e) => {
-        // const { name, value } = e.target;
-        // setStudentList(prev =>
-        //     prev.map(a =>
-        //         a.userId === name ? { ...a, done: a.done ^ 1 } : a
-        //     ))
-        // // setData({ ...data, done: tmp })
-        // fetch("/api/setQuestDone", {
-        //     method: "POST",
-        //     body: JSON.stringify({ userId: name, _id: data._id }),
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        // })
-    }
+
     useEffect(() => {
         if (studentData) {
 
@@ -59,10 +45,7 @@ export default function QuestDetail({ params, role }) {
                 : { ...a, isactive: true } // 제출 안 한 학생만 isActive 변경
         );
         setStudentArr(updatedStudents)
-        // setStudentArr((prev) => {
-        //     return prev.map(obj =>
-        //         ({ ...obj, isactive: true }))
-        // })
+
     }
     const clearAll = () => {
         setIsSelectedAll(false)
@@ -82,8 +65,8 @@ export default function QuestDetail({ params, role }) {
     }
     if (isQuestDetailLoading || isStudentDataLoading || isClassDataLoading) return <div>Loading data...</div>;
     if (isQuestDetailError || isStudentDataError || isClassDataError) return <div>Error loading data</div>;
-    console.log(questDetailData)
-    console.log(studentData)
+
+    const studentCount = studentData.length;
     return (
         <div className="flex justify-center ">
             <div className="text-[1.2rem]  rounded-lg   mt-[32px] text-orange-500 flex flex-col justify-center w-[896px] max-[896px]:w-[744px] max-[744px]:w-[592px] max-[592px]:w-[440px] max-[440px]:w-[288px]">
@@ -92,10 +75,16 @@ export default function QuestDetail({ params, role }) {
                 <div className="bg-orange-100 rounded-lg p-[24px] flex justify-between flex-wrap">
                     <div>
                         <div className="flex items-center">
-                            <h1 className="text-[2rem] font-bold ">{questDetailData?.questName}</h1>
-                            <div className="badge bg-orange-500 text-white ml-[8px]">{questDetailData?.questReward.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                            <h1 className="text-[2rem] font-bold mr-[8px]">{questDetailData?.questName}</h1>
+                            <div className="flex mr-[16px] text-orange-400 items-center">
+                                <svg className="feather feather-user" fill="none" height="24" stroke="orange" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                                <span className="font-light">{questDetailData.finished.length}/{studentCount}</span>
+                            </div>
                         </div>
-                        <h2 className="text-orange-400">{questDetailData?.questGoal}</h2>
+                        <h2 className="text-black">{questDetailData?.questGoal}</h2>
                     </div>
                     <div className=" bg-white rounded-lg text-black w-[320px] p-[16px]">
                         <div className="text-[1.5rem] font-bold mb-[4px] text-orange-500">보상</div>
@@ -112,10 +101,10 @@ export default function QuestDetail({ params, role }) {
                                     <path d="M 22.828125 3 C 22.316375 3 21.804562 3.1954375 21.414062 3.5859375 L 19 6 L 24 11 L 26.414062 8.5859375 C 27.195062 7.8049375 27.195062 6.5388125 26.414062 5.7578125 L 24.242188 3.5859375 C 23.851688 3.1954375 23.339875 3 22.828125 3 z M 17 8 L 5.2597656 19.740234 C 5.2597656 19.740234 6.1775313 19.658 6.5195312 20 C 6.8615312 20.342 6.58 22.58 7 23 C 7.42 23.42 9.6438906 23.124359 9.9628906 23.443359 C 10.281891 23.762359 10.259766 24.740234 10.259766 24.740234 L 22 13 L 17 8 z M 4 23 L 3.0566406 25.671875 A 1 1 0 0 0 3 26 A 1 1 0 0 0 4 27 A 1 1 0 0 0 4.328125 26.943359 A 1 1 0 0 0 4.3378906 26.939453 L 4.3632812 26.931641 A 1 1 0 0 0 4.3691406 26.927734 L 7 26 L 5.5 24.5 L 4 23 z"></path>
                                 </svg>
                             </button>
-                            <EditQuestModal currencyEmoji={classData.currencyEmoji} questDetailData={questDetailData} />
+                            <EditQuestModal currencyEmoji={classData.currencyEmoji} questDetailData={questDetailData} code={code}/>
                             <div>
-                                <button onClick={()=>document.getElementById('resetModal').showModal()} className="btn bg-red-500 text-white mr-[8px]" >초기화</button>
-                                <ResetQuestModal data={questDetailData} code={code}/>
+                                <button onClick={() => document.getElementById('resetModal').showModal()} className="btn bg-red-500 text-white mr-[8px]" >초기화</button>
+                                <ResetQuestModal data={questDetailData} code={code} />
                                 {isSelectedAll
                                     ? <button className="btn bg-orange-500 text-white" onClick={clearAll}>모두 해제</button>
                                     : <button className="btn bg-orange-500 text-white" onClick={selectAll}>모두 선택</button>}

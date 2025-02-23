@@ -40,6 +40,7 @@ export default function CreateStudentAccount() {
 
     if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
     if (isStudentError || isClassError) return <div>Error loading data</div>;
+    const {startExp, commonDifference} = classData.expTable;
     return (
         <div>
             <div>
@@ -85,7 +86,7 @@ export default function CreateStudentAccount() {
             <PickNumber classData={classData} />
             <DeleteModal picked={picked} />
             <ResetModal picked={picked} />
-            <DetailModal isDetailClicked={isDetailClicked} picked={picked} />
+            <DetailModal isDetailClicked={isDetailClicked} picked={picked} startExp={startExp} commonDifference={commonDifference}/>
         </div>
     )
 }

@@ -2,7 +2,7 @@
 import { useEffect } from "react"
 import { useState, useRef } from "react"
 import { mutate } from "swr"
-export default function AddQuestModal({currencyEmoji, questDetailData}) {
+export default function AddQuestModal({currencyEmoji, questDetailData, code}) {
     const [input, setInput] = useState({ name: '', goal: '', reward: '', exp: '', title: '' })
 
     const onChange = (e) => {
@@ -11,7 +11,7 @@ export default function AddQuestModal({currencyEmoji, questDetailData}) {
     }
     const onSubmit = (e) => {
         e.preventDefault();
-        fetch("/api/addQuest", {
+        fetch("/api/editQuest", {
             method: "POST",
             body: JSON.stringify(input),
             headers: {
@@ -21,7 +21,7 @@ export default function AddQuestModal({currencyEmoji, questDetailData}) {
             if (data.result === true) {
                 document.getElementById('editQuestModal').close()
                 setInput(prev => ({...prev, name: '', goal: '', reward: '', exp: '', title: '' }))
-                mutate('/api/fetchQuestList')
+                mutate(`/api/fetchQuestDetail/${code}`)
             }
         })
     }

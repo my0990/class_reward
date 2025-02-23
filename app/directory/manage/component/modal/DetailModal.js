@@ -3,7 +3,7 @@ import CardTemplate from "../card/CardTemplate";
 
 import { fetchData } from "@/hooks/swrHooks";
 
-export default function DetailModal({ picked }) {
+export default function DetailModal({ picked, startExp, commonDifference}) {
 
 
     const userId = picked?.userId;
@@ -55,7 +55,7 @@ export default function DetailModal({ picked }) {
             <dialog id="my_modal_4" className="modal">
                 <div className="modal-box max-w-[850px] flex justify-between flex-wrap max-[870px]:max-w-[400px]">
                     <div className=" max-w-[352px] flex p-[8px] bg-green-400 justify-center rounded-xl">
-                        <CardTemplate picked={picked} />
+                        <CardTemplate picked={picked} startExp={startExp} commonDifference={commonDifference}/>
                     </div>
                     <div className="w-[400px] h-[500px] overflow-auto" >
                         <h1 className="text-[1.8rem] mb-[16px] font-bold">화폐 및 아이템 사용 기록</h1>

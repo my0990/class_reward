@@ -42,7 +42,7 @@ export default function DeleteModal({ pickedItem, currencyName }) {
                 },
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
-                    alert('성공했습니다.');
+
 
                     setIsLoading(false);
                     mutate('/api/fetchClassData');
@@ -66,7 +66,7 @@ export default function DeleteModal({ pickedItem, currencyName }) {
                 },
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
-                    alert('성공했습니다.');
+                    
                     setIsEdited(false);
                     setIsLoading(false);
                     mutate('/api/fetchClassData');
