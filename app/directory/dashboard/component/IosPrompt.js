@@ -1,7 +1,7 @@
 
 
 export default function IosPrompt({iosCancelClicked}) {
-
+    console.log("ios prompt")
     return (
         <div role="alert" className="alert flex justify-center absolute bottom-0 left-0 flex-wrap">
             <span >class-reward는 앱에서 원활히 사용할 수 있습니다.&nbsp;

@@ -8,6 +8,7 @@ const InstallPrompt = () => {
     const [isIOS, setIsIOS] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [isDenied,setIsDenied] = useState(false);
+    console.log('install prompt')
     useEffect(()=>{
         // console.log('isDenied: ', JSON.parse(localStorage.getItem('a2hsDenied')))
         setIsDenied(JSON.parse(localStorage.getItem('a2hsDenied')));

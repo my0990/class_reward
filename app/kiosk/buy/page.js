@@ -1,7 +1,8 @@
-import ItemBuy from "./components/buy/ItemBuy"
+import ItemBuyTemplate from "./components/buy/ItemBuyTemplate"
+
 export default function BuyTemplate() {
 
     return(
-        <ItemBuy />
+        <ItemBuyTemplate />
     )
 }

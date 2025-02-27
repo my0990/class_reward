@@ -36,10 +36,11 @@ export default async function handler(req, res) {
           classNumber: Number(a),
           profileUrl: "https://i.postimg.cc/HLXdVT11/orange.png",
           profileUrlStorage: {},
+          profileTitle: "초보 오렌지",
           inventory: [],
           role: 'student',
           exp: 0,
-          title: []
+          titles: []
         })
     })
     // MongoDB 연결

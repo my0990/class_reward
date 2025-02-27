@@ -1,31 +1,18 @@
 'use client'
 import Link from 'next/link';
-import { useRef, useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 
 
-//atom({key:, default:})로 새로운 아톰을 만들 수 있다.
-// 이때 key는 각 아톰을 구별하는 고유한 식별자이다.
-// default는 initial state를 의미한다.
 
 
 export default function Kiosk() {
 
 
-    const elementRef = useRef(null);
 
 
-    const enterFullscreen = () => {
-        if (elementRef.current.requestFullscreen) {
-            elementRef.current.requestFullscreen();
-        } else if (elementRef.current.mozRequestFullScreen) { /* Firefox */
-            elementRef.current.mozRequestFullScreen();
-        } else if (elementRef.current.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-            elementRef.current.webkitRequestFullscreen();
-        } else if (elementRef.current.msRequestFullscreen) { /* IE/Edge */
-            elementRef.current.msRequestFullscreen();
-        }
-    };
+
+
     useEffect(() => {
         const preventGoBack = () => {
             history.pushState(null, '', location.href);
@@ -38,7 +25,7 @@ export default function Kiosk() {
     }, []);
 
     return (
-        <div ref={elementRef} >
+        <div  >
 
             {/* {menu=== 'home'
                 ? <KioskHomeTemplate enterFullscreen={enterFullscreen} />
@@ -53,7 +40,7 @@ export default function Kiosk() {
                 <button className="btn mb-[16px] px-[24px] w-[140px]">아이템 사용하기</button>
                 <button className="btn px-[12px] w-[140px]"><span className="text-[1.5rem]">🌡️</span> 학급 온도계</button>
 
-                <button onClick={enterFullscreen} className="btn px-[24px] absolute top-0 right-0 opacity-50 hover:opacity-100" >전체 <br></br>화면</button>
+
             </div>
         </div>
     );
