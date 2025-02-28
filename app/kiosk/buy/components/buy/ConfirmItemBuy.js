@@ -40,8 +40,8 @@ export default function ConfirmItemBuy({ requestData, setRequsetData }) {
     console.log(userData, itemData)
     const { emoji, itemName, itemExplanation, itemStock, itemPrice } = requestData.itemData;
     return (
-        <div className="flex flex-col  justify-center items-center">
-            <div className="w-[800px] max-[800px]:w-[90%] min-w-[400px]">
+        <div className="flex  justify-center min-h-[100vh] py-[32px]">
+            <div className="flex flex-col justify-between w-[800px] max-[800px]:w-[90%] min-w-[400px]">
                 <div className="text-right text-[1.2rem] mt-[8px]">
                     처음으로
                 </div>
@@ -65,7 +65,7 @@ export default function ConfirmItemBuy({ requestData, setRequsetData }) {
 
                     </div>
                 </div>
-                <div className="text-[2rem] mt-[128px]">
+                <div className="text-[2rem] mt-[64px]">
                     <div className="flex justify-between mb-[16px]">
                         <div>
                             보유 금액
