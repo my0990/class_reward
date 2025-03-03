@@ -13,16 +13,9 @@ export default function TeacherProfileTemplate({ urlObj }) {
 
     const [url, setUrl] = useState([]);
     const [modalData, setModalData] = useState({ isActive: null, price: null, url: null, urlId: null });
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isFirstRender, setIsFirstRender] = useState(true);
 
-    useEffect(() => {
-        if (isEditModalOpen) {
-          setTimeout(() => setIsFirstRender(false), 100); // 모달이 열린 후 transition 활성화
-        } else {
-          setIsFirstRender(true); // 모달 닫힐 때 다시 초기화
-        }
-      }, [isEditModalOpen]);
+
+
 
     const nodeRef = useRef();
     // useEffect(() => {
@@ -41,7 +34,7 @@ export default function TeacherProfileTemplate({ urlObj }) {
 
     if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
     if (isClassError || isUserError) return <div>Error loading data</div>;
-    const { profileImgStorage, currencyName, currencyEmoji } = classData;
+    const { currencyName, currencyEmoji } = classData;
     return (
         <div className="flex flex-wrap justify-center">
             {/* {Object.keys(url).map((a, i) => {
@@ -52,7 +45,7 @@ export default function TeacherProfileTemplate({ urlObj }) {
             <div className="flex justify-center">
                 <div className=" min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                     <TransitionGroup noderef={nodeRef} className="flex p-[8px] flex-wrap">
-                        {profileImgStorage && Object.keys(profileImgStorage)?.map((a, i) =>
+                        {classData?.profileImgStorage && Object.keys(classData?.profileImgStorage)?.map((a, i) =>
                         (
                             <CSSTransition
                                 key={a}
@@ -60,7 +53,7 @@ export default function TeacherProfileTemplate({ urlObj }) {
                                 classNames="item"
                             >
 
-                                <ProfileCard setIsEditModalOpen={setIsEditModalOpen} setModalData={setModalData} urlData={profileImgStorage[a]} urlId={a} currencyName={currencyName} />
+                                <ProfileCard  setModalData={setModalData} urlData={classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
 
                             </CSSTransition>
                         )
@@ -76,7 +69,7 @@ export default function TeacherProfileTemplate({ urlObj }) {
                 </div>
             </div>
             <AddProfileImgModal />
-            <EditProfileImgModal modalData={modalData} currencyEmoji={currencyEmoji} isFirstRender={isFirstRender} setIsEditModalOpen={setIsEditModalOpen}/>
+            <EditProfileImgModal modalData={modalData} currencyEmoji={currencyEmoji}  />
             {/* <ProfileSetModal modalData={modalData} setModalData={setModalData} setUrl={setUrl} url={url} /> */}
         </div>
     )

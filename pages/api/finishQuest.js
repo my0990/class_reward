@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     // console.log(req.body)
     const titleId = new ObjectId()
     const {questReward, questExp, questTitle} = req.body.questData;
-    const response = await db.collection('user_data').updateMany({ userId: { $in: userIds}, role: 'student'},{$inc: {money: questReward ? parseInt(questReward) : 0, exp: questExp ? parseInt(questExp) : 0}, $push: {title: {id: titleId, title: questTitle}}}, {upsert: true})
+    const response = await db.collection('user_data').updateMany({ userId: { $in: userIds}, role: 'student'},{$inc: {money: questReward ? parseInt(questReward) : 0, exp: questExp ? parseInt(questExp) : 0}, $push: {titles: {id: titleId, title: questTitle}}}, {upsert: true})
     const response2 = await db.collection('quest').updateOne({_id: questId}, {$addToSet: { finished: { $each: userIds } } })
 
     if(questReward){

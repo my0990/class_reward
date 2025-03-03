@@ -1,21 +1,21 @@
 import { useEffect, useState, useRef } from "react";
 import { mutate } from "swr";
-export default function EditProfileImgModal({ modalData, currencyEmoji, isFirstRender, setIsEditModalOpen }) {
+export default function EditProfileImgModal({ modalData, currencyEmoji}) {
     const [isLoading, setIsLoading] = useState(false);
     const [isEdited, setIsEdited] = useState(false);
     const [profilePrice, setProfilePrice] = useState('');
-    const [isProfileActive, setIsProfileActive] = useState(false);
+
 
 
     const spanRef = useRef(null);
     const inputRef = useRef(null);
 
-    const onCheckboxChange = (e) => {
-        if (isEdited === false) {
-            setIsEdited(true)
-        }
-        setIsProfileActive(e.target.checked)
-    }
+    // const onCheckboxChange = (e) => {
+    //     if (isEdited === false) {
+    //         setIsEdited(true)
+    //     }
+    //     setIsProfileActive(e.target.checked)
+    // }
     const onChange = (e) => {
         if (isEdited === false) {
             setIsEdited(true)
@@ -29,7 +29,6 @@ export default function EditProfileImgModal({ modalData, currencyEmoji, isFirstR
     const onCloseModal = () => {
 
         document.getElementById('edit').close();
-        setIsEditModalOpen(false);
 
         setTimeout(() => {
             // setProfilePrice(modalData?.price);
@@ -67,7 +66,7 @@ export default function EditProfileImgModal({ modalData, currencyEmoji, isFirstR
             setIsLoading(true)
             fetch("/api/modifyProfileImg", {
                 method: "POST",
-                body: JSON.stringify({ modalData: modalData, price: profilePrice, isActive: isProfileActive  }),
+                body: JSON.stringify({ modalData: modalData, price: profilePrice }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -82,7 +81,6 @@ export default function EditProfileImgModal({ modalData, currencyEmoji, isFirstR
     }
     useEffect(() => {
         if (modalData) {
-            setIsProfileActive(modalData.isActive);
             setProfilePrice(modalData.price);
         }
     }, [modalData])
@@ -99,9 +97,9 @@ export default function EditProfileImgModal({ modalData, currencyEmoji, isFirstR
 
     return (
         <dialog id="edit" className="modal  modal-middle ">
-            <div className={`${isProfileActive ? " bg-orange-200 dark:bg-orange-200" : "bg-gray-300 dark:bg-gray-300"} modal-box p-[24px]  flex flex-col bg-orange-100 max-w-[320px] overflow-hidden`}>
+            <div className="bg-orange-200 dark:bg-orange-200 modal-box p-[24px]  flex flex-col bg-orange-100 max-w-[320px] overflow-hidden">
                 <div className="flex justify-between items-center mb-[16px]">
-                    <h1 className="text-[1.6rem] ">프로필 이미지 삭제 및 수정</h1>
+                    <h1 className="text-[1.4rem] ">프로필 이미지 삭제 및 수정</h1>
                 </div>
                 <div className="w-full flex justify-center">
                     <div className="w-[190px] h-[190px] rounded-full border-[12px] border-white bg-white flex justify-center items-center mb-[16px] overflow-hidden">
@@ -121,9 +119,6 @@ export default function EditProfileImgModal({ modalData, currencyEmoji, isFirstR
                             {profilePrice || " "}
                         </span>
                     </div>
-                    <div className="flex justify-between" >
-                        공개 <input type="checkbox" className={`toggle toggle-success ${isFirstRender ? "transition-none" : "transition"}`} checked={isProfileActive || false} onChange={onCheckboxChange } />
-                    </div>
                 </div>
                 {isEdited
                     ? <form onSubmit={onModify}>
@@ -133,7 +128,7 @@ export default function EditProfileImgModal({ modalData, currencyEmoji, isFirstR
                         <button className="btn w-full border-0 mb-[8px] bg-orange-400 hover:bg-orange-500">삭제</button>
                     </form>}
 
-                <button className="btn w-full border-0 bg-gray-300 hover:bg-gray-400">취소</button>
+                <button onClick={onCloseModal} className="btn w-full border-0 bg-gray-300 hover:bg-gray-400">취소</button>
             </div>
             <form method="dialog" className="modal-backdrop" onClick={onCloseModal}>
                 <button>close</button>

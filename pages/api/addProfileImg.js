@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     const db = (await connectDB).db('data');
 
 
-    const response = await db.collection('class_data').updateOne({code:code},{$set: {[newKey]: {url: req.body.data, price: 0, isActive: false}}},{upsert: true})
+    const response = await db.collection('class_data').updateOne({code:code},{$set: {[newKey]: {url: req.body.data, price: 99999}}},{upsert: true})
 
 
 

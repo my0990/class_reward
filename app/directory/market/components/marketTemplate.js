@@ -32,6 +32,11 @@ export default function MarketTemplate({ tmpItemList }) {
 
     const { currencyEmoji,  currencyName, itemList } = classData;
     const {userId} = userData;
+    if(itemList.length === 0){
+        return(
+            <div className="text-[2rem] text-center">등록된 아이템이 없습니다.</div>
+        )
+    }
     return (
 
         <div className="flex justify-center">

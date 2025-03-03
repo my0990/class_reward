@@ -72,7 +72,7 @@ export default function AddProfilImgModal() {
                 <form onSubmit={onSubmit}>
                     <button className="btn w-full mb-[8px] bg-orange-300 hover:bg-orange-400">확인</button>
                 </form>
-                <button className="btn w-full bg-gray-300 hover:bg-gray-400">취소</button>
+                <button onClick={onCloseModal} className="btn w-full bg-gray-300 hover:bg-gray-400">취소</button>
             </div>
             <form method="dialog" className="modal-backdrop" onClick={onCloseModal}>
                 <button>close</button>
