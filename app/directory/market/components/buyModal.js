@@ -1,6 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-export default function BuyModal({ buyList, setItemList, itemList, money, currencyName, currencyEmoji }) {
+import { mutate } from "swr";
+export default function BuyModal({ buyList,  money, currencyName, currencyEmoji, userId }) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const left = (money - buyList?.itemPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -12,12 +13,13 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
             setIsLoading(true)
             if (money < buyList.itemPrice) {
                 alert('돈이 모자랍니다')
+                setIsLoading(false);
                 document.getElementById('buy').close()
                 return
             }
             fetch("/api/buyItem", {
                 method: "POST",
-                body: JSON.stringify({ itemData: buyList, balance: left }),
+                body: JSON.stringify({ itemData: buyList, balance: left, userId:  userId}),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -25,10 +27,11 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                 if (data.result === true) {
                     alert('구매완료');
                     setIsLoading(false);
-                    location.reload();
+                    mutate('/api/fetchClassData')
                     // const newItemList = itemList.map((a, i) => a.itemId === buyList.itemId ? { ...a, 'itemQuantity': a.itemQuantity - 1 } : a)
                     // setItemList(newItemList);
-                    document.getElementById('buy').close()
+                    document.getElementById('buy').close();
+                    
 
                 }
             })
@@ -47,7 +50,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                     <div className="w-[20px] h-[20px] mr-[8px]">
                         {/* <Image src={gold} alt="money" /> */}
                     </div>
-                    <div className="text-[0.9rem]">보유 {currencyName}: {currentMoney}{currencyEmoji} </div>
+                    <div className="text-[0.9rem]">보유 {currencyName}: {currentMoney} {currencyEmoji} </div>
                 </div>
                 <div className="flex items-center">
                     <h1 className="text-[1.5rem] font-bold">{buyList?.itemName}</h1>
@@ -70,7 +73,7 @@ export default function BuyModal({ buyList, setItemList, itemList, money, curren
                         <div className="text-green-500">{left}{currencyName}</div> :
                         <div className="text-red-500">{left}{currencyName}</div>}
                 </div>
-                <div className="mb-[32px]">남은 수량: {buyList?.itemQuantity}</div>
+                <div className={`mb-[32px] ${buyList?.itemStock < 3 ? "text-red-500 font-bold" : null}`}>남은 수량: {buyList?.itemStock}</div>
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
                     <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
                         <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] outline-none hover:bg-orange-500">구입</button>

@@ -15,7 +15,7 @@ export default async function Home() {
         
         <div>
           <div className="text-center text-[1.5rem]">
-            아직 완성되지 않았습니다~
+            90% 완성
           </div>
           <Link href="/auth/login/teacher">
             <div className=" bg-white text-center text-[2rem] cursor-pointer m-[16px] rounded-3xl py-[32px] px-[64px] transition-all hover:scale-110">

@@ -1,16 +1,13 @@
 'use client'
 import { useState } from "react";
-import Alert from "../../../components/Alert";
-import { useRecoilState } from 'recoil';
-import { stepDataState, requestDataState } from '@/store/atoms';
+import { useRouter } from "next/navigation";
 
-export default function FinishBuyModal({itemId}) {
 
-    const [stepData, setStepData] = useRecoilState(stepDataState)
-    const [requestData,setRequestData] = useRecoilState(requestDataState);
+export default function FinishBuyModal({requestData, fetchItemId}) {
     const { itemName, itemPrice} = requestData.itemData;
-    const { userId, userName,  teacher } = requestData;
+    const { userId, money} = requestData.userData;
     const [isLoading, setIsLoading] = useState(false);
+    const route = useRouter();
     const onItemUse = (e) => {
         if (isLoading) {
             return
@@ -19,14 +16,15 @@ export default function FinishBuyModal({itemId}) {
             fetch("/api/useItem", {
                 method: "POST",
                 // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemName, userId: userId, teacher: teacher, itemPrice: itemPrice, itemId: itemId, userName: userName}),
+                body: JSON.stringify({ itemName: itemName, userId: userId,  balance: money - itemPrice, itemId: fetchItemId}),
                 headers: {
                     "Content-Type": "application/json",
                 },
             }).then((res) => res.json()).then((data) => {
 
                 if (data.result === true) {
-                    document.getElementById('my_modal_2').showModal()
+                    alert('아이템을 사용하였습니다');
+                    route.push('/kiosk')
                 } else {
                     setIsLoading(false)
                 }
@@ -35,21 +33,18 @@ export default function FinishBuyModal({itemId}) {
 
     }
 
-    const onModalFinish = () => {
-        location.reload();
-    }
     return (
-        <dialog id="my_modal_3" className="modal  modal-middle ">
-            <div className="modal-box p-0 dark:bg-orange-200 flex flex-col bg-orange-100 max-w-[400px] ">
-                <div className=" rounded-xl bg-orange-200 border-0 p-[16px] ">
-                    <h1 className="text-[1.6rem]"> <span className="text-red-500 font-bold">{itemName}</span> 아이템을 구입하였습니다</h1>
-                    <div className="flex justify-between flex-col">
-                        <button className="btn my-[16px] font-bold" onClick={onItemUse}>지금 바로 사용할래요</button>
-                        <button className="btn font-bold" onClick={() => location.reload()}>다음에 사용할래요</button>
+        <dialog id="finishModal" className="modal  modal-middle ">
+            <div className="modal-box p-0 dark:bg-orange-200 p-[32px] flex flex-col bg-orange-100 max-w-[600px] ">
+                <div className=" rounded-xl bg-orange-100 border-0 p-[16px] ">
+                    <h1 className="text-[2rem]"> <span className="text-red-500 font-bold">{itemName}</span> 아이템을 구입하였습니다</h1>
+                    <div className="flex justify-between flex-col mt-[16px]">
+                        <button className="bg-orange-500  rounded-lg font-semibold hover:text-white transition-all text-black my-[16px] py-[16px] text-[1.4rem]" onClick={onItemUse}>지금 바로 사용할래요</button>
+                        <button className="bg-red-500  rounded-lg font-semibold hover:text-white transition-all text-black py-[16px] text-[1.4rem]" onClick={() => route.push('/kiosk')}>다음에 사용할래요</button>
                     </div>
                 </div>
             </div>
-            <Alert onModalFinish={onModalFinish} >아이템을 사용하였습니다</Alert>
+
         </dialog>
 
     )

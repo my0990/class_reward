@@ -22,7 +22,6 @@ export default function MarketTemplate() {
 
     const nodeRef = useRef();
 
-
     if (isClassLoading ) return <div>Loading data...</div>;
     if (isClassError ) return <div>Error loading data</div>;
 

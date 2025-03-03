@@ -16,7 +16,10 @@ export default function CharacterCard(props) {
     return (
         <div>
             <div {...props} className="w-[160px] p-[16px] m-[8px] bg-orange-200 rounded-xl cursor-pointer ">
-                <div className="font-semibold">LV. {findLargestSumUnderTarget()}</div>
+                <div className="flex justify-between mb-[8px]">
+                    <div className="font-semibold">LV. {findLargestSumUnderTarget()}</div>
+                    <div className="w-[80px] text-right overflow-hidden whitespace-nowrap">{props?.currencyemoji} {user.money} </div>
+                </div>
                 <div className="flex justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
                     <img src={user.profileUrl} width="100" height="100" alt="characther" className="rounded-full" />
                 </div>

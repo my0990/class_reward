@@ -1,56 +1,38 @@
 'use client'
 import { useState, useEffect } from "react";
-// import Alert from "./Alert";
-import { userDataState } from '@/store/atoms';
-import { useRecoilState } from "recoil";
-import Alert from "./Alert";
-export default function ItemUseTemplate({ setIsItemPicked, setRequestData }) {
-    const [data, setData] = useRecoilState(userDataState);
-    const tmp = data.itemList.map((a) => {
-        const acopy = { ...a }
-        { acopy.checked = false; return acopy }
-    })
-    for (let index = tmp.length; index < 32; index++) {
-        tmp.push({ itemId: null })
+import { fetchData } from "@/hooks/swrHooks";
+import { mutate } from "swr";
 
-    }
+
+export default function ItemUseTemplate({ }) {
+    const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');
+    const [itemList, setItemList] = useState([])
+    
+    useEffect(() => {
+        if (userData) {
+
+
+            const tmp = userData.itemList.map((a) => {
+                const acopy = { ...a }
+                { acopy.checked = false; return acopy }
+            })
+            for (let index = tmp.length; index < 32; index++) {
+                tmp.push({ itemId: null })
+
+            }
+            setItemList(tmp)
+        }
+    }, [userData])
+
     const [isLoading, setIsLoading] = useState(false);
-    const { userId, money } = data;
-    const [itemList, setItemList] = useState(tmp)
+
+
     const [isSelected, setIsSelected] = useState(false);
-    const [itemDetail, setItemDetail] = useState({ itemName: null, teacher: null, itemPrice: null, itemId: null, itemEmoji: null, itemExplanation: null })
+    const [itemDetail, setItemDetail] = useState({ itemName: null,  itemPrice: null, itemId: null, itemEmoji: null, itemExplanation: null })
     const onItemClick = (a) => {
         setItemDetail({ itemName: a.itemName, itemExplanation: a.itemExplanation, itemEmoji: a.itemEmoji, teacher: a.teacher, itemPrice: a.itemPrice, itemId: a.itemId })
     }
-    const onClick = (a) => {
 
-        if (isSelected === false) {
-            setIsSelected(true)
-        }
-
-        setRequestData(prev => ({ ...prev, itemData: a }))
-        const updatedItems = itemList.map(item => {
-            // 대상 사용자를 찾으면 비밀번호를 변경
-            if (item.itemId === a.itemId) {
-                return { ...item, checked: true };
-            } else {
-                return { ...item, checked: false }
-            }
-        });
-
-        // 업데이트된 사용자 리스트를 상태로 설정
-        setItemList(updatedItems);
-    }
-    const onNext = () => {
-        if (isSelected) {
-            setIsItemPicked(true)
-        } else {
-            document.getElementById('my_modal_2').showModal();
-        }
-    }
-    const onModalClick = () => {
-        document.getElementById('my_modal_2').close();
-    }
     let tmpWidth = 0;
 
     if (window.innerHeight * 1.3 < window.innerWidth) {
@@ -65,13 +47,17 @@ export default function ItemUseTemplate({ setIsItemPicked, setRequestData }) {
     useEffect(() => {
         const handleResize = () => {
             let tmp = 0;
+            
+            if(typeof window === "undefined"){
+                return
+            }
             if (window.innerHeight * 1.3 < window.innerWidth) {
                 tmp = window.innerHeight * 1.3
             } else {
                 tmp = window.innerWidth
             }
             setWidth(tmp * 0.01)
-            console.log(width)
+
         };
         if (typeof window !== "undefined") {
             window.addEventListener('resize', handleResize);
@@ -81,6 +67,8 @@ export default function ItemUseTemplate({ setIsItemPicked, setRequestData }) {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
+
+
     const onSubmit = (e) => {
         if (isLoading) {
             return
@@ -89,20 +77,29 @@ export default function ItemUseTemplate({ setIsItemPicked, setRequestData }) {
             fetch("/api/useItem", {
                 method: "POST",
                 // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemDetail.itemName, userId: userId, teacher: itemDetail.teacher, itemPrice: itemDetail.itemPrice, itemId: itemDetail.itemId, userMoney: money }),
+                // itemName, userId, itemId, balance
+                body: JSON.stringify({ itemName: itemDetail.itemName, userId: userId,  itemId: itemDetail.itemId, balance: money }),
                 headers: {
                     "Content-Type": "application/json",
                 },
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
-                    document.getElementById('alert').showModal()
-                } else {
+                    mutate('/api/fetchUserData');
+                    alert(`${itemDetail.itemName} 아이템을 사용하였습니다`);
+                    setItemDetail({itemName: null,  itemPrice: null, itemId: null, itemEmoji: null, itemExplanation: null});
+                    
+                } 
                     setIsLoading(false)
-                }
+
             })
         }
 
     }
+
+    if (isUserLoading) return <div>Loading data...</div>;
+    if (isUserError) return <div>Error loading data</div>;
+    const { userId, money } = userData;
+
     return (
         <div className="flex justify-center items-center h-[100vh] bg-orange-100" style={{ scrollbarWidth: 'auto' }}>
             <div>
@@ -139,55 +136,8 @@ export default function ItemUseTemplate({ setIsItemPicked, setRequestData }) {
                     </div>
 
                 </div>
-                <Alert>아이템 사용을 신청하였습니다</Alert>
             </div>
         </div>
     )
 }
 
-// import UseModal from "./useModal"
-// import { useState } from "react"
-// export default function Inventory({data, userId, teacher, userName, userMoney}) {
-//     const [item,setItem] = useState();
-//     const onClick = (a) => {
-//         document.getElementById('my_modal_3').showModal()
-//         setItem(a)
-//     }
-//     return (
-//         <div className=" flex justify-center">
-//             <div className="overflow-x-auto w-[1024px]">
-//                 <table className="table">
-//                     {/* head */}
-//                     <thead>
-//                         <tr >
-//                             <th className="max-[443px]:hidden dark:text-white"></th>
-//                             <th className="dark:text-white">아이템 <br></br>이름</th>
-//                             <th className="dark:text-white">가격</th>
-//                             <th className="dark:text-white">남은 <br></br>수량</th>
-//                             <th></th>
-//                         </tr>
-//                     </thead>
-//                     <tbody>
-//                         {data?.map((a, i) => {
-//                             return (
-//                                 <tr className="hover:bg-gray-400" key={i}>
-//                                     <th className="max-[443px]:hidden dark:text-white">{i}</th>
-//                                     <th className="dark:text-white">{a.itemName}</th>
-//                                     <td className="dark:text-white">{a.itemPrice}</td>
-//                                     <td className="dark:text-white">1개</td>
-//                                     <td className="flex justify-center">
-//                                         <button className="btn bg-red-500 text-white border-0" onClick={()=>onClick(a)}>사용</button>
-//                                     </td>
-//                                 </tr>
-//                             )
-//                         })}
-
-
-//                     </tbody>
-
-//                 </table>
-//                 <UseModal item={item} userId={userId} teacher={teacher} userName={userName} userMoney={userMoney}/>
-//             </div>
-//         </div>
-//     )
-// }

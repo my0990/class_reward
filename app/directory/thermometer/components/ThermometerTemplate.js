@@ -30,12 +30,18 @@ export default function ThermometerTemplate({ role }) {
         document.getElementById('handleThermo').showModal()
         setHandleThermoType(type)
     }
-
-    if(role === "student" && thermoData.isActive !== false){
-        return(
-            <div>학급 온도계가 비활성화 되어있습니다.</div>
-        )
+    const onDonate = () => {
+        if(userData.money <= 0){
+            alert('빈털털이입니다')
+            return
+        }
+        document.getElementById('donation').showModal()
     }
+    // if(role === "student" && thermoData.isActive !== false){
+    //     return(
+    //         <div>학급 온도계가 비활성화 되어있습니다.</div>
+    //     )
+    // }
     return (
         <div className="flex justify-center items-center  flex-col">
             <div className="flex mt-[32px] w-[647px] max-[647px]:w-full  max-[647px]:mt-0 justify-between">
@@ -60,7 +66,7 @@ export default function ThermometerTemplate({ role }) {
                         </button>
                     </div>
                     : <div className="flex items-center">
-                        <button onClick={() => document.getElementById('donation').showModal()} className="hover:scale-110 transition-all px-[16px] py-[8px] rounded-lg  border-0 outline-none">
+                        <button onClick={onDonate} className="hover:scale-110 transition-all px-[16px] py-[8px] rounded-lg  border-0 outline-none">
                             <span className="border-b-4 border-orange-400 py-[4px] hover:border-orange-600 ">❤️기부하기</span>
                         </button>
                         <Donation userData={userData} classData={classData} thermoData={thermoData} />
@@ -86,7 +92,7 @@ export default function ThermometerTemplate({ role }) {
                     </div>)
             })}
             <HandleThermo thermoData={thermoData} currencyName={classData.currencyName} type={handleThermoType} />
-            {thermoData.isActive ? null : <div>학급온도계 기능이 비활성화되어있습니다.</div>}
+            {/* {thermoData.isActive ? null : <div>학급온도계 기능이 비활성화되어있습니다.</div>} */}
         </div>
     )
 

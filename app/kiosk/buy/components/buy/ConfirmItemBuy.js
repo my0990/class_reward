@@ -1,7 +1,10 @@
 import { useState } from "react";
 import FinishBuyModal from "./FinishBuyModal";
 import { fetchData } from "@/hooks/swrHooks";
-export default function ConfirmItemBuy({ requestData, setRequsetData }) {
+import Link from "next/link";
+
+export default function ConfirmItemBuy({ requestData, setRequestData }) {
+
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
     const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData('/api/fetchStudentData');
 
@@ -9,7 +12,8 @@ export default function ConfirmItemBuy({ requestData, setRequsetData }) {
     const [isLoading, setIsLoading] = useState(false);
     const { itemData, userData } = requestData;
     const { money, userId, profileName } = userData;
-    const [itemId, setItemId] = useState(null);
+    const [fetchItemId, setFetchItemId] = useState();
+
     const onClick = (e) => {
         if (isLoading) {
             return
@@ -22,9 +26,11 @@ export default function ConfirmItemBuy({ requestData, setRequsetData }) {
                     "Content-Type": "application/json"
                 },
             }).then((res) => res.json()).then((data) => {
+
                 if (data.result === true) {
-                    setItemId(data.itemId)
-                    document.getElementById('my_modal_3').showModal()
+                    document.getElementById('finishModal').showModal();
+
+                    setFetchItemId(data.itemId)
                 } else {
                     setIsLoading(false)
                 }
@@ -37,13 +43,22 @@ export default function ConfirmItemBuy({ requestData, setRequsetData }) {
     if (isClassDataError || isStudentDataError) return <div>Error loading data</div>;
 
     const { currencyEmoji, currencyName } = classData;
-    console.log(userData, itemData)
+
     const { emoji, itemName, itemExplanation, itemStock, itemPrice } = requestData.itemData;
     return (
         <div className="flex  justify-center min-h-[100vh] py-[32px]">
             <div className="flex flex-col justify-between w-[800px] max-[800px]:w-[90%] min-w-[400px]">
-                <div className="text-right text-[1.2rem] mt-[8px]">
-                    처음으로
+                <div className="flex justify-between">
+                    <div className="text-[2rem] text-orange-400">
+                        {userData.profileNickname} &#40;{userData.userId}&#41;
+                    </div>
+                    <div className="text-right text-[1.2rem] flex justify-end">
+                        <Link href="/kiosk">
+                            <div className="cursor-pointer text-[2rem] transition-all  hover:scale-110">
+                                처음으로
+                            </div>
+                        </Link>
+                    </div>
                 </div>
                 <div className="p-[32px] flex w-full  bg-orange-100 rounded-xl mt-[8px]">
                     <div className="text-[136px] text-center leading-none mr-[32px]">
@@ -65,13 +80,13 @@ export default function ConfirmItemBuy({ requestData, setRequsetData }) {
 
                     </div>
                 </div>
-                <div className="text-[2rem] mt-[64px]">
+                <div className="text-[1.8rem] mt-[64px]">
                     <div className="flex justify-between mb-[16px]">
                         <div>
                             보유 금액
                         </div>
                         <div>
-                            {userData.money}
+                            {userData.money} {currencyName}
                         </div>
                     </div>
                     <div className="flex justify-between border-b-2 border-gray-300 pb-[8px] mb-[24px]">
@@ -79,7 +94,7 @@ export default function ConfirmItemBuy({ requestData, setRequsetData }) {
                             결제 금액
                         </div>
                         <div>
-                            {itemPrice}
+                            - {itemPrice} {currencyName}
                         </div>
                     </div>
                     <div className=" flex justify-between items-center">
@@ -87,51 +102,16 @@ export default function ConfirmItemBuy({ requestData, setRequsetData }) {
                             잔액
                         </div>
                         <div className="text-[3rem] text-orange-500">
-                            {userData.money - itemPrice}
+                            {userData.money - itemPrice} {currencyName}
                         </div>
                     </div>
 
                 </div>
-                <div className="text-[2rem] flex justify-center mt-[64px]">
-                    <button className="bg-red-500 text-white rounded-full w-full py-[16px]">결제하기</button>
+                <div className="text-[1.8rem] flex justify-center mt-[64px] hover:scale-105 transition-all">
+                    <button onClick={onClick} className="bg-red-500 text-white rounded-full w-full py-[16px]">결제하기</button>
                 </div>
             </div>
-            {/* <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
-            {(money - itemData?.itemPrice) < 0  ? <div><span className="text-red-500 text-[2rem]">잔액이 부족합니다😢 </span></div> : null}
-                <div className="flex justify-end">
-                    <div className="text-[0.9rem]">{money} {currencyName}</div>
-                </div>
-
-                <div className="flex items-center">
-                    <div className="text-[1.5rem]">{itemData.emoji}</div>
-                    <h1 className="text-[1.5rem] font-bold">{itemData?.itemName}</h1>
-                    <div className="mx-[8px]">-</div>
-                    <div className="text-[1.1rem] ">{itemData.itemPrice} {currencyName}</div>
-                </div>
-                <div className="text-gray-500 mb-[32px]">
-                    {itemData?.itemExplanation}
-                </div>
-                <div className="mb-[8px]">남는금액: </div>
-                <div className="flex mb-[32px] flex-wrap">
-                    <div>{money} {currencyName}</div>
-                    <div className="mx-[8px]">-</div>
-                    <div>{itemData.itemPrice} {currencyName}</div>
-                    <div className="mx-[8px]">=</div>
-                    <div className={(money - itemData?.itemPrice) < 0 ? 'text-red-500' : `text-green-500`}>{money - itemData?.itemPrice}{currencyName}</div>
-                </div>
-                <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
-                    {money - itemData?.itemPrice < 0
-                        ? <div className="w-[48%] max-[600px]:w-[100%] opacity-50 ">
-                            <button className="cursor-default w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
-                        </div>
-                        : <div onClick={onClick} className="w-[48%] max-[600px]:w-[100%]">
-                            <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px]">구입</button>
-                        </div>}
-
-                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px] hover:bg-gray-300 transition-all" onClick={() => setStepData({ menu: 'home', step: null })}>취소</button>
-                </div>
-            </div> */}
-            {/* <FinishBuyModal data={requestData} teacher={teacher} itemId={itemId} /> */}
+            <FinishBuyModal requestData={requestData} fetchItemId={fetchItemId} />
         </div>
     )
 }

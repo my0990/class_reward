@@ -9,7 +9,6 @@ export default async function handler(req, res) {
     const { amount, type } = req.body;
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const code = token.code;
-
     // const session = await getServerSession(req,res,authOptions); //{user: {name: '아이묭', id: 'my0990}}
     // const {id} = session.user;
     // // MongoDB 연결

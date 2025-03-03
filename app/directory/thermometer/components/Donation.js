@@ -4,8 +4,15 @@ export default function Dontaion({ userData, classData, thermoData }) {
     const [amount, setAmount] = useState("");
     const [isLoading,setIsLoading] = useState(false);
     const onChange = (e) => {
-        if (/^[0-9]\d*$/.test(e.target.value) || e.target.value === '') {
-            setAmount(e.target.value)
+        if (/^\d*$/.test(e.target.value)) {
+
+            if (e.target.value < userData.money) {
+
+
+                setAmount(e.target.value)
+            } else {
+                setAmount(userData.money)
+            }
         }
 
     }
@@ -16,6 +23,10 @@ export default function Dontaion({ userData, classData, thermoData }) {
 
     const onSubmit = (e) => {
         e.preventDefault();
+        if(isNaN(Number(parseInt(amount).toFixed(1))) || Number(amount) === 0){
+            alert('입력값을 확인해주세요')
+            return;
+        }
         if (isLoading) {
             return
         } else {
@@ -30,12 +41,13 @@ export default function Dontaion({ userData, classData, thermoData }) {
 
                 if (data.result === true) {
                     alert("기부하였습니다");
+                    setAmount('')
                     document.getElementById('donation').close()
-                    setIsLoading(false)
+                    
                 }
             })
         }
-
+        setIsLoading(false)
     }
     return (
         <div>

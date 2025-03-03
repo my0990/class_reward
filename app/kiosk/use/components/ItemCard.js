@@ -1,7 +1,7 @@
 import soldOut from "@/public/soldOut.png"
 import Image from "next/image";
 export default function ItemBuyCard({onClick, itemData}) {
-    const {itemStock, itemName, itemExplanation,itemPrice, checked, emoji, currencyName} = itemData;
+    const { itemName, itemExplanation,itemPrice,  itemEmoji, currencyName} = itemData;
     function getByteB(str) {
         let byte = 0;
         for (let i = 0; i < str?.length; ++i) {
@@ -19,18 +19,10 @@ export default function ItemBuyCard({onClick, itemData}) {
     };
     return (
         <div onClick={onClick} className=" p-[16px] w-[192px] h-[300px]  font-bold rounded-lg relative">
-            {itemStock <= 0
-                ? <div className="absolute z-50 top-[50px]">
-                    <Image src={soldOut} />
-                </div>
-                : null}
 
-            <div className={`${itemStock <= 0 ? "opacity-40" : null}`}>
-                <div className={`flex justify-end ${itemStock <= 3 ? "text-red-500" : null}`}>
-                    <div>남은수량: {itemStock}</div>
-                </div>
+            <div>
                 <div className="text-[130px] text-center leading-none">
-                    {emoji}
+                    {itemEmoji}
                 </div>
                 <div className="text-[1.5rem]  mt-[16px] whitespace-nowrap overflow-hidden text-ellipsis">
                     {itemName}

@@ -5,15 +5,13 @@ export default function ThermoDec({ thermoData, currencyName, type }) {
     const [amount, setAmount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const onChagne = (e) => {
-
-        console.log(amount)
         const inputValue = e.target.value;
         const numberValue = Number(inputValue);
     
-        if (!Number.isNaN(numberValue)) {
+        if (/^\d*$/.test(numberValue)) {
             setAmount(inputValue); // 숫자만 상태에 저장
         } else {
-          console.log("Invalid input: NaN");
+
         }
 
     }
@@ -23,7 +21,10 @@ export default function ThermoDec({ thermoData, currencyName, type }) {
     }
 
     const onSubmit = (e) => {
-
+        if(!/^\d*$/.test(e.target.value)){
+            alert('숫자만 입력해주세요')
+            return
+        }
         if (isLoading) {
             alert('처리중입니다.')
             return
@@ -35,7 +36,7 @@ export default function ThermoDec({ thermoData, currencyName, type }) {
             setIsLoading(true)
             fetch("/api/handleTemp", {
                 method: "POST",
-                body: JSON.stringify({  amount: amount, type: type }),
+                body: JSON.stringify({  amount: Number(amount), type: type }),
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -53,7 +54,6 @@ export default function ThermoDec({ thermoData, currencyName, type }) {
     return (
         <dialog id="handleThermo" className="modal  modal-middle ">
             <div className="modal-box bg-orange-200">
-
                 <div className="flex relative mt-[16px] h-[40px]">
                     <input type="text"  value={amount === 0 ? "" : amount} onChange={onChagne} className="border-2 pl-[32px] h-full rounded-lg border-orange-300 outline-none focus:border-orange-500 text-right w-[100px] pr-[8px] mr-[8px]" ></input>
                     <div className="h-full text-[1.5rem]">도를 {type === "up" ? "올립니다" : "내립니다"}</div>

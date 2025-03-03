@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import Alert from "../Alert";
+
 
 export default function CheckPwdModal({ type, requestData, setRequestData }) {
     const [isLoading,setIsLoading] = useState(false)
@@ -62,7 +62,7 @@ export default function CheckPwdModal({ type, requestData, setRequestData }) {
             <form method="dialog" className="modal-backdrop" onClick={onCloseModal}>
                 <button>close</button>
             </form>
-            <Alert onModalFinish={onModalFinish}>비밀번호를 확인해주세요</Alert>
+            {/* <Alert onModalFinish={onModalFinish}>비밀번호를 확인해주세요</Alert> */}
         </dialog>
 
     )

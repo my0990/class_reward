@@ -1,6 +1,6 @@
 import ItemBuyTemplate from "./components/buy/ItemBuyTemplate"
 
-export default function BuyTemplate() {
+export default function ItemBuy() {
 
     return(
         <ItemBuyTemplate />

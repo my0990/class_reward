@@ -8,7 +8,12 @@ export default async function handler(req, res) {
         const code = token.code;
 
         const db = (await connectDB).db('data');
-        const { userId, amount, teacher, money } = req.body;
+        const { userId, amount,  money } = req.body;
+        console.log(amount)
+        console.log(amount)
+        console.log(amount)
+        console.log(amount)
+        console.log(amount)
         const response = await db.collection('user_data').updateOne(
             { userId: userId },
             {
@@ -36,6 +41,6 @@ export default async function handler(req, res) {
                 name: "기부"
             }
         )
-        res.status(201).json({ result: true, message: 'donation updated' });
+        res.status(200).json({ result: true, message: 'donation updated' });
     }
 }
