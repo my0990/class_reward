@@ -38,7 +38,7 @@ export default function StudentProfileTemplate({ }) {
                     <div className="flex p-[8px] flex-wrap">
                         {classData?.profileImgStorage && Object.keys(classData?.profileImgStorage)?.map((a, i) =>
                         (
-                            <StudentProfileCard setModalData={setModalData} urlData={classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
+                            <StudentProfileCard key={i} setModalData={setModalData} urlData={classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
                         )
                         )}
 
