@@ -12,11 +12,11 @@ export default function ItemUseTemplate({ }) {
         if (userData) {
 
 
-            const tmp = userData.itemList.map((a) => {
+            const tmp = userData.itemList?.map((a) => {
                 const acopy = { ...a }
                 { acopy.checked = false; return acopy }
             })
-            for (let index = tmp.length; index < 32; index++) {
+            for (let index = tmp?.length; index < 32; index++) {
                 tmp.push({ itemId: null })
 
             }
@@ -111,7 +111,7 @@ export default function ItemUseTemplate({ }) {
                         </h1>
                         <div className="flex justify-center">
                             <div className="flex flex-wrap overflow-scroll overflow-x-hidden" style={{ height: 38 * width + 'px', width: 45 * width + 'px' }}>
-                                {itemList.map((a, i) => {
+                                {itemList?.map((a, i) => {
                                     return (
                                         a.itemId === null || a.state === "대기중"
                                             ? <div key={i} style={{ width: 8 * width + 'px', height: 8 * width + 'px', margin: width * 0.8 + 'px', fontSize: 4 * width }} className="bg-white  flex justify-center items-center  rounded-lg"></div>

@@ -10,7 +10,14 @@ export default function StudentProfileTemplate({ }) {
     const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');
 
     const [modalData, setModalData] = useState({ urlData: undefined, urlId: undefined });
+    const [filteredObj, setFilterdObj] = useState({});
+    useEffect(() => {
 
+        if (classData) {
+
+        }
+
+    }, [classData])
     // const {profileUrlObj} = userData;
     if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
     if (isClassError || isUserError) return <div>Error loading data</div>;
@@ -23,6 +30,8 @@ export default function StudentProfileTemplate({ }) {
             </div>
         )
     }
+
+
     return (
         // <div className="flex flex-wrap justify-center">
         //     {Object.keys(classData.profileImgStorage).map((a,i)=>{
@@ -36,16 +45,20 @@ export default function StudentProfileTemplate({ }) {
             <div className="flex justify-center">
                 <div className="min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                     <div className="flex p-[8px] flex-wrap">
-                        {classData?.profileImgStorage && Object.keys(classData?.profileImgStorage)?.map((a, i) =>
-                        (
-                            <StudentProfileCard key={i} setModalData={setModalData} urlData={classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
-                        )
-                        )}
-
+                        {/* {classData?.profileImgStorage && Object.keys(Object.fromEntries(
+                            Object.entries(classData?.profileImgStorage).filter(([key]) => !userData.profileImgStorage?.hasOwnProperty(key))))?.map((a, i) =>
+                            (
+                                <StudentProfileCard key={i} setModalData={setModalData} urlData={classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
+                            )
+                            )} */}
+                        {Object.keys(classData?.profileImgStorage)?.map((a, i) => (
+                            < StudentProfileCard key = { i } setModalData = { setModalData } urlData = { classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
+                        ))}
                     </div>
-                    <ProfileBuyModal modalData={modalData} currencyName={currencyName} userId={userData.userId} money={userData.money}/>
+                    <ProfileBuyModal modalData={modalData} currencyName={currencyName} userId={userData.userId} money={userData.money} />
                 </div>
             </div>
+
         </div>
     )
 }

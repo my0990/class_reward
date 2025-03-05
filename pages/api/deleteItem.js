@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     // MongoDB 연결
-    const deleteId = req.body.itemId;
+    const deleteId = req.body.itemId
 
     const db = (await connectDB).db('data');
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });

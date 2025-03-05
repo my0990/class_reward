@@ -26,7 +26,7 @@ export default function MarketTemplate() {
     if (isClassError ) return <div>Error loading data</div>;
 
 
-    const { currencyEmoji, currencyName, itemList } = classData;
+    const { currencyName, itemList } = classData;
     return (
         <div className="flex justify-center">
             <div className=" min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">

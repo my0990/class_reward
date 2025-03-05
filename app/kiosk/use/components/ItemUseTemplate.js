@@ -4,7 +4,7 @@ import CharacterPickTemplate from "../../common/character/CharacterPickTeplate";
 import ItemPickTemplate from "./ItemPickTemplate";
 
 
-export default function ItemUse() {
+export default function ItemUseTemplate() {
     const [requestData,setRequestData] = useState({step: 'useCharacterPick', itemData: {}, userData: {}})
     return (
         requestData.step === "useCharacterPick"

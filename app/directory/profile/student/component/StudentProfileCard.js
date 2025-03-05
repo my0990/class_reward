@@ -5,7 +5,7 @@ export default function StudentProfileCard({urlData, urlId, setModalData, curren
         document.getElementById('profileBuy').showModal();
         setModalData((prev)=> ({...prev, urlData: urlData, urlId: urlId}))
     }
-
+ 
     return (
         // profileUrlObj[urlId]
         // ?

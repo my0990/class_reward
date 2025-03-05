@@ -8,8 +8,7 @@ export default async function handler(req, res) {
 
     const {modalData, userId, balance} = req.body;
     // console.log(req.body)
-    console.log(userId)
-    console.log(modalData)
+
     
     const {urlData, urlId} = modalData;
     const {price, url} = urlData;

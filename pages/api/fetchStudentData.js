@@ -17,6 +17,6 @@ export default async function handler(req, res) {
         teacher = session.teacher
     }
     const response = await db.collection('user_data').find({ teacher: teacher}).sort({ classNumber: 1 }).toArray()
-    res.status(200).json(response);
+    res.status(200).json(response); 
   }
 }

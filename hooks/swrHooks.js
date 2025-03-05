@@ -18,7 +18,11 @@ const fetcher = async (url) => {
 
 
 export function fetchData(url) {
-  const { data, error, mutate } = useSWR(url, fetcher);
+  const { data, error, mutate } = useSWR(url, fetcher, {
+    revalidateIfStale: false,  // 캐시 데이터가 오래되어도 자동 갱신 안 함
+    revalidateOnFocus: false,  // 브라우저 포커스 시 자동 갱신 안 함
+    revalidateOnReconnect: false,
+  });
   return {
     data,
     isLoading: !error && !data,
