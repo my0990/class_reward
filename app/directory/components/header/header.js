@@ -51,7 +51,7 @@ export default function Header({ session }) {
                     <div className="p-[24px]  max-[700px]:p-[16px] flex  text-[1.2rem] justify-between text-gray-500 font-semibold">
                         <div className="flex items-center">
                             <div className="min-[601px]:mr-[5vw]">
-                                <Link href="/directory/dashboard" replace>
+                                <Link prefetch={false} href="/directory/dashboard" replace>
                                     <div className="w-[56px] h-[56px] font-medium rounded-full border-4  bg-orange-500 text-[32px] transition-all hover:scale-110 bg-orange-500 text-white transition-all duration-500 align-middle flex justify-center items-center">
                                         뀰
                                     </div>
@@ -60,21 +60,21 @@ export default function Header({ session }) {
                             <div>
                                 {session.role === 'teacher' ?
                                     <ul className="flex max-[700px]:hidden">
-                                        <Link href="/directory/manage" key="manage"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
-                                        <Link href="/directory/market" key="market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
-                                        <Link href="/directory/thermometer" key="thermometer"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/thermometer" ? "border-b-8 border-orange-400" : null}`}>학급 온도계</li></Link>
-                                        <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트 관리</li></Link>
-                                        <Link href="/directory/profile" key="profile"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/profile" ? "border-b-8 border-orange-400" : null}`}>프로필 관리</li></Link>
-                                        <Link href="/kiosk"><li className={` dark:text-white`}>키오스크 모드</li></Link>
+                                        <Link prefetch={false} href="/directory/manage" key="manage"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/manage" ? "border-b-8 border-orange-400" : null}`}>학생 관리</li></Link>
+                                        <Link prefetch={false} href="/directory/market" key="market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>아이템 관리</li></Link>
+                                        <Link prefetch={false} href="/directory/thermometer" key="thermometer"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/thermometer" ? "border-b-8 border-orange-400" : null}`}>학급 온도계</li></Link>
+                                        <Link prefetch={false} href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트 관리</li></Link>
+                                        <Link prefetch={false} href="/directory/profile" key="profile"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/profile" ? "border-b-8 border-orange-400" : null}`}>프로필 관리</li></Link>
+                                        <Link prefetch={false} href="/kiosk"><li className={` dark:text-white`}>키오스크 모드</li></Link>
 
 
                                     </ul> :
                                     <ul className="flex max-[700px]:hidden">
-                                        <Link href="/directory/inventory"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/inventory" ? "border-b-8 border-orange-400" : null}`}>창고 가기</li></Link>
-                                        <Link href="/directory/market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>상점 가기</li></Link>
-                                        <Link href="/directory/thermometer"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/thermometer" ? "border-b-8 border-orange-400" : null}`}>학급온도계</li></Link>
-                                        <Link href="/directory/profile" key="profile"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/profile" ? "border-b-8 border-orange-400" : null}`}>프로필 상점</li></Link>
-                                        <Link href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트</li></Link>
+                                        <Link prefetch={false} href="/directory/inventory"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/inventory" ? "border-b-8 border-orange-400" : null}`}>창고 가기</li></Link>
+                                        <Link prefetch={false} href="/directory/market"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/market" ? "border-b-8 border-orange-400" : null}`}>상점 가기</li></Link>
+                                        <Link prefetch={false} href="/directory/thermometer"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/thermometer" ? "border-b-8 border-orange-400" : null}`}>학급온도계</li></Link>
+                                        <Link prefetch={false} href="/directory/profile" key="profile"><li className={`mr-[3vw] dark:text-white ${pathname === "/directory/profile" ? "border-b-8 border-orange-400" : null}`}>프로필 상점</li></Link>
+                                        <Link prefetch={false} href="/directory/quest" key="quest"><li className={`mr-[3vw] dark:text-white ${/^\/directory\/quest/.test(pathname) || /^\/directory\/questDetail/.test(pathname) ? "border-b-8 border-orange-400" : null}`}>퀘스트</li></Link>
 
 
 
@@ -87,7 +87,7 @@ export default function Header({ session }) {
                         <div className="flex">
                             {/* {isClient && session.role === "teacher" && data && data?.notification?.length > 0 
                         ?<div className="mr-[8px] min-[700px]:mr-[16px]">
-                                <Link href="/directory/notification"><Notification /></Link>
+                                <Link prefetch={false} href="/directory/notification"><Notification /></Link>
                             </div>
                             : null
                         } */}
