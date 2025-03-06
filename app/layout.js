@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 import { connectDB } from "@/app/lib/database";
 import RecoilRootProvider from "@/util/recoilRootProvider";
 import Layout from "@/util/Layout";
+import Script from "next/script";
 // import Head from "next/head";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -82,12 +83,34 @@ export default async function RootLayout({ children }) {
   //   response2 = await db.collection('thermometer').findOne({ userId: teacher })
   // }
   // console.log(response2)  
+  const GA_MEASUREMENT_ID = "G-1XP2WLNQ01"
+
   return (
     <html lang="en" className="w-full dark:bg-gray-700">
+      <head>
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_MEASUREMENT_ID}', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         {/* <RecoilRootProvider> */}
-          {/* <Layout fetchedUserData={response} fetchedThermometerData={response2} session={session} /> */}
-          {children}
+        {/* <Layout fetchedUserData={response} fetchedThermometerData={response2} session={session} /> */}
+        {children}
         {/* </RecoilRootProvider> */}
       </body>
     </html>
