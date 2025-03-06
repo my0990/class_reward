@@ -63,7 +63,7 @@ export default function ProfileImgModal({ userData }) {
                             // <div className="w-[165px] h-[165px] mb-[16px] rounded-full bg-green-400 flex justify-center items-center overflow-hidden">
                             //     <img src={userData.profileImgStorage[a]} width="150" height="150" alt="orange" className=""/>
                             // </div>
-                            <div onClick={(e)=>{onSubmit(e,a)}} className="m-[8px] border-8 bg-white border-white cursor-pointer transition-all hover:scale-105 w-[165px] h-[165px] mb-[16px] rounded-full  flex justify-center items-center overflow-hidden">
+                            <div key={i} onClick={(e)=>{onSubmit(e,a)}} className="m-[8px] border-8 bg-white border-white cursor-pointer transition-all hover:scale-105 w-[165px] h-[165px] mb-[16px] rounded-full  flex justify-center items-center overflow-hidden">
                                 <img src={userData.profileImgStorage[a]} width="165" height="165" alt="orange" className="object-fill" />
                             </div>
                         )

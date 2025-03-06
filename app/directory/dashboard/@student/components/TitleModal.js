@@ -66,7 +66,7 @@ export default function TitleModal({ userData }) {
                             // <div className="w-[165px] h-[165px] mb-[16px] rounded-full bg-green-400 flex justify-center items-center overflow-hidden">
                             //     <img src={userData.profileImgStorage[a]} width="150" height="150" alt="orange" className=""/>
                             // </div>
-                            <div onClick={(e)=>onSubmit(a)} className="m-[8px] cursor-pointer hover:scale-105 transition-all py-[4px] px-[32px] text-center text-[1.2rem]  bg-green-400 text-white font-bold rounded-lg">
+                            <div key={i} onClick={(e)=>onSubmit(a)} className="m-[8px] cursor-pointer hover:scale-105 transition-all py-[4px] px-[32px] text-center text-[1.2rem]  bg-green-400 text-white font-bold rounded-lg">
                                 {a.title}
                             </div>
                         )
