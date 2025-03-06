@@ -5,7 +5,10 @@ import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
 import { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { fetchData } from "@/hooks/swrHooks";
 export default function Header({ session }) {
+    const { data: classData, isLoading: isClassLoading, isError: isClassError} = fetchData('/api/fetchClassData');
+    const { data: userData, isLoading: isUserLoading, isError: isUserError} = fetchData('/api/fetchUserData');
 
 
     const [isClient, setIsClient] = useState(false)
@@ -38,6 +41,9 @@ export default function Header({ session }) {
             null
         )
     }
+
+    if (isClassLoading || isUserLoading) return <div></div>;
+    if (isClassError || isUserError) return <div>Error loading data</div>;
     return (
 
             <>
@@ -87,7 +93,7 @@ export default function Header({ session }) {
                         } */}
                             <div className="avatar cursor-pointer max-[700px]:hidden flex items-center justify-center" onClick={userinfoClicked} ref={profileiconRef}>
                                 <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2 ">
-                                    <img src="https://i.postimg.cc/HLXdVT11/orange.png" width="90" height="90" alt="characther" />
+                                    <img src={userData.profileUrl} width="90" height="90" alt="characther" />
                                 </div>
                             </div>
 
@@ -101,7 +107,7 @@ export default function Header({ session }) {
                     </div>
                 </div>
                 {isHamburgerClicked ? <DropDown role={role} /> : null}
-                {isUserinfoClicked ? <UserInfo session={session} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} /> : null}
+                {isUserinfoClicked ? <UserInfo session={session} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} userData={userData} classData={classData}/> : null}
             </>
 
     )

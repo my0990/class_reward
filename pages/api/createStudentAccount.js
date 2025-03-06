@@ -34,7 +34,7 @@ export default async function handler(req, res) {
           profileState: '',
           teacher: userId,
           classNumber: Number(a),
-          profileUrl: "https://i.postimg.cc/HLXdVT11/orange.png",
+          profileUrl: "https://cdn.pixabay.com/photo/2014/03/25/15/23/tangerine-296654_1280.png",
           profileImgStorage: {},
           profileTitle: "초보 오렌지",
           inventory: [],

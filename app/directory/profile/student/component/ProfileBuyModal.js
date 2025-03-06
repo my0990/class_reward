@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { mutate } from "swr";
-export default function ProfileBuyModal({ modalData, currencyName, userId, money }) {
+export default function ProfileBuyModal({ pickedData, currencyName, userId, money }) {
     const [isLoading, setIsLoading] = useState(false);
+
     const onSubmit = (e) => {
-        if (modalData.urlData.price > money) {
+        if (pickedData.price > money) {
             alert('잔액이 부족합니다')
             return
         }
@@ -13,7 +14,7 @@ export default function ProfileBuyModal({ modalData, currencyName, userId, money
             setIsLoading(true)
             fetch("/api/buyProfileImg", {
                 method: "POST",
-                body: JSON.stringify({ modalData: modalData, userId: userId, balance: money - modalData.urlData.price }),
+                body: JSON.stringify({ pickedData: pickedData, userId: userId, balance: money - pickedData.price }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -31,16 +32,17 @@ export default function ProfileBuyModal({ modalData, currencyName, userId, money
                 if (data.result === true) {
                     alert('구입하였습니다');
                     // document.getElementById('profileBuy').close();
-                    const urlId = modalData.urlId;
+
                     mutate(
-                        "/api/fetchClassData",
+                        "/api/fetchUserData",
                         (prevItems) => {
                             console.log(prevItems)
-                            const updatedItems = { ...prevItems.profileImgStorage };
+                            const updatedItems = { ...prevItems.profileImgStorage, [pickedData.urlId]: pickedData.url};
+                            const updatedMoney = prevItems.money - pickedData.price;
                             console.log("1: ", updatedItems)
-                            delete updatedItems[urlId]; // 객체에서 특정 키 삭제
+                            
                             console.log("2: ",updatedItems)
-                            return {... prevItems, profileImgStorage: updatedItems};
+                            return {... prevItems, profileImgStorage: updatedItems, money: updatedMoney};
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
@@ -68,12 +70,12 @@ export default function ProfileBuyModal({ modalData, currencyName, userId, money
                 <h1>이 그림을 구매하시겠습니까?</h1>
                 <div className="flex justify-center my-[16px]">
                     <div className="w-[160px] h-[160px] border-[8px] border-white rounded-full bg-white flex justify-center items-center overflow-hidden">
-                        <img src={modalData?.urlData?.url} width="200" height="200" alt="profileImg" />
+                        <img src={pickedData?.url} width="200" height="200" alt="profileImg" />
                     </div>
                 </div>
                 <div className="flex justify-between ">
                     <div>가격: </div>
-                    <div>{modalData.urlData && modalData.urlData.price} {currencyName}</div>
+                    <div>{pickedData && pickedData.price} {currencyName}</div>
                 </div>
                 <div className="flex justify-between mt-[32px]">
                     <button onClick={onSubmit} className=" bg-orange-500 text-white py-[8px] hover:bg-orange-600 w-[128px] px-[24px] rounded-lg">확인</button>

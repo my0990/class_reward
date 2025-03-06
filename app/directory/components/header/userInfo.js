@@ -6,9 +6,8 @@ import Link from 'next/link';
 
 import { fetchData } from "@/hooks/swrHooks";
 
-export default function UserInfo({ session, isUserinfoClicked, setIsUserinfoClicked, profileiconRef  }) {
-    const { data: classData, isLoading: isClassLoading, isError: isClassError} = fetchData('/api/fetchClassData');
-    const { data: userData, isLoading: isUserLoading, isError: isUserError} = fetchData('/api/fetchUserData');
+export default function UserInfo({ session, isUserinfoClicked, setIsUserinfoClicked, profileiconRef , userData, classData }) {
+
     console.log('userData: ', userData)
     console.log('classData: ', classData)
     const dropDownRef = useRef();
@@ -29,8 +28,7 @@ export default function UserInfo({ session, isUserinfoClicked, setIsUserinfoClic
         document.addEventListener("mousedown", outSideClick);
         return () => document.removeEventListener('mousedown', outSideClick);
     }, [isUserinfoClicked]);
-    if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
-    if (isClassError || isUserError) return <div>Error loading data</div>;
+
     return (
         <div className="max-[600px]:hidden" ref={dropDownRef}>
             <div className={styles.speechBubble}>

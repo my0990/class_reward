@@ -6,12 +6,12 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
 
 
-    const {modalData, userId, balance} = req.body;
+    const {pickedData, userId, balance} = req.body;
     // console.log(req.body)
 
     
-    const {urlData, urlId} = modalData;
-    const {price, url} = urlData;
+    const {price, url, urlId} = pickedData;
+
     // MongoDB 연결
     const db = (await connectDB).db('data');
 

@@ -37,6 +37,6 @@ export default async function handler(req, res) {
 
 
     // console.log(response2)
-    res.status(201).json({ result: true, message: 'profile 변경 성공' });
+    res.status(200).json({ result: true, message: 'profile 변경 성공' });
   }
 }

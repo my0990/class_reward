@@ -27,7 +27,7 @@ export default function CardTemplate({ picked, startExp, commonDifference }) {
                     <img src={picked?.profileUrl} width="170" height="170" alt="orange" className="rounded-full" />
                     {/* <img src="https://i.postimg.cc/HLXdVT11/orange.png"></img> */}
                 </div>
-                <div className=" py-[12px] w-full text-center text-[1.2rem] h-[52.8px] bg-green-400 text-white font-bold rounded-xl">초보 오렌지</div>
+                <div className=" py-[12px] w-full text-center text-[1.2rem] h-[52.8px] bg-green-400 text-white font-bold rounded-xl">{picked?.profileTitle}</div>
             </div>
             <div className="w-full h-[134px] bg-white rounded-xl p-[8px]">{picked?.profileState}</div>
         </div>

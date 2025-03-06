@@ -33,8 +33,6 @@ export default function AddModal() {
             }).then((res) => res.json()).then((data) => {
 
                 if (data.result === true) {
-  
-
                     setIsLoading(false);
                     mutate(
                         "/api/fetchClassData",

@@ -19,6 +19,6 @@ export default async function handler(req, res) {
     // const respojnse2 = await db.collection('user_data').updateMany({teacher:userId},{$set: {classData: req.body.data}},{upsert: false})
 
     // console.log(response2)
-    res.status(201).json({ result: true, message: '화폐 입력 성공' });
+    res.status(200).json({ result: true, message: '화폐 입력 성공' });
   }
 }

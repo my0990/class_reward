@@ -9,53 +9,69 @@ export default function StudentProfileTemplate({ }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
     const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');
 
-    const [modalData, setModalData] = useState({ urlData: undefined, urlId: undefined });
-    const [filteredObj, setFilterdObj] = useState({});
-    useEffect(() => {
+    const [pickedData, setPickedData] = useState({});
+    const [filterdData,setFilteredData] = useState([]);
 
-        if (classData) {
-
+    useEffect(()=>{
+        console.log('use Effect')
+        console.log('use Effect')
+        console.log('use Effect')
+        console.log('use Effect')
+        if(classData && userData){
+            const updatedClassItems = Object.keys(classData.profileImgStorage).map(key => {
+                const classItem = classData.profileImgStorage[key];
+              
+                // 유저가 이 아이템을 가지고 있으면, 'owned' 키 추가
+                if (userData.profileImgStorage[key]) {
+                  return {
+                    ...classItem,
+                    owned: true, // 유저가 가진 아이템에 "owned" 키를 추가
+                    urlId: key
+                  };
+                } else {
+                    return {
+                    ...classItem,
+                    owned: false,
+                    urlId: key
+                    }
+                }
+              
+                // 유저가 아이템을 가지고 있지 않으면 원래 아이템 그대로 반환
+              });
+              console.log(updatedClassItems)
+              console.log(updatedClassItems)
+              console.log(updatedClassItems)
+              console.log(updatedClassItems)
+              setFilteredData(updatedClassItems)
         }
+    },[userData, classData])
 
-    }, [classData])
-    // const {profileUrlObj} = userData;
+
     if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
     if (isClassError || isUserError) return <div>Error loading data</div>;
 
-    const { currencyName, currencyEmoji } = classData;
-    if (!classData.profileImgStorage || Object.keys(classData.profileImgStorage).length === 0) {
+    const { currencyName } = classData;
+    if (Object.keys(classData.profileImgStorage).length === 0) {
         return (
             <div className="text-[2rem] text-center mt-[16px]">
                 등록된 프로필 이미지가 없습니다.
             </div>
         )
     }
+    
 
 
     return (
-        // <div className="flex flex-wrap justify-center">
-        //     {Object.keys(classData.profileImgStorage).map((a,i)=>{
-        //         return(
-        //         <StudentProfileCard key={i}  urlData={classData.profileImgStorage[a]} urlId={a} setProfileData={setProfileData}/>
-        //         )
-        //     })}
-        //     {/* <ProfileBuyModal profileData={profileData} setUserData={setUserData}/> */}
-        // </div>
+
         <div className="flex flex-wrap justify-center">
             <div className="flex justify-center">
                 <div className="min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                     <div className="flex p-[8px] flex-wrap">
-                        {/* {classData?.profileImgStorage && Object.keys(Object.fromEntries(
-                            Object.entries(classData?.profileImgStorage).filter(([key]) => !userData.profileImgStorage?.hasOwnProperty(key))))?.map((a, i) =>
-                            (
-                                <StudentProfileCard key={i} setModalData={setModalData} urlData={classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
-                            )
-                            )} */}
-                        {Object.keys(classData?.profileImgStorage)?.map((a, i) => (
-                            < StudentProfileCard key = { i } setModalData = { setModalData } urlData = { classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
+                        {filterdData?.map((a, i) => (
+                            < StudentProfileCard key = { i } setPickedData = { setPickedData } profileImgData = {a} currencyName={currencyName} />
                         ))}
                     </div>
-                    <ProfileBuyModal modalData={modalData} currencyName={currencyName} userId={userData.userId} money={userData.money} />
+                    <ProfileBuyModal pickedData={pickedData} currencyName={currencyName} userId={userData.userId} money={userData.money} />
                 </div>
             </div>
 

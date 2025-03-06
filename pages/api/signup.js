@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       role: 'teacher',
       profileNickname: '',
       profileState: '',
-      profileUrl: 'https://i.postimg.cc/XYzP6hfz/2024-11-22-9-44-07.png',
+      profileUrl: 'https://cdn.pixabay.com/photo/2014/03/25/15/23/tangerine-296654_1280.png',
       profileUrlObj: []
     })
     // 성공시 response

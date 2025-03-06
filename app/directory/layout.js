@@ -2,9 +2,7 @@ import Header from "./components/header/header"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getServerSession } from "next-auth"
-import { connectDB } from "@/app/lib/database";
-import RecoilRootProvider from "@/util/recoilRootProvider";
-import Layout from "@/util/Layout";
+
 
 export default async function RootLayout({ children }) {
     const session = await getServerSession(authOptions);
