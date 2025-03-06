@@ -13,7 +13,7 @@ import { fetchData } from "@/hooks/swrHooks";
 export default function MarketTemplate() {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
 
-
+    
     const [pickedItem, setPickedItem] = useState();
     const onDelete = (e) => {
         setPickedItem(e)
@@ -27,6 +27,7 @@ export default function MarketTemplate() {
 
 
     const { currencyName, itemList } = classData;
+    console.log(classData)
     return (
         <div className="flex justify-center">
             <div className=" min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
@@ -34,11 +35,11 @@ export default function MarketTemplate() {
                     {itemList?.map((a, i) =>
                     (
                         <CSSTransition
-                            key={a.itemId}
+                            key={a?.itemId}
                             timeout={600}
                             classNames="item"
                         >
-                            <div className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} ref={nodeRef}>
+                            <div className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a?.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} ref={nodeRef}>
                                 <ItemCard data={a} currencyName={currencyName} onClick={onDelete} />
                             </div>
                         </CSSTransition>

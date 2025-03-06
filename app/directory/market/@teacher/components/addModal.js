@@ -27,7 +27,7 @@ export default function AddModal() {
             fetch("/api/addItem", {
                 method: "POST",
                 body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemStock: quantityRef.current.value, itemExplanation: explanationRef.current.value, emoji: emoji }),
-                headers: {
+                headers: {  
                     "Content-Type": "application/json",
                 },
             }).then((res) => res.json()).then((data) => {
@@ -36,7 +36,13 @@ export default function AddModal() {
                     setIsLoading(false);
                     mutate(
                         "/api/fetchClassData",
-                        )
+                        (prev) => {
+                            const updatedItemList = [...prev.itemList,{itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemStock: quantityRef.current.value, itemExplanation: explanationRef.current.value, emoji: emoji, itemId: data.itemId}]
+                            
+                            return {...prev, itemList: updatedItemList}
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     document.getElementById('add').close()
                     nameRef.current.value = ""
                     priceRef.current.value = ""

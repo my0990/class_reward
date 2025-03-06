@@ -39,6 +39,7 @@ export default function Home() {
     },[classData])
     if (isStudentLoading) return <div>Loading data...</div>;
     if (isStudentError) return <div>Error loading data</div>;
+
     return (
         <div className=" pt-0 flex justify-center">
             <div className="w-[1360px] max-[1360px]:w-[1224px] max-[1224px]:w-[1088px] max-[1088px]:w-[952px] max-[952px]:w-[816px] max-[816px]:w-[680px] max-[680px]:w-[544px] max-[544px]:w-[408px] max-[408px]:w-[272px]">
@@ -61,7 +62,7 @@ export default function Home() {
                     })}</div>
             </div>
 
-            <Modal targetStudent={studentArr.filter((a) => a.isactive === true)} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll}/>
+            <Modal targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll}/>
             <InstallPrompt />
             {!classData?.currencyEmoji || !classData?.currencyName ?  <SetCurrencyNameModal /> : null}
         </div>

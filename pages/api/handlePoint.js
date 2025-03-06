@@ -28,6 +28,6 @@ export default async function handler(req, res) {
 
 
 
-    res.status(201).json({ result: true, message: '로그인 성공' });
+    res.status(200).json({ result: true, message: '로그인 성공' });
   }
 }

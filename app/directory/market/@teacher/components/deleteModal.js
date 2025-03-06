@@ -45,7 +45,13 @@ export default function DeleteModal({ pickedItem, currencyName }) {
 
 
                     setIsLoading(false);
-                    mutate('/api/fetchClassData');
+                    mutate(
+                        "/api/fetchClassData",
+                        (prev) => {
+                            return {...prev, itemList: prev.itemList.filter((item)=> item.itemId !== pickedItem.itemId)}
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     document.getElementById('delete').close();
                 }
             })

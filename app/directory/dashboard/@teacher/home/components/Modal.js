@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import DialBtn from "./DialBtn";
-export default function Modal({ isSend, currencyName, targetStudent, clearAll }) {
+import { mutate } from "swr";
+export default function Modal({ isSend, currencyName, targetStudent, clearAll, studentArr }) {
     const [point, setPoint] = useState(null);
     const [fontSize, setFontSize] = useState(1.7);
     const [activeKey, setActiveKey] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
+    console.log(studentArr)
     const onClick = (e) => {
         if (point === null) {
             setPoint(e.target.value.toString())
@@ -52,6 +53,15 @@ export default function Modal({ isSend, currencyName, targetStudent, clearAll })
                         clearAll();
                     }
                     modalClose();
+                    mutate(
+                        "/api/fetchStudentData",
+                        (prev) => {
+                            console.log(prev)
+                            return studentArr.map((a,i)=> a.isactive === true ? {...a, money: Number(a.money) + Number(point)} : a);
+
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     document.getElementById('modal').close();
                     setIsLoading(false);
 

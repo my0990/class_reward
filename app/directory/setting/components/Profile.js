@@ -53,8 +53,8 @@ export default function Profile({ }) {
                             </div>
                         )
                     }, [])} */}
-                    <div onClick={() => document.getElementById('profileSetModal').showModal()} className="hover:scale-105 transition-all w-24 rounded-full ring ring-primary cursor-default ring-offset-base-100 ring-offset-2 cursor-pointer">
-                        {updatedUserData?.profileUrl ? <img src={updatedUserData?.profileUrl} width="90" height="90" alt="characther" /> : <div></div>}
+                    <div className="transition-all w-24 rounded-full cursor-default border-orange-200 border-[6px] ring-offset-base-100 ring-offset-2 ">
+                        {updatedUserData?.profileUrl ? <img src={updatedUserData?.profileUrl} width="100" height="100" alt="characther" /> : <div></div>}
                     </div>
                 </div>
                 <h2 className="mt-[24px]">프로필 별명</h2>
@@ -65,7 +65,7 @@ export default function Profile({ }) {
                     <button className="btn bg-orange-500 text-white block border-0 mt-[24px] w-[100%]">확인</button>
                 </form>
             </div>
-            {/* <ProfileImgSettingModal profileUrlObj={profileUrlObj} setUserData={setUpdatedUserData} userData={userData} /> */}
+
         </div>
     )
 }
