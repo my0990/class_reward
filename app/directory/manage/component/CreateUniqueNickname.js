@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef } from "react"
+import { mutate } from "swr";
 export default function CreateUniqueNickname() {
     const [error, setError] = useState(false);
     const [isLoading,setIsLoading] = useState(false);
@@ -30,6 +31,7 @@ export default function CreateUniqueNickname() {
 
                 if (data.result === true) {
                     alert('고유 별명을 등록하였습니다.')
+                    mutate('/api/fetchClassData')
                 } else {
                     setError(ref.current.value + '은(는) 이미 존재하는 별명입니다.')
                     setIsLoading(false);

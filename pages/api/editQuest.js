@@ -2,20 +2,23 @@ import { connectDB } from '@/app/lib/database'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
 import {getToken} from 'next-auth/jwt'
-
+import { ObjectId } from 'mongodb';
 export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
-    const { name, goal, reward, exp, title } = req.body;
-
+    console.log(req.body)
+    const { name, goal, reward, exp, title, questId } = req.body;
+    console.log(questId)
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const code = token.code;
 
     // MongoDB 연결
-    // let questId = (new ObjectId()).toString();
+    let convertedQuestId = ObjectId.createFromHexString(questId);
+    
+    console.log(convertedQuestId)
     const db = (await connectDB).db('data');
-    const response = await db.collection('quest').updateOne({ code: code},{$set: { questName: name, questGoal: goal, questReward: reward, questExp: exp, questTitle: title, time: new Date()} }, { upsert: true })
+    const response = await db.collection('quest').updateOne({ code: code, _id: convertedQuestId},{$set: { questName: name, questGoal: goal, questReward: reward, questExp: exp, questTitle: title, time: new Date()} }, { upsert: true })
 
 
     if(response){

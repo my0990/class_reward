@@ -42,11 +42,12 @@ export default function ThermometerTemplate({ role }) {
     //         <div>학급 온도계가 비활성화 되어있습니다.</div>
     //     )
     // }
+    const {currencyEmoji, currencyName} = classData;
     return (
         <div className="flex justify-center items-center  flex-col">
             <div className="flex mt-[32px] w-[647px] max-[647px]:w-full  max-[647px]:mt-0 justify-between">
-            
-                <h1 className="text-[2rem] font-bold text-orange-500">현재온도 - {((sum / thermoData.requireCurrency) + thermoData.adjustment).toFixed(1)}도</h1>
+                
+                <h1 className="text-[2rem] font-bold text-orange-500">현재 온도:  {((sum / thermoData.requireCurrency) + thermoData.adjustment).toFixed(1)}도</h1>
 
                 {role === 'teacher'
                     ?
@@ -79,7 +80,7 @@ export default function ThermometerTemplate({ role }) {
                         <ThermometerObject reward={thermoData.reward} temp={temp} />
                     </div>
                     <div>
-                        <h1 className="text-[1.2rem] font-bold w-auto">기부 천사 순위</h1>
+                        <h1 className="text-[1.2rem] font-bold w-auto">기부 순위 <span className="text-red-500">&#40;기부{currencyName} 총액 {Object.values(thermoData.donators).reduce((acc, value) => acc + value, 0)}{currencyEmoji}&#41;</span></h1>
                         <DonationList thermoData={thermoData} currencyName={classData.currencyName} studentData={studentData} />
                     </div>
                 </div>
@@ -92,7 +93,6 @@ export default function ThermometerTemplate({ role }) {
                     </div>)
             })}
             <HandleThermo thermoData={thermoData} currencyName={classData.currencyName} type={handleThermoType} />
-            {/* {thermoData.isActive ? null : <div>학급온도계 기능이 비활성화되어있습니다.</div>} */}
         </div>
     )
 

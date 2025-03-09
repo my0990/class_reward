@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
 
     const db = (await connectDB).db('data');
-    const response = await db.collection('quest').find({code: code}).sort({time:'-1'}).toArray();
+    const response = await db.collection('quest').find({code: code},{projection: {code: 0}}).sort({time:'-1'}).toArray();
 
 
 

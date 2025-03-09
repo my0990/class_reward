@@ -2,18 +2,27 @@
 import { useEffect } from "react"
 import { useState, useRef } from "react"
 import { mutate } from "swr"
-export default function AddQuestModal({currencyEmoji, questDetailData, code}) {
+export default function EditQuestModal({currencyEmoji, questDetailData, setQuestDetailData}) {
     const [input, setInput] = useState({ name: '', goal: '', reward: '', exp: '', title: '' })
 
     const onChange = (e) => {
         const { name, value } = e.target
-        setInput({ ...input, [name]: value })
+
+        const numberValue = Number(value);
+        if(name === 'title' || name === 'name' || name === 'goal'){
+            setInput({ ...input, [name]: value })
+            return
+        }
+        if (/^\d*$/.test(numberValue)) {
+            setInput({ ...input, [name]: value })
+
+        } 
     }
     const onSubmit = (e) => {
         e.preventDefault();
         fetch("/api/editQuest", {
             method: "POST",
-            body: JSON.stringify(input),
+            body: JSON.stringify({...input, questId: questDetailData._id}),
             headers: {
                 "Content-Type": "application/json",
             },
@@ -21,7 +30,16 @@ export default function AddQuestModal({currencyEmoji, questDetailData, code}) {
             if (data.result === true) {
                 document.getElementById('editQuestModal').close()
                 setInput(prev => ({...prev, name: '', goal: '', reward: '', exp: '', title: '' }))
-                mutate(`/api/fetchQuestDetail/${code}`)
+                mutate(
+                    `/api/fetchQuestList`,
+                    (prev) => {
+                        const updatedArr = prev.filter((item) => item._id === questDetailData._id ? {...item, questName: input.name, questGoal: input.goal, questReward: input. reward, questExp: input.exp, questTitle: input.title} : item)
+                        setQuestDetailData({...questDetailData, questName: input.name, questGoal: input.goal, questReward: input. reward, questExp: input.exp, questTitle: input.title})
+                        return updatedArr;
+                    },
+                    false 
+                );
+
             }
         })
     }

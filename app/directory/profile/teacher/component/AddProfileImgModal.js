@@ -1,5 +1,5 @@
 'use client'
-import {  useState } from "react";
+import { useState } from "react";
 import { mutate } from "swr";
 
 
@@ -18,7 +18,7 @@ export default function AddProfilImgModal() {
     const [isLoading, setIsLoading] = useState(false);
     const onSubmit = (e) => {
         e.preventDefault();
-        if(url === null){
+        if (url === null) {
             alert('url을 입력해주세요')
             return
         }
@@ -36,7 +36,15 @@ export default function AddProfilImgModal() {
 
                 if (data.result === true) {
                     document.getElementById('addProfileImg').close()
-                    mutate("/api/fetchClassData");
+                    mutate(
+                        "/api/fetchClassData",
+                        (prev) => {
+                            const updatedProfileImgObj = {...prev.profileImgStorage, [data.itemId]: {price: 99999, url: url}}
+
+                            return { ...prev, profileImgStorage: updatedProfileImgObj }
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     setUrl("");
                 } else {
                     alert('error!!')
@@ -60,13 +68,13 @@ export default function AddProfilImgModal() {
                 <div className="w-full flex justify-center">
                     <div className="w-[190px] h-[190px] rounded-full bg-white flex justify-center items-center mb-[12px] overflow-hidden">
                         {/* <Image src={male}/> */}
-                        {url && <img src={url} width="190" height="190" alt="orange"  />}
+                        {url && <img src={url} width="190" height="190" alt="orange" />}
                         {/* <img src="https://i.postimg.cc/HLXdVT11/orange.png"></img> */}
                     </div>
                 </div>
                 <h2 className="opacity-70 text-[1.1rem]">이미지 url 주소를 입력해주세요</h2>
                 <div className="mb-[16px]">
-                    <input value={url || ""} onChange={onChange} className="w-full"/>
+                    <input value={url || ""} onChange={onChange} className="w-full" />
                     {/* <button className="border-b-4 " onClick={onClick}>입력</button> */}
                 </div>
                 <form onSubmit={onSubmit}>

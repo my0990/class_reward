@@ -21,5 +21,5 @@ export default async function handler(req, res) {
 
 
 
-    res.status(200).json({ result: true, message: '아이템 생성 성공'});
+    res.status(200).json({ result: true, message: '아이템 생성 성공', itemId: itemId});
 }}

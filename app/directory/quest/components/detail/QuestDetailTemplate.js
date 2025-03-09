@@ -7,11 +7,14 @@ import { fetchData } from "@/hooks/swrHooks"
 import EditQuestModal from "./EditQuestModal"
 import ResetQuestModal from "./ResetQuestModal"
 
-export default function QuestDetail({ params, role }) {
-    const { code } = params;
-    const { data: questDetailData, isLoading: isQuestDetailLoading, isError: isQuestDetailError } = fetchData(code ? `/api/fetchQuestDetail/${code}` : null);
-    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData('/api/fetchStudentData');
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
+export default function QuestDetailTemplate({ classData, studentData, role, questDetailData, setQuestDetailData, setIsDetail }) {
+
+
+    // const { data: questDetailData, isLoading: isQuestDetailLoading, isError: isQuestDetailError } = fetchData(questId ? `/api/fetchQuestDetail/${questId}` : null);
+    // const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData('/api/fetchStudentData');
+    // const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
+
+
     const [isSelectedAll, setIsSelectedAll] = useState(false);
     const [studentArr, setStudentArr] = useState([]);
 
@@ -63,15 +66,29 @@ export default function QuestDetail({ params, role }) {
         }
 
     }
-    if (isQuestDetailLoading || isStudentDataLoading || isClassDataLoading) return <div>Loading data...</div>;
-    if (isQuestDetailError || isStudentDataError || isClassDataError) return <div>Error loading data</div>;
 
+    console.log(questDetailData)
     const studentCount = studentData.length;
     return (
         <div className="flex justify-center ">
+
             <div className="text-[1.2rem]  rounded-lg   mt-[32px] text-orange-500 flex flex-col justify-center w-[896px] max-[896px]:w-[744px] max-[744px]:w-[592px] max-[592px]:w-[440px] max-[440px]:w-[288px]">
+                <div className="flex justify-between mb-[8px]">
+                    <div className="px-[4px] rounded-full hover:bg-orange-100 transition-all cursor-pointer text-[2rem] text-right text-black hover:scale-110  flex items-center" onClick={() => setIsDetail(false)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[40px] h-[40px] mb-[4px]">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                        </svg>
+                    </div>
+                    {role === 'teacher' ?
+                        <button onClick={() => document.getElementById('editQuestModal').showModal()} className="flex justify-center items-center   bg-white outline-none border-none rounded-full hover:bg-orange-100 transition-all w-[48px] h-[48px] hover:scale-110">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="p-[4px] w-[40px] h-[40px]">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                            </svg>
 
-
+                        </button> :
+                        null
+                    }
+                </div>
                 <div className="bg-orange-100 rounded-lg p-[24px] flex justify-between flex-wrap">
                     <div>
                         <div className="flex items-center">
@@ -95,16 +112,11 @@ export default function QuestDetail({ params, role }) {
                 </div>
                 <div className="mt-[32px]">
                     {role === 'teacher'
-                        ? <div className="flex justify-between mb-[8px]">
-                            <button onClick={() => document.getElementById('editQuestModal').showModal()} className="flex justify-center items-center bg-white outline-none border-none rounded-full hover:bg-orange-100 transition-all w-[48px] h-[48px] hover:scale-110">
-                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 30 30">
-                                    <path d="M 22.828125 3 C 22.316375 3 21.804562 3.1954375 21.414062 3.5859375 L 19 6 L 24 11 L 26.414062 8.5859375 C 27.195062 7.8049375 27.195062 6.5388125 26.414062 5.7578125 L 24.242188 3.5859375 C 23.851688 3.1954375 23.339875 3 22.828125 3 z M 17 8 L 5.2597656 19.740234 C 5.2597656 19.740234 6.1775313 19.658 6.5195312 20 C 6.8615312 20.342 6.58 22.58 7 23 C 7.42 23.42 9.6438906 23.124359 9.9628906 23.443359 C 10.281891 23.762359 10.259766 24.740234 10.259766 24.740234 L 22 13 L 17 8 z M 4 23 L 3.0566406 25.671875 A 1 1 0 0 0 3 26 A 1 1 0 0 0 4 27 A 1 1 0 0 0 4.328125 26.943359 A 1 1 0 0 0 4.3378906 26.939453 L 4.3632812 26.931641 A 1 1 0 0 0 4.3691406 26.927734 L 7 26 L 5.5 24.5 L 4 23 z"></path>
-                                </svg>
-                            </button>
-                            <EditQuestModal currencyEmoji={classData.currencyEmoji} questDetailData={questDetailData} code={code}/>
+                        ? <div className="flex justify-end mb-[8px]">
+                            <EditQuestModal currencyEmoji={classData.currencyEmoji} questDetailData={questDetailData} setQuestDetailData={setQuestDetailData} />
                             <div>
                                 <button onClick={() => document.getElementById('resetModal').showModal()} className="btn bg-red-500 text-white mr-[8px]" >초기화</button>
-                                <ResetQuestModal data={questDetailData} code={code} />
+                                <ResetQuestModal questData={questDetailData} setQuestDetailData={setQuestDetailData}/>
                                 {isSelectedAll
                                     ? <button className="btn bg-orange-500 text-white" onClick={clearAll}>모두 해제</button>
                                     : <button className="btn bg-orange-500 text-white" onClick={selectAll}>모두 선택</button>}
@@ -125,18 +137,7 @@ export default function QuestDetail({ params, role }) {
                                 )
                             }
                             return (
-                                // <label className="swap swap-flip text-9xl" key={i}>
-                                //     {role === "teacher"
-                                //         ? <input type="checkbox" checked={a.done} onChange={onChange} name={a['userId']} />
-                                //         : <input type="checkbox" checked={a.done} readOnly name={a['userId']} />}
 
-
-                                //     <div className="swap-on relative">
-                                //         <div className="bg-orange-200 text-gray-600 rounded-lg font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px] opacity-30">
-                                //             {a['classNumber']}. {a['profileNickname']}
-                                //         </div>
-                                //         <div className="text-red-500 w-[136px] h-[180px] absolute flex justify-center top-0 items-center font-bold text-[1.7rem]">Checked</div>
-                                //     </div>
 
                                 <div key={a._id} onClick={(e) => onClick(a)} className={` ${a.isactive ? "bg-orange-400" : undefined} bg-orange-200 cursor-pointer text-gray-600 rounded-lg font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px]`}>
                                     {a['classNumber']}. {a['profileNickname']}
@@ -156,8 +157,8 @@ export default function QuestDetail({ params, role }) {
                 }
 
             </div>
-            <FinishQuestModal rewardedUserData={studentArr.filter((a) => a.isactive === true)} questData={questDetailData} currencyName={classData.currencyName} clearAll={clearAll} code={code} />
-            <DeleteQuestCardModal data={questDetailData} />
+            <FinishQuestModal setQuestDetailData={setQuestDetailData} rewardedUserData={studentArr.filter((a) => a.isactive === true)} questData={questDetailData} currencyName={classData.currencyName} clearAll={clearAll}  />
+            <DeleteQuestCardModal data={questDetailData} setIsDetail={setIsDetail}/>
         </div>
 
 

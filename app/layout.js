@@ -6,6 +6,7 @@ import { connectDB } from "@/app/lib/database";
 import RecoilRootProvider from "@/util/recoilRootProvider";
 import Layout from "@/util/Layout";
 import Script from "next/script";
+
 // import Head from "next/head";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -106,6 +107,7 @@ export default async function RootLayout({ children }) {
             `,
           }}
         />
+        <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className}>
         {/* <RecoilRootProvider> */}

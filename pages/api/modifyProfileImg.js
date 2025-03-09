@@ -12,11 +12,9 @@ export default async function handler(req, res) {
     // MongoDB 연결
     const db = (await connectDB).db('data');
 
-    console.log(req.body)
-    const updatedData = {isActive: req.body.isActive, price: req.body.price, url: req.body.modalData.url}
-    console.log(updatedData)
+    const updatedData = { price: req.body.price, url: req.body.modalData.url}
     const response = await db.collection('class_data').updateOne({code: code},{$set: {[modifyKey]: updatedData}},{upsert: true})
 
-    res.status(201).json({ result: true, message: '화폐 입력 성공' });
+    res.status(200).json({ result: true, message: '화폐 입력 성공' });
   }
 }

@@ -44,7 +44,19 @@ export default function ThermoDec({ thermoData, currencyName, type }) {
                 if (data.result === true) {
                     setAmount(0);
                     document.getElementById('handleThermo').close();
-                    mutate("/api/fetchThermometerData")
+
+                    mutate(
+                        "/api/fetchThermometerData",
+                        (prev) => {
+                            if(type === 'up'){
+                                return {...prev, adjustment: prev.adjustment + Number(amount)}
+                            } else {
+                                return {...prev, adjustment: prev.adjustment - Number(amount)}
+                            }
+                            
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     setIsLoading(false)
                 } 
             })

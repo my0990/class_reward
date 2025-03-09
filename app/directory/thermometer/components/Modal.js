@@ -2,10 +2,10 @@
 import { useState, useRef, useEffect } from "react";
 import Scale from "@/app/components/thermometer/Scale";
 import Degree from "@/app/components/thermometer/Degree";
+import { mutate } from "swr";
 
 
-
-export default function Modal({ thermoData, width, classData, inputMirrorRef, setInputWidth, inputWidth, rewardObj, setRewardObj }) {
+export default function Modal({ thermoData, classData, inputMirrorRef, setInputWidth, inputWidth, rewardObj, setRewardObj }) {
 
     const [isFirstStep, setIsFirstStep] = useState(true);
     const { currencyEmoji, currencyName } = classData;
@@ -58,9 +58,19 @@ export default function Modal({ thermoData, width, classData, inputMirrorRef, se
         }).then((res) => res.json()).then((data) => {
 
             if (data.result === true) {
-                document.getElementById('my_modal_3').close()
-                location.reload();
+
+                mutate(
+                    "/api/fetchThermometerData",
+                    (prev) => {
+                        return { ...prev, requireCurrency: requireCurrency, reward:  rewardObj}
+
+
+                    },
+                    false // 서버 요청 없이 즉시 반영
+                );
+
             }
+            document.getElementById('my_modal_3').close()
         })
     }
     const onClose = () => {

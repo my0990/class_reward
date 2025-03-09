@@ -2,13 +2,16 @@
 
 import { mutate } from "swr";
 
-export default function FinishQuestModal({ rewardedUserData, questData, currencyName, clearAll, code }) {
+export default function FinishQuestModal({ rewardedUserData, questData, currencyName, clearAll, setQuestDetailData }) {
 
     const onSubmit = (e) => {
         e.preventDefault();
+
         fetch("/api/finishQuest", {
             method: "POST",
-            body: JSON.stringify({ questData: questData, rewarded: rewardedUserData }),
+            // body: JSON.stringify({ questData: questData, rewarded: rewardedUserData }),
+            body: JSON.stringify({ questData: questData, rewarded: rewardedUserData.map(obj => ({userId: obj.userId,money: obj.money})) }),
+            
             headers: {
                 "Content-Type": "application/json",
             },
@@ -16,7 +19,15 @@ export default function FinishQuestModal({ rewardedUserData, questData, currency
             if (data.result === true) {
                 document.getElementById('my_modal_2').close()
                 clearAll();
-                mutate(`/api/fetchQuestDetail/${code}`)
+                mutate(
+                    `/api/fetchQuestList`,
+                    (prev) => {
+                        const updatedArr = prev.map((item) => item._id === questData._id ? { ...item,  finished: [...questData.finished, ...rewardedUserData.map(obj => obj.userId)] } : item)
+                        setQuestDetailData({ ...questData, finished: [...questData.finished, ...rewardedUserData.map(obj => obj.userId)] })
+                        return updatedArr;
+                    },
+                    false
+                );
             }
         })
     }

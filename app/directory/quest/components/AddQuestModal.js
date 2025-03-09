@@ -6,7 +6,19 @@ export default function AddQuestModal({currencyEmoji}) {
 
     const onChange = (e) => {
         const { name, value } = e.target
-        setInput({ ...input, [name]: value })
+        
+
+        const numberValue = Number(value);
+        if(name === 'title' || name === 'name' || name === 'goal'){
+            setInput({ ...input, [name]: value })
+            return
+        }
+        if (/^\d*$/.test(numberValue)) {
+            setInput({ ...input, [name]: value })
+
+        } 
+
+
     }
     const onSubmit = (e) => {
         e.preventDefault();
@@ -20,7 +32,9 @@ export default function AddQuestModal({currencyEmoji}) {
             if (data.result === true) {
                 document.getElementById('my_modal_2').close()
                 setInput(prev => ({...prev, name: '', goal: '', reward: '', exp: '', title: '' }))
-                mutate('/api/fetchQuestList')
+                mutate(
+                    "/api/fetchQuestList",
+                );
             }
         })
     }
@@ -41,29 +55,29 @@ export default function AddQuestModal({currencyEmoji}) {
                     <h2 className="font-bold"  >퀘스트 보상</h2>
                     <div className="mb-[8px]">
                         <div className="flex justify-between mb-[8px] h-[32px]">
-                            <div className="flex items-center">
-                                <input id="currency" type="checkbox" tabIndex="-1" checked={input.reward} className="cursor-pointer checkbox checkbox-warning mr-[8px]" />
-                                <label for="currency" className="cursor-pointer">쿠키</label>
+                            <div className="flex items-center cursor-default">
+                                <input id="currency" readOnly type="checkbox" tabIndex="-1" checked={input.reward} className="cursor-default checkbox checkbox-warning mr-[8px]" />
+                                <label htmlFor="currency" className="cursor-default">쿠키</label>
                             </div>
                             <div className="flex">
                                 <div className="border-b-4 border-orange-400">{currencyEmoji}</div>
-                                <input onChange={onChange} name="reward" value={input.reward} className="w-[160px] text-right cursor-pointer disabled:bg-transparent disabled:border-transparent border-orange-400 disabled:cursor-default  outline-none border-b-4 " />
+                                <input onChange={onChange} name="reward" placeholder="숫자만 입력" value={input.reward} className="placeholder:text-center w-[160px] text-right cursor-pointer disabled:bg-transparent disabled:border-transparent border-orange-400 disabled:cursor-default  outline-none border-b-4 " />
                             </div>
                         </div>
                         <div className="flex justify-between mb-[8px] h-[32px]">
-                            <div className="flex items-center">
-                                <input id="exp" type="checkbox" tabIndex="-1" checked={input.exp} className="cursor-pointer checkbox checkbox-warning mr-[8px]" />
-                                <label for="exp" className="cursor-pointer">경험치</label>
+                            <div className="flex items-center cursor-default">
+                                <input id="exp" readOnly type="checkbox" tabIndex="-1" checked={input.exp} className="cursor-default checkbox checkbox-warning mr-[8px]" />
+                                <label htmlFor="exp" className="cursor-defaultr">경험치</label>
                             </div>
                             <div className="flex">
                                 <div className="border-b-4 border-orange-400">🆙</div>
-                                <input onChange={onChange} name="exp" value={input.exp} className="w-[160px] text-right cursor-pointer disabled:bg-transparent disabled:border-transparent border-orange-400 disabled:cursor-default  outline-none border-b-4 " />
+                                <input onChange={onChange} name="exp" placeholder="숫자만 입력" value={input.exp} className="placeholder:text-center w-[160px] text-right cursor-pointer disabled:bg-transparent disabled:border-transparent border-orange-400 disabled:cursor-default  outline-none border-b-4 " />
                             </div>
                         </div>
                         <div className="flex justify-between mb-[8px] h-[32px]">
-                            <div className="flex items-center">
-                                <input id="title" type="checkbox" tabIndex="-1" checked={input.title} className="cursor-pointer checkbox checkbox-warning mr-[8px]" />
-                                <label for="title" className="cursor-pointer">칭호</label>
+                            <div className="flex items-center cursor-default">
+                                <input id="title" readOnly type="checkbox" tabIndex="-1" checked={input.title} className="cursor-default checkbox checkbox-warning mr-[8px]" />
+                                <label htmlFor="title" className="cursor-default">칭호</label>
                             </div>
                             <div className="flex">
                                 <div className="border-b-4 border-orange-400">🍊</div>

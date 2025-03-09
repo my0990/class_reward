@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { mutate } from "swr";
-export default function EditProfileImgModal({ modalData, currencyEmoji}) {
+export default function EditProfileImgModal({ modalData, currencyEmoji }) {
     const [isLoading, setIsLoading] = useState(false);
     const [isEdited, setIsEdited] = useState(false);
     const [profilePrice, setProfilePrice] = useState('');
@@ -9,7 +9,7 @@ export default function EditProfileImgModal({ modalData, currencyEmoji}) {
 
     const spanRef = useRef(null);
     const inputRef = useRef(null);
-
+    console.log(modalData)
     // const onCheckboxChange = (e) => {
     //     if (isEdited === false) {
     //         setIsEdited(true)
@@ -36,7 +36,7 @@ export default function EditProfileImgModal({ modalData, currencyEmoji}) {
         }, 250)
     }
 
-    const onDelete= (e) => {
+    const onDelete = (e) => {
         e.preventDefault();
         if (isLoading) {
             return
@@ -51,7 +51,25 @@ export default function EditProfileImgModal({ modalData, currencyEmoji}) {
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
                     setIsLoading(false);
-                    mutate('/api/fetchClassData');
+                    mutate(
+                        "/api/fetchClassData",
+                        (prev) => {
+                            const newObj = Object.fromEntries(
+                                Object.entries({...prev.profileImgStorage}).filter(([key,value]) => key !== modalData.urlId)
+                            );
+
+                            console.log(newObj)
+                            console.log(newObj)
+                            console.log(newObj)
+                            console.log(newObj)
+                            return {...prev, profileImgStorage: newObj};
+
+
+
+                            // return { ...prev, profileImgStorage: updatedProfileImgObj }
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     document.getElementById('edit').close();
                 }
             })
@@ -73,7 +91,15 @@ export default function EditProfileImgModal({ modalData, currencyEmoji}) {
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
                     setIsLoading(false);
-                    mutate('/api/fetchClassData');
+                    mutate(
+                        "/api/fetchClassData",
+                        (prev) => {
+                            const updatedProfileImgObj = { ...prev.profileImgStorage, [modalData.urlId]: { price: profilePrice, url: modalData.url } }
+
+                            return { ...prev, profileImgStorage: updatedProfileImgObj }
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     document.getElementById('edit').close();
                 }
             })
@@ -91,9 +117,9 @@ export default function EditProfileImgModal({ modalData, currencyEmoji}) {
         }
     }, [profilePrice]);
 
-    useEffect(()=>{
+    useEffect(() => {
         inputRef.current.blur();
-    },[])
+    }, [])
 
     return (
         <dialog id="edit" className="modal  modal-middle ">
