@@ -6,7 +6,7 @@ export default function Modal({ isSend, currencyName, targetStudent, clearAll, s
     const [fontSize, setFontSize] = useState(1.7);
     const [activeKey, setActiveKey] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    console.log(studentArr)
+
     const onClick = (e) => {
         if (point === null) {
             setPoint(e.target.value.toString())

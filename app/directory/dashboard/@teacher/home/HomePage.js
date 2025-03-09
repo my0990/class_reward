@@ -19,26 +19,38 @@ export default function Home() {
     const [isSend, setIsSend] = useState(false);
     const [isSelectedAll, setIsSelectedAll] = useState(false);
     const [studentArr, setStudentArr] = useState([]);
-    const {onClick,selectAll,clearAll,onSend,onTake} = util({setStudentArr, setIsSelectedAll, studentArr, setIsSend});
+    const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend });
+    const [isModalOpen, setIsModalOpen] = useState(false);
     useEffect(() => {
         if (studentData) {
             const updatedData = studentData.map(obj => {
                 return { ...obj, isactive: false }; // 새로운 키-값 쌍 추가하여 새로운 객체 반환
             });
-          // 로컬 캐시 업데이트
-          setStudentArr(updatedData)
+            // 로컬 캐시 업데이트
+            setStudentArr(updatedData)
         }
-      }, [studentData]);
+    }, [studentData]);
 
-    useEffect(() => {
-        if (!classData?.currencyEmoji  || !classData?.currencyName  ) {
-            console.log('open')
-            document.getElementById('setting')?.showModal();
-            
-        }
-    },[classData])
-    if (isStudentLoading) return <div>Loading data...</div>;
-    if (isStudentError) return <div>Error loading data</div>;
+
+
+    // useEffect(() => {
+    //     if (classData && studentData) {
+    //         if (!classData?.currencyEmoji || !classData?.currencyName)
+    //             setIsModalOpen(true); // 특정 데이터가 없을 때 모달을 열도록
+    //     }
+    // }, [classData, studentData, isClassLoading, isStudentLoading]);
+
+        useEffect(() => {
+        if (classData && studentData) {
+            if (!classData?.currencyEmoji || !classData?.currencyName){
+                setIsModalOpen(true); // 특정 데이터가 없을 때 모달을 열도록
+            }}
+    }, [classData, studentData, isClassLoading, isStudentLoading]);
+    if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
+    if (isStudentError || isClassError) return <div>Error loading data</div>;
+
+
+
 
     return (
         <div className=" pt-0 flex justify-center">
@@ -62,9 +74,11 @@ export default function Home() {
                     })}</div>
             </div>
 
-            <Modal targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll}/>
+            <Modal targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll} />
             <InstallPrompt />
-            {!classData?.currencyEmoji || !classData?.currencyName ?  <SetCurrencyNameModal /> : null}
+            {isModalOpen && <input type="checkbox" id="setting" className="modal-toggle" checked readOnly />}
+            <SetCurrencyNameModal setIsModalOpen={setIsModalOpen}/>
+
         </div>
     )
 }

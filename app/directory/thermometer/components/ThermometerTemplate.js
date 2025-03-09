@@ -80,7 +80,7 @@ export default function ThermometerTemplate({ role }) {
                         <ThermometerObject reward={thermoData.reward} temp={temp} />
                     </div>
                     <div>
-                        <h1 className="text-[1.2rem] font-bold w-auto">기부 순위 <span className="text-red-500">&#40;기부{currencyName} 총액 {Object.values(thermoData.donators).reduce((acc, value) => acc + value, 0)}{currencyEmoji}&#41;</span></h1>
+                        <h1 className="text-[1.2rem] font-bold w-auto">기부 순위 <span className="text-red-500">&#40;총 기부 {currencyName} - {Object.values(thermoData.donators).reduce((acc, value) => acc + value, 0)}{currencyEmoji}&#41;</span></h1>
                         <DonationList thermoData={thermoData} currencyName={classData.currencyName} studentData={studentData} />
                     </div>
                 </div>
