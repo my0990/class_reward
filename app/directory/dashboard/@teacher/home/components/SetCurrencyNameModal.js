@@ -30,70 +30,64 @@ export default function SetCurrencyNameModal({ setIsModalOpen }) {
     }
 
     return (
+
         <label id="setting" htmlFor="setting" className="modal " tabIndex="-1">
-            <div className={`modal-box p-[32px] flex flex-col`} >
-                <div className="text-[2rem] text-orange-500 font-bold mb-[16px]">2025년 3월 11일 오후 10시 모든 데이터가 초기화됩니다.</div>
-                <button onClick={()=>setIsModalOpen(false)} className="btn btn-error bg-orange-500 text-white">확인</button>
+            <div className={`modal-box p-[32px]`} >
+                {step === "name"
+                    ? <div>
+                        <div className="text-[1.5rem]">우리 반 화폐의 이름을 설정해 주세요</div>
+                        <div>예&#41; 꿈싹, 쿠키, 원</div>
+                        <div className="flex mt-[16px]">
+                            <input ref={ref} value={classData.currencyName} onChange={onNameClick} className="border-2 mr-[16px] border-orange-300 focus:border-orange-500 focus:outline-none"></input>
+                            <button className="bg-orange-300 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" onClick={() => classData.currencyName ? setStep("emoji") : alert('화폐의 이름을 입력해주세요')}>다음</button>
+                        </div>
+                    </div>
+                    : step === "emoji"
+                        ? <div>
+                            <div className="flex items-center">
+                                <div className="text-[1.5rem]">우리 반 화폐의 모양을 설정해 주세요 - <span className="text-[1.5rem]">{classData.currencyEmoji}</span></div>
+
+                            </div>
+                            <div className="flex justify-center my-[16px]">
+                                <Picker
+                                    data={data}
+                                    onEmojiSelect={(emojiObject) => setClassData({ ...classData, currencyEmoji: emojiObject.native })}
+                                    locale="ko"
+                                    emojiButtonColors={[
+                                        'rgba(155,223,88,.7)',
+                                        'rgba(149,211,254,.7)',
+                                        'rgba(247,233,34,.7)',
+                                        'rgba(238,166,252,.7)',
+                                        'rgba(255,213,143,.7)',
+                                        'rgba(211,209,255,.7)',
+                                    ]}
+                                    categories={[
+                                        'activity',
+                                        'flags',
+                                        'foods',
+                                        'frequent',
+                                        'nature',
+                                        'objects',
+                                        'people',
+                                        'places',
+                                        'symbols',
+                                    ]}
+                                />
+                            </div>
+                            <div className="flex justify-between">
+                                <button className="bg-orange-300 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" onClick={() => setStep("name")}>이전</button>
+                                <button className="bg-orange-300 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" onClick={() => classData.currencyEmoji ? setStep("finish") : alert("화페 모양을 선택해주세요")}>다음</button>
+                            </div>
+                        </div>
+                        : <div >
+                            <h1 className="text-[1.5rem]">우리반 화폐 이름: {classData.currencyName}</h1>
+                            <h1 className="text-[1.5rem]">우리반 화폐 이모지: {classData.currencyEmoji}</h1>
+                            <form onSubmit={onSubmit} className="flex justify-between mt-[16px]">
+                            <button className="bg-orange-300 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" onClick={() => setStep("emoji")}>이전</button>
+                                <button className="bg-green-500 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" >확인</button>
+                            </form>
+                        </div>}
             </div>
-
         </label>
-        // <label id="setting" htmlFor="setting" className="modal " tabIndex="-1">
-        //     <div className={`modal-box p-[32px]`} >
-        //         {step === "name"
-        //             ? <div>
-        //                 <div className="text-[1.5rem]">우리 반 화폐의 이름을 설정해 주세요</div>
-        //                 <div>예&#41; 꿈싹, 쿠키, 원</div>
-        //                 <div className="flex mt-[16px]">
-        //                     <input ref={ref} value={classData.currencyName} onChange={onNameClick} className="border-2 mr-[16px] border-orange-300 focus:border-orange-500 focus:outline-none"></input>
-        //                     <button className="bg-orange-300 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" onClick={() => classData.currencyName ? setStep("emoji") : alert('화폐의 이름을 입력해주세요')}>다음</button>
-        //                 </div>
-        //             </div>
-        //             : step === "emoji"
-        //                 ? <div>
-        //                     <div className="flex items-center">
-        //                         <div className="text-[1.5rem]">우리 반 화폐의 모양을 설정해 주세요 - <span className="text-[1.5rem]">{classData.currencyEmoji}</span></div>
-
-        //                     </div>
-        //                     <div className="flex justify-center my-[16px]">
-        //                         <Picker
-        //                             data={data}
-        //                             onEmojiSelect={(emojiObject) => setClassData({ ...classData, currencyEmoji: emojiObject.native })}
-        //                             locale="ko"
-        //                             emojiButtonColors={[
-        //                                 'rgba(155,223,88,.7)',
-        //                                 'rgba(149,211,254,.7)',
-        //                                 'rgba(247,233,34,.7)',
-        //                                 'rgba(238,166,252,.7)',
-        //                                 'rgba(255,213,143,.7)',
-        //                                 'rgba(211,209,255,.7)',
-        //                             ]}
-        //                             categories={[
-        //                                 'activity',
-        //                                 'flags',
-        //                                 'foods',
-        //                                 'frequent',
-        //                                 'nature',
-        //                                 'objects',
-        //                                 'people',
-        //                                 'places',
-        //                                 'symbols',
-        //                             ]}
-        //                         />
-        //                     </div>
-        //                     <div className="flex justify-between">
-        //                         <button className="bg-orange-300 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" onClick={() => setStep("name")}>이전</button>
-        //                         <button className="bg-orange-300 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" onClick={() => classData.currencyEmoji ? setStep("finish") : alert("화페 모양을 선택해주세요")}>다음</button>
-        //                     </div>
-        //                 </div>
-        //                 : <div >
-        //                     <h1 className="text-[1.5rem]">우리반 화폐 이름: {classData.currencyName}</h1>
-        //                     <h1 className="text-[1.5rem]">우리반 화폐 이모지: {classData.currencyEmoji}</h1>
-        //                     <form onSubmit={onSubmit} className="flex justify-between mt-[16px]">
-        //                     <button className="bg-orange-300 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" onClick={() => setStep("emoji")}>이전</button>
-        //                         <button className="bg-green-500 px-[16px] py-[8px] rounded-lg font-bold  hover:text-white" >확인</button>
-        //                     </form>
-        //                 </div>}
-        //     </div>
-        // </label>
     )
 }

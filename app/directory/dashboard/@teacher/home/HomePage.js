@@ -21,6 +21,7 @@ export default function Home() {
     const [studentArr, setStudentArr] = useState([]);
     const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend });
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         if (studentData) {
             const updatedData = studentData.map(obj => {
@@ -33,19 +34,14 @@ export default function Home() {
 
 
 
-    // useEffect(() => {
-    //     if (classData && studentData) {
-    //         if (!classData?.currencyEmoji || !classData?.currencyName)
-    //             setIsModalOpen(true); // 특정 데이터가 없을 때 모달을 열도록
-    //     }
-    // }, [classData, studentData, isClassLoading, isStudentLoading]);
-
-        useEffect(() => {
+    useEffect(() => {
         if (classData && studentData) {
-            if (!classData?.currencyEmoji || !classData?.currencyName){
+            if (!classData?.currencyEmoji || !classData?.currencyName)
                 setIsModalOpen(true); // 특정 데이터가 없을 때 모달을 열도록
-            }}
+        }
     }, [classData, studentData, isClassLoading, isStudentLoading]);
+
+
     if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
     if (isStudentError || isClassError) return <div>Error loading data</div>;
 
@@ -54,7 +50,14 @@ export default function Home() {
 
     return (
         <div className=" pt-0 flex justify-center">
+
             <div className="w-[1360px] max-[1360px]:w-[1224px] max-[1224px]:w-[1088px] max-[1088px]:w-[952px] max-[952px]:w-[816px] max-[816px]:w-[680px] max-[680px]:w-[544px] max-[544px]:w-[408px] max-[408px]:w-[272px]">
+
+                <div className="overflow-hidden whitespace-nowrap text-orange-500 text-[2rem] h-[64px]  py-2 relative">
+                    <div className="absolute animate-marquee">
+                        ⭐2025년 3월 11일 화요일 저녁 10시 모든 데이터 초기화 예정입니다⭐
+                    </div>
+                </div>
                 <div className="flex py-[16px] mr-[8px] justify-between">
 
                     {isSelectedAll
@@ -77,7 +80,7 @@ export default function Home() {
             <Modal targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll} />
             <InstallPrompt />
             {isModalOpen && <input type="checkbox" id="setting" className="modal-toggle" checked readOnly />}
-            <SetCurrencyNameModal setIsModalOpen={setIsModalOpen}/>
+            <SetCurrencyNameModal setIsModalOpen={setIsModalOpen} />
 
         </div>
     )
