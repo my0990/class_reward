@@ -3,10 +3,12 @@ import AuthInput from "../../components/authInput"
 import AuthBtn from "../../components/authBtn"
 import Link from "next/link"
 import { useValidateForm } from "@/app/lib/useValidateForm"
+import PrivacyCheckModal from "./PrivacyCheckModal"
+import { useState } from "react"
 export default function SignUpPage() {
     const specialCharPattern = /[!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?~]/;
     const emojiPattern = /[\u{1F600}-\u{1F64F}|\u{1F300}-\u{1F5FF}|\u{1F680}-\u{1F6FF}|\u{1F700}-\u{1F77F}|\u{1F780}-\u{1F7FF}|\u{1F800}-\u{1F8FF}|\u{1F900}-\u{1F9FF}|\u{1FA00}-\u{1FA6F}|\u{1FA70}-\u{1FAFF}|\u{2702}-\u{27B0}|\u{24C2}-\u{1F251}|\u{1F1E6}-\u{1F1FF}]/u;
-
+    const [isPrivacyChecked,setIsPrivacyChecked] = useState(false);
     const onChange = (e) => {
         const { changeHandler, value, blurHandler } = getFieldProps(e.target.name);
         changeHandler(e);
@@ -35,14 +37,16 @@ export default function SignUpPage() {
         validate,
         type: 'register'
     });
-    return(
-        <div>
-            <h1 className="text-orange-500 text-[2rem]">준비중입니다</h1>
-            <div>2025년 3월 12일 공개예정</div>
-        </div>
-    )
+    const onSubmit = (e) => {
+        e.preventDefault();
+        if(isPrivacyChecked){
+            submitHandler(e);
+        } else {
+            alert('개인정보 수집에 동의해주세요');
+        }
+    }
     return (
-        <form type="POST" onSubmit={submitHandler}>
+        <form type="POST" onSubmit={onSubmit}>
             <div className="w-full flex flex-col items-center mt-[80px]">
                 <div className="w-10/12 min-[500px]:w-[400px] mx-5 ">
                     <div className="text-[3rem] ">
@@ -51,11 +55,16 @@ export default function SignUpPage() {
                     <div className="mb-5 text-[1.2rem] text-gray-400">
                         선생님만 가입해주세요
                     </div>
+                    
                     <AuthInput placeholder="아이디를 입력해주세요" name="id" onChange={onChange} />
                     <AuthInput placeholder="비밀번호를 입력해주세요" type="password" name="pwd" onChange={onChange} />
                     <AuthInput placeholder="비밀번호를 한번 더 입력해주세요" type="password" name="pwdCheck" onChange={onChange} />
                     <AuthInput placeholder="선생님 코드를 입력해주세요" name="code" onChange={onChange} />
-                    <div className="text-red-500 text-center mb-[16px]">{errors.id || errors.emoji || errors.hasBlank || errors.pwd || errors.pwdCheck || errors.code}</div>
+                    <div className="text-red-500 text-center">{errors.id || errors.emoji || errors.hasBlank || errors.pwd || errors.pwdCheck || errors.code}</div>
+                    <div className=" mb-[16px] ">
+                        <input id="privacyCheck" checked={isPrivacyChecked} type="checkbox" className="mr-[8px]" /><label onClick={()=>console.log(document.getElementById('privacyCheckModal').showModal())} htmlFor="privacyCheck" className="cursor-pointer text-[1.2rem]">개인정보 수집에 동의합니다</label>
+                    </div>
+                    <PrivacyCheckModal setIsPrivacyChecked={setIsPrivacyChecked}/>
                     <AuthBtn className="text-blue-100 mb-[0px]">회원가입</AuthBtn>
                     <div className="flex flex-col w-full border-opacity-50">
                         <div className="divider">OR</div>
