@@ -9,7 +9,7 @@ import { fetchData } from "@/hooks/swrHooks";
 export default function Header({ session }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError} = fetchData('/api/fetchClassData');
     const { data: userData, isLoading: isUserLoading, isError: isUserError} = fetchData('/api/fetchUserData');
-
+    
 
     const [isClient, setIsClient] = useState(false)
     const { role } = session

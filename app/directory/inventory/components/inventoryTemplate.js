@@ -25,12 +25,9 @@ export default function ItemUseTemplate({ }) {
     }, [userData])
 
     const [isLoading, setIsLoading] = useState(false);
-
-
-    const [isSelected, setIsSelected] = useState(false);
-    const [itemDetail, setItemDetail] = useState({ itemName: null,  itemPrice: null, itemId: null, itemEmoji: null, itemExplanation: null })
+    const [itemDetail, setItemDetail] = useState({ itemName: null,  itemPrice: null, itemId: null, emoji: null, itemExplanation: null })
     const onItemClick = (a) => {
-        setItemDetail({ itemName: a.itemName, itemExplanation: a.itemExplanation, itemEmoji: a.itemEmoji, teacher: a.teacher, itemPrice: a.itemPrice, itemId: a.itemId })
+        setItemDetail({ itemName: a.itemName, itemExplanation: a.itemExplanation, emoji: a.emoji, teacher: a.teacher, itemPrice: a.itemPrice, itemId: a.itemId })
     }
 
     let tmpWidth = 0;
@@ -84,9 +81,17 @@ export default function ItemUseTemplate({ }) {
                 },
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
-                    mutate('/api/fetchUserData');
+                    mutate(
+                        "/api/fetchUserData",
+                        (prev) => {
+                            const updatedItemList = prev.itemList.filter((item) => item.itemId != itemDetail.itemId)
+                            const updatedUserData = {...prev, itemList: updatedItemList}
+                            return updatedUserData;
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     alert(`${itemDetail.itemName} 아이템을 사용하였습니다`);
-                    setItemDetail({itemName: null,  itemPrice: null, itemId: null, itemEmoji: null, itemExplanation: null});
+                    setItemDetail({itemName: null,  itemPrice: null, itemId: null, emoji: null, itemExplanation: null});
                     
                 } 
                     setIsLoading(false)
@@ -99,7 +104,7 @@ export default function ItemUseTemplate({ }) {
     if (isUserLoading) return <div>Loading data...</div>;
     if (isUserError) return <div>Error loading data</div>;
     const { userId, money } = userData;
-
+    console.log(userData)
     return (
         <div className="flex justify-center items-center h-[100vh] bg-orange-100" style={{ scrollbarWidth: 'auto' }}>
             <div>
@@ -113,9 +118,9 @@ export default function ItemUseTemplate({ }) {
                             <div className="flex flex-wrap overflow-scroll overflow-x-hidden" style={{ height: 38 * width + 'px', width: 45 * width + 'px' }}>
                                 {itemList?.map((a, i) => {
                                     return (
-                                        a.itemId === null || a.state === "대기중"
+                                        a.itemId === null
                                             ? <div key={i} style={{ width: 8 * width + 'px', height: 8 * width + 'px', margin: width * 0.8 + 'px', fontSize: 4 * width }} className="bg-white  flex justify-center items-center  rounded-lg"></div>
-                                            : <div onClick={() => onItemClick(a)} key={i} style={{ width: 8 * width + 'px', height: 8 * width + 'px', margin: width * 0.8 + 'px', fontSize: 4 * width }} className="bg-white  hover:bg-yellow-300    flex justify-center items-center cursor-pointer hover:scale-110  rounded-lg">{a.itemEmoji}</div>
+                                            : <div onClick={() => onItemClick(a)} key={i} style={{ width: 8 * width + 'px', height: 8 * width + 'px', margin: width * 0.8 + 'px', fontSize: 4 * width }} className="bg-white  hover:bg-yellow-300    flex justify-center items-center cursor-pointer hover:scale-110  rounded-lg">{a.emoji}</div>
                                     )
                                 })}
                             </div>
@@ -125,7 +130,7 @@ export default function ItemUseTemplate({ }) {
 
                         {itemDetail.itemName
                             ? <div className="bg-white  h-[100%] flex flex-col justify-evenly rounded-xl" style={{ width: 30 * width + 'px', padding: width + 'px' }}>
-                                <div className="leading-none text-center hover:cursor-default" style={{ fontSize: 20 * width + 'px' }}>{itemDetail.itemEmoji}</div>
+                                <div className="leading-none text-center hover:cursor-default" style={{ fontSize: 20 * width + 'px' }}>{itemDetail.emoji}</div>
                                 <div>
                                     <h1 className="" style={{ fontSize: 3.5 * width + 'px' }}>{itemDetail.itemName}</h1>
                                     <div className="" style={{ fontSize: 1.5 * width + 'px' }}>{itemDetail.itemExplanation}</div>

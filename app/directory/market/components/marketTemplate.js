@@ -1,8 +1,7 @@
 'use client'
 
-import AddModal from "../@teacher/components/addModal"
+
 import BuyModal from "./buyModal"
-import DeleteModal from "../@teacher/components/deleteModal"
 import { useState, useRef } from "react"
 import {
     CSSTransition,
@@ -56,7 +55,7 @@ export default function MarketTemplate({ tmpItemList }) {
                     )
                     )}
                 </TransitionGroup>
-                <BuyModal buyList={buyList} userId={userId} money={userData?.money} currencyName={currencyName} currencyEmoji={currencyEmoji} />
+                <BuyModal  buyList={buyList} userId={userId} money={userData?.money} currencyName={currencyName} currencyEmoji={currencyEmoji} />
             </div>
         </div>
     )

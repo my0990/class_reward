@@ -46,7 +46,7 @@ export default function Quest({ role }) {
                 <div className="w-[100%]">
                     {questListData.map((a, i) => {
                         return (
-                            <QuestCard key={i} data={a} setQuestDetailData={setQuestDetailData} studentCount={studentCount} teacherId={teacherId} setIsDetail={setIsDetail} />
+                            <QuestCard key={i} data={a} setQuestDetailData={setQuestDetailData} studentCount={studentCount} teacherId={teacherId} setIsDetail={setIsDetail} role={role}/>
                         )
                     })}
                     {/* {role === "teacher" && <AddQuestBtn />} */}

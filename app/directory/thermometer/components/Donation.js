@@ -18,7 +18,9 @@ export default function Dontaion({ userData, classData, thermoData }) {
 
     }
     const onClose = () => {
+        document.getElementById('donation').close();
         setAmount("");
+        
 
     }
 
@@ -86,7 +88,7 @@ export default function Dontaion({ userData, classData, thermoData }) {
                         </div>
                         <div className="flex justify-center flex-col">
                             <button onClick={onSubmit} className="bg-red-500 rounded-lg mr-[8px] px-[16px] py-[8px] w-full mt-[16px] hover:bg-red-400 text-[1rem] text-white">확인</button>
-                            <button className="bg-gray-400 rounded-lg px-[16px] py-[8px] w-full mt-[8px] hover:bg-gray-300 text-[1rem] text-white">취소</button>
+                            <button onClick={onClose} className="bg-gray-400 rounded-lg px-[16px] py-[8px] w-full mt-[8px] hover:bg-gray-300 text-[1rem] text-white">취소</button>
                         </div>
                         <div className="text-center text-red-500 text-[1.2rem] mt-[8px]"></div>
                     </div>

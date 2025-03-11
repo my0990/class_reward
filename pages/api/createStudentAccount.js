@@ -19,6 +19,17 @@ export default async function handler(req, res) {
     const { userId } = session;
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const code = token.code;
+    const randomUrlArr = [
+      'https://cdn.pixabay.com/photo/2014/03/25/15/23/tangerine-296654_1280.png',
+      'https://cdn.pixabay.com/photo/2022/11/01/19/52/tangerine-7563214_1280.png',
+      'https://cdn.pixabay.com/photo/2021/06/05/22/19/orange-6313871_1280.png',
+      'https://cdn.pixabay.com/photo/2013/07/12/16/59/tangerine-151616_1280.png',
+      'https://cdn.pixabay.com/photo/2022/08/25/21/25/mandarin-7411336_1280.png',
+      'https://images.unsplash.com/photo-1632055214451-559fde197458?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'https://cdn.pixabay.com/photo/2014/04/03/11/57/fruit-312671_1280.png',
+      'https://cdn.pixabay.com/photo/2021/06/04/01/12/orange-6308395_1280.png'
+
+    ]
     const accountInfo = accountArr.map((a) => {
       return (
         {
@@ -34,7 +45,7 @@ export default async function handler(req, res) {
           profileState: '',
           teacher: userId,
           classNumber: Number(a),
-          profileUrl: "https://cdn.pixabay.com/photo/2014/03/25/15/23/tangerine-296654_1280.png",
+          profileUrl: randomUrlArr[Math.floor(Math.random() * randomUrlArr.length)],
           profileImgStorage: {},
           profileTitle: "초보 오렌지",
           inventory: [],

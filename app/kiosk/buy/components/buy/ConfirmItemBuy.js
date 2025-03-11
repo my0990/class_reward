@@ -45,7 +45,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
                         "/api/fetchStudentData",
                         (prev) => {
                             const updatedStudentData = prev.map((student) => student.userId === userId ? {...userData, money: userData.money - itemData.itemPrice, itemList: [...userData?.itemList, {...itemData, itemId: data.itemId}]} : student)
-                            console.log(updatedStudentData)
+                            
                             return updatedStudentData;
                         },
                         false // 서버 요청 없이 즉시 반영

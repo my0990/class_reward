@@ -20,7 +20,7 @@ export default function CharacterCard(props) {
                     <div className="font-semibold">LV. {findLargestSumUnderTarget()}</div>
                     <div className="w-[80px] text-right overflow-hidden whitespace-nowrap">{props?.currencyemoji} {user.money} </div>
                 </div>
-                <div className="flex justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
+                <div className="flex overflow-hidden border-4 border-white justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
                     <img src={user.profileUrl} width="100" height="100" alt="characther" className="rounded-full" />
                 </div>
                 <h1 className="text-[1rem] font-bold text-center overflow-hidden">{user.classNumber}. {user.profileNickname}</h1>

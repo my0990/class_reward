@@ -52,12 +52,6 @@ export default function Home() {
         <div className=" pt-0 flex justify-center">
 
             <div className="w-[1360px] max-[1360px]:w-[1224px] max-[1224px]:w-[1088px] max-[1088px]:w-[952px] max-[952px]:w-[816px] max-[816px]:w-[680px] max-[680px]:w-[544px] max-[544px]:w-[408px] max-[408px]:w-[272px]">
-
-                <div className="overflow-hidden whitespace-nowrap text-orange-500 text-[2rem] h-[64px]  py-2 relative">
-                    <div className="absolute animate-marquee">
-                        ⭐2025년 3월 11일 화요일 저녁 10시 모든 데이터 초기화 예정입니다⭐
-                    </div>
-                </div>
                 <div className="flex py-[16px] mr-[8px] justify-between">
 
                     {isSelectedAll

@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate } from "swr";
-export default function BuyModal({ buyList,  money, currencyName, currencyEmoji, userId }) {
+export default function BuyModal({ buyList, money, currencyName, currencyEmoji, userId }) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const left = (money - buyList?.itemPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -19,7 +19,7 @@ export default function BuyModal({ buyList,  money, currencyName, currencyEmoji,
             }
             fetch("/api/buyItem", {
                 method: "POST",
-                body: JSON.stringify({ itemData: buyList, balance: left, userId:  userId}),
+                body: JSON.stringify({ itemData: buyList, balance: left, userId: userId }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -27,11 +27,26 @@ export default function BuyModal({ buyList,  money, currencyName, currencyEmoji,
                 if (data.result === true) {
                     alert('구매완료');
                     setIsLoading(false);
-                    mutate('/api/fetchClassData')
-                    // const newItemList = itemList.map((a, i) => a.itemId === buyList.itemId ? { ...a, 'itemQuantity': a.itemQuantity - 1 } : a)
-                    // setItemList(newItemList);
+                    mutate(
+                        "/api/fetchClassData",
+                        (prev) => {
+
+                            const updatedItemList = prev.itemList.map((item) => buyList.itemId === item.itemId ? { ...buyList, itemStock: buyList.itemStock - 1 } : item)
+
+                            return { ...prev, itemList: updatedItemList }
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
+                    mutate(
+                        "/api/fetchUserData",
+                        (prev) => {
+                            const updatedUserData = {...prev, money: prev.money - buyList.itemPrice, itemList: [...prev.itemList, {...buyList, itemId: data.itemId}]}
+                            return updatedUserData;
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     document.getElementById('buy').close();
-                    
+
 
                 }
             })
