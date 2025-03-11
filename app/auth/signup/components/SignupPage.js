@@ -35,7 +35,12 @@ export default function SignUpPage() {
         validate,
         type: 'register'
     });
-
+    return(
+        <div>
+            <h1 className="text-orange-500 text-[2rem]">준비중입니다</h1>
+            <div>2025년 3월 12일 공개예정</div>
+        </div>
+    )
     return (
         <form type="POST" onSubmit={submitHandler}>
             <div className="w-full flex flex-col items-center mt-[80px]">
