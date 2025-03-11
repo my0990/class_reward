@@ -61,7 +61,7 @@ export default function AddProfilImgModal() {
             <div className="modal-box p-[24px] dark:bg-orange-100 flex flex-col bg-orange-100 max-w-[320px]">
                 <div className="flex justify-between items-center mb-[16px]">
                     <h1 className="text-[1.6rem] ">프로필 이미지 등록하기</h1>
-                    <a href="https://www.notion.so/example-guide" target="_blank" rel="noopener noreferrer" className="rounded-full bg-orange-300 cursor-pointer w-[24px] h-[24px] flex justify-center items-center">
+                    <a href="https://www.notion.so/1b327dcf545c80e3afb3d6000b98f3f5?pvs=4" target="_blank" rel="noopener noreferrer" className="rounded-full bg-orange-300 cursor-pointer w-[24px] h-[24px] flex justify-center items-center">
                         ?
                     </a>
                 </div>

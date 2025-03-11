@@ -1,12 +1,14 @@
 import { connectDB } from '@/app/lib/database'
 import { ObjectId } from 'mongodb';
-
+import {getToken} from 'next-auth/jwt'
 export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
     // const {userId, point} = req.body;
-
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const code = token.code;
+    console.log(code)
     // console.log(req.body)
     const db = (await connectDB).db('data');
     const questId = ObjectId.createFromHexString(req.body.questData._id)
@@ -24,7 +26,7 @@ export default async function handler(req, res) {
 
 
     if (questReward) {
-      const historyArray = req.body.rewarded.map((a) => ({ userId: a.userId, balance: parseInt(a.money) + parseInt(questReward), type: 'deposit', amount: parseInt(questReward), date: new Date(), name: '퀘스트 완료', expiresAfter: new Date() }))
+      const historyArray = req.body.rewarded.map((a) => ({ code: code, userId: a.userId, balance: parseInt(a.money) + parseInt(questReward), type: 'deposit', amount: parseInt(questReward), date: new Date(), name: '퀘스트 완료', expiresAfter: new Date() }))
       const response4 = await db.collection('history').insertMany(historyArray)
     }
     const response2 = await db.collection('quest').updateOne({ _id: questId }, { $addToSet: { finished: { $each: userIds } } })

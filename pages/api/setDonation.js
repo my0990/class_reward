@@ -26,7 +26,7 @@ export default async function handler(req, res) {
             })
 
         const response3 = await db.collection('history').insertOne(
-            {
+            {   code: code,
                 userId: userId,
                 balance: money - amount,
                 type: 'withDrawal',

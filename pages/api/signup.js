@@ -55,7 +55,7 @@ export default async function handler(req, res) {
     const status4 = await db2.collection('thermometer').insertOne({
       code: uniqueCode,
       isActive: false,
-      requireCurrency: 1,
+      requireCurrency: 999,
       reward: {0: "", 10: "", 20: "", 30: "", 40: "", 50: "", 60: "", 70: "", 80: "", 90: "", 100: ""},
       donators: {},
       adjustment: 0,

@@ -6,11 +6,11 @@ import { redirect } from "next/navigation"
 
 export default async function RootLayout({ children }) {
     const session = await getServerSession(authOptions);
-    console.log(session)
-    // if (!session) {
-    //     redirect("/");
+    console.log
+    if (!session) {
+        redirect("/");
 
-    // } else {
+    } else {
         return (
             <div className="dark:text-black flex flex-col h-screen">
                 <Header session={session} />
@@ -18,5 +18,5 @@ export default async function RootLayout({ children }) {
                 <SpeedInsights />
             </div>
         )
-    // }
+    }
 }

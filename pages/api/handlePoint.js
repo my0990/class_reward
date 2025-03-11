@@ -1,6 +1,5 @@
 import { connectDB } from '@/app/lib/database'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getServerSession } from 'next-auth/next';
+import {getToken} from 'next-auth/jwt'
 
 export default async function handler(req, res) {
 
@@ -14,14 +13,16 @@ export default async function handler(req, res) {
     // let itemId = (new ObjectId()).toString();
     const db = (await connectDB).db('data');
     const idArray = targetStudent.map((a) => a.userId)
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const code = token.code;
 
     if (isSend) {
       const response = await db.collection('user_data').updateMany({ userId: { $in: idArray }, role: 'student' }, { $inc: { money: parseInt(point) } })
-      const historyArray = targetStudent.map((a) => ({ userId: a.userId, balance: parseInt(a.money) + parseInt(point), type: 'deposit', amount: point, date: new Date(), name: '선생님으로부터 받음', expiresAfter: new Date() }))
+      const historyArray = targetStudent.map((a) => ({ code: code, userId: a.userId, balance: parseInt(a.money) + parseInt(point), type: 'deposit', amount: point, date: new Date(), name: '선생님으로부터 받음', expiresAfter: new Date() }))
       const response2 = await db.collection('history').insertMany(historyArray)
     } else {
       const response = await db.collection('user_data').updateMany({ userId: { $in: idArray }, role: 'student' }, { $inc: { money: -parseInt(point) } })
-      const historyArray = targetStudent.map((a) => ({ userId: a.userId, balance: parseInt(a.money) - parseInt(point), type: 'withDrawal', amount: point, date: new Date(), name: '선생님으로부터 받음', expiresAfter: new Date() }))
+      const historyArray = targetStudent.map((a) => ({ code: code, userId: a.userId, balance: parseInt(a.money) - parseInt(point), type: 'withDrawal', amount: point, date: new Date(), name: '선생님으로부터 받음', expiresAfter: new Date() }))
       const response2 = await db.collection('history').insertMany(historyArray)
     }
 
