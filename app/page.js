@@ -12,11 +12,7 @@ export default async function Home() {
   return (
     <main>
       <div className="flex justify-center items-center flex-wrap bg-orange-200 h-[100vh] ">
-        
         <div>
-          <div className="text-center text-[1.5rem]">
-            99% 완성
-          </div>
           <Link href="/auth/login/teacher">
             <div className=" bg-white text-center text-[2rem] cursor-pointer m-[16px] rounded-3xl py-[32px] px-[64px] transition-all hover:scale-110">
               <div>선생님 로그인</div>

@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const questId = new ObjectId();
 
     
-    const response = await db.collection('quest').insertOne({_id: questId, code: code, questName: questName, questGoal: questGoal, questReward: questReward, questExp: questExp, questTitle: questTitle, finished: [],  time: new Date() }, { upsert: true })
+    const response = await db.collection('quest').insertOne({_id: questId, code: code, questName: questName, questGoal: questGoal, questReward: questReward, questExp: questExp, questTitle: questTitle, finished: [],  time: new Date(), pending: [] }, { upsert: true })
 
 
     if(response){
