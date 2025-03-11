@@ -1,8 +1,9 @@
 import { useState } from "react"
-
+import { mutate } from "swr";
 export default function Dontaion({ userData, classData, thermoData }) {
     const [amount, setAmount] = useState("");
-    const [isLoading,setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    console.log(thermoData);
     const onChange = (e) => {
         if (/^\d*$/.test(e.target.value)) {
 
@@ -23,7 +24,7 @@ export default function Dontaion({ userData, classData, thermoData }) {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        if(isNaN(Number(parseInt(amount).toFixed(1))) || Number(amount) === 0){
+        if (isNaN(Number(parseInt(amount).toFixed(1))) || Number(amount) === 0) {
             alert('입력값을 확인해주세요')
             return;
         }
@@ -42,8 +43,27 @@ export default function Dontaion({ userData, classData, thermoData }) {
                 if (data.result === true) {
                     alert("기부하였습니다");
                     setAmount('')
+                    mutate(
+                        "/api/fetchThermometerData",
+                        (prev) => {
+                            const updatedDonators = {...prev.donators};
+                            updatedDonators[userData.userId] = (updatedDonators[userData.userId] ?? 0) + Number(parseInt(amount).toFixed(1));
+
+                        return {...prev, donators: updatedDonators};
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
+                    mutate(
+                        "/api/fetchUserData",
+                        (prev) => {
+                            
+
+                        return {...prev, money: prev.money - Number(parseInt(amount).toFixed(1))};
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     document.getElementById('donation').close()
-                    
+
                 }
             })
         }
@@ -61,7 +81,7 @@ export default function Dontaion({ userData, classData, thermoData }) {
                         <div className="mt-[16px] flex justify-end text-[1.5rem]">
                             <input type="number" className="max-w-[120px] text-right border-b-2 border-black px-[8px] min-w-[32px] outline-none bg-orange-200" onChange={onChange} value={amount} />{classData.currencyName} 기부하기
                         </div>
-                        <div className="text-right text-[1.2rem] text-red-500 mt-[4px]">약 {amount/thermoData.requireCurrency}도 상승</div>
+                        <div className="text-right text-[1.2rem] text-red-500 mt-[4px]">약 {amount / thermoData.requireCurrency}도 상승</div>
                         <div className="mt-[8px]">
                         </div>
                         <div className="flex justify-center flex-col">

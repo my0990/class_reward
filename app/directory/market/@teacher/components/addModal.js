@@ -11,23 +11,39 @@ export default function AddModal() {
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [emoji, setEmoji] = useState();
+    const [inputData, setInputData] = useState({ itemName: '', itemPrice: '', itemStock: '', itemExplanation: '', emoji: '' })
+    
+    const onChange = (e) => {
+        const { name, value } = e.target
 
 
+        const numberValue = Number(value);
+        if (name === 'itemName' || name === 'itemExplanation') {
+            setInputData({ ...inputData, [name]: value })
+            return
+        }
+        if (/^\d*$/.test(numberValue)) {
+            setInputData({ ...inputData, [name]: value })
+
+        }
+
+
+    }
     const onSubmit = (e) => {
         e.preventDefault();
         if (isLoading) {
             return
         } else {
             setIsLoading(true);
-            if (nameRef.current.value === "" || priceRef.current.value === "" || quantityRef.current.value === "" || explanationRef.current.value === "") {
+            if (inputData.itemName === "" || inputData.itemPrice === "" || inputData.itemStock === "" || inputData.itemExplanation === "") {
                 setIsError(true)
                 setIsLoading(false);
                 return
             }
             fetch("/api/addItem", {
                 method: "POST",
-                body: JSON.stringify({ itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemStock: quantityRef.current.value, itemExplanation: explanationRef.current.value, emoji: emoji }),
-                headers: {  
+                body: JSON.stringify({ ...inputData, emoji: emoji }),
+                headers: {
                     "Content-Type": "application/json",
                 },
             }).then((res) => res.json()).then((data) => {
@@ -37,17 +53,14 @@ export default function AddModal() {
                     mutate(
                         "/api/fetchClassData",
                         (prev) => {
-                            const updatedItemList = [...prev.itemList,{itemName: nameRef.current.value, itemPrice: priceRef.current.value, itemStock: quantityRef.current.value, itemExplanation: explanationRef.current.value, emoji: emoji, itemId: data.itemId}]
-                            
-                            return {...prev, itemList: updatedItemList}
+                            const updatedItemList = [...prev.itemList, { ...inputData,itemId: data.itemId, emoji: emoji }]
+
+                            return { ...prev, itemList: updatedItemList }
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
                     document.getElementById('add').close()
-                    nameRef.current.value = ""
-                    priceRef.current.value = ""
-                    quantityRef.current.value = ""
-                    explanationRef.current.value = ""
+                    setInputData({ itemName: '', itemPrice: '', itemStock: '', itemExplanation: '', emoji: '' });
                     setEmoji(null)
 
                 }
@@ -57,10 +70,7 @@ export default function AddModal() {
     }
 
     const onCloseModal = () => {
-        nameRef.current.value = ""
-        priceRef.current.value = ""
-        quantityRef.current.value = ""
-        explanationRef.current.value = ""
+        setInputData({ itemName: '', itemPrice: '', itemStock: '', itemExplanation: '', emoji: '' });
         setEmoji(null)
         document.getElementById('add').close()
         setTimeout(() => {
@@ -120,19 +130,19 @@ export default function AddModal() {
                     <div className="w-[320px]">
                         <div className="mb-[16px]">
                             <h1 >아이템 이름</h1>
-                            <input ref={nameRef} className="w-[100%] rounded-xl h-[40px] bg-orange-100 outline-0 text-[1.3rem] indent-3" />
+                            <input onChange={onChange} name="itemName" value={inputData.itemName} className="w-[100%] rounded-xl h-[40px] bg-orange-100 outline-0 text-[1.3rem] indent-3" />
                         </div>
                         <div className="mb-[16px]">
                             <h1 >아이템 설명</h1>
-                            <input ref={explanationRef} className="w-[100%] rounded-xl h-[40px] bg-orange-100 outline-0 text-[1.3rem] indent-3" />
+                            <input onChange={onChange} name="itemExplanation" value={inputData.itemExplanation}  className="w-[100%] rounded-xl h-[40px] bg-orange-100 outline-0 text-[1.3rem] indent-3" />
                         </div>
                         <div className="mb-[16px]">
                             <h1>가격</h1>
-                            <input type="number" ref={priceRef} className="w-[100%] rounded-xl h-[40px] bg-orange-100 outline-0 text-[1.3rem] indent-3 " />
+                            <input onChange={onChange} name="itemPrice" value={inputData.itemPrice}  className="w-[100%] rounded-xl h-[40px] bg-orange-100 outline-0 text-[1.3rem] indent-3 " />
                         </div>
                         <div className="mb-[32px]">
                             <h1>수량</h1>
-                            <input type="number" ref={quantityRef} className="w-[100%] rounded-xl h-[40px] bg-orange-100 outline-0 text-[1.3rem] indent-3" />
+                            <input onChange={onChange} name="itemStock" value={inputData.itemStock}  className="w-[100%] rounded-xl h-[40px] bg-orange-100 outline-0 text-[1.3rem] indent-3" />
                         </div>
 
                         <div className="flex flex-col relative">

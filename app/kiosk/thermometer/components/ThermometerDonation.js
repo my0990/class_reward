@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import ConfirmModal from "./ConfirmModal";
 import { useRouter } from "next/navigation";
+import { mutate } from "swr";
+
 export default function ThermometerDonation({ requestData }) {
     const { data: thermoData, isLoading: isThermoLoading, isError: isThermoError } = fetchData('/api/fetchThermometerData');
 
@@ -17,8 +19,8 @@ export default function ThermometerDonation({ requestData }) {
     const [error, setError] = useState('');
     const [width, setWidth] = useState(32);
     const [isLoading, setIsLoading] = useState(false);
-    const { userId, money, profileNickname, teacher } = requestData.userData;
-
+    const { userId, money } = requestData.userData;
+    const {userData} = requestData;
     const onChange = (e) => {
         setWidth(mirrorRef.current.clientWidth);
         if (/^\d*$/.test(e.target.value)) {
@@ -36,7 +38,7 @@ export default function ThermometerDonation({ requestData }) {
     const onSubmit = (e) => {
         e.preventDefault();
         console.log(typeof (amount))
-        if(isNaN(Number(parseInt(amount).toFixed(1))) || Number(amount) === 0){
+        if (isNaN(Number(parseInt(amount).toFixed(1))) || Number(amount) === 0) {
             setError('입력값을 확인해주세요')
             return;
         }
@@ -55,6 +57,25 @@ export default function ThermometerDonation({ requestData }) {
                 if (data.result === true) {
                     alert(`${Number(parseInt(amount).toFixed(1))}${currencyName}을/를 기부하였습니다`)
                     setIsLoading(false)
+                    mutate(
+                        "/api/fetchThermometerData",
+                        (prev) => {
+                            const updatedDonators = { ...prev.donators };
+                            updatedDonators[userData.userId] = (updatedDonators[userData.userId] ?? 0) + Number(parseInt(amount).toFixed(1));
+
+                            return { ...prev, donators: updatedDonators };
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
+                    mutate(
+                        "/api/fetchStudentData",
+                        (prev) => {
+                            const updatedStudentData = prev.map((student) => student.userId === userId ? {...userData, money: userData.money - Number(parseInt(amount).toFixed(1))} : student)
+
+                            return updatedStudentData;
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     route.push('/kiosk')
                 }
             })
@@ -71,7 +92,7 @@ export default function ThermometerDonation({ requestData }) {
     if (isThermoLoading || isClassLoading) return <div>Loading data...</div>;
     if (isThermoError || isClassError) return <div>Error loading data</div>;
     const { currencyName, currencyEmoji } = classData;
-    const { userData } = requestData;
+
     return (
 
 

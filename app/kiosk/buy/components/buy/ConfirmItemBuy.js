@@ -2,7 +2,7 @@ import { useState } from "react";
 import FinishBuyModal from "./FinishBuyModal";
 import { fetchData } from "@/hooks/swrHooks";
 import Link from "next/link";
-
+import { mutate } from "swr";
 export default function ConfirmItemBuy({ requestData, setRequestData }) {
 
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
@@ -11,6 +11,8 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
 
     const [isLoading, setIsLoading] = useState(false);
     const { itemData, userData } = requestData;
+    console.log(itemData)
+    console.log(userData)
     const { money, userId, profileName } = userData;
     const [fetchItemId, setFetchItemId] = useState();
 
@@ -29,11 +31,28 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
 
                 if (data.result === true) {
                     document.getElementById('finishModal').showModal();
+                    mutate(
+                        "/api/fetchClassData",
+                        (prev) => {
 
+                            const updatedItemList = prev.itemList.map((item)=> itemData.itemId === item.itemId ? {...itemData, itemStock: itemData.itemStock - 1} : item)
+
+                            return { ...prev, itemList: updatedItemList }
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
+                    mutate(
+                        "/api/fetchStudentData",
+                        (prev) => {
+                            const updatedStudentData = prev.map((student) => student.userId === userId ? {...userData, money: userData.money - itemData.itemPrice, itemList: [...userData?.itemList, {...itemData, itemId: data.itemId}]} : student)
+                            console.log(updatedStudentData)
+                            return updatedStudentData;
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     setFetchItemId(data.itemId)
-                } else {
-                    setIsLoading(false)
-                }
+                } 
+                setIsLoading(false);
             })
         }
 
@@ -42,9 +61,10 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
     if (isClassDataLoading || isStudentDataLoading) return <div>Loading data...</div>;
     if (isClassDataError || isStudentDataError) return <div>Error loading data</div>;
 
-    const { currencyEmoji, currencyName } = classData;
+    const {  currencyName } = classData;
 
     const { emoji, itemName, itemExplanation, itemStock, itemPrice } = requestData.itemData;
+    console.log(studentData)
     return (
         <div className="flex  justify-center min-h-[100vh] py-[32px]">
             <div className="flex flex-col justify-between w-[800px] max-[800px]:w-[90%] min-w-[400px]">

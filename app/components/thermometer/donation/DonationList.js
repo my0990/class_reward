@@ -1,6 +1,5 @@
 export default function DonationList({ thermoData, currencyName, studentData }) {
     const { donators } = thermoData;
-    console.log(studentData)
     const userMap = studentData.reduce((acc, user) => {
         acc[user.userId] = user.profileNickname;
         return acc;

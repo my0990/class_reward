@@ -9,11 +9,6 @@ export default async function handler(req, res) {
 
         const db = (await connectDB).db('data');
         const { userId, amount,  money } = req.body;
-        console.log(amount)
-        console.log(amount)
-        console.log(amount)
-        console.log(amount)
-        console.log(amount)
         const response = await db.collection('user_data').updateOne(
             { userId: userId },
             {

@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { mutate } from "swr";
+export default function ConfirmItemUse({ itemData, userData }) {
 
-export default function ConfirmItemUse({itemData, userData}) {
-    
-    
+
     const [isLoading, setIsLoading] = useState(false);
     const onClose = () => {
         document.getElementById('confirmModal').close();
     }
     const route = useRouter();
+    console.log(itemData, userData)
     const onSubmit = (data) => {
 
         const { itemName, itemId } = itemData;
@@ -29,6 +30,17 @@ export default function ConfirmItemUse({itemData, userData}) {
 
                 if (data.result === true) {
                     alert('아이템을 사용하였습니다')
+                    mutate(
+                        "/api/fetchStudentData",
+                        (prev) => {
+                            const updatedItemList = userData.itemList.filter((item) => item.itemId !== itemId)
+                            console.log(updatedItemList)
+                            const updatedStudentData = prev.map((student) => student.userId === userId ? { ...userData, itemList: updatedItemList } : student)
+
+                            return updatedStudentData;
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     route.push('/kiosk')
                 }
                 setIsLoading(false)

@@ -1,13 +1,14 @@
 'use client'
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { mutate } from "swr";
 
-
-export default function FinishBuyModal({requestData, fetchItemId}) {
-    const { itemName, itemPrice} = requestData.itemData;
-    const { userId, money} = requestData.userData;
+export default function FinishBuyModal({ requestData, fetchItemId }) {
+    const { itemName, itemPrice } = requestData.itemData;
+    const { userId, money } = requestData.userData;
     const [isLoading, setIsLoading] = useState(false);
     const route = useRouter();
+    const {userData, itemData} = requestData;
     const onItemUse = (e) => {
         if (isLoading) {
             return
@@ -16,7 +17,7 @@ export default function FinishBuyModal({requestData, fetchItemId}) {
             fetch("/api/useItem", {
                 method: "POST",
                 // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemName, userId: userId,  balance: money - itemPrice, itemId: fetchItemId}),
+                body: JSON.stringify({ itemName: itemName, userId: userId, balance: money - itemPrice, itemId: fetchItemId }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -24,6 +25,16 @@ export default function FinishBuyModal({requestData, fetchItemId}) {
 
                 if (data.result === true) {
                     alert('아이템을 사용하였습니다');
+                    mutate(
+                        "/api/fetchStudentData",
+                        (prev) => {
+                            const updatedItemList = userData.itemList.filter((item) => item.itemId !== fetchItemId )
+                            const updatedStudentData = prev.map((student) => student.userId === userId ? { ...userData,  itemList: updatedItemList } : student)
+
+                            return updatedStudentData;
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
                     route.push('/kiosk')
                 } else {
                     setIsLoading(false)

@@ -34,7 +34,7 @@ export default function CheckPwdModal({ type, requestData, setRequestData }) {
 
 
                 } else {
-                    document.getElementById('my_modal_2').showModal()
+                    alert('비밀번호를 확인해주세요')
                     pwdRef.current.value = ""
                     setIsLoading(false)
                     // onCloseModal()

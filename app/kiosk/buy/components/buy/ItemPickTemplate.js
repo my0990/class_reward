@@ -18,7 +18,8 @@ export default function ItemPickTemplate({ setRequestData }) {
 
     if (isClassDataLoading) return <div>Loading data...</div>;
     if (isClassDataError) return <div>Error loading data</div>;
-    const { itemList, currencyEmoji, currencyName } = classData;
+    const { itemList,  currencyName } = classData;
+
     return (
         <div className="flex flex-col  items-center relative  bg-orange-100 min-h-[100vh]">
             <div className="flex justify-betwen min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
@@ -48,7 +49,7 @@ export default function ItemPickTemplate({ setRequestData }) {
                 {itemList?.map((a, i) => {
                     return (
                         <div key={i} className={`m-[16px] w-[192px]   flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemStock <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"} `}>
-                            <ItemBuyCard onClick={e => onClick(a)} itemData={a} currencyname={currencyName} currencyemoji={currencyEmoji} />
+                            <ItemBuyCard onClick={e => onClick(a)} itemData={a} currencyname={currencyName} />
                         </div>
                     )
                 })}

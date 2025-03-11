@@ -1,7 +1,8 @@
 import soldOut from "@/public/soldOut.png"
 import Image from "next/image";
-export default function ItemBuyCard({onClick, itemData}) {
-    const {itemStock, itemName, itemExplanation,itemPrice, checked, emoji, currencyName} = itemData;
+export default function ItemBuyCard({onClick, itemData, currencyname}) {
+    const {itemStock, itemName, itemExplanation,itemPrice,  emoji} = itemData;
+    
     function getByteB(str) {
         let byte = 0;
         for (let i = 0; i < str?.length; ++i) {
@@ -40,7 +41,7 @@ export default function ItemBuyCard({onClick, itemData}) {
 
                 </div>
                 <div className="text-[1.5rem] text-red-500 text-end mt-[16px] absolute bottom-2 right-3">
-                    {itemPrice}<span className="ml-[4px]">{currencyName}</span>
+                    {itemPrice}<span className="ml-[4px]">{currencyname}</span>
                 </div>
             </div>
         </div>

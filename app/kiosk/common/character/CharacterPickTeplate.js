@@ -52,7 +52,7 @@ export default function CharacterPickTemplate({ type, requestData, setRequestDat
                             <h1 className="text-[2rem] flex items-center">{type === "use" ? "아이템 사용" : "학급 온도계 기부"}</h1>
                             <div className=" flex  cursor-pointer hover:scale-110 transition-all">
 
-                                <div onClick={() => route.push('/kiosk')} className="flex items-center text-[2rem]">처음으로</div>
+                                {type !== 'use' ? <div onClick={() => route.push('/kiosk')} className="flex items-center text-[2rem]">처음으로</div> : <div></div>}
                             </div>
                         </div>
                     </div>

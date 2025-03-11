@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
-    const { name, goal, reward, exp, title } = req.body;
+    const { questName, questGoal, questReward, questExp, questTitle } = req.body;
 
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const code = token.code;
@@ -18,14 +18,14 @@ export default async function handler(req, res) {
 
     const db = (await connectDB).db('data');
 
-
+    const questId = new ObjectId();
 
     
-    const response = await db.collection('quest').insertOne({ code: code, questName: name, questGoal: goal, questReward: reward, questExp: exp, questTitle: title, finished: [],  time: new Date() }, { upsert: true })
+    const response = await db.collection('quest').insertOne({_id: questId, code: code, questName: questName, questGoal: questGoal, questReward: questReward, questExp: questExp, questTitle: questTitle, finished: [],  time: new Date() }, { upsert: true })
 
 
     if(response){
-      res.status(200).json({ result: true, message: 'quest 추가 성공' });
+      res.status(200).json({ result: true, message: 'quest 추가 성공',questId: questId.toString() });
     } else {
       res.status(402).json({result: false})
     }

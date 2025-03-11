@@ -36,12 +36,9 @@ export default function ProfileBuyModal({ pickedData, currencyName, userId, mone
                     mutate(
                         "/api/fetchUserData",
                         (prevItems) => {
-                            console.log(prevItems)
                             const updatedItems = { ...prevItems.profileImgStorage, [pickedData.urlId]: pickedData.url};
                             const updatedMoney = prevItems.money - pickedData.price;
-                            console.log("1: ", updatedItems)
-                            
-                            console.log("2: ",updatedItems)
+
                             return {... prevItems, profileImgStorage: updatedItems, money: updatedMoney};
                         },
                         false // 서버 요청 없이 즉시 반영

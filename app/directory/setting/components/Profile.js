@@ -10,7 +10,7 @@ export default function Profile({ }) {
     const [updatedUserData,setUpdatedUserData] = useState({profileNickname: '', profileState: '', profileUrl: ''})
 
     useEffect(()=>{
-        setUpdatedUserData(() => ({profileNickname: userData?.profileNickname, profileState: userData?.profileState, profileUrl: userData?.profileUrl}));
+        setUpdatedUserData(() => ({profileNickname: userData?.profileNickname, profileState: userData?.profileState ,profileUrl: userData?.profileUrl}));
     },[userData])
 
     const onChange = (e) => {
@@ -33,10 +33,6 @@ export default function Profile({ }) {
         })
     }
 
-    const onClick = (a) => {
-        setUpdatedUserData(prev => ({ ...prev, profileUrl: a }))
-        console.log(userData)
-    }
 
     if (isUserLoading) return <div>Loading data...</div>;
     if (isUserError) return <div>Error loading data</div>;
@@ -46,13 +42,6 @@ export default function Profile({ }) {
             <div className="text-[1.1rem] w-[280px]">
                 <h1 className="text-[2rem] mb-[24px]">프로필</h1>
                 <div className="avatar w-[100%] justify-center">
-                    {/* {useMemo(() => {
-                        return (
-                            <div onClick={() => document.getElementById('profileSetModal').showModal()} className="hover:scale-105 transition-all w-24 rounded-full ring ring-primary cursor-default ring-offset-base-100 ring-offset-2 cursor-pointer">
-                                <img src={profileUrl} width="90" height="90" alt="characther" />
-                            </div>
-                        )
-                    }, [])} */}
                     <div className="transition-all w-24 rounded-full cursor-default border-orange-200 border-[6px] ring-offset-base-100 ring-offset-2 ">
                         {updatedUserData?.profileUrl ? <img src={updatedUserData?.profileUrl} width="100" height="100" alt="characther" /> : <div></div>}
                     </div>

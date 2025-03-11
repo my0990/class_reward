@@ -40,7 +40,8 @@ export default async function handler(req, res) {
           inventory: [],
           role: 'student',
           exp: 0,
-          titles: []
+          titles: [],
+          itemList: []
         })
     })
     // MongoDB 연결

@@ -9,7 +9,7 @@ export default function EditProfileImgModal({ modalData, currencyEmoji }) {
 
     const spanRef = useRef(null);
     const inputRef = useRef(null);
-    console.log(modalData)
+
     // const onCheckboxChange = (e) => {
     //     if (isEdited === false) {
     //         setIsEdited(true)
@@ -58,10 +58,6 @@ export default function EditProfileImgModal({ modalData, currencyEmoji }) {
                                 Object.entries({...prev.profileImgStorage}).filter(([key,value]) => key !== modalData.urlId)
                             );
 
-                            console.log(newObj)
-                            console.log(newObj)
-                            console.log(newObj)
-                            console.log(newObj)
                             return {...prev, profileImgStorage: newObj};
 
 
