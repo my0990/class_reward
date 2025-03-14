@@ -5,9 +5,11 @@ import Link from "next/link";
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (session) {
     redirect("/directory/dashboard")
-  }
+  } else {
+  
+    
 
   return (
     <main>
@@ -29,4 +31,4 @@ export default async function Home() {
       </div>
     </main>
   );
-}
+}}
