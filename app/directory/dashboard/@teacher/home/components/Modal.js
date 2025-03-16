@@ -57,7 +57,7 @@ export default function Modal({ isSend, currencyName, targetStudent, clearAll, s
                         "/api/fetchStudentData",
                         (prev) => {
                             console.log(prev)
-                            return studentArr.map((a,i)=> a.isactive === true ? {...a, money: Number(a.money) + Number(point)} : a);
+                            return studentArr.map((a,i)=> a.isactive === true ? {...a, money: isSend ? Number(a.money) + Number(point) : Number(a.money) - Number(point)} : a);
 
                         },
                         false // 서버 요청 없이 즉시 반영
