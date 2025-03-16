@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     // 성공시 response
 
     const studentArr = {};
-    for (let i = 1; i <= 30; i++) {
+    for (let i = 1; i <= 40; i++) {
       studentArr[i] = false;
     }
     const status3 = await db2.collection('class_data').insertOne({
