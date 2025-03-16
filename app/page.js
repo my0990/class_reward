@@ -17,7 +17,7 @@ export default async function Home() {
         <div>
           <Link href="/auth/login/teacher">
             <div className=" bg-white text-center text-[2rem] cursor-pointer m-[16px] rounded-3xl py-[32px] px-[64px] transition-all hover:scale-110">
-              <div>선생님 로그인</div>
+              <div>선생님 로그인2</div>
             </div>
           </Link>
           <Link href="/auth/login/student">
