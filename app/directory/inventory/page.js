@@ -1,4 +1,4 @@
-
+'use client'
 import dynamic from 'next/dynamic'
 const DynamicComponentWithNoSSR = dynamic(
     () => import('./components/inventoryTemplate'), // dynamic import 할 컴포넌트를 불러오고,
