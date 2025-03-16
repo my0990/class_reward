@@ -35,7 +35,7 @@ export default function MarketTemplate() {
                     {itemList?.map((a, i) =>
                     (
 
-                            <div className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a?.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} ref={nodeRef}>
+                            <div key={i} className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a?.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} >
                                 <ItemCard data={a} currencyName={currencyName} onClick={onDelete} />
                             </div>
 

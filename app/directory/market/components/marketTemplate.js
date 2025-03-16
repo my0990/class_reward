@@ -40,21 +40,17 @@ export default function MarketTemplate({ tmpItemList }) {
 
         <div className="flex justify-center">
             <div className=" min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
-                <TransitionGroup noderef={nodeRef} className="flex p-[8px] flex-wrap">
+                <div noderef={nodeRef} className="flex p-[8px] flex-wrap">
                     {itemList?.map((a, i) =>
                     (
-                        <CSSTransition
-                            key={a.itemId}
-                            timeout={600}
-                            classNames="item"
-                        >
-                            <div className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} ref={nodeRef}>
+
+                            <div key={i} className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} >
                                 <ItemCard data={a} onClick={onBuy} currencyName={currencyName} />
                             </div>
-                        </CSSTransition>
+
                     )
                     )}
-                </TransitionGroup>
+                </div>
                 <BuyModal  buyList={buyList} userId={userId} money={userData?.money} currencyName={currencyName} currencyEmoji={currencyEmoji} />
             </div>
         </div>
