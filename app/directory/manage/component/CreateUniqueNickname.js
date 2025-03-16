@@ -3,7 +3,8 @@ import { useState, useRef } from "react"
 import { mutate } from "swr";
 export default function CreateUniqueNickname() {
     const [error, setError] = useState(false);
-    const [isLoading,setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isClick,setIsClick] = useState(false);
     const ref = useRef();
     const onClick = (e) => {
 
@@ -16,7 +17,7 @@ export default function CreateUniqueNickname() {
                 setError("아무것도 입력되어 있지 않습니다")
                 setIsLoading(false);
                 return
-            } else if(/\d/.test(ref.current.value)){
+            } else if (/\d/.test(ref.current.value)) {
                 setError("숫자는 입력할 수 없습니다")
                 setIsLoading(false);
                 return
@@ -48,19 +49,29 @@ export default function CreateUniqueNickname() {
                 </legend>
                 <ol>
                     <li>
-                        1. 고유 닉네임은 임의의 숫자를 추가하여 학생들의 계정 아이디가 됩니다. <br></br>
-                        ex&#41; 꿈틀, 새싹, power...
+                        1. 고유 닉네임은 학급 번호를 추가하여 학생들의 계정 아이디가 됩니다. <br></br>
+                        계정 아이디 -&#62; 고유아이디 + 학급번호<br></br>
+                        ex&#41; <span className="text-orange-500">꿈틀</span>이 고유닉네임이라면 학생들 아이디는 꿈틀1, 꿈틀2, 꿈틀3... 가 됩니다.
+                    </li>
+                    <li className="mt-[8px] flex flex-wrap">
+                        <div>고유 닉네임이 <span className="text-orange-500">쿠키</span>, 학생의 학급 번호가 <span className="text-green-500">3</span>번이라면 학생 아이디는 뭐가 될까요?</div>
+                        {isClick ? <div className="ml-[8px] text-orange-500">쿠키<span className="text-green-500">3</span></div> : <div onClick={()=>setIsClick(true)} className="cursor-pointer ml-[8px] w-[50px] bg-gray-500"></div>}
                     </li>
                     <li className="mt-[8px]">
-                        2. 한번 생성한 후에는 수정할 수 없습니다.
+                        2. 학생들은 계정 아이디와 비밀번호를 입력하여 로그인합니다. 초기 비밀번호는 1234입니다.
+                    </li>
+
+                    <li className="mt-[8px] bg-red-400">
+                        3. 한번 생성한 후에는 수정할 수 없습니다!!!!
                     </li>
                     <li className="mt-[8px]">
-                        3. 숫자는 입력할 수 없습니다.
+                        4. 숫자는 입력할 수 없습니다.
                     </li>
+
                 </ol>
                 <div className="flex justifty-center flex-col items-center mt-[32px]">
                     <div className="flex flex-col">
-                        <input ref={ref} placeholder="고유 별명을 입력하세요" className="mb-[8px] outline-orange-400 p-[8px] rounded-lg border-gray-300 border-2"/>
+                        <input ref={ref} placeholder="고유 별명을 입력하세요" className="mb-[8px] outline-orange-400 p-[8px] rounded-lg border-gray-300 border-2" />
                         <div className="text-red-500 text-[1rem] text-center">{error}</div>
                         <button onClick={onClick} className="bg-orange-300 p-[8px] mt-[8px] rounded-lg hover:bg-orange-500">확인</button>
                     </div>

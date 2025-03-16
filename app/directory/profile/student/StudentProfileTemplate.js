@@ -13,10 +13,6 @@ export default function StudentProfileTemplate({ }) {
     const [filterdData,setFilteredData] = useState([]);
 
     useEffect(()=>{
-        console.log('use Effect')
-        console.log('use Effect')
-        console.log('use Effect')
-        console.log('use Effect')
         if(classData && userData){
             const updatedClassItems = Object.keys(classData.profileImgStorage).map(key => {
                 const classItem = classData.profileImgStorage[key];
@@ -38,10 +34,6 @@ export default function StudentProfileTemplate({ }) {
               
                 // 유저가 아이템을 가지고 있지 않으면 원래 아이템 그대로 반환
               });
-              console.log(updatedClassItems)
-              console.log(updatedClassItems)
-              console.log(updatedClassItems)
-              console.log(updatedClassItems)
               setFilteredData(updatedClassItems)
         }
     },[userData, classData])
