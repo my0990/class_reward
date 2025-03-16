@@ -47,7 +47,9 @@ export default function TeacherProfileTemplate({ urlObj }) {
                     <div className="flex p-[8px] flex-wrap">
                         {classData?.profileImgStorage && Object.keys(classData?.profileImgStorage)?.map((a, i) =>
                         (
-                            <ProfileCard setModalData={setModalData} urlData={classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
+                            <div key={a}>
+                                <ProfileCard setModalData={setModalData} urlData={classData?.profileImgStorage[a]} urlId={a} currencyName={currencyName} />
+                            </div>
                         )
                         )}
                         <div className="p-[16px] w-[192px] h-[300px] justify-center items-center flex cursor-pointer font-bold rounded-lg m-[16px]  relative bg-orange-100 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg hover:scale-110 transition-all" onClick={() => document.getElementById('addProfileImg').showModal()}>
