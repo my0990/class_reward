@@ -2,13 +2,20 @@ import CharacterCard from "@/app/kiosk/common/character/CharacterCard";
 import CheckPwdModal from "@/app/kiosk/common/character/CheckPwdModal";
 import { fetchData } from "@/hooks/swrHooks";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { mutate } from "swr";
 
 export default function CharacterPickTemplate({ type, requestData, setRequestData }) {
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
     const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData('/api/fetchStudentData');
 
     const { itemName, itemPrice, itemExplanation, itemStock, emoji } = requestData.itemData;
+    const [rotation, setRotation] = useState(0);
     const route = useRouter();
+    const onRefresh = () => {
+        setRotation((prev) => prev + 360);
+        mutate(`/api/fetchStudentData`)
+    }
     const onPrevious = () => {
         if (type === "buy") {
             setRequestData(prev => ({ ...prev, step: "buyItemPick" }))
@@ -57,7 +64,7 @@ export default function CharacterPickTemplate({ type, requestData, setRequestDat
                     <h1 className="text-[2rem] flex items-center">아이템 구매</h1>
                     <div className=" flex  cursor-pointer hover:scale-110 transition-all">
 
-                        <div onClick={()=>route.push('/kiosk')} className="flex items-center text-[2rem]">처음으로</div>
+                        <div onClick={() => route.push('/kiosk')} className="flex items-center text-[2rem]">처음으로</div>
                     </div>
                 </div>
             </div>
@@ -88,7 +95,12 @@ export default function CharacterPickTemplate({ type, requestData, setRequestDat
                     </div>
                 </div>
                 <div className="mt-[32px] pb-[32px]">
-                    <div className="ml-[8px] text-[2rem] text-red-500">구매할 계정을 선택해주세요</div>
+                    <div className="flex justify-between items-center">
+                        <div className="ml-[8px] text-[2rem] text-red-500 ">구매할 계정을 선택해주세요</div>
+                        <div onClick={onRefresh} style={{ transform: `rotate(${rotation}deg)`, transition: "transform 0.5s ease-in-out" }} className=" top-10 right-10 mr-[16px] cursor-pointer hover:scale-105 transition-all" >
+                            <svg width="32px" height="32px" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none" fill-rule="evenodd" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="matrix(0 1 1 0 2.5 2.5)"> <path d="m3.98652376 1.07807068c-2.38377179 1.38514556-3.98652376 3.96636605-3.98652376 6.92192932 0 4.418278 3.581722 8 8 8s8-3.581722 8-8-3.581722-8-8-8"></path> <path d="m4 1v4h-4" transform="matrix(1 0 0 -1 0 6)"></path> </g> </g></svg>
+                        </div>
+                    </div>
                     <div className="flex flex-wrap ">
                         {studentData.map((a, i) => {
                             return (

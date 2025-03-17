@@ -3,7 +3,7 @@ import { useState, useRef } from "react"
 import { mutate } from "swr"
 // import { ObjectId } from "mongodb"
 
-export default function AddQuestModal({ currencyEmoji }) {
+export default function AddQuestModal({ currencyEmoji, currencyName }) {
     const [input, setInput] = useState({ questName: '', questGoal: '', questReward: '', questExp: '', questTitle: '' })
 
     const onChange = (e) => {
@@ -65,7 +65,7 @@ export default function AddQuestModal({ currencyEmoji }) {
                         <div className="flex justify-between mb-[8px] h-[32px]">
                             <div className="flex items-center cursor-default">
                                 <input id="questReward" readOnly type="checkbox" tabIndex="-1" checked={input.questReward} className="cursor-default checkbox checkbox-warning mr-[8px]" />
-                                <label htmlFor="questReward" className="cursor-default">쿠키</label>
+                                <label htmlFor="questReward" className="cursor-default">{currencyName}</label>
                             </div>
                             <div className="flex">
                                 <div className="border-b-4 border-orange-400">{currencyEmoji}</div>

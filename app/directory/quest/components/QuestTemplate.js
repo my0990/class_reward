@@ -19,7 +19,7 @@ export default function Quest({ role }) {
     if (isQuestListError || isClassDataError || isStudentDataError) return <div>Error loading data</div>;
 
 
-    const { currencyEmoji, teacherId } = classData;
+    const { currencyEmoji, teacherId, currencyName } = classData;
     const studentCount = studentData.length
     console.log(questDetailData)
     if (isDetail) {
@@ -52,7 +52,7 @@ export default function Quest({ role }) {
                     {/* {role === "teacher" && <AddQuestBtn />} */}
                 </div>
             </div>
-            {role === "teacher" && <AddQuestModal currencyEmoji={currencyEmoji} />}
+            {role === "teacher" && <AddQuestModal currencyName={currencyName} currencyEmoji={currencyEmoji} />}
         </div>
     )
 }
