@@ -106,7 +106,7 @@ export default function Header({ session }) {
                         </div>
                     </div>
                 </div>
-                {isHamburgerClicked ? <DropDown role={role} /> : null}
+                {isHamburgerClicked ? <DropDown role={role} userData={userData} classData={classData}/> : null}
                 {isUserinfoClicked ? <UserInfo session={session} profileiconRef={profileiconRef} isUserinfoClicked={isUserinfoClicked} setIsUserinfoClicked={setIsUserinfoClicked} userData={userData} classData={classData}/> : null}
             </>
 

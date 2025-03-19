@@ -13,8 +13,8 @@ import { fetchData } from "@/hooks/swrHooks"
 
 
 export default function MarketTemplate({ tmpItemList }) {
-    const { data: classData, isLoading: isClassLoading, isError: isClassError} = fetchData('/api/fetchClassData');
-    const { data: userData, isLoading: isUserLoading, isError: isUserError} = fetchData('/api/fetchUserData');
+    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
+    const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');
 
 
     const onBuy = (picked) => {
@@ -29,10 +29,10 @@ export default function MarketTemplate({ tmpItemList }) {
     if (isClassError || isUserError) return <div>Error loading data</div>;
 
 
-    const { currencyEmoji,  currencyName, itemList } = classData;
-    const {userId} = userData;
-    if(itemList.length === 0){
-        return(
+    const { currencyEmoji, currencyName, itemList } = classData;
+    const { userId } = userData;
+    if (itemList.length === 0) {
+        return (
             <div className="text-[2rem] text-center">등록된 아이템이 없습니다.</div>
         )
     }
@@ -44,14 +44,14 @@ export default function MarketTemplate({ tmpItemList }) {
                     {itemList?.map((a, i) =>
                     (
 
-                            <div key={i} className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} >
-                                <ItemCard data={a} onClick={onBuy} currencyName={currencyName} />
-                            </div>
+                        <div key={i} className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} >
+                            <ItemCard data={a} onClick={onBuy} currencyName={currencyName} />
+                        </div>
 
                     )
                     )}
                 </div>
-                <BuyModal  buyList={buyList} userId={userId} money={userData?.money} currencyName={currencyName} currencyEmoji={currencyEmoji} />
+                <BuyModal buyList={buyList} userId={userId} money={userData?.money} currencyName={currencyName} currencyEmoji={currencyEmoji} />
             </div>
         </div>
     )
