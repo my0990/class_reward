@@ -41,9 +41,18 @@ export default function ConfirmItemUse({ itemData, userData }) {
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
-                    route.push('/kiosk')
+
+                } else if (data.message === '아이템이 존재하지 않음') {
+                    alert(data.message);
+
+                    mutate(
+                        "/api/fetchStudentData", undefined, { revalidate: true }
+                    );
                 }
-                setIsLoading(false)
+
+
+                route.push('/kiosk');
+                setIsLoading(false);
             })
         }
 

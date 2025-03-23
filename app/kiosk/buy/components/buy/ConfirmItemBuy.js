@@ -3,18 +3,19 @@ import FinishBuyModal from "./FinishBuyModal";
 import { fetchData } from "@/hooks/swrHooks";
 import Link from "next/link";
 import { mutate } from "swr";
+import { useRouter } from "next/navigation";
 export default function ConfirmItemBuy({ requestData, setRequestData }) {
 
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
     const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData('/api/fetchStudentData');
 
-
+    const route = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const { itemData, userData } = requestData;
-    console.log(itemData)
-    console.log(userData)
+
     const { money, userId, profileName } = userData;
     const [fetchItemId, setFetchItemId] = useState();
+
 
     const onClick = (e) => {
         if (isLoading) {
@@ -35,7 +36,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
                         "/api/fetchClassData",
                         (prev) => {
 
-                            const updatedItemList = prev.itemList.map((item)=> itemData.itemId === item.itemId ? {...itemData, itemStock: itemData.itemStock - 1} : item)
+                            const updatedItemList = prev.itemList.map((item) => itemData.itemId === item.itemId ? { ...itemData, itemStock: itemData.itemStock - 1 } : item)
 
                             return { ...prev, itemList: updatedItemList }
                         },
@@ -44,14 +45,27 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
                     mutate(
                         "/api/fetchStudentData",
                         (prev) => {
-                            const updatedStudentData = prev.map((student) => student.userId === userId ? {...userData, money: userData.money - itemData.itemPrice, itemList: [...userData?.itemList, {...itemData, itemId: data.itemId}]} : student)
-                            
+                            const updatedStudentData = prev.map((student) => student.userId === userId ? { ...userData, money: userData.money - itemData.itemPrice, itemList: [...userData?.itemList, { ...itemData, itemId: data.itemId }] } : student)
+
                             return updatedStudentData;
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
                     setFetchItemId(data.itemId)
-                } 
+                } else {
+                    alert(data.message);
+                    if(data.message === '잔액부족'){
+                        mutate(
+                            "/api/fetchStudentData"
+                        );
+                    } else {
+                        mutate(
+                            "/api/fetchClassData"
+                        );
+                    }
+
+                    route.push('/kiosk')
+                }
                 setIsLoading(false);
             })
         }
@@ -61,7 +75,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
     if (isClassDataLoading || isStudentDataLoading) return <div>Loading data...</div>;
     if (isClassDataError || isStudentDataError) return <div>Error loading data</div>;
 
-    const {  currencyName } = classData;
+    const { currencyName } = classData;
 
     const { emoji, itemName, itemExplanation, itemStock, itemPrice } = requestData.itemData;
     console.log(studentData)

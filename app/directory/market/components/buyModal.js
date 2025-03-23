@@ -26,7 +26,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
                     alert('구매완료');
-                    setIsLoading(false);
+
                     mutate(
                         "/api/fetchClassData",
                         (prev) => {
@@ -40,16 +40,27 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
                     mutate(
                         "/api/fetchUserData",
                         (prev) => {
-                            const updatedUserData = {...prev, money: prev.money - buyList.itemPrice, itemList: [...prev.itemList, {...buyList, itemId: data.itemId}]}
+                            const updatedUserData = { ...prev, money: prev.money - buyList.itemPrice, itemList: [...prev.itemList, { ...buyList, itemId: data.itemId }] }
                             return updatedUserData;
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
-                    document.getElementById('buy').close();
-
-
+                } else {
+                    alert(data.message);
+                    if (data.message === '잔액부족') {
+                        mutate(
+                            "/api/fetchUserData"
+                        );
+                    } else {
+                        mutate(
+                            "/api/fetchClassData"
+                        );
+                    }
                 }
             })
+            document.getElementById('buy').close();
+            setIsLoading(false);
+
         }
 
     }
