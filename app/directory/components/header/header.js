@@ -117,8 +117,8 @@ export default function Header({ session }) {
                                                     </a>
                                                 </li>
                                                 <li className="">
-                                                    <a href="http://kkyul/tools/random" target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
-                                                        번호 뽑기 테스트
+                                                    <a href="http://kkyul.kr/tools/random" target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
+                                                        번호 뽑기 미완
                                                     </a>
                                                 </li>
                                             </ul>
