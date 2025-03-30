@@ -13,7 +13,7 @@ export default function StudentProfileTemplate({ }) {
     const [filterdData,setFilteredData] = useState([]);
 
     useEffect(()=>{
-        if(classData && userData){
+        if(classData && classData.profileImgStorage && userData){
             const updatedClassItems = Object.keys(classData.profileImgStorage).map(key => {
                 const classItem = classData.profileImgStorage[key];
               
@@ -43,7 +43,7 @@ export default function StudentProfileTemplate({ }) {
     if (isClassError || isUserError) return <div>Error loading data</div>;
 
     const { currencyName } = classData;
-    if (Object.keys(classData.profileImgStorage).length === 0) {
+    if (!classData.profileImgStorage || Object.keys(classData.profileImgStorage).length === 0) {
         return (
             <div className="text-[2rem] text-center mt-[16px]">
                 등록된 프로필 이미지가 없습니다.
