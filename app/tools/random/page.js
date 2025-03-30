@@ -26,14 +26,15 @@ export default function Random() {
         }
 
     };
-    if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
-    if (isStudentError || isClassError) return <div>Error loading data</div>;
-    const { user, startExp, commonDifference } = classData;
     useEffect(() => {
         if (studentData) {
             setNumArr(studentData)
         }
     }, [studentData])
+    if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
+    if (isStudentError || isClassError) return <div>Error loading data</div>;
+    const { user, startExp, commonDifference } = classData;
+
     return (
         <div className="bg-orange-300 h-[100vh]">
             <div>{isClicked && selectedStudent.classNumber}</div>
