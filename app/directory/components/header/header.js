@@ -9,7 +9,18 @@ import { fetchData } from "@/hooks/swrHooks";
 export default function Header({ session }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
     const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');
+    const [newUrl, setNewUrl] = useState("#");
 
+    useEffect(() => {
+      if (typeof window === "undefined") return;
+  
+      const currentDomain = window.location.hostname;
+      const targetUrl = currentDomain.includes("vercel.app")
+        ? "https://class-reward.vercel.app/tools/random"
+        : "https://kkyul.kr/tools/random";
+  
+      setNewUrl(targetUrl);
+    }, []);
 
     const [isClient, setIsClient] = useState(false)
     const { role } = session
@@ -117,7 +128,7 @@ export default function Header({ session }) {
                                                     </a>
                                                 </li>
                                                 <li className="">
-                                                    <a href="http://kkyul.kr/tools/random" target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
+                                                    <a href={newUrl} target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
                                                         번호 뽑기 미완
                                                     </a>
                                                 </li>
