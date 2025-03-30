@@ -8,7 +8,6 @@ import SetCurrencyNameModal from "./components/SetCurrencyNameModal";
 
 
 import { fetchData } from "@/hooks/swrHooks";
-import { mutate } from "swr";
 import util from './utils/util'
 
 export default function Home() {

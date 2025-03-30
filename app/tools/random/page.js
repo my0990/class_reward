@@ -1,14 +1,58 @@
 'use client'
 import { fetchData } from "@/hooks/swrHooks";
-
+import { useState, useEffect } from "react";
 export default function Random() {
+    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData('/api/fetchStudentData');
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
-    if (isClassLoading ) return <div>Loading data...</div>;
-    if (isClassError ) return <div>Error loading data</div>;
+    const [numArr, setNumArr] = useState([]);
+    const [isClicked, setIsClicked] = useState(false);
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const pickRandomStudent = () => {
+        if (studentData.length === 0) return;
+        const randomIndex = Math.floor(Math.random() * studentData.length);
+        setIsClicked(true);
+        setSelectedStudent(studentData[randomIndex]);
+    };
 
-    return(
-        <div>
-            random 
+    const findLargestSumUnderTarget = () => {
+
+        let k = Math.floor((-2 * startExp + commonDifference + Math.sqrt((2 * startExp - commonDifference) ** 2 + 8 * commonDifference * user.exp)) / (2 * commonDifference));
+        let sumK = (k / 2) * (2 * startExp + (k - 1) * commonDifference);
+
+        if (sumK > user.exp) {
+            return k
+        } else {
+            return k + 1
+        }
+
+    };
+    if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
+    if (isStudentError || isClassError) return <div>Error loading data</div>;
+    const { user, startExp, commonDifference } = classData;
+    useEffect(() => {
+        if (studentData) {
+            setNumArr(studentData)
+        }
+    }, [studentData])
+    return (
+        <div className="bg-orange-300 h-[100vh]">
+            <div>{isClicked && selectedStudent.classNumber}</div>
+            <div>
+                <div  className="w-[160px] p-[16px] m-[8px] bg-orange-200 rounded-xl cursor-pointer ">
+                    <div className="flex justify-between mb-[8px]">
+                        <div className="font-semibold">LV. {findLargestSumUnderTarget()}</div>
+                        <div className="w-[80px] text-right overflow-hidden whitespace-nowrap">{props?.currencyemoji} {user.money} </div>
+                    </div>
+                    <div className="flex overflow-hidden border-4 border-white justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
+                        <img src={selectedStudent.profileUrl} width="100" height="100" alt="characther" className="rounded-full" />
+                    </div>
+                    <h1 className="text-[1rem] font-bold text-center overflow-hidden">{selectedStudent.classNumber}. {selectedStudent.profileNickname}</h1>
+                    <div className="bg-white rounded-lg flex items-center justify-center">
+                        {selectedStudent.profileTitle}
+                    </div>
+                </div>
+            </div>
+            <button onClick={pickRandomStudent}>뽑기</button>
         </div>
     )
 }

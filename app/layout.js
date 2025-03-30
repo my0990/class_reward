@@ -1,10 +1,5 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { getServerSession } from "next-auth"
-import { connectDB } from "@/app/lib/database";
-import RecoilRootProvider from "@/util/recoilRootProvider";
-import Layout from "@/util/Layout";
 import Script from "next/script";
 
 // import Head from "next/head";
