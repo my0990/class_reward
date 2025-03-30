@@ -9,7 +9,7 @@ export default function DropDown({ role, userData, classData }) {
     const {money, profileNickname} = userData;
     console.log(classData)
     return (
-        <div className="border-b-2 min-[701px]:hidden dark:text-white">
+        <div className="border-b-2 min-[979px]:hidden dark:text-white">
             <ul>
                 <li className="mt-[1rem]">
                     <div className="flex items-center justify-space ">

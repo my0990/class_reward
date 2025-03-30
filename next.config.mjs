@@ -9,6 +9,8 @@ import withPWAInit from "@ducanh2912/next-pwa";
 
 const withPWA = withPWAInit({
   dest: "public",
+  webpack5: true, 
+  webpack: (config, options) => { config.cache = false; return config; },
 
   
   // disable: process.env.NODE_ENV === "development",

@@ -107,6 +107,7 @@ export default async function RootLayout({ children }) {
             `,
           }}
         />
+         {/* <meta name="google" content="notranslate" /> */}
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className}>
