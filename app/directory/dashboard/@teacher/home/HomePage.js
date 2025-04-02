@@ -45,12 +45,12 @@ export default function Home() {
     if (isStudentError || isClassError) return <div>Error loading data</div>;
 
 
-
+    const {currencyEmoji, expTable} = classData;
 
     return (
         <div className=" pt-0 flex justify-center">
 
-            <div className="w-[1360px] max-[1360px]:w-[1224px] max-[1224px]:w-[1088px] max-[1088px]:w-[952px] max-[952px]:w-[816px] max-[816px]:w-[680px] max-[680px]:w-[544px] max-[544px]:w-[408px] max-[408px]:w-[272px]">
+            <div className="w-[1410px] max-[1410px]:w-[1235px] max-[1235px]:w-[1060px] max-[1060px]:w-[885px] max-[885px]:w-[710px] max-[710px]:w-[535px] max-[535px]:w-[360px]">
                 <div className="flex py-[16px] mr-[8px] justify-between">
 
                     {isSelectedAll
@@ -65,7 +65,7 @@ export default function Home() {
                 <div className=" flex flex-wrap">
                     {studentArr && studentArr.map((a, i) => {
                         return (
-                            <StudentInfoCard key={i} isactive={a.isactive ? 1 : 0} onClick={(e) => onClick(a)} data={a}>{a.classNumber}. {a.profileNickname}</StudentInfoCard>
+                            <StudentInfoCard  currencyEmoji={currencyEmoji} expTable={expTable} key={i} isactive={a.isactive ? 1 : 0} onClick={(e) => onClick(a)} data={a}>{a.classNumber}. {a.profileNickname}</StudentInfoCard>
                         )
                     })}</div>
             </div>
