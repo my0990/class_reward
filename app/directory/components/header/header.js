@@ -12,14 +12,14 @@ export default function Header({ session }) {
     const [newUrl, setNewUrl] = useState("#");
 
     useEffect(() => {
-      if (typeof window === "undefined") return;
-  
-      const currentDomain = window.location.hostname;
-      const targetUrl = currentDomain.includes("vercel.app")
-        ? "https://class-reward.vercel.app/tools/random"
-        : "https://kkyul.kr/tools/random";
-  
-      setNewUrl(targetUrl);
+        if (typeof window === "undefined") return;
+
+        const currentDomain = window.location.hostname;
+        const targetUrl = currentDomain.includes("vercel.app")
+            ? "https://class-reward.vercel.app/tools/random"
+            : "https://kkyul.kr/tools/random";
+
+        setNewUrl(targetUrl);
     }, []);
 
     const [isClient, setIsClient] = useState(false)
@@ -56,16 +56,16 @@ export default function Header({ session }) {
 
 
     let timeoutId = null;
-  
+
     const handleMouseEnter = (menu) => {
-      if (timeoutId) clearTimeout(timeoutId); // 닫히는 것을 방지
-      setOpenMenu(menu);
+        if (timeoutId) clearTimeout(timeoutId); // 닫히는 것을 방지
+        setOpenMenu(menu);
     };
-  
+
     const handleMouseLeave = () => {
-      timeoutId = setTimeout(() => {
-        setOpenMenu(null);
-      }, 300); // 300ms 후에 서브메뉴 닫기
+        timeoutId = setTimeout(() => {
+            setOpenMenu(null);
+        }, 300); // 300ms 후에 서브메뉴 닫기
     };
 
     if (isClassLoading || isUserLoading) return <div></div>;
@@ -94,7 +94,7 @@ export default function Header({ session }) {
                                     <Link prefetch={false} href="/kiosk"><li className={` dark:text-white mr-[3vw]`}>키오스크 모드</li></Link>
                                     {/* <nav className="bg-gray-800 text-white p-4"> */}
                                     <ul className=""
->
+                                    >
                                         {/* 메뉴 1 */}
                                         <li
                                             className="relative group"
@@ -109,7 +109,7 @@ export default function Header({ session }) {
                                             </button>
                                             <ul
                                                 className={`absolute left-0 mt-2 w-40 bg-orange-300 rounded-lg overflow-hidden shadow-lg transition-opacity duration-200 
-              ${openMenu === "menu1" ? "opacity-100 visible" : "opacity-0 invisible"}
+              ${openMenu === "menu1" ? "opacity-100 visible  z-50" : "opacity-0 invisible"}
             `}
                                             >
                                                 <li className="">
