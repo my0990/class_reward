@@ -118,6 +118,11 @@ export default function Header({ session }) {
                                                     </a>
                                                 </li>
                                                 <li className="">
+                                                    <a href={newUrl} target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
+                                                        랜덤 번호 뽑기
+                                                    </a>
+                                                </li>
+                                                <li className="">
                                                     <a href="https://my0990.github.io/decibel_meter/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
                                                         타이머
                                                     </a>
@@ -125,11 +130,6 @@ export default function Header({ session }) {
                                                 <li className="">
                                                     <a href="https://my0990.github.io/switching_seats/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
                                                         자리 바꾸기
-                                                    </a>
-                                                </li>
-                                                <li className="">
-                                                    <a href={newUrl} target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
-                                                        번호 뽑기 미완
                                                     </a>
                                                 </li>
                                             </ul>
