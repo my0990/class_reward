@@ -1,6 +1,6 @@
 'use client'
 import { fetchData } from "@/hooks/swrHooks";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import _ from "lodash";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,14 +13,39 @@ export default function Random() {
     const [selectedStudentArr, setSelectedStudentArr] = useState([]);
     const [studentNum, setStudentNum] = useState(1);
     const [rotation, setRotation] = useState(0);
+
+    const audioRef = useRef(null);
     // const pickRandomStudent = () => {
     //     if (studentData.length === 0) return;
     //     const randomIndex = Math.floor(Math.random() * studentData.length);
     //     setIsClicked(true);
     //     setSelectedStudent(studentData[randomIndex]);
     // };
-
+    const audioPool = useRef([]);
+    const index = useRef(0);
+    const timeoutIds = useRef([]);
+    const playSound = () => {
+        const audio = audioPool.current[index.current];
+        audio.currentTime = 0;
+        audio.play();
+        index.current = (index.current + 1) % audioPool.current.length;
+    };
+    const clearAllTimeouts = () => {
+        timeoutIds.current.forEach(clearTimeout);
+        timeoutIds.current = [];
+    };
     const pickRandomStudent = () => {
+
+
+        if(originalStudentArr.length === 0){
+            if(isClicked === false){
+                alert('학생을 추가해주세요')
+            } else {
+                alert('모두 뽑았습니다')
+                onRefresh();
+            }
+            return
+        }
         setIsClicked(true)
         const shuffled = [...originalStudentArr].sort(() => 0.5 - Math.random());
         const selected = shuffled.slice(0, studentNum);
@@ -29,9 +54,18 @@ export default function Random() {
         const remain = originalStudentArr.filter(item => !selected.includes(item));
 
         // 상태 업데이트
+
         setSelectedStudentArr([]);
+        clearAllTimeouts();
         setTimeout(() => {
             setSelectedStudentArr(prev => [...selected]);
+
+            for (let i = 0; i < selected.length; i++) {
+                const id = setTimeout(() => {
+                    playSound();
+                }, i * 310); // 150ms 간격으로 반복
+                timeoutIds.current.push(id);
+            }
         }, 50);
 
 
@@ -42,17 +76,25 @@ export default function Random() {
         if (studentData) {
 
             setOriginalStudentArr(_.shuffle(studentData))
+
         }
     }, [studentData])
 
     const onRefresh = () => {
+
         setRotation((prev) => prev + 360);
         setSelectedStudentArr([]);
         setPickedStudentArr([]);
         setOriginalStudentArr(studentData);
         setIsClicked(false);
-        
+
     }
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            audioPool.current = Array.from({ length: 5 }, () => new Audio('/pop.mp3'));
+        }
+    }, []);
     if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
     if (isStudentError || isClassError) return <div>Error loading data</div>;
     const { startExp, commonDifference } = classData.expTable;
@@ -87,7 +129,9 @@ export default function Random() {
                     </button>
                 </div>
             </div>
+            <div className="bg-orange-300 w-full flex justify-end pr-[16px] text-[1.5rem]" style={{color: originalStudentArr.length === 0 ? 'red' : null}}>남은 학생: {originalStudentArr.length}명</div>
             <div className="h-[600px] w-full flex justify-center items-center bg-orange-300 mb-[32px] py-[48px] flex-wrap overflow-y-scroll">
+
                 {isClicked ?
                     selectedStudentArr.map((selectedStudent, i) => {
                         return (
@@ -116,7 +160,7 @@ export default function Random() {
                             </motion.div>
                         )
                     })
-                :<div className="text-[2rem]">뽑기 버튼을 클릭해주세요</div>}
+                    : <div className="text-[2rem]">뽑기 버튼을 클릭해주세요</div>}
             </div>
             <div className="flex items-center mb-[32px]">
                 <div onClick={() => setStudentNum(prev => prev > 1 ? prev - 1 : 1)} className="cursor-pointer transition-all hover:scale-110">
