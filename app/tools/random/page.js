@@ -2,7 +2,9 @@
 import { fetchData } from "@/hooks/swrHooks";
 import { useState, useEffect, useRef } from "react";
 import _ from "lodash";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import Modal from "./components/Modal";
+import util from "@/app/directory/dashboard/@teacher/home/utils/util";
 
 export default function Random() {
     const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData('/api/fetchStudentData');
@@ -10,17 +12,16 @@ export default function Random() {
     const [originalStudentArr, setOriginalStudentArr] = useState([]);
     const [pickedStudentArr, setPickedStudentArr] = useState([]);
     const [isClicked, setIsClicked] = useState(false);
-    const [selectedStudentArr, setSelectedStudentArr] = useState([]);
+    const [studentArr, setStudentArr] = useState([]);
     const [studentNum, setStudentNum] = useState(1);
     const [rotation, setRotation] = useState(0);
 
-    const audioRef = useRef(null);
-    // const pickRandomStudent = () => {
-    //     if (studentData.length === 0) return;
-    //     const randomIndex = Math.floor(Math.random() * studentData.length);
-    //     setIsClicked(true);
-    //     setSelectedStudent(studentData[randomIndex]);
-    // };
+    const [isSend, setIsSend] = useState(false);
+    const [isSelectedAll, setIsSelectedAll] = useState(false);
+
+
+
+    const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend });
     const audioPool = useRef([]);
     const index = useRef(0);
     const timeoutIds = useRef([]);
@@ -37,8 +38,8 @@ export default function Random() {
     const pickRandomStudent = () => {
 
 
-        if(originalStudentArr.length === 0){
-            if(isClicked === false){
+        if (originalStudentArr.length === 0) {
+            if (isClicked === false) {
                 alert('학생을 추가해주세요')
             } else {
                 alert('모두 뽑았습니다')
@@ -55,10 +56,10 @@ export default function Random() {
 
         // 상태 업데이트
 
-        setSelectedStudentArr([]);
+        setStudentArr([]);
         clearAllTimeouts();
         setTimeout(() => {
-            setSelectedStudentArr(prev => [...selected]);
+            setStudentArr(prev => [...selected]);
 
             for (let i = 0; i < selected.length; i++) {
                 const id = setTimeout(() => {
@@ -83,7 +84,7 @@ export default function Random() {
     const onRefresh = () => {
 
         setRotation((prev) => prev + 360);
-        setSelectedStudentArr([]);
+        setStudentArr([]);
         setPickedStudentArr([]);
         setOriginalStudentArr(studentData);
         setIsClicked(false);
@@ -98,7 +99,7 @@ export default function Random() {
     if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
     if (isStudentError || isClassError) return <div>Error loading data</div>;
     const { startExp, commonDifference } = classData.expTable;
-
+    const { currencyName } = classData;
     const findLargestSumUnderTarget = (selectedStudent) => {
 
         let k = Math.floor((-2 * startExp + commonDifference + Math.sqrt((2 * startExp - commonDifference) ** 2 + 8 * commonDifference * selectedStudent.exp)) / (2 * commonDifference));
@@ -119,6 +120,7 @@ export default function Random() {
                     나온 번호: {pickedStudentArr.map((a, i) => a.classNumber).sort((a, b) => Number(a) - Number(b)).join(', ')}
                 </div>
                 <div className="">
+
                     {/* <input type="checkbox" className="mr-[8px] cursor-pointer" id="dup" />
                     <label htmlFor="dup" className="cursor-pointer">중복</label> */}
                     <button onClick={onRefresh} style={{ transform: `rotate(${rotation}deg)`, transition: "transform 0.5s ease-in-out" }}>
@@ -129,11 +131,20 @@ export default function Random() {
                     </button>
                 </div>
             </div>
-            <div className="bg-orange-300 w-full flex justify-end pr-[16px] text-[1.5rem]" style={{color: originalStudentArr.length === 0 ? 'red' : null}}>남은 학생: {originalStudentArr.length}명</div>
-            <div className="h-[600px] w-full flex justify-center items-center bg-orange-300 mb-[32px] py-[48px] flex-wrap overflow-y-scroll">
+            <div className="flex p-[8px]  justify-between w-full bg-orange-300">
+
+                {isSelectedAll
+                    ? <button className="btn bg-orange-500 text-white ml-[8px] border-0" onClick={clearAll}>모두 해제</button>
+                    : <button className="btn bg-orange-500 text-white ml-[8px] border-0" onClick={selectAll}>모두 선택</button>}
+                <div>
+                    <button className="btn btn-success text-white mr-[16px] " onClick={onSend}>{classData?.currencyName} 보내기</button>
+                    <button className="btn bg-red-500 border-0 text-white" onClick={onTake}>{classData?.currencyName} 빼앗기</button>
+                </div>
+            </div>
+            <div className="h-[568px] w-full flex justify-center items-center bg-orange-300  py-[24px] flex-wrap overflow-y-scroll">
 
                 {isClicked ?
-                    selectedStudentArr.map((selectedStudent, i) => {
+                    studentArr.map((selectedStudent, i) => {
                         return (
                             <motion.div
                                 key={i}
@@ -142,8 +153,9 @@ export default function Random() {
                                 exit={{ opacity: 0, scale: 0.5 }}
                                 transition={{ delay: i * 0.3, duration: 0.5, ease: "easeOut" }}
                             >
-                                <div key={i}>
-                                    <div className="shadow-[4px_6px_0px_0px_#050071] w-[160px] p-[16px] m-[8px] bg-orange-200 rounded-xl cursor-pointer ">
+                                {/* <div key={i} onClick={() => document.getElementById('modal').showModal()}> */}
+                                <div key={i} onClick={(e) => onClick(selectedStudent)}>
+                                    <div className={`shadow-[4px_6px_0px_0px_#050071] w-[160px] p-[16px] m-[8px] bg-orange-200 rounded-xl cursor-pointer ${selectedStudent.isactive ? "bg-orange-500" : ""}`}>
                                         <div className="flex justify-between mb-[8px]">
                                             <div className="font-semibold">LV. {findLargestSumUnderTarget(selectedStudent)}</div>
                                             <div className="w-[80px] text-right overflow-hidden whitespace-nowrap"> </div>
@@ -161,7 +173,9 @@ export default function Random() {
                         )
                     })
                     : <div className="text-[2rem]">뽑기 버튼을 클릭해주세요</div>}
+
             </div>
+            <div className="bg-orange-300 mb-[32px] pb-[16px] w-full flex justify-end pr-[16px] text-[1.5rem]" style={{ color: originalStudentArr.length === 0 ? 'red' : null }}>남은 학생: {originalStudentArr.length}명</div>
             <div className="flex items-center mb-[32px]">
                 <div onClick={() => setStudentNum(prev => prev > 1 ? prev - 1 : 1)} className="cursor-pointer transition-all hover:scale-110">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9">
@@ -205,8 +219,10 @@ export default function Random() {
 
 
                 </div>
-            </div>
 
+            </div>
+            {/* currencyName, targetStudent, clearAll */}
+            <Modal targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll}/>
         </div>
     )
 }
