@@ -25,15 +25,16 @@ export default function Random() {
 
     const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend });
 
-    useEffect(() => {
-        if (studentData) {
-            const updatedData = studentData.map(obj => {
-                return { ...obj, isactive: false }; // 새로운 키-값 쌍 추가하여 새로운 객체 반환
-            });
-            // 로컬 캐시 업데이트
-            setStudentArr(updatedData)
-        }
-    }, [studentData]);
+    // useEffect(() => {
+    //     if (studentData) {
+    //         console.log(studentData)
+    //         const updatedData = studentData.map(obj => {
+    //             return { ...obj, isactive: false }; // 새로운 키-값 쌍 추가하여 새로운 객체 반환
+    //         });
+    //         // 로컬 캐시 업데이트
+    //         setStudentArr(updatedData)
+    //     }
+    // }, [studentData]);
     
     const audioPool = useRef([]);
     const index = useRef(0);
@@ -88,7 +89,6 @@ export default function Random() {
     }
     useEffect(() => {
         if (studentData) {
-
             setOriginalStudentArr(_.shuffle(studentData))
 
         }
@@ -173,7 +173,6 @@ export default function Random() {
                                             <div className="font-semibold">LV. {findLargestSumUnderTarget(selectedStudent)}</div>
                                             <div className="w-[80px] text-right overflow-hidden whitespace-nowrap"> </div>
                                         </div>
-                                        <div>{selectedStudent.money}</div>
                                         <div className="flex overflow-hidden border-4 border-white justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
                                             <img src={selectedStudent.profileUrl} width="100" height="100" alt="characther" className="rounded-full" />
                                         </div>
@@ -236,7 +235,7 @@ export default function Random() {
 
             </div>
             {/* currencyName, targetStudent, clearAll */}
-            <Modal targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll}/>
+            <Modal setStudentArr={setStudentArr} targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll}/>
         </div>
     )
 }

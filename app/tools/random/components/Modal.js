@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import DialBtn from "./DialBtn";
 import { mutate } from "swr";
-export default function Modal({ studentArr, currencyName, targetStudent, clearAll, isSend }) {
+import { update } from "lodash";
+export default function Modal({ studentArr, currencyName, targetStudent, clearAll, isSend, setStudentArr }) {
     const [point, setPoint] = useState(null);
     const [fontSize, setFontSize] = useState(1.7);
     const [activeKey, setActiveKey] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
+    console.log(studentArr)
     const onClick = (e) => {
         if (point === null) {
             setPoint(e.target.value.toString())
@@ -53,12 +54,40 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
 
                     }
                     clearAll();
+                    const activeIds = targetStudent.map(student => student._id);
+                    const updatedStudentArr = studentArr.map(student => {
+                        if (activeIds.includes(student._id)) {
+                            const updatedMoney = isSend ? Number(student.money) + Number(point) : Number(student.money) - Number(point)
+                            return {
+                                ...student,
+                                money: updatedMoney,// 원하는 만큼 증가
+                                isactive: false
+                            };
+                        }  else {
+                            return student;
+                        }
+
+                    });
+                    console.log(updatedStudentArr)
+                    setStudentArr(updatedStudentArr)
                     mutate(
                         "/api/fetchStudentData",
                         (prev) => {
-                            console.log(prev)
-                            return studentArr.map((a, i) => a.isactive === true ? { ...a, money: isSend ? Number(a.money) + Number(point) : Number(a.money) - Number(point) } : a);
 
+
+                            const updatedStudentData = prev.map(student => {
+                                if (activeIds.includes(student._id)) {
+                                    const updatedMoney = isSend ? Number(student.money) + Number(point) : Number(student.money) - Number(point)
+                                    return {
+                                        ...student,
+                                        money: updatedMoney// 원하는 만큼 증가
+                                    };
+                                }
+                                return student;
+                            });
+                            console.log(updatedStudentData)
+                            // return prev.map((a, i) => a.isactive === true ? { ...a, money: isSend ? Number(a.money) + Number(point) : Number(a.money) - Number(point) } : a);
+                            return updatedStudentData
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
