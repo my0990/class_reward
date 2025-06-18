@@ -82,12 +82,13 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
                                         ...student,
                                         money: updatedMoney// 원하는 만큼 증가
                                     };
-                                }
+                                } 
                                 return student;
                             });
                             console.log(updatedStudentData)
                             // return prev.map((a, i) => a.isactive === true ? { ...a, money: isSend ? Number(a.money) + Number(point) : Number(a.money) - Number(point) } : a);
-                            return updatedStudentData
+                            return updatedStudentData;
+                            // return prev;
                         },
                         false // 서버 요청 없이 즉시 반영
                     );

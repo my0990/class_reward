@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { mutate } from "swr";
 import { motion, AnimatePresence } from "framer-motion";
-export default function SeatModal({ grid, setGrid }) {
+
+export default function SeatModal({ grid, setGrid, isModalOpen }) {
     const [value, setValue] = useState([[]]);
-    const startIndex = useRef('');
+    const startIndex = useRef(''); 
     const currentIndex = useRef('');
     const startTable = useRef([]);
     const mode = useRef(false);
@@ -13,7 +13,7 @@ export default function SeatModal({ grid, setGrid }) {
 
     // 행 추가
     const addRow = () => {
-        const newRow = Array(value[0].length).fill(true);
+        const newRow = Array(value[0].length).fill({isOpen: true, group:[]});
         setValue([...value, newRow]);
 
 
@@ -21,8 +21,9 @@ export default function SeatModal({ grid, setGrid }) {
 
     // 열 추가
     const addColumn = () => {
-        const newValue = value.map(row => [...row, true]);
+        const newValue = value.map(row => [...row, {isOpen: true, group: []}]);
         setValue(newValue);
+        console.log(value)
     };
 
     // 행 제거
@@ -104,6 +105,7 @@ export default function SeatModal({ grid, setGrid }) {
         return { rowIndex, colIndex };
     }
     const handleDragStart = (e) => {
+        console.log(value)
         const index = getTableCellIndex(e);
         if (index === null) {
             return;
@@ -121,10 +123,9 @@ export default function SeatModal({ grid, setGrid }) {
 
         startTable.current = value.map(row => row.slice());
         startIndex.current = convertIndexToString(rowIndex, colIndex);
-        mode.current = !value[rowIndex][colIndex];
-
+        mode.current = !value[rowIndex][colIndex].isOpen;
         const newValue = [...value];
-        newValue[rowIndex][colIndex] = mode.current;
+        newValue[rowIndex][colIndex].isOpen = mode.current;
 
         setValue(newValue);
     };
@@ -165,9 +166,9 @@ export default function SeatModal({ grid, setGrid }) {
         newValue.forEach((r, i) => {
             r.forEach((_, j) => {
                 if (i < minRow || i > maxRow || j < minCol || j > maxCol) {
-                    newValue[i][j] = startTable.current[i][j];
+                    newValue[i][j].isOpen = startTable.current[i][j].isOpen;
                 } else {
-                    newValue[i][j] = mode.current;
+                    newValue[i][j].isOpen = mode.current;
                 }
             });
         });
@@ -249,6 +250,7 @@ export default function SeatModal({ grid, setGrid }) {
         e.preventDefault();
         setValue(grid.map(row => row.slice()))
         document.getElementById("seatModal").close();
+        isModalOpen.current = false;
     }
 
 
@@ -313,7 +315,7 @@ export default function SeatModal({ grid, setGrid }) {
                                                     transition={{ duration: 0.2 }}
                                                     key={i}
                                                     style={{ width: deskStyle.width, height: deskStyle.height }}
-                                                    className={`${a ? "bg-orange-400" : "bg-gray-200"}  aspect-[2/1] select-none cursor-pointer    rounded-lg`}
+                                                    className={`${a.isOpen ? "bg-orange-400" : "bg-gray-200"}  aspect-[2/1] select-none cursor-pointer    rounded-lg`}
                                                 />
                                             ))}
                                         </MotionTr>
@@ -332,7 +334,7 @@ export default function SeatModal({ grid, setGrid }) {
                     </div>
                 </div>
                 <form method="dialog" className="modal-backdrop">
-                    <button>close</button>
+                    <button onClick={onCancel}>close</button>
                 </form>
             </dialog>
         </div>

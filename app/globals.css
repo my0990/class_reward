@@ -45,6 +45,9 @@
 }
 
 
+body.allow-scroll {
+  overflow: auto;
+}
 
 .item-enter {
   opacity: 0;

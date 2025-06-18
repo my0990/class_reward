@@ -3,21 +3,18 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
 
-import CreateGrid from "./CreateGrid";
+import CreateGrid from "./seat/CreateGrid";
 import FirstPage from "./FirstPage";
 import CreateGroup from "./group/CreateGroup";
-export default function SeatTemplate({ containerRef }) {
 
 
-    const [grid, setGrid] = useState([
-        [true, true, false, true, true, false, true, true],
-        [true, true, false, true, true, false, true, true],
-        [true, true, false, true, true, false, true, true],
-        [true, true, false, true, true, false, true, true],
-    ]);
+export default function SeatTemplate({ containerRef, }) {
+    
+    const isModalOpen = useRef(false);
+    const [grid, setGrid] = useState([[{isOpen: true, group: []}]]);
 
     const [deskStyle, setDeskStyle] = useState({
-        width: 0,
+        width: 0,  
         height: 0,
         gap: 0,
         gridHeight: 0,
@@ -76,13 +73,16 @@ export default function SeatTemplate({ containerRef }) {
 
     useEffect(() => {
         if (!scroll) return;
+
         scroll.stop();
         const handleWheel = (e) => {
-
-            if (isScrolling.current) {
+            // if (typeof window === 'undefined') return;
+            // if (!containerRef.current) return;
+            if (isScrolling.current || isModalOpen.current) {
 
                 return
             } // 중첩 방지
+
 
             isScrolling.current = true;
 
@@ -102,7 +102,10 @@ export default function SeatTemplate({ containerRef }) {
                 offset: 0,
                 easing: [0.25, 0.0, 0.35, 1.0],
                 callback: () => {
-                    isScrolling.current = false; // 애니메이션 끝나면 해제
+                    setTimeout(()=>{
+                    isScrolling.current = false;
+                    },800)
+                    // 애니메이션 끝나면 해제
                 },
             });
         };
@@ -113,6 +116,8 @@ export default function SeatTemplate({ containerRef }) {
             window.removeEventListener("wheel", handleWheel);
         };
     }, [scroll, isScrolling]);
+
+    
     return (
 
         <div data-scroll-container ref={containerRef}>
@@ -135,9 +140,9 @@ export default function SeatTemplate({ containerRef }) {
                     {index === 0
                         ? <FirstPage />
                         : index === 1
-                            ? <CreateGrid grid={grid} setGrid={setGrid} deskStyle={deskStyle}/>
+                            ? <CreateGrid grid={grid} setGrid={setGrid} deskStyle={deskStyle} isModalOpen={isModalOpen} />
                             : index === 2
-                                ? <CreateGroup grid={grid} setGrid={setGrid} deskStyle={deskStyle}/>
+                                ? <CreateGroup grid={grid} setGrid={setGrid} deskStyle={deskStyle} isModalOpen={isModalOpen} />
                                 // ? <div>test</div>
                                 : section.title}
 

@@ -17,7 +17,7 @@ export default function Random() {
     const [studentArr, setStudentArr] = useState([]);
     const [studentNum, setStudentNum] = useState(1);
     const [rotation, setRotation] = useState(0);
-
+    const [isFirst,setIsFirst] = useState(true);
     const [isSend, setIsSend] = useState(false);
     const [isSelectedAll, setIsSelectedAll] = useState(false);
 
@@ -88,20 +88,20 @@ export default function Random() {
         setOriginalStudentArr(remain);
     }
     useEffect(() => {
-        if (studentData) {
+        if (studentData && isFirst) {
             setOriginalStudentArr(_.shuffle(studentData))
-
+            setIsFirst(false)
         }
     }, [studentData])
 
     const onRefresh = () => {
-
+        
         setRotation((prev) => prev + 360);
         setStudentArr([]);
         setPickedStudentArr([]);
         setOriginalStudentArr(studentData);
         setIsClicked(false);
-
+        // setIsFirst(true);
     }
 
     useEffect(() => {
