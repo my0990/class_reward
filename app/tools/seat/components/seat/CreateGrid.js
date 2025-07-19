@@ -285,11 +285,9 @@ export default function CreateGrid({ isModalOpen }) {
         for (const { r, c } of candidates) {
             const newDesks = deepCloneDesks(desks);
             if (!newDesks[r][c].isOpen) continue
-            console.log(newDesks[r][c].isOpen)
             newDesks[r][c].assigned = student;
 
             const result = assignStudents(index + 1, newDesks);
-            console.log(result)
             if (result) return result; // 성공
         }
 

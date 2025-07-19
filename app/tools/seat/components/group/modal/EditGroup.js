@@ -109,7 +109,7 @@ export default function EditGrouop({ setIsListPage, selectedGroup, setSelectedGr
     if (isStudentLoading) return <div>Loading data...</div>;
     if (isStudentError) return <div>Error loading data</div>;
 
-    console.log(groupData)
+
     return (
         <div className="flex flex-col w-full h-[564px] ">
             <div className="w-full flex justify-end text-[1.5rem] ">
