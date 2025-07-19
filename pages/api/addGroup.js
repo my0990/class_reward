@@ -8,14 +8,14 @@ export default async function handler(req, res) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const code = token.code;
 
-    const { groupName } = req.body;
+    const { groupName, groupColor } = req.body;
     // MongoDB 연결
     let groupId = new ObjectId().toString();
     const db = (await connectDB).db('data');
     const newKey = "groupData." + groupId
 
     // const response = await db.collection('class_data').updateOne({code:code},{$push: {"groupData": {groupId: groupId, groupName: groupName, groupColor: "bg-orange-500", groupMember: []}}},{upsert: true})
-    const response = await db.collection('class_data').updateOne({ code: code }, { $set: { [newKey]: { groupName: groupName, groupColor: "bg-orange-500", groupMember: [] } } }, { upsert: true })
+    const response = await db.collection('class_data').updateOne({ code: code }, { $set: { [newKey]: { groupName: groupName, groupColor: groupColor, groupMember: [] } } }, { upsert: true })
 
 
 

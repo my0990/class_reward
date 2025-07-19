@@ -53,9 +53,10 @@ export default function GroupModalList({ setIsListPage, setSelectedGroup }) {
         } else {
             setIsLoading(true);
             const randomName = groupNames[Math.floor(Math.random() * groupNames.length)];
+            const groupColor = '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
             fetch("/api/addGroup", {
                 method: "POST",
-                body: JSON.stringify({ groupName: randomName }),
+                body: JSON.stringify({ groupName: randomName, groupColor: groupColor }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -66,7 +67,7 @@ export default function GroupModalList({ setIsListPage, setSelectedGroup }) {
                         "/api/fetchClassData",
                         (prev) => {
                             const prevData = prev.groupData
-                            return { ...prev, groupData: {...prevData, [data.groupId]: {groupName: randomName, groupColor: 'bg-orange-500', groupMember: []}}}
+                            return { ...prev, groupData: {...prevData, [data.groupId]: {groupName: randomName, groupColor: groupColor, groupMember: []}}}
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
@@ -80,8 +81,8 @@ export default function GroupModalList({ setIsListPage, setSelectedGroup }) {
     return (
         <div className="flex  w-full p-[24px] flex-col  bg-gray-100 items-center">
             <div className="flex justify-between items-center w-full px-[18px] mb-[16px]">
-                <h1 className="text-[1.5rem]">
-                    group
+                <h1 className="text-[1.8rem] font-bold">
+                    그룹 설정하기
                 </h1>
                 <button className="text-[1rem] btn bg-orange-300" onClick={onSubmit}>새로운 그룹 생성하기</button>
             </div>

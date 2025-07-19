@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { mutate } from "swr";
+import _ from "lodash";
 
-export default function SeatModal({ grid, setGrid, isModalOpen }) {
+export default function SeatModal({ classData, isModalOpen, count, setCount }) {
+    const grid = classData.gridData;
     const [value, setValue] = useState([[]]);
-    const startIndex = useRef(''); 
+    const [isLoading, setIsLoading] = useState(false);
+    const startIndex = useRef('');
     const currentIndex = useRef('');
     const startTable = useRef([]);
     const mode = useRef(false);
@@ -11,9 +15,15 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
     const MotionTd = motion.td;
     const MotionTr = motion.tr;
 
+    
+
     // 행 추가
     const addRow = () => {
-        const newRow = Array(value[0].length).fill({isOpen: true, group:[]});
+        const arr = new Array(3).fill(null).map(() => new Array(3).fill(0));
+        arr[0][0] = 1;
+
+        // const newRow = Array(value[0].length).fill({ isOpen: true, group: [] });
+        const newRow = Array.from({ length: value[0].length }, () => ({ isOpen: true, group: [] }))
         setValue([...value, newRow]);
 
 
@@ -21,9 +31,10 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
 
     // 열 추가
     const addColumn = () => {
-        const newValue = value.map(row => [...row, {isOpen: true, group: []}]);
+        const newValue = value.map(row => [...row, { isOpen: true, group: [] }]);
+
         setValue(newValue);
-        console.log(value)
+
     };
 
     // 행 제거
@@ -106,6 +117,7 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
     }
     const handleDragStart = (e) => {
         console.log(value)
+        console.log(e)
         const index = getTableCellIndex(e);
         if (index === null) {
             return;
@@ -124,9 +136,8 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
         startTable.current = value.map(row => row.slice());
         startIndex.current = convertIndexToString(rowIndex, colIndex);
         mode.current = !value[rowIndex][colIndex].isOpen;
-        const newValue = [...value];
+        const newValue = _.cloneDeep(value)
         newValue[rowIndex][colIndex].isOpen = mode.current;
-
         setValue(newValue);
     };
 
@@ -177,6 +188,7 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
     };
 
     const handleDragEnd = (e) => {
+
         startIndex.current = '';
         currentIndex.current = '';
         startTable.current = [];
@@ -190,7 +202,7 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
 
     useEffect(() => {
         setValue(grid.map(row => row.slice()))
-    }, [])
+    }, [grid])
 
 
 
@@ -206,6 +218,18 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
     });
 
     useEffect(() => {
+        let tmp = 0;
+        for (let r = 0; r < value.length; r++) {
+            for (let c = 0; c < value[r].length; c++) {
+                const desk = value[r][c];
+                if (desk.isOpen) {
+                    tmp++
+                }
+            }
+        }
+
+        setCount(tmp)
+
         const rowCount = value.length;
         const colCount = value[0].length;
         // 1. 기본 gap, 비율
@@ -240,14 +264,49 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
         });
     }, [value, setValue]);
 
-    const onClick = (e) => {
+    const onClick = async (e) => {
         e.preventDefault();
-        setGrid(value.map(row => row.slice()));
+        const prevData = classData;
+
+
+        const optimisticData = {
+            ...classData,
+            gridData: _.cloneDeep(value)
+        }
+
+        console.log(optimisticData)
+        mutate(
+            "/api/fetchClassData",
+            optimisticData,
+            false // 서버 요청 없이 즉시 반영
+        );
+
         document.getElementById("seatModal").close();
+        try {
+
+            const res = await fetch("/api/setGrid", {
+                method: "POST",
+                body: JSON.stringify({ updatedGrid: value.map(row => row.slice()) }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            if (!res.ok) throw new Error('서버에러')
+
+        } catch (err) {
+            console.log(err)
+            mutate("/api/fetchClassData", prevData, false);
+            alert("업데이트 실패! 😢");
+        }
+
+
+        isModalOpen.current = false;
+
     }
 
     const onCancel = (e) => {
         e.preventDefault();
+
         setValue(grid.map(row => row.slice()))
         document.getElementById("seatModal").close();
         isModalOpen.current = false;
@@ -259,29 +318,33 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
         <div>
             <dialog id="seatModal" className="modal">
                 <div className="modal-box min-w-[1000px] min-h-[600px] flex flex-col justify-between">
-                    <div className="flex justify-end">
-                        <div className="flex items-center mr-[8px]">
-                            <svg onClick={removeRow} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 cursor-pointer hover:scale-110 transition-all">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            <div className="text-[1.5rem] mx-[8px]">행</div>
-                            <svg onClick={addRow} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 cursor-pointer hover:scale-110 transition-all">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
 
-                        </div>
-                        <div className="flex items-center">
-                            <svg onClick={removeColumn} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 cursor-pointer hover:scale-110 transition-all">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            <div className="text-[1.5rem] mx-[8px]">열</div>
-                            <svg onClick={addColumn} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 cursor-pointer hover:scale-110 transition-all">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
+                    <div className="flex justify-between">
+                        <div className="text-[2rem]">책상 배열 설정</div>
+                        <div className="flex">
+                            <div className="flex items-center mr-[8px]">
+                                <svg onClick={removeRow} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 cursor-pointer hover:scale-110 transition-all">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <div className="text-[1.5rem] mx-[8px]">행</div>
+                                <svg onClick={addRow} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 cursor-pointer hover:scale-110 transition-all">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            </div>
+
+                            <div className="flex items-center">
+                                <svg onClick={removeColumn} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 cursor-pointer hover:scale-110 transition-all">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <div className="text-[1.5rem] mx-[8px]">열</div>
+                                <svg onClick={addColumn} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 cursor-pointer hover:scale-110 transition-all">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex justify-center w-full py-[24px] h-[564px] bg-blue-100 items-center">
+                    <div className="flex justify-center w-full py-[24px] h-[564px]  items-center">
                         <table className="m-4"
                             onTouchStart={handleDragStart}
                             onMouseDown={handleDragStart}
@@ -323,7 +386,9 @@ export default function SeatModal({ grid, setGrid, isModalOpen }) {
                                 </AnimatePresence>
                             </tbody>
                         </table>
+                        
                     </div>
+                    <div className="text-[1.5rem] text-end">자리: {count}</div>
                     <div className="flex justify-center mt-[16px]">
                         <form >
                             <button onClick={onClick} className="btn bg-red-500 text-white mr-[8px]">확인</button>
