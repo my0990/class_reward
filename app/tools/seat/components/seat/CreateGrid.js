@@ -5,6 +5,7 @@ import GroupModal from "../group/modal/GroupModal";
 import Image from "next/image";
 import { mutate } from "swr";
 import _ from "lodash";
+import { seatChangeStart } from "./util/util"
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -17,6 +18,7 @@ export default function CreateGrid({ isModalOpen }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
     const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData('/api/fetchStudentData');
     const [count, setCount] = useState(0);
+    const [assignments, setAssignments] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [deskStyle, setDeskStyle] = useState({
         width: 0,
@@ -80,16 +82,20 @@ export default function CreateGrid({ isModalOpen }) {
         if (!classData) return;
 
         // 누락된 key를 채워 넣기
-        let tmp = 0;
-        for (let r = 0; r < classData.gridData.length; r++) {
-            for (let c = 0; c < classData.gridData[r].length; c++) {
-                const desk = classData.gridData[r][c];
-                if (desk.isOpen) {
-                    tmp++
+        if (classData.gridData) {
+
+
+            let tmp = 0;
+            for (let r = 0; r < classData.gridData.length; r++) {
+                for (let c = 0; c < classData.gridData[r].length; c++) {
+                    const desk = classData.gridData[r][c];
+                    if (desk.isOpen) {
+                        tmp++
+                    }
                 }
             }
+            setCount(tmp)
         }
-        setCount(tmp)
 
         // 캐시 갱신
         mutate(
@@ -230,7 +236,8 @@ export default function CreateGrid({ isModalOpen }) {
 
     if (isClassLoading || isStudentLoading) return <div>Loading data...</div>;
     if (isClassError || isStudentError) return <div>Error loading data</div>;
-
+    // console.log(classData)
+    // console.log(studentData)
     const buildStudentGroupMap = () => {
         const map = {};
         for (const [gid, g] of Object.entries(classData.groupData)) {
@@ -273,12 +280,13 @@ export default function CreateGrid({ isModalOpen }) {
 
 
     const assignStudents = (index, desks) => {
-        console.log(index)
         if (index >= studentData.length || index >= count) return desks; // 성공
         const student = studentData[index];
         const candidates = getAssignableDesks(student._id, desks);
+
         if (candidates.length === 0) {
-            console.log(candidates, student.userId)
+
+            return
         }
         shuffle(candidates)
 
@@ -295,10 +303,11 @@ export default function CreateGrid({ isModalOpen }) {
     };
     const handleAssign = () => {
 
-        const final = assignStudents(0, classData.gridData);
-        setResult(final);
-        console.log(final)
-        setResult(final)
+        // const final = assignStudents(0, classData.gridData);
+        // setResult(final);
+        const assigned = assignSeatsWithPriorityQueue(classData.gridData, studentData, classData.groupData);
+        console.log(assigned);
+        setResult(assigned)
     };
     return (
 
@@ -353,13 +362,14 @@ export default function CreateGrid({ isModalOpen }) {
                                             onClick={() => toggleCell(rowIndex, colIndex)}
                                             style={{ width: deskStyle.width, height: deskStyle.height }}
                                             className={`${isCellSelected(rowIndex, colIndex) ? "bg-red-500" : "bg-orange-200"} text-[1rem]  flex select-none cursor-pointer z-[999]  rounded-lg flex justify-center items-center flex-wrap overflow-hidden`}>
-                                            {a.group.map((data, i) => {
-
-                                                return (
-                                                    isDrawerOpen ? <div key={i} style={{ backgroundColor: classData.groupData[data].groupColor }} className=" w-[20px] h-[20px] rounded-full"></div> : null
-                                                )
-                                            })}
-                                            {!isDrawerOpen && result && result[rowIndex] && result[rowIndex][colIndex]?.assigned?.userId}
+                                            {isDrawerOpen ?
+                                                a.group.map((data, i) => {
+                                                    return (
+                                                        <div key={i} style={{ backgroundColor: classData.groupData[data].groupColor }} className=" w-[20px] h-[20px] rounded-full"></div>
+                                                    )
+                                                })
+                                                : <div key={a.id}>{assignments && assignments[rowIndex][colIndex]}</div>}
+                                            {!isDrawerOpen && result && result[rowIndex] && result[rowIndex][colIndex]?.userId}
                                         </td>
                                         : <td
                                             key={colIndex}
@@ -372,7 +382,7 @@ export default function CreateGrid({ isModalOpen }) {
                     ))}
                 </tbody>
             </table>
-            <button onClick={handleAssign} className="mt-[32px] bg-orange-500 py-[16px] px-[24px] rounded-full text-[1.2rem] text-white font-bold ">자리배치 시작</button>
+            <button onClick={(e) => seatChangeStart({ gridData: classData.gridData, groupData: classData.groupData, studentData: studentData, setAssignments: setAssignments })} className="mt-[32px] bg-orange-500 py-[16px] px-[24px] rounded-full text-[1.2rem] text-white font-bold ">자리배치 시작</button>
 
             <SeatModal classData={classData} isModalOpen={isModalOpen} count={count} setCount={setCount} />
             <GroupModal isModalOpen={isModalOpen} />

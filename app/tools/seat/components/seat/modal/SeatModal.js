@@ -201,7 +201,12 @@ export default function SeatModal({ classData, isModalOpen, count, setCount }) {
 
 
     useEffect(() => {
-        setValue(grid.map(row => row.slice()))
+        if(grid){
+            setValue(grid.map(row => row.slice()))
+        } else {
+            setValue([[{isOpen: true, }]])
+        }
+
     }, [grid])
 
 

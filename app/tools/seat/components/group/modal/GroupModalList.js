@@ -102,7 +102,7 @@ export default function GroupModalList({ setIsListPage, setSelectedGroup }) {
                             transition={{ duration: 0.3 }}
                         // className="bg-white p-3 rounded-xl shadow"
                         >
-                            <GroupCard setIsListPage={setIsListPage} key={index} groupData = {classData?.groupData[groupKey]} groupKey={groupKey} setSelectedGroup={setSelectedGroup} />
+                            <GroupCard setIsListPage={setIsListPage} key={index} groupData = {classData?.groupData[groupKey]} gridData={classData?.gridData} groupKey={groupKey} setSelectedGroup={setSelectedGroup} />
                         </motion.div>
                     ))}
                 </AnimatePresence>
