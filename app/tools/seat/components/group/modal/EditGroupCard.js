@@ -4,7 +4,7 @@ export default function EditGroupCard({data, onEdit, isAdd}) {
         <div className="flex bg-white p-[16px] w-[280px] m-[16px] rounded-2xl cursor-pointer " onClick={(e) => onEdit(e,data,isAdd)}>
             <div className="avatar">
                 <div className="w-14 rounded-full">
-                    <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" />
+                    <img src={data.profileUrl} />
                 </div>
             </div>
             <div className="ml-[24px] ">

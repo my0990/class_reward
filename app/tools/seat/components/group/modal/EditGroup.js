@@ -116,7 +116,7 @@ export default function EditGrouop({ setIsListPage, selectedGroup, setSelectedGr
                 <button className="hover:scale-110 transition-all" onClick={() => setIsListPage(true)}>뒤로 가기</button>
             </div>
             <div className="pl-[16px] mb-[16px] flex items-center text-[1.6rem]">
-                <div className='w-[32px] h-[32px] bg-red-500 rounded-full mr-[16px] '></div>
+                <div style={{backgroundColor: groupData.groupColor}} className='w-[32px] h-[32px] rounded-full mr-[16px] '></div>
                 <input onBlur={onBlur} ref={inputRef} className="bg-transparent box-content px-[16px] border-b-4 outline-none hover:cursor-pointer min-w-[12px] border-gray-500" onChange={onChange} value={input} />
                 <span ref={spanRef} className="text-[1.6rem]" style={{ visibility: "hidden", position: "absolute", whiteSpace: "pre" }}>
                     {input || " "}

@@ -65,7 +65,7 @@ export default function Home() {
                 <div className=" flex flex-wrap">
                     {studentArr && studentArr.map((a, i) => {
                         return (
-                            <StudentInfoCard  currencyEmoji={currencyEmoji} expTable={expTable} key={i} isactive={a.isactive ? 1 : 0} onClick={(e) => onClick(a)} data={a}>{a.classNumber}. {a.profileNickname}</StudentInfoCard>
+                            <StudentInfoCard  currencyemoji={currencyEmoji} exptable={expTable} key={i} isactive={a.isactive ? 1 : 0} onClick={(e) => onClick(a)} data={a}>{a.classNumber}. {a.profileNickname}</StudentInfoCard>
                         )
                     })}</div>
             </div>

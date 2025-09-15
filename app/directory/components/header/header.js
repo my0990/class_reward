@@ -16,8 +16,8 @@ export default function Header({ session }) {
 
         const currentDomain = window.location.hostname;
         const targetUrl = currentDomain.includes("vercel.app")
-            ? "https://class-reward.vercel.app/tools/random"
-            : "https://kkyul.kr/tools/random";
+            ? "https://class-reward.vercel.app/"
+            : "https://kkyul.kr/";
 
         setNewUrl(targetUrl);
     }, []);
@@ -102,8 +102,7 @@ export default function Header({ session }) {
                                             onMouseLeave={handleMouseLeave}
                                         >
                                             <button
-                                                className="block "
-                                                onClick={() => toggleMenu("menu1")}
+                                                className="block " 
                                             >
                                                 편의 기능
                                             </button>
@@ -118,7 +117,7 @@ export default function Header({ session }) {
                                                     </a>
                                                 </li>
                                                 <li className="">
-                                                    <a href={newUrl} target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
+                                                    <a href={newUrl + "tools/random"} target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
                                                         랜덤 번호 뽑기
                                                     </a>
                                                 </li>
@@ -130,6 +129,11 @@ export default function Header({ session }) {
                                                 <li className="">
                                                     <a href="https://my0990.github.io/switching_seats/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
                                                         자리 바꾸기
+                                                    </a>
+                                                </li>
+                                                <li className="">
+                                                    <a href={newUrl + "tools/seat"}target="_blank" rel="noopener noreferrer" className="text-white hover:text-orange-500 block px-4 py-2 ">
+                                                        자리 바꾸기(new)
                                                     </a>
                                                 </li>
                                             </ul>

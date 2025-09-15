@@ -2,7 +2,6 @@ import { useState } from "react";
 import { mutate } from "swr";
 export default function GroupCard({ setIsListPage, groupData, setSelectedGroup, groupKey, gridData }) {
     const [isLoading, setIsLoading] = useState(false);
-
     const onClick = () => {
         setSelectedGroup({ groupKey: groupKey, selectedGroup: groupData });
         setIsListPage(false)
@@ -17,14 +16,8 @@ export default function GroupCard({ setIsListPage, groupData, setSelectedGroup, 
             return
         } else {
             setIsLoading(true)
-            // const updatedGrid = gridData.map(row =>
-            //     row.map(desk =>
-
-            //         desk.group === target ? { ...desk, group: null } : desk
-            //     )
-            // );
             const updatedGrid = gridData.map(row =>
-                row.map(desk =>{
+                row.map(desk => {
                     const updatedGroupData = desk.group.filter((data) => data !== groupKey)
                     return (
                         {
@@ -35,7 +28,6 @@ export default function GroupCard({ setIsListPage, groupData, setSelectedGroup, 
                 }
                 )
             );
-            console.log(updatedGrid)
 
             fetch("/api/deleteGroup", {
                 method: "POST",
@@ -77,27 +69,29 @@ export default function GroupCard({ setIsListPage, groupData, setSelectedGroup, 
                 </div>
             </div>
             <div>
+
                 <div className="avatar-group -space-x-6">
-                    <div className="avatar">
-                        <div className="w-8">
-                            <img src="https://img.daisyui.com/images/profile/demo/batperson@192.webp" />
+                    {groupData.groupMember && groupData.groupMember.map((a, i) => {
+                        return (
+
+                            i < 3
+                                ? <div key={i} className="avatar">
+                                    <div className="w-12">
+                                        <img src={a.profileUrl} />
+                                    </div>
+                                </div>
+                                : null
+                        )
+                    })}
+                    {groupData.groupMember && groupData.groupMember.length > 3
+                        ? <div className="avatar avatar-placeholder">
+                            <div className="bg-neutral text-neutral-content w-12 flex text-[1.2rem] pt-[8px] pl-[8px] justify-center items-center">
+                                <span>+{groupData.groupMember.length - 3}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div className="avatar">
-                        <div className="w-8">
-                            <img src="https://img.daisyui.com/images/profile/demo/spiderperson@192.webp" />
-                        </div>
-                    </div>
-                    <div className="avatar">
-                        <div className="w-8">
-                            <img src="https://img.daisyui.com/images/profile/demo/averagebulk@192.webp" />
-                        </div>
-                    </div>
-                    <div className="avatar">
-                        <div className="w-8">
-                            <img src="https://img.daisyui.com/images/profile/demo/wonderperson@192.webp" />
-                        </div>
-                    </div>
+                        : null}
+
+
                 </div>
             </div>
 

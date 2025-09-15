@@ -2,9 +2,9 @@
 
 export default function StudentInfoCard(props) {
     // console.log(props)
-    const { expTable, currencyEmoji } = props
+    const { exptable, currencyemoji } = props
     console.log(props)
-    const { startExp, commonDifference } = expTable;
+    const { startExp, commonDifference } = exptable;
     const findLargestSumUnderTarget = () => {
 
         let k = Math.floor((-2 * startExp + commonDifference + Math.sqrt((2 * startExp - commonDifference) ** 2 + 8 * commonDifference * props.data.exp)) / (2 * commonDifference));
@@ -28,7 +28,7 @@ export default function StudentInfoCard(props) {
             <div {...props} className={`w-[160px] p-[16px] m-[8px] bg-orange-200 rounded-xl cursor-pointer ${props.isactive ? "bg-orange-500" : ""}`}>
                 <div className="flex justify-between mb-[8px]">
                     <div className="font-semibold">LV. {findLargestSumUnderTarget()}</div>
-                    <div className="w-[80px] text-right overflow-hidden whitespace-nowrap">{currencyEmoji} {props.data.money} </div>
+                    <div className="w-[80px] text-right overflow-hidden whitespace-nowrap">{currencyemoji} {props.data.money} </div>
                 </div>
                 <div className="flex overflow-hidden border-4 border-white justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
                     <img src={props.data.profileUrl} width="100" height="100" alt="characther" className="rounded-full" />

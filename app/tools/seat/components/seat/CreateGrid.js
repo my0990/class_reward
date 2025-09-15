@@ -1,24 +1,27 @@
 import SeatModal from "./modal/SeatModal";
 import { fetchData } from "@/hooks/swrHooks";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import GroupModal from "../group/modal/GroupModal";
 import Image from "next/image";
 import { mutate } from "swr";
 import _ from "lodash";
-import { seatChangeStart } from "./util/util"
-function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-}
+import { seatChangeStart, stop } from "./util/util"
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CreateGrid({ isModalOpen }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
     const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData('/api/fetchStudentData');
     const [count, setCount] = useState(0);
-    const [assignments, setAssignments] = useState(null);
+    const [isStarted, setIsStarted] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [running, setRunning] = useState(false);
+    const [total, setTotal] = useState(0);
+    const stopRef = useRef(false);
+    const genRef = useRef(null);
+    const [error, setError] = useState('');
+
+
+
     const [isLoading, setIsLoading] = useState(false);
     const [deskStyle, setDeskStyle] = useState({
         width: 0,
@@ -26,6 +29,9 @@ export default function CreateGrid({ isModalOpen }) {
         gap: 0,
         gridHeight: 0,
     });
+
+
+
 
     const containerWidth = 900;
     const maxContainerHeight = 500;
@@ -191,31 +197,56 @@ export default function CreateGrid({ isModalOpen }) {
         }
 
     }
-    // const onGroupAssign = (a) => {
-    //     console.log(a)
-    //     mutate()
-    //     setGrid(prevGrid =>
-    //         prevGrid.map((row, rowIdx) =>
-    //             row.map((cell, colIdx) => {
-    //                 const shouldUpdate = selectedCells.some(
-    //                     pos => pos.row === rowIdx && pos.col === colIdx
-    //                 );
-    //                 if (shouldUpdate) {
-    //                     const alreadyHasItem = cell.group.includes(a);
-    //                     return alreadyHasItem
-    //                         ? cell
-    //                         : {
-    //                             ...cell,
-    //                             group: [...cell.group, a], // 배열 복사 후 push
-    //                         };
-    //                 }
-    //                 return cell;
-    //             })
-    //         )
-    //     );
-    // };
+    const onGroupDelete = () => {
+        if (isLoading) {
+            return
+        } else {
+            setIsLoading(true)
+
+            let updatedGrid = _.cloneDeep(classData.gridData).map((row, rowIdx) =>
+                row.map((cell, colIdx) => {
+                    const shouldUpdate = selectedCells.some(
+                        pos => pos.row === rowIdx && pos.col === colIdx
+                    );
+                    if (shouldUpdate) {
+                        cell.group = []
+                    }
+                    return cell;
+                })
+            )
 
 
+            fetch("/api/assignGroupToGrid", {
+                method: "POST",
+                body: JSON.stringify({ updatedGrid: updatedGrid }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => res.json()).then((data) => {
+                if (data.result === true) {
+
+
+                    setIsLoading(false);
+                    mutate(
+                        "/api/fetchClassData",
+                        (prev) => {
+
+                            return { ...prev, gridData: updatedGrid }
+                        },
+                        false // 서버 요청 없이 즉시 반영
+                    );
+
+                }
+            })
+        }
+    }
+
+    useEffect(() => {
+        if (error !== '') {
+            setTimeout(() => setError(''), 2000)
+        }
+
+    }, [error, setError])
 
     const onDrawerCancel = () => {
         setIsDrawerOpen(false);
@@ -233,104 +264,52 @@ export default function CreateGrid({ isModalOpen }) {
         document.getElementById('seatModal').showModal()
     }
 
-
+    const onReset = () => {
+        setResult(null);
+        setIsStarted(false);
+    }
     if (isClassLoading || isStudentLoading) return <div>Loading data...</div>;
     if (isClassError || isStudentError) return <div>Error loading data</div>;
-    // console.log(classData)
-    // console.log(studentData)
-    const buildStudentGroupMap = () => {
-        const map = {};
-        for (const [gid, g] of Object.entries(classData.groupData)) {
-            for (const student of g.groupMember) {
-                if (!map[student._id]) map[student._id] = [];
-                map[student._id].push(gid);
-            }
-        }
-        return map;
-    };
-
-    const studentGroupMap = buildStudentGroupMap();
-
-    const deepCloneDesks = (desks) =>
-        desks.map((row) => row.map((cell) => ({ ...cell })));
-
-
-    const getAssignableDesks = (studentId, currentDesks) => {
-
-        const studentGroups = studentGroupMap[studentId] || [];
-        const candidates = [];
-
-        for (let r = 0; r < currentDesks.length; r++) {
-            for (let c = 0; c < currentDesks[r].length; c++) {
-                const desk = currentDesks[r][c];
-
-                if (desk.assigned) continue;
-                const ok =
-                    studentGroups.length === 0 ||
-                    studentGroups.every(g => desk.group.includes(g));
-
-                if (ok) candidates.push({ r, c });
-            }
-        }
-
-        return candidates;
-    };
 
 
 
 
-    const assignStudents = (index, desks) => {
-        if (index >= studentData.length || index >= count) return desks; // 성공
-        const student = studentData[index];
-        const candidates = getAssignableDesks(student._id, desks);
 
-        if (candidates.length === 0) {
 
-            return
-        }
-        shuffle(candidates)
 
-        for (const { r, c } of candidates) {
-            const newDesks = deepCloneDesks(desks);
-            if (!newDesks[r][c].isOpen) continue
-            newDesks[r][c].assigned = student;
 
-            const result = assignStudents(index + 1, newDesks);
-            if (result) return result; // 성공
-        }
 
-        return null; // 실패
-    };
-    const handleAssign = () => {
-
-        // const final = assignStudents(0, classData.gridData);
-        // setResult(final);
-        const assigned = assignSeatsWithPriorityQueue(classData.gridData, studentData, classData.groupData);
-        console.log(assigned);
-        setResult(assigned)
-    };
     return (
 
 
 
         <div className="flex items-center justify-center flex-col" >
-            <div className="flex justify-end w-full mb-[32px]">
-                <div title="책상 배열 설정" onClick={onSeatClick} className="w-[56px] cursor-pointer mr-[24px] h-[56px] bg-[#E7E1D7] hover:scale-110 transition-all overflow-hidden p-[8px] rounded-full">
-                    <Image
-                        src="/chair.png"
-                        alt="설명"
-                        width={300}
-                        height={200}
-                    />
+            <div className="flex justify-between w-full mb-[32px]">
+                <div title="설정" onClick={() => alert('준비중')} className="w-[56px] cursor-pointer  h-[56px]  hover:scale-110 transition-all overflow-hidden p-[8px] rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-[40px]">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
 
                 </div>
-                <div title="그룹 설정" onClick={onGroupClick} className="w-[56px] cursor-pointer h-[56px] hover:scale-110 transition-all bg-red-300 rounded-full overflow-hidden">
-                    <Image
-                        src="/group.png"
-                        alt="설명"
-                        width={300}
-                        height={200}
-                    />
+                <div className="flex">
+                    <div title="책상 배열 설정" onClick={onSeatClick} className="w-[56px] cursor-pointer mr-[24px] h-[56px] bg-[#E7E1D7] hover:scale-110 transition-all overflow-hidden p-[8px] rounded-full">
+                        <Image
+                            src="/chair.png"
+                            alt="설명"
+                            width={300}
+                            height={200}
+                        />
+
+                    </div>
+                    <div title="그룹 설정" onClick={onGroupClick} className="w-[56px] cursor-pointer h-[56px] hover:scale-110 transition-all bg-red-300 rounded-full overflow-hidden">
+                        <Image
+                            src="/group.png"
+                            alt="설명"
+                            width={300}
+                            height={200}
+                        />
+                    </div>
                 </div>
             </div>
             <div className="mb-[16px] cursor-pointer w-[320px] relative h-[116px] rounded-lg border-[10px] bg-green-700 border-amber-700 text-white flex justify-cneter items-center text-[0.9rem]">
@@ -368,7 +347,24 @@ export default function CreateGrid({ isModalOpen }) {
                                                         <div key={i} style={{ backgroundColor: classData.groupData[data].groupColor }} className=" w-[20px] h-[20px] rounded-full"></div>
                                                     )
                                                 })
-                                                : <div key={a.id}>{assignments && assignments[rowIndex][colIndex]}</div>}
+                                                :
+                                                <div key={a.id}>
+                                                    <AnimatePresence>
+                                                        {result && (
+                                                            <motion.div
+                                                                key="text"
+                                                                initial={isStarted ? { opacity: 0, y: 0 } : null}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                exit={{ opacity: 0, y: 0 }}
+                                                                transition={{ duration: 0.5 }}
+                                                                className=" text-xl font-bold"
+
+                                                            >
+                                                                {result[rowIndex][colIndex]}
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence></div>}
+
                                             {!isDrawerOpen && result && result[rowIndex] && result[rowIndex][colIndex]?.userId}
                                         </td>
                                         : <td
@@ -382,7 +378,14 @@ export default function CreateGrid({ isModalOpen }) {
                     ))}
                 </tbody>
             </table>
-            <button onClick={(e) => seatChangeStart({ gridData: classData.gridData, groupData: classData.groupData, studentData: studentData, setAssignments: setAssignments })} className="mt-[32px] bg-orange-500 py-[16px] px-[24px] rounded-full text-[1.2rem] text-white font-bold ">자리배치 시작</button>
+            <div className="text-red-500 font-bold h-[24px]">
+                {error}
+            </div>
+            {isStarted
+                ? <button onClick={onReset} className="mt-[32px] bg-red-500 py-[16px] px-[24px] rounded-full text-[1.2rem] text-white font-bold ">다시 뽑기</button>
+                : <button onClick={(e) => seatChangeStart({ gridData: classData.gridData, groupData: classData.groupData, studentData: studentData, stopRef: stopRef, setRunning: setRunning, setTotal: setTotal, genRef: genRef, setProgress: setProgress, setResult: setResult, setIsStarted: setIsStarted, setError: setError })} className="mt-[32px] bg-orange-500 py-[16px] px-[24px] rounded-full text-[1.2rem] text-white font-bold ">자리배치 시작</button>}
+
+            {/* <button onClick={(e) => start({ stopRef: stopRef, setRunning: setRunning, setTotal: setTotal, setProgress: setProgress })} className="mt-[32px] bg-orange-500 py-[16px] px-[24px] rounded-full text-[1.2rem] text-white font-bold ">자리배치 시작</button> */}
 
             <SeatModal classData={classData} isModalOpen={isModalOpen} count={count} setCount={setCount} />
             <GroupModal isModalOpen={isModalOpen} />
@@ -401,6 +404,17 @@ export default function CreateGrid({ isModalOpen }) {
                             </li>
                         )
                     })}
+                    <li onClick={onGroupDelete} className="py-[8px] cursor-pointer transition-all hover:bg-orange-300  rounded-xl">
+                        <div>
+                            <div className="w-[24px] h-[24px] rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-[24px]">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+
+                            </div>
+                            <div>삭제하기</div>
+                        </div>
+                    </li>
                     <div className="mt-[32px]">
                         <li><button onClick={onDrawerCancel}>닫기</button></li>
                     </div>
