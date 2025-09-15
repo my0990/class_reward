@@ -161,14 +161,15 @@ export function* getSeatCombinations(arr, k) {
 export function seatChangeStart({ groupData, gridData, studentData, stopRef, setRunning, setTotal, genRef, setProgress, setResult, setIsStarted, setError }) {
   const assignments = {};
   // 1. 그룹 조합별 학생 및 자식 배열 생성하기
-  const groupCombFromStudent = getGroupCombFromStudent({ groupData, studentData });
-  const total = Object.keys(groupCombFromStudent).length;
-  const groupCombFromGrid = getGroupCombFromGrid({ gridData });
-  const availableSeatsForStudents = buildAvailableSeatsForStudents({ groupCombFromStudent: groupCombFromStudent, groupCombFromGrid: groupCombFromGrid });
   if (!groupData) {
     groupData = [];
   }
   console.log(groupData);
+  const groupCombFromStudent = getGroupCombFromStudent({ groupData, studentData });
+  const total = Object.keys(groupCombFromStudent).length;
+  const groupCombFromGrid = getGroupCombFromGrid({ gridData });
+  const availableSeatsForStudents = buildAvailableSeatsForStudents({ groupCombFromStudent: groupCombFromStudent, groupCombFromGrid: groupCombFromGrid });
+
 
   //순서 가지치기
   const entries = Object.entries({ ...availableSeatsForStudents });
