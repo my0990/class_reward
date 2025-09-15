@@ -165,7 +165,10 @@ export function seatChangeStart({ groupData, gridData, studentData, stopRef, set
   const total = Object.keys(groupCombFromStudent).length;
   const groupCombFromGrid = getGroupCombFromGrid({ gridData });
   const availableSeatsForStudents = buildAvailableSeatsForStudents({ groupCombFromStudent: groupCombFromStudent, groupCombFromGrid: groupCombFromGrid });
-
+  if (!groupData) {
+    groupData = [];
+  }
+  console.log(groupData);
 
   //순서 가지치기
   const entries = Object.entries({ ...availableSeatsForStudents });
