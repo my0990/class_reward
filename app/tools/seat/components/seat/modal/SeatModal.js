@@ -6,7 +6,6 @@ import _ from "lodash";
 export default function SeatModal({ classData, isModalOpen, count, setCount }) {
     const grid = classData.gridData;
     const [value, setValue] = useState([[]]);
-    const [isLoading, setIsLoading] = useState(false);
     const startIndex = useRef('');
     const currentIndex = useRef('');
     const startTable = useRef([]);

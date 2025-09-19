@@ -19,8 +19,7 @@ export default function CreateGrid({ isModalOpen }) {
     const stopRef = useRef(false);
     const genRef = useRef(null);
     const [error, setError] = useState('');
-
-
+    const [isFunc, setIsFunc] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [deskStyle, setDeskStyle] = useState({
@@ -153,6 +152,7 @@ export default function CreateGrid({ isModalOpen }) {
         } else {
             setIsLoading(true)
 
+
             let updatedGrid = _.cloneDeep(classData.gridData).map((row, rowIdx) =>
                 row.map((cell, colIdx) => {
                     const shouldUpdate = selectedCells.some(
@@ -170,7 +170,7 @@ export default function CreateGrid({ isModalOpen }) {
                     return cell;
                 })
             )
-            console.log(updatedGrid)
+
 
             fetch("/api/assignGroupToGrid", {
                 method: "POST",
@@ -180,9 +180,10 @@ export default function CreateGrid({ isModalOpen }) {
                 },
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
-
-
                     setIsLoading(false);
+                    setIsFunc(true);
+                    setSelectedCells([]);
+
                     mutate(
                         "/api/fetchClassData",
                         (prev) => {
@@ -191,6 +192,7 @@ export default function CreateGrid({ isModalOpen }) {
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
+                    
 
                 }
             })
@@ -252,10 +254,13 @@ export default function CreateGrid({ isModalOpen }) {
         setIsDrawerOpen(false);
         setSelectedCells([]);
     }
-
+    useEffect(()=>{
+        setIsFunc(false);
+    }, [isFunc, setIsFunc])
     useEffect(() => {
-        if (selectedCells.length === 0) {
+        if (selectedCells.length === 0 && !isFunc) {
             setIsDrawerOpen(false);
+
         }
     }, [setSelectedCells, selectedCells])
 
@@ -344,7 +349,7 @@ export default function CreateGrid({ isModalOpen }) {
                                             {isDrawerOpen ?
                                                 a.group.map((data, i) => {
                                                     return (
-                                                        <div key={i} style={{ backgroundColor: classData.groupData[data].groupColor }} className=" w-[20px] h-[20px] rounded-full"></div>
+                                                        <div key={i} style={{ backgroundColor: classData?.groupData[data]?.groupColor }} className=" w-[20px] h-[20px] rounded-full"></div>
                                                     )
                                                 })
                                                 :
