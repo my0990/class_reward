@@ -53,7 +53,6 @@ export function getGroupCombFromStudent({ groupData, studentData }) {
   // 1. 학생마다 어떤 그룹에 속해있는지 정리
   for (const [groupKey, data] of Object.entries(groupData)) {
     for (const student of data.groupMember) {
-      console.log(student)
       if (!studentGroupsMap[student.userId]) {
         studentGroupsMap[student.userId] = new Set();
       }
@@ -164,7 +163,6 @@ export function seatChangeStart({ groupData, gridData, studentData, stopRef, set
   if (!groupData) {
     groupData = [];
   }
-  console.log(groupData);
   const groupCombFromStudent = getGroupCombFromStudent({ groupData, studentData });
   const total = Object.keys(groupCombFromStudent).length;
   const groupCombFromGrid = getGroupCombFromGrid({ gridData });

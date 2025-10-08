@@ -8,6 +8,7 @@ import _ from "lodash";
 import { seatChangeStart, stop } from "./util/util"
 import { motion, AnimatePresence } from "framer-motion";
 
+
 export default function CreateGrid({ isModalOpen }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
     const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData('/api/fetchStudentData');
@@ -20,6 +21,203 @@ export default function CreateGrid({ isModalOpen }) {
     const genRef = useRef(null);
     const [error, setError] = useState('');
     const [isFunc, setIsFunc] = useState(false);
+    const mode = useRef(false);
+
+
+    const [value, setValue] = useState([[]]);
+    const startIndex = useRef('');
+    const currentIndex = useRef('');
+    const startTable = useRef([]);
+
+
+    const [grid, setGrid] = useState([[{ isOpen: true, group: [] }]])
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [result, setResult] = useState(null);
+
+    useEffect(() => {
+        if (classData?.gridData) {
+            const newGrid = classData?.gridData.map(row =>
+                row.map(cell => ({
+                    ...cell,            // 기존 키값 복사
+                    isSelected: false   // 새 키 추가
+                }))
+            );
+            setValue(newGrid)
+        } else {
+            setValue([[{ isOpen: true, isSelected: false }]])
+        }
+
+    }, [classData?.gridData])
+
+
+
+    const isTouchEvent = (e) => {
+        return 'ontouchstart' in window && e.type.startsWith('touch');
+    }
+    const isMouseEvent = (e) => {
+        return e.nativeEvent instanceof MouseEvent;
+    }
+    const convertIndexToString = (rowIndex, colIndex) => {
+        return `${rowIndex}-${colIndex}`;
+    }
+    const convertStringToIndex = (indexString) => {
+        if (!indexString.includes('-')) {
+            throw new Error('indexString must be in the format of "rowIndex-colIndex"');
+        }
+
+        return indexString.split('-').map(Number);
+    }
+    const getTableCellElement = (e) => {
+        let target
+        if (isTouchEvent(e) && e.touches) {
+            const { clientX, clientY } = e.touches[0];
+            target = document.elementFromPoint(clientX, clientY);
+        } else if (isMouseEvent(e)) {
+            target = e.target;
+        }
+
+
+        if (target instanceof HTMLTableCellElement && target.tagName === 'TD') {
+            return target;
+        }
+
+        return null;
+    }
+
+    const getTableCellIndex = (e) => {
+        let rowIndex = null;
+        let colIndex = null;
+
+        const target = getTableCellElement(e);
+        if (!target) {
+            return null;
+        }
+
+        if (target.parentNode instanceof HTMLTableRowElement) {
+            const tr = target.parentNode;
+
+            rowIndex = tr.sectionRowIndex;
+
+            const tds = tr.querySelectorAll('td');
+
+            for (let i = 0; i < tds.length; i++) {
+                if (tds[i] === target) {
+                    colIndex = i;
+                    break;
+                }
+            }
+        }
+
+        if (rowIndex === null || colIndex === null) {
+            return null;
+        }
+
+        return { rowIndex, colIndex };
+    }
+    const handleDragStart = (e) => {
+
+        const index = getTableCellIndex(e);
+        if (index === null) {
+            return;
+        }
+
+        if (isMouseEvent(e) && e.buttons !== 1) {
+            return;
+        }
+
+        if (isTouchEvent(e) && e.cancelable) {
+            e.preventDefault();
+        }
+
+        const { rowIndex, colIndex } = index;
+        if (isFunc === true) {
+            setIsFunc(false);
+        }
+
+        startTable.current = value.map(row => row.slice());
+        startIndex.current = convertIndexToString(rowIndex, colIndex);
+        mode.current = !value[rowIndex][colIndex].isSelected;
+        const newValue = _.cloneDeep(value)
+
+        if (!newValue[rowIndex][colIndex].isOpen) {
+            return
+        }
+
+        if (isDrawerOpen === false) {
+            setIsDrawerOpen(true);
+        }
+
+        // if(newValue[rowIndex][colIndex].isOpen){
+        newValue[rowIndex][colIndex].isSelected = mode.current;
+        // }
+
+        setValue(newValue);
+    };
+
+    const handleDragMove = (e) => {
+
+        if (startIndex.current === '') {
+            return;
+        }
+
+        if (isMouseEvent(e) && e.buttons !== 1) {
+            return;
+        }
+
+        const index = getTableCellIndex(e);
+
+        if (index === null) {
+            return;
+        }
+
+        const { rowIndex, colIndex } = index;
+
+        const indexString = convertIndexToString(rowIndex, colIndex);
+        const isSameAsPrevIndex = indexString === currentIndex.current;
+
+        if (isSameAsPrevIndex) {
+            return;
+        }
+
+        currentIndex.current = indexString;
+
+        const [startRowIndex, startColIndex] = convertStringToIndex(startIndex.current);
+        const [minRow, maxRow] = [startRowIndex, rowIndex].sort((a, b) => a - b);
+        const [minCol, maxCol] = [startColIndex, colIndex].sort((a, b) => a - b);
+
+
+        const newValue = [...value];
+        newValue.forEach((r, i) => {
+            r.forEach((_, j) => {
+                if (!newValue[i][j].isOpen) {
+                    return
+                }
+
+                if (i < minRow || i > maxRow || j < minCol || j > maxCol) {
+                    newValue[i][j].isSelected = startTable.current[i][j].isSelected;
+                } else {
+
+                    newValue[i][j].isSelected = mode.current;
+                }
+            });
+        });
+
+        setValue(newValue);
+    };
+
+    const handleDragEnd = (e) => {
+
+        startIndex.current = '';
+        currentIndex.current = '';
+        startTable.current = [];
+        mode.current = false;
+
+        if (e.cancelable) {
+            e.preventDefault();
+        }
+    }
+
+
 
     const [isLoading, setIsLoading] = useState(false);
     const [deskStyle, setDeskStyle] = useState({
@@ -70,13 +268,7 @@ export default function CreateGrid({ isModalOpen }) {
         });
     }, [classData?.gridData]);
 
-    const [grid, setGrid] = useState([[{ isOpen: true, group: [] }]])
 
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [selectedCells, setSelectedCells] = useState([]);
-
-
-    const [result, setResult] = useState(null);
 
 
     useEffect(() => {
@@ -106,36 +298,13 @@ export default function CreateGrid({ isModalOpen }) {
         mutate(
             "/api/fetchClassData",
             (prev) => {
-                return { ...prev, gridData: classData.gridData ?? [[{ isOpen: true, group: [] }, { isOpen: true, group: [] }]] }
+                return { ...prev, gridData: classData.gridData ?? [[{ isOpen: true, group: [], isSelected: false },]] }
             },
             false // 서버 요청 없이 즉시 반영
         );
     }, [classData]);
 
 
-    const toggleCell = (rowIndex, colIndex) => {
-        setIsDrawerOpen(true)
-        const cellKey = `${rowIndex}-${colIndex}`;
-        const isSelected = selectedCells.some(
-            (cell) => cell.row === rowIndex && cell.col === colIndex
-        );
-
-        if (isSelected) {
-            // 이미 선택된 셀이면 제거
-            setSelectedCells((prev) =>
-                prev.filter((cell) => `${cell.row}-${cell.col}` !== cellKey)
-            );
-        } else {
-            // 선택된 셀이 아니면 추가
-            setSelectedCells((prev) => [...prev, { row: rowIndex, col: colIndex }]);
-        }
-    };
-
-    const isCellSelected = (rowIndex, colIndex) => {
-        return selectedCells.some(
-            (cell) => cell.row === rowIndex && cell.col === colIndex
-        );
-    };
 
     const onGroupClick = () => {
         document.getElementById('groupModal').showModal();
@@ -146,19 +315,18 @@ export default function CreateGrid({ isModalOpen }) {
 
 
     const onGroupAssign = (a) => {
-
         if (isLoading) {
             return
         } else {
             setIsLoading(true)
+            setIsFunc(true);
 
-
-            let updatedGrid = _.cloneDeep(classData.gridData).map((row, rowIdx) =>
+            let updatedGrid = _.cloneDeep(value).map((row, rowIdx) =>
                 row.map((cell, colIdx) => {
-                    const shouldUpdate = selectedCells.some(
-                        pos => pos.row === rowIdx && pos.col === colIdx
-                    );
-                    if (shouldUpdate) {
+                    // const shouldUpdate = selectedCells.some(
+                    //     pos => pos.row === rowIdx && pos.col === colIdx
+                    // );
+                    if (cell.isSelected) {
                         const alreadyHasItem = cell.group.includes(a);
                         return alreadyHasItem
                             ? cell
@@ -181,9 +349,6 @@ export default function CreateGrid({ isModalOpen }) {
             }).then((res) => res.json()).then((data) => {
                 if (data.result === true) {
                     setIsLoading(false);
-                    setIsFunc(true);
-                    setSelectedCells([]);
-
                     mutate(
                         "/api/fetchClassData",
                         (prev) => {
@@ -192,7 +357,7 @@ export default function CreateGrid({ isModalOpen }) {
                         },
                         false // 서버 요청 없이 즉시 반영
                     );
-                    
+
 
                 }
             })
@@ -203,14 +368,13 @@ export default function CreateGrid({ isModalOpen }) {
         if (isLoading) {
             return
         } else {
-            setIsLoading(true)
-
-            let updatedGrid = _.cloneDeep(classData.gridData).map((row, rowIdx) =>
+            setIsLoading(true);
+            setIsFunc(true);
+            let updatedGrid = _.cloneDeep(value).map((row, rowIdx) =>
                 row.map((cell, colIdx) => {
-                    const shouldUpdate = selectedCells.some(
-                        pos => pos.row === rowIdx && pos.col === colIdx
-                    );
-                    if (shouldUpdate) {
+
+
+                    if (cell.isSelected) {
                         cell.group = []
                     }
                     return cell;
@@ -252,17 +416,29 @@ export default function CreateGrid({ isModalOpen }) {
 
     const onDrawerCancel = () => {
         setIsDrawerOpen(false);
-        setSelectedCells([]);
+        const newGrid = classData?.gridData.map(row =>
+            row.map(cell => ({
+                ...cell,            // 기존 키값 복사
+                isSelected: false   // 새 키 추가
+            }))
+        );
+        setValue(newGrid)
     }
-    useEffect(()=>{
-        setIsFunc(false);
-    }, [isFunc, setIsFunc])
+
+
+
+
+
     useEffect(() => {
-        if (selectedCells.length === 0 && !isFunc) {
+
+        const hasSelected = value.some(row =>
+            row.some(cell => cell.isSelected === true)
+        );
+        if (!hasSelected && !isFunc) {
             setIsDrawerOpen(false);
 
         }
-    }, [setSelectedCells, selectedCells])
+    }, [value, setValue])
 
     const onSeatClick = () => {
         isModalOpen.current = true
@@ -322,7 +498,107 @@ export default function CreateGrid({ isModalOpen }) {
                 <div className="w-[320px] h-[116px] outline-none  flex  text-[1.5rem] overflow-hidden p-[8px]" contentEditable="true"></div>
                 <div className="absolute right-0 bottom-0">떠든 사람</div>
             </div>
-            <table className="m-4 min-w-[600px] min-h-[320px] flex justify-center items-center" >
+            <table className="m-4 min-w-[600px] min-h-[320px] flex justify-center items-center"
+
+                onTouchStart={handleDragStart}
+                onMouseDown={handleDragStart}
+                onTouchMove={handleDragMove}
+                onMouseOver={handleDragMove}
+                onTouchEnd={handleDragEnd}
+                onMouseUp={handleDragEnd}
+            >
+                <thead>
+
+                </thead>
+                <tbody className="flex flex-col"
+                    style={{ gap: deskStyle.gap }}>
+                    <AnimatePresence>
+                        {value.map((row, rowIndex) => (
+                            <tr
+                                key={rowIndex}
+                                style={{ gap: deskStyle.gap }}
+                                className="flex"
+                                transition={{ duration: 0.2 }}>
+                                {row.map((a, colIndex) => {
+                                    return (
+                                        a.isOpen
+                                            ? <td
+                                                key={colIndex}
+                                                style={{ width: deskStyle.width, height: deskStyle.height }}
+                                                className={`${a.isSelected ? "bg-red-500" : "bg-orange-200"} text-[1rem]  flex select-none cursor-pointer z-[999]  rounded-lg flex justify-center items-center flex-wrap overflow-hidden`}>
+                                                {isDrawerOpen ?
+                                                    a.group.map((data, i) => {
+                                                        return (
+                                                            <div
+                                                                onMouseDown={(e) => {
+                                                                    // div 클릭 시 부모 td 기준 이벤트 전달
+                                                                    e.stopPropagation(); // div 자체 이벤트 버블링 막음
+
+                                                                    const tdElement = e.currentTarget.closest("td"); // 부모 td 찾기
+
+                                                                    if (!tdElement) return;
+
+                                                                    // td 기준 fake 이벤트 생성
+                                                                    const fakeEvent = {
+                                                                        ...e,
+                                                                        target: tdElement,
+                                                                        currentTarget: tdElement,
+                                                                        nativeEvent: e.nativeEvent,
+                                                                        preventDefault: () => e.preventDefault(),
+                                                                        stopPropagation: () => e.stopPropagation()
+                                                                    };
+
+                                                                    handleDragStart(fakeEvent); // table 핸들러 호출
+                                                                }}
+                                                                key={i}
+                                                                style={{ backgroundColor: classData?.groupData[data]?.groupColor }}
+                                                                className=" w-[20px] h-[20px] rounded-full"></div>
+                                                        )
+                                                    })
+                                                    :
+                                                    <div key={a.id}>
+                                                        <AnimatePresence>
+                                                            {result && (
+                                                                <motion.div
+                                                                    key="text"
+                                                                    initial={isStarted ? { opacity: 0, y: 0 } : null}
+                                                                    animate={{ opacity: 1, y: 0 }}
+                                                                    exit={{ opacity: 0, y: 0 }}
+                                                                    transition={{ duration: 0.5 }}
+                                                                    className=" text-xl font-bold"
+
+                                                                >
+                                                                    {result[rowIndex][colIndex]}
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence></div>}
+
+                                                {!isDrawerOpen && result && result[rowIndex] && result[rowIndex][colIndex]?.userId}
+                                            </td>
+                                            : <td
+                                                key={colIndex}
+                                                style={{ width: deskStyle.width, height: deskStyle.height }}
+                                                className={`select-none  z-[999] px-4 py-2 rounded-lg`} />
+                                    )
+
+                                })}
+                                {/* {row.map((a, i) => (
+                                    <td
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        // exit={{ opacity: 0, scale: 0.95 }}
+                                        transition={{ duration: 0.2 }}
+                                        key={i}
+                                        style={{ width: deskStyle.width, height: deskStyle.height }}
+                                        className={`${a.isOpen ? "bg-orange-400" : "bg-gray-200"}  aspect-[2/1] select-none cursor-pointer    rounded-lg`}
+                                    />
+                                ))} */}
+                            </tr>
+                        ))}
+                    </AnimatePresence>
+                </tbody>
+            </table>
+            {/* <table className="m-4 min-w-[600px] min-h-[320px] flex justify-center items-center" >
                 <thead>
 
                 </thead>
@@ -382,7 +658,7 @@ export default function CreateGrid({ isModalOpen }) {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </table> */}
             <div className="text-red-500 font-bold h-[24px]">
                 {error}
             </div>
