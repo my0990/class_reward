@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 
+
 @layer utilities {
   @keyframes marquee {
     from {
@@ -84,6 +85,8 @@ body {
 .typeWriterCursor {
   color: rgb(245, 127, 9);
 }
+
+
 
 .responsive {
 

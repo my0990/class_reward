@@ -34,7 +34,6 @@ export function getGroupCombFromGrid({ gridData }) {
   for (let row = 0; row < gridData.length; row++) {
     for (let col = 0; col < gridData[row].length; col++) {
       const desk = gridData[row][col];
-      const deskGroups = desk.groups;
 
       // 해당 책상에 학생이 이미 앉아있으면 제외
       if (!desk.isOpen) continue;
