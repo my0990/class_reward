@@ -11,9 +11,7 @@ export default function PrintModal({ value, deskStyle, result, displayData, clas
         document.getElementById("printModal").close();
 
     }
-
     const handlePrint = useReactToPrint({ contentRef });
-
 
     return (
         <div ref={contentRef}>
@@ -60,10 +58,10 @@ export default function PrintModal({ value, deskStyle, result, displayData, clas
                                                         className={`${a.isSelected ? "bg-red-500" : "bg-orange-200"} ${isReversal ? "rotate-180" : ""} text-[1rem]  flex select-none z-[999]  rounded-lg flex justify-center items-center flex-wrap overflow-hidden`}>
                                                         {/* {result && result[rowIndex] && result[rowIndex][colIndex]} */}
                                                         {classData?.setting?.result === 0
-                                                            ? displayData[result[rowIndex][colIndex]][0]
+                                                            ? displayData?.[result?.[rowIndex]?.[colIndex]]?.[0]
                                                             : classData?.setting?.result === 1
-                                                                ? displayData[result[rowIndex][colIndex]][1] + "." + displayData[result[rowIndex][colIndex]][0]
-                                                                : displayData[result[rowIndex][colIndex]][1]}
+                                                                ? displayData?.[result?.[rowIndex]?.[colIndex]]?.[1] + "." + displayData?.[result?.[rowIndex]?.[colIndex]]?.[0]
+                                                                : displayData?.[result?.[rowIndex]?.[colIndex]]?.[1]}
                                                     </td>
                                                     : <td
                                                         key={colIndex}

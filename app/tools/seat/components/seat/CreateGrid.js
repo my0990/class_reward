@@ -34,17 +34,22 @@ export default function CreateGrid({ isModalOpen }) {
     const currentIndex = useRef('');
     const startTable = useRef([]);
 
-
+    
     const [grid, setGrid] = useState([[{ isOpen: true, group: [] }]])
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [result, setResult] = useState(null);
 
     useEffect(()=>{
+        if(!studentData){
+            return
+        }
         const result = studentData?.reduce((acc, user) => {
             acc[user.userId] = [user.profileNickname, user.classNumber];
             return acc;
           }, {});
+  
           setDisplayData(result);
+
     }, [studentData])
 
     useEffect(() => {
@@ -473,7 +478,6 @@ export default function CreateGrid({ isModalOpen }) {
     }
     if (isClassLoading || isStudentLoading) return <div>Loading data...</div>;
     if (isClassError || isStudentError) return <div>Error loading data</div>;
-
 
 
 

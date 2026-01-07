@@ -4,8 +4,11 @@
 // };
 
 // export default nextConfig;
+// next.config.js
+
 
 import withPWAInit from "@ducanh2912/next-pwa";
+
 
 const withPWA = withPWAInit({
   dest: "public",
@@ -21,6 +24,6 @@ const withPWA = withPWAInit({
 
 // Your Next config is automatically typed!
 export default withPWA({
-  
+  turbopack: {}, 
   // Your Next.js config
 });
