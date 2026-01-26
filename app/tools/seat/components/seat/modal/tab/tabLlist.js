@@ -1,8 +1,7 @@
-import { useState } from "react"
 import { mutate } from "swr"
+import { getGroupCombFromGrid, getGroupKeys } from "../../util/util";
 
-
-export function GeneralTab({  setting }) {
+export function GeneralTab({ setting }) {
     // const setting = { result: 0, color: "#fdba74" };
     // const setting = classData?.setting ?? { result: 0, color: "#fdba74" };
 
@@ -45,7 +44,7 @@ export function GeneralTab({  setting }) {
                     ,
                 },
             }), { revalidate: false });
-        
+
     };
 
     const example = [
@@ -86,36 +85,6 @@ export function GeneralTab({  setting }) {
 
     ];
 
-    const onSettingSave = () => {
-        if (isLoading) {
-            return
-        } else {
-            setIsLoading(true);
-
-            fetch("/api/editSetting", {
-                method: "POST",
-                body: JSON.stringify({ setting: setting }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }).then((res) => res.json()).then((data) => {
-                if (data.result === true) {
-
-
-                    setIsLoading(false);
-                    mutate(
-                        "/api/fetchClassData",
-                        (prev) => {
-
-                            return { ...prev, setting: setting }
-                        },
-                        false // 서버 요청 없이 즉시 반영
-                    );
-
-                }
-            })
-        }
-    }
 
 
     return (
@@ -186,11 +155,108 @@ export function GeneralTab({  setting }) {
     );
 }
 
-export function AccountTab() {
+export function AccountTab({ studentData, classData }) {
+    const studentGroupsMap = {};
+
+    // 1. 학생마다 어떤 그룹에 속해있는지 정리
+    if (classData) {
+        for (const [groupKey, data] of Object.entries(classData.groupData)) {
+            for (const student of data.groupMember) {
+                if (!studentGroupsMap[student.userId]) {
+                    studentGroupsMap[student.userId] = new Set();
+                }
+                studentGroupsMap[student.userId].add(groupKey);
+            }
+        }
+    }
+    const groupKeys = getGroupKeys({ gridData: classData.gridData })
+    const isPossible = (a) => {
+        for (let index = 0; index < groupKeys.length; index++) {
+            console.log([...(studentGroupsMap?.[a.userId] ?? [])])
+
+            if([...(studentGroupsMap?.[a.userId] ?? [])].every(g => groupKeys[index].includes(g))){
+                return true
+            }
+            
+        }
+    }
     return (
-        <div>
-            <h3 className="text-xl font-semibold mb-3">계정 설정</h3>
-            <p className="text-gray-600">프로필, 비밀번호, 이메일 정보를 관리합니다.</p>
+        <div className="overflow-x-auto">
+            <table className="table text-center">
+                {/* head */}
+                <thead>
+                    <tr className="text-[1.2rem]">
+                        <th></th>
+                        <th>아이디</th>
+                        <th>닉네임</th>
+                        <th>자리 그룹</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {studentData.map((a, i) => {
+                        const group = [...(studentGroupsMap?.[a.userId] ?? [])]
+                            .map(key => classData?.groupData?.[key]?.groupName)
+                            .filter(Boolean) // undefined 제거
+                            .sort((a, b) => a.localeCompare(b, "ko"))
+                            .join(", ")
+                        
+
+                        return (
+                            <tr key={i}>
+                                <th>{i + 1}</th>
+                                <td>{a.userId}</td>
+                                <td>{a.profileNickname}</td>
+                                {/* <td>{classData?.groupData?.[studentGroupsMap?.[a.userId]]?.groupName ?? ""}</td> */}
+                                <td className="flex justify-between" >
+                                    {/* <div>{[...(studentGroupsMap?.[a.userId] ?? [])].map(key => classData?.groupData?.[key]?.groupName).join(", ")}</div> */}
+                                    <div>
+                                        {/* {[...(studentGroupsMap?.[a.userId] ?? [])]
+                                            .map(key => classData?.groupData?.[key]?.groupName)
+                                            .filter(Boolean) // undefined 제거
+                                            .sort((a, b) => a.localeCompare(b, "ko"))
+                                            .join(", ")} */}
+                                        {group}
+                                    </div>
+                                    {isPossible(a)
+                                        ? null
+                                        : <div className="relative inline-block group">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth="1.5"
+                                                stroke="currentColor"
+                                                className="size-6 text-red-500 cursor-pointer"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+                                                />
+                                            </svg>
+
+                                            <span
+                                                className="
+                                            pointer-events-none
+                                            absolute -top-9 left-1/2 -translate-x-1/2
+                                            whitespace-nowrap
+                                            rounded bg-gray-800 px-2 py-1 text-xs text-white
+                                            opacity-0
+                                            group-hover:opacity-100
+                                            transition-opacity duration-75
+                                            "
+                                            >
+                                                배정 불가
+                                            </span>
+                                        </div>}
+
+                                </td>
+                            </tr>
+                        )
+                    })}
+
+                </tbody>
+            </table>
         </div>
     );
 }

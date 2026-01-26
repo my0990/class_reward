@@ -333,6 +333,7 @@ export default function CreateGrid({ isModalOpen }) {
 
 
     const onGroupAssign = (a) => {
+
         if (isLoading) {
             return
         } else {
@@ -635,7 +636,7 @@ export default function CreateGrid({ isModalOpen }) {
                 : <button onClick={(e) => seatChangeStart({ gridData: classData.gridData, groupData: classData.groupData, studentData: studentData, stopRef: stopRef, setRunning: setRunning, setTotal: setTotal, genRef: genRef, setProgress: setProgress, setResult: setResult, setIsStarted: setIsStarted, setError: setError })} className="mt-[32px] bg-orange-500 py-[16px] px-[24px] rounded-full text-[1.2rem] text-white font-bold ">자리배치 시작</button>}
 
             {/* <button onClick={handlePrint}>ddd</button> */}
-            <SetModal classData={classData} displayData={displayData}/>
+            <SetModal classData={classData}  studentData={studentData}/>
             <SeatModal classData={classData} isModalOpen={isModalOpen} count={count} setCount={setCount} />
             <GroupModal isModalOpen={isModalOpen} />
             <PrintModal value={value} deskStyle={deskStyle} result={result} displayData={displayData} classData={classData}/>

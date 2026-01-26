@@ -1,4 +1,6 @@
+export function checkSeat(groupCombFromGrid, studentsGroupMap){
 
+}
 
 function getGroupKey(groups) {
   return groups.slice().sort().join("|");
@@ -27,7 +29,26 @@ function isPossible(nextArr, groupCombFromStudent) {
   }
   return true;
 }
+export function getGroupKeys({gridData}){
+  const seen = {};
+  const result = [];
+  for (let row = 0; row < gridData.length; row++) {
+    for (let col = 0; col < gridData[row].length; col++) {
+      const desk = gridData[row][col];
 
+      // 해당 책상에 학생이 이미 앉아있으면 제외
+      if (!desk.isOpen) continue;
+      const key = getGroupKey(desk.group);
+      if (!seen[key]) {
+        seen[key] = true;
+        result.push([...desk.group])
+      }
+
+    }
+  }
+
+  return result;
+}
 
 export function getGroupCombFromGrid({ gridData }) {
   const map = {};

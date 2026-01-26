@@ -6,10 +6,10 @@ import { mutate } from "swr";
 
 const tabs = [
     { id: "general", label: "스타일", },
-    { id: "account", label: "뽑기", },
-    { id: "security", label: "테마", },
+    { id: "account", label: "학생 관리", },
+    // { id: "security", label: "테마", },
 ];
-export default function SetModal({ classData}) {
+export default function SetModal({ classData, studentData}) {
     const [activeTab, setActiveTab] = useState("general");
     const containerRef = useRef(null);
 
@@ -108,8 +108,8 @@ export default function SetModal({ classData}) {
                                     transition={{ duration: 0.2 }}
                                 >
                                     {activeTab === "general" && <GeneralTab setting={setting} classData={classData}  />}
-                                    {activeTab === "account" && <AccountTab />}
-                                    {activeTab === "security" && <SecurityTab />}
+                                    {activeTab === "account" && <AccountTab studentData={studentData} classData={classData}/>}
+                                    {/* {activeTab === "security" && <SecurityTab />} */}
                                 </motion.div>
                             </AnimatePresence>
                         </main>
