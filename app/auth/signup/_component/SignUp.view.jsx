@@ -159,11 +159,11 @@ export default function SignUpView() {
         
             if (!loginRes?.ok) {
               alert(loginRes?.error ?? "회원가입은 완료됐지만 로그인 실패");
-              router.push("../auth/teacher/login");
+              router.push("../auth/login/teacher");
               return;
             }
         
-            router.push("/teacher");
+            router.push("/");
           } catch (err) {
             console.error(err);
             setError("네트워크 오류");

@@ -21,7 +21,7 @@ export async function signupTeacherService({ email, password }) {
   }
 
   try {
-    const client = await connectDB;
+    const client = await connectDB();
     const db = client.db("user");
 
     // ✅ 이메일 인증 필수
@@ -48,7 +48,7 @@ export async function signupTeacherService({ email, password }) {
       updatedAt: now,
     });
     const db2 = client.db('data');
-    const result2 = await db.collection("user_data").insertOne({
+    const result2 = await db2.collection("user_data").insertOne({
       userId: e,
       money: 0,
       role: 'teacher',
