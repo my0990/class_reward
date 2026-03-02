@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 
-export default function FinishBuyModal({ requestData, fetchItemId }) {
+export default function FinishBuyModal({ requestData, fetchItemId, classId }) {
     const { itemName, itemPrice } = requestData.itemData;
     const { userId, money } = requestData.userData;
     const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +17,7 @@ export default function FinishBuyModal({ requestData, fetchItemId }) {
             fetch("/api/useItem", {
                 method: "POST",
                 // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemName, userId: userId, balance: money - itemPrice, itemId: fetchItemId }),
+                body: JSON.stringify({ itemName: itemName, userId: userId, balance: money - itemPrice, itemId: fetchItemId, classId: classId }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -26,16 +26,10 @@ export default function FinishBuyModal({ requestData, fetchItemId }) {
                 if (data.result === true) {
                     alert('아이템을 사용하였습니다');
                     mutate(
-                        "/api/fetchStudentData",
-                        (prev) => {
-                            const updatedItemList = userData.itemList.filter((item) => item.itemId !== fetchItemId )
-                            const updatedStudentData = prev.map((student) => student.userId === userId ? { ...userData,  itemList: updatedItemList } : student)
+                        `/api/students/${classId}`,
 
-                            return updatedStudentData;
-                        },
-                        false // 서버 요청 없이 즉시 반영
                     );
-                    route.push('/kiosk')
+                    route.push(`/teacher/kiosk/${classId}`)
                 } else {
                     setIsLoading(false)
                 }
@@ -51,7 +45,7 @@ export default function FinishBuyModal({ requestData, fetchItemId }) {
                     <h1 className="text-[2rem]"> <span className="text-red-500 font-bold">{itemName}</span> 아이템을 구입하였습니다</h1>
                     <div className="flex justify-between flex-col mt-[16px]">
                         <button className="bg-orange-500  rounded-lg font-semibold hover:text-white transition-all text-black my-[16px] py-[16px] text-[1.4rem]" onClick={onItemUse}>지금 바로 사용할래요</button>
-                        <button className="bg-red-500  rounded-lg font-semibold hover:text-white transition-all text-black py-[16px] text-[1.4rem]" onClick={() => route.push('/kiosk')}>다음에 사용할래요</button>
+                        <button className="bg-red-500  rounded-lg font-semibold hover:text-white transition-all text-black py-[16px] text-[1.4rem]" onClick={() => route.push(`/teacher/kiosk/${classId}`)}>다음에 사용할래요</button>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { mutate } from "swr";
-export default function QuestCard({ data, studentCount, role, setIsDetail, setQuestDetailData }) {
+export default function QuestCard({ data, classId, studentCount, role, setIsDetail, setQuestDetailData }) {
 
     const date = new Date(data.time);
 
@@ -13,14 +13,14 @@ export default function QuestCard({ data, studentCount, role, setIsDetail, setQu
         e.preventDefault();
         fetch("/api/deleteQuest", {
             method: "POST",
-            body: JSON.stringify({ data: data }),
+            body: JSON.stringify({ data: data, classId: classId }),
             headers: {
                 "Content-Type": "application/json",
             },
         }).then((res) => res.json()).then((response) => {
             if (response.result === true) {
                 mutate(
-                    "/api/fetchQuestList",
+                    `/api/fetchQuestList/${classId}`,
                 );
             }
         })

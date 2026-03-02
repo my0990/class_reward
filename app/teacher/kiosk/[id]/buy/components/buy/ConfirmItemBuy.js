@@ -4,7 +4,7 @@ import { fetchData } from "@/hooks/swrHooks";
 import Link from "next/link";
 import { mutate } from "swr";
 import { useRouter } from "next/navigation";
-export default function ConfirmItemBuy({ requestData, setRequestData }) {
+export default function ConfirmItemBuy({ requestData, setRequestData, classId }) {
 
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
     const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData('/api/fetchStudentData');
@@ -24,7 +24,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
             setIsLoading(true)
             fetch("/api/buyItem", {
                 method: "POST",
-                body: JSON.stringify({ itemData: itemData, userId: userId, balance: money - itemData?.itemPrice }),
+                body: JSON.stringify({ itemData: itemData, userId: userId, balance: money - itemData?.itemPrice, classId: classId }),
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -78,7 +78,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
     const { currencyName } = classData;
 
     const { emoji, itemName, itemExplanation, itemStock, itemPrice } = requestData.itemData;
-    console.log(studentData)
+
     return (
         <div className="flex  justify-center min-h-[100vh] py-[32px]">
             <div className="flex flex-col justify-between w-[800px] max-[800px]:w-[90%] min-w-[400px]">
@@ -145,7 +145,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData }) {
                     <button onClick={onClick} className="bg-red-500 text-white rounded-full w-full py-[16px]">결제하기</button>
                 </div>
             </div>
-            <FinishBuyModal requestData={requestData} fetchItemId={fetchItemId} />
+            <FinishBuyModal requestData={requestData} fetchItemId={fetchItemId} classId={classId}/>
         </div>
     )
 }

@@ -14,7 +14,7 @@ export default function AddQuestModal({ data, setIsDetail, classId }) {
         }).then((res) => res.json()).then((response) => {
             if (response.result === true) {
                 mutate(
-                    "/api/fetchQuestList",
+                    `/api/fetchQuestList/${classId}`,
 
                 );
                 setIsDetail(false);

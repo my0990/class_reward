@@ -1,15 +1,16 @@
-'use client'
-import { useState } from "react"
-import { mutate } from "swr"
+'use client';
+
+import { useState } from "react";
+import { mutate } from "swr";
 
 const makeInitialInput = (classId) => ({
-  questName: '',
-  questGoal: '',
-  // 값은 문자열로 유지 (input value용)
-  questReward: '',
-  questExp: '',
-  questTitle: '',
-  // 체크박스는 boolean으로 분리
+  questName: "",
+  questGoal: "",
+  // input value용: 문자열 유지
+  questReward: "",
+  questExp: "",
+  questTitle: "",
+  // checkbox는 "값 존재 여부" 표시용 boolean
   rewardEnabled: false,
   expEnabled: false,
   titleEnabled: false,
@@ -19,37 +20,47 @@ const makeInitialInput = (classId) => ({
 export default function AddQuestModal({ currencyEmoji, currencyName, classId }) {
   const [input, setInput] = useState(() => makeInitialInput(classId));
 
+  const syncEnabled = (next) => ({
+    ...next,
+    rewardEnabled: next.questReward.trim() !== "",
+    expEnabled: next.questExp.trim() !== "",
+    titleEnabled: next.questTitle.trim() !== "",
+  });
+
   const onChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
 
-    // 체크박스면 boolean로만
-    if (type === "checkbox") {
-      setInput(prev => ({ ...prev, [name]: checked }));
+    // 텍스트 필드
+    if (name === "questName" || name === "questGoal") {
+      setInput((prev) => ({ ...prev, [name]: value }));
       return;
     }
 
-    // 문자열 필드
-    if (name === 'questTitle' || name === 'questName' || name === 'questGoal') {
-      setInput(prev => ({ ...prev, [name]: value }));
+    // 칭호(문자열)
+    if (name === "questTitle") {
+      setInput((prev) => syncEnabled({ ...prev, questTitle: value }));
       return;
     }
 
-    // 숫자 입력 필드(문자열로 보관, 숫자만 허용)
-    if (/^\d*$/.test(value)) {
-      setInput(prev => ({ ...prev, [name]: value }));
+    // 숫자 필드(문자열로 저장, 숫자만)
+    if (name === "questReward" || name === "questExp") {
+      if (!/^\d*$/.test(value)) return;
+
+      setInput((prev) => syncEnabled({ ...prev, [name]: value }));
+      return;
     }
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    // 서버로 보낼 payload (enabled false면 값은 0/""로 정리)
+    // enabled는 "값 존재 여부" 기준이니까, payload도 그 기준으로 정리
     const payload = {
       questName: input.questName,
       questGoal: input.questGoal,
-      questReward: input.rewardEnabled ? Number(input.questReward || 0) : 0,
-      questExp: input.expEnabled ? Number(input.questExp || 0) : 0,
-      questTitle: input.titleEnabled ? input.questTitle : '',
+      questReward: input.questReward.trim() !== "" ? Number(input.questReward) : 0,
+      questExp: input.questExp.trim() !== "" ? Number(input.questExp) : 0,
+      questTitle: input.questTitle.trim() !== "" ? input.questTitle : "",
       classId: input.classId,
     };
 
@@ -62,14 +73,17 @@ export default function AddQuestModal({ currencyEmoji, currencyName, classId }) 
     const response = await res.json();
 
     if (response.result === true) {
-      document.getElementById('my_modal_2').close();
+      document.getElementById("my_modal_2")?.close();
       setInput(makeInitialInput(classId));
-      mutate("/api/fetchQuestList");
+      mutate(`/api/fetchQuestList/${classId}`);
+    } else {
+      // 원하면 서버 메시지 노출
+      alert(response?.message ?? "퀘스트 등록 실패");
     }
   };
 
   const onCloseModal = () => {
-    document.getElementById('my_modal_2').close();
+    document.getElementById("my_modal_2")?.close();
     setInput(makeInitialInput(classId));
   };
 
@@ -77,7 +91,9 @@ export default function AddQuestModal({ currencyEmoji, currencyName, classId }) 
     <dialog id="my_modal_2" className="modal w-[100%]">
       <div className="modal-box max-w-[600px] p-[32px] border-0 text-red-900 text-[1.2rem]">
         <div className="flex justify-center flex-col">
-          <h1 className="text-red-900 font-bold text-[2rem] text-center mb-[8px]">퀘스트 등록하기</h1>
+          <h1 className="text-red-900 font-bold text-[2rem] text-center mb-[8px]">
+            퀘스트 등록하기
+          </h1>
 
           <h2 className="font-bold">퀘스트 이름</h2>
           <input
@@ -97,7 +113,6 @@ export default function AddQuestModal({ currencyEmoji, currencyName, classId }) 
 
           <h2 className="font-bold">퀘스트 보상</h2>
           <div className="mb-[8px]">
-
             {/* Reward */}
             <div className="flex justify-between mb-[8px] h-[32px]">
               <div className="flex items-center cursor-default">
@@ -105,21 +120,24 @@ export default function AddQuestModal({ currencyEmoji, currencyName, classId }) 
                   id="rewardEnabled"
                   name="rewardEnabled"
                   type="checkbox"
-                  checked={input.rewardEnabled} // ✅ 항상 boolean
-                  onChange={onChange}
-                  className="cursor-pointer checkbox checkbox-warning mr-[8px]"
+                  checked={input.rewardEnabled}
+                  readOnly
+                  onClick={(e) => e.preventDefault()} // 표시용
+                  className="cursor-default checkbox checkbox-warning mr-[8px]"
                 />
-                <label htmlFor="rewardEnabled" className="cursor-default">{currencyName}</label>
+                <label htmlFor="rewardEnabled" className="cursor-default">
+                  {currencyName}
+                </label>
               </div>
+
               <div className="flex">
                 <div className="border-b-4 border-orange-400">{currencyEmoji}</div>
                 <input
                   onChange={onChange}
                   name="questReward"
                   placeholder="숫자만 입력"
-                  value={input.questReward}     // ✅ 항상 string
-                  disabled={!input.rewardEnabled}
-                  className="placeholder:text-center w-[160px] text-right cursor-pointer disabled:bg-transparent disabled:border-transparent border-orange-400 disabled:cursor-default outline-none border-b-4"
+                  value={input.questReward}
+                  className="placeholder:text-center w-[160px] text-right cursor-pointer border-orange-400 outline-none border-b-4"
                 />
               </div>
             </div>
@@ -131,21 +149,24 @@ export default function AddQuestModal({ currencyEmoji, currencyName, classId }) 
                   id="expEnabled"
                   name="expEnabled"
                   type="checkbox"
-                  checked={input.expEnabled} // ✅ 항상 boolean
-                  onChange={onChange}
-                  className="cursor-pointer checkbox checkbox-warning mr-[8px]"
+                  checked={input.expEnabled}
+                  readOnly
+                  onClick={(e) => e.preventDefault()} // 표시용
+                  className="cursor-default checkbox checkbox-warning mr-[8px]"
                 />
-                <label htmlFor="expEnabled" className="cursor-default">경험치</label>
+                <label htmlFor="expEnabled" className="cursor-default">
+                  경험치
+                </label>
               </div>
+
               <div className="flex">
                 <div className="border-b-4 border-orange-400">🆙</div>
                 <input
                   onChange={onChange}
                   name="questExp"
                   placeholder="숫자만 입력"
-                  value={input.questExp}       // ✅ 항상 string
-                  disabled={!input.expEnabled}
-                  className="placeholder:text-center w-[160px] text-right cursor-pointer disabled:bg-transparent disabled:border-transparent border-orange-400 disabled:cursor-default outline-none border-b-4"
+                  value={input.questExp}
+                  className="placeholder:text-center w-[160px] text-right cursor-pointer border-orange-400 outline-none border-b-4"
                 />
               </div>
             </div>
@@ -157,20 +178,23 @@ export default function AddQuestModal({ currencyEmoji, currencyName, classId }) 
                   id="titleEnabled"
                   name="titleEnabled"
                   type="checkbox"
-                  checked={input.titleEnabled} // ✅ 항상 boolean
-                  onChange={onChange}
-                  className="cursor-pointer checkbox checkbox-warning mr-[8px]"
+                  checked={input.titleEnabled}
+                  readOnly
+                  onClick={(e) => e.preventDefault()} // 표시용
+                  className="cursor-default checkbox checkbox-warning mr-[8px]"
                 />
-                <label htmlFor="titleEnabled" className="cursor-default">칭호</label>
+                <label htmlFor="titleEnabled" className="cursor-default">
+                  칭호
+                </label>
               </div>
+
               <div className="flex">
                 <div className="border-b-4 border-orange-400">🍊</div>
                 <input
                   onChange={onChange}
                   name="questTitle"
-                  value={input.questTitle}      // ✅ 항상 string
-                  disabled={!input.titleEnabled}
-                  className="w-[160px] text-right cursor-pointer disabled:bg-transparent disabled:border-transparent border-orange-400 disabled:cursor-default outline-none border-b-4"
+                  value={input.questTitle}
+                  className="w-[160px] text-right cursor-pointer border-orange-400 outline-none border-b-4"
                 />
               </div>
             </div>

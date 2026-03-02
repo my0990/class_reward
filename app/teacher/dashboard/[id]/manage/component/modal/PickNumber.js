@@ -48,14 +48,14 @@ export default function PickNumber({ classData, classId }) {
         }).then((res) => res.json()).then((data) => {
 
             if (data.result === true) {
-                
+
                 mutate(`/api/classData/${classId}`);
                 mutate(`/api/students/${classId}`);
                 alert('성공');
                 onCloseModal();
             }
         })
-        setIsLoading(false);    
+        setIsLoading(false);
 
     };
 
@@ -65,8 +65,11 @@ export default function PickNumber({ classData, classId }) {
         <div>
             <dialog id="my_modal_2" className="modal">
                 <div className="modal-box w-[1000px]">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center flex-col">
                         <h3 className="font-bold  text-[1.5rem] mb-[16px]">계정은 1번부터 40번까지 만들 수 있습니다</h3>
+                        <div>
+                            <h3 className="font-bold text-gray-400  text-[1rem] mb-[16px]">초기 비밀번호는 12345678입니다</h3>
+                        </div>
                     </div>
                     {/* 😴😆 */}
                     <div className="grid grid-cols-5">

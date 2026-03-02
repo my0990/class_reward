@@ -4,9 +4,9 @@ import { useState } from "react";
 import { fetchData } from "@/hooks/swrHooks";
 import Link from "next/link";
 
-export default function ItemPickTemplate({ setRequestData }) {
-
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
+export default function ItemPickTemplate({ setRequestData, classId }) {
+    
+    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData(`/api/classData/${classId}`);
 
 
     const onClick = (a) => {
@@ -29,7 +29,7 @@ export default function ItemPickTemplate({ setRequestData }) {
                     <div className="h-[64px] w-[24px] flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M15.293 3.293 6.586 12l8.707 8.707 1.414-1.414L9.414 12l7.293-7.293-1.414-1.414z" /></svg>
                     </div>
-                    <Link className="flex items-center justify-center text-[2rem]" href="/kiosk">
+                    <Link className="flex items-center justify-center text-[2rem]" href={`/teacher/kiosk/${classId}`}>
                         <div >이전</div>
                     </Link>
                 </div>
@@ -49,7 +49,7 @@ export default function ItemPickTemplate({ setRequestData }) {
                 {itemList?.map((a, i) => {
                     return (
                         <div key={i} className={`m-[16px] w-[192px]   flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a.itemStock <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"} `}>
-                            <ItemBuyCard onClick={e => onClick(a)} itemData={a} currencyname={currencyName} />
+                            <ItemBuyCard onClick={e => onClick(a)} itemData={a} currencyname={currencyName} classId={classId}/>
                         </div>
                     )
                 })}

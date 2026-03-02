@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     // MongoDB 연결
     let itemId = (new ObjectId()).toString();
     const db = (await connectDB).db('user');
-    const password = await hash('1234', 12)
+    const password = await hash('12345678', 12)
 
     const response = await db.collection('users').updateOne({userId:student},{$set: {"password": password}})
 

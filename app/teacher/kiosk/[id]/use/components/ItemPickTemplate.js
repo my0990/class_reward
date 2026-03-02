@@ -5,7 +5,7 @@ import ItemCard from "./ItemCard";
 import { useRouter } from "next/navigation";
 import ConfirmItemUse from "./ConfirmItemUse";
 
-export default function ItemPickTemplate({ requestData, setRequestData }) {
+export default function ItemPickTemplate({ requestData, setRequestData, classId }) {
 
 
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
@@ -46,7 +46,7 @@ export default function ItemPickTemplate({ requestData, setRequestData }) {
                 <div className="flex items-center cursor-pointer hover:scale-110 transition-all">
                     <div className="  cursor-pointer hover:scale-110 transition-all">
 
-                        <div onClick={() => route.push('/kiosk')} className="flex items-center text-[2rem]">처음으로</div>
+                        <div onClick={() => route.push(`/teacher/kiosk/${classId}`)} className="flex items-center text-[2rem]">처음으로</div>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@ export default function ItemPickTemplate({ requestData, setRequestData }) {
                     )
                 })}
             </div>
-            <ConfirmItemUse userData={requestData.userData} itemData={pickedItem} />
+            <ConfirmItemUse userData={requestData.userData} itemData={pickedItem} classId={classId} />
         </div >
     )
 }

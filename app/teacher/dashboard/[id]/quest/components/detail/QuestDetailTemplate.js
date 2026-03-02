@@ -66,7 +66,7 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
         }
 
     }
-
+    console.log(questDetailData)
     const studentCount = studentData.length;
     return (
         <div className="flex justify-center ">

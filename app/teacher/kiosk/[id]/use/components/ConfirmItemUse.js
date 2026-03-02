@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
-export default function ConfirmItemUse({ itemData, userData }) {
+export default function ConfirmItemUse({ itemData, userData, classId }) {
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function ConfirmItemUse({ itemData, userData }) {
             fetch("/api/useItem", {
                 method: "POST",
                 // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemName, userId: userId, balance: money, itemId: itemId }),
+                body: JSON.stringify({ itemName: itemName, userId: userId, balance: money, itemId: itemId, classId: classId }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -30,28 +30,17 @@ export default function ConfirmItemUse({ itemData, userData }) {
 
                 if (data.result === true) {
                     alert('아이템을 사용하였습니다')
-                    mutate(
-                        "/api/fetchStudentData",
-                        (prev) => {
-                            const updatedItemList = userData.itemList.filter((item) => item.itemId !== itemId)
-                            console.log(updatedItemList)
-                            const updatedStudentData = prev.map((student) => student.userId === userId ? { ...userData, itemList: updatedItemList } : student)
 
-                            return updatedStudentData;
-                        },
-                        false // 서버 요청 없이 즉시 반영
-                    );
 
                 } else if (data.message === '아이템이 존재하지 않음') {
                     alert(data.message);
 
-                    mutate(
-                        "/api/fetchStudentData", undefined, { revalidate: true }
-                    );
                 }
 
-
-                route.push('/kiosk');
+                mutate(
+                    `/api/students/${classId}`,
+                );
+                route.push(`/teacher/kiosk/${classId}`);
                 setIsLoading(false);
             })
         }

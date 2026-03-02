@@ -85,7 +85,7 @@ export default function EditQuestModal({ currencyEmoji, questDetailData, setQues
       setQuestDetailData(nextQuest);
 
       mutate(
-        `/api/fetchQuestList`,
+        `/api/fetchQuestList/${classId}`,
       );
     }
   };

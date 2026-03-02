@@ -61,7 +61,7 @@ export const teacherNav = [
     {
       key: "kiosk",
       label: "키오스크",
-      href: () => `/kiosk`,
+      href: (id) => `/teacher//kiosk/${id}`,
       icon: ComputerDesktopIcon,
       activeMatch: () => false,
     },

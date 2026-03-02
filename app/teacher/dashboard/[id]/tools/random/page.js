@@ -5,10 +5,13 @@ import _ from "lodash";
 import { motion } from "framer-motion";
 import Modal from "./components/Modal";
 import util from "@/app/directory/dashboard/@teacher/home/utils/util";
-
+import { useParams } from 'next/navigation';
 export default function Random() {
-    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData('/api/fetchStudentData');
-    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
+    const params = useParams();
+    const id = params.id;
+
+    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData(`/api/students/${id}`);
+    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData(`/api/classData/${id}`);
 
 
     const [originalStudentArr, setOriginalStudentArr] = useState([]);

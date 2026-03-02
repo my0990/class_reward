@@ -32,7 +32,7 @@ export async function createClassService({ className, teacher_id }) {
         expTable: {startExp: 100, commonDifference: 10},
         currencyEmoji: "🍪",
         currencyName: "쿠키",
-        gridData: [],
+        gridData: [[{isOpen: true, group: [], isSelected: false}]],
         groupData: {},
         studentAccounts: obj,
         setting: {

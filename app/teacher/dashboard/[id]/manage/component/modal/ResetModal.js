@@ -12,7 +12,7 @@ export default function ResetModal({picked}) {
         }).then((res) => res.json()).then((data) => {
 
             if (data.result === true) {
-                alert(picked?.userName + '의 비밀번호를 1234로 초기화하였습니다');
+                alert(picked?.userName + '의 비밀번호를 12345678로 초기화하였습니다');
                 document.getElementById('my_modal_1').close()
                 
             }

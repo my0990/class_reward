@@ -4,6 +4,7 @@ import _ from "lodash";
 import { useReactToPrint } from "react-to-print";
 
 export default function PrintModal({ value, deskStyle, result, displayData, classData }) {
+    console.log(deskStyle)
     const [isReversal, setIsReversal] = useState(false);
     const contentRef = useRef(null);
     const onCancel = (e) => {

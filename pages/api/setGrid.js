@@ -1,18 +1,16 @@
 import { connectDB } from '@/app/lib/database'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getServerSession } from 'next-auth/next';
-import {getToken} from 'next-auth/jwt'
-import { ObjectId } from 'mongodb';
+
+import { buildFilter } from '@/lib/api/buildFilter';
 export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
     const { updatedGrid } = req.body;
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    const code = token.code;
+
+    const scopeFilter = await buildFilter(req, res, { classIdRequired: true });
     const db = (await connectDB).db('data');
 
-    const response = await db.collection('class_data').updateOne({code: code},{$set: {gridData: updatedGrid}},{upsert: true})
+    const response = await db.collection('class_data').updateOne({...scopeFilter},{$set: {gridData: updatedGrid}},{upsert: true})
     if(response){
       res.status(200).json({ result: true, message: 'grid set success' });
     } else {

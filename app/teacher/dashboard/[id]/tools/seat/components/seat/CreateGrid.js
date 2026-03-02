@@ -8,6 +8,7 @@ import { mutate } from "swr";
 import _ from "lodash";
 import { seatChangeStart, stop } from "./util/util"
 import { motion, AnimatePresence } from "framer-motion";
+import { useParams } from "next/navigation";
 import SetModal from "./modal/SetModal";
 
 
@@ -16,8 +17,11 @@ import SetModal from "./modal/SetModal";
 
 
 export default function CreateGrid({ isModalOpen }) {
-    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
-    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData('/api/fetchStudentData');
+    const params = useParams();
+    const id = params.id;
+
+    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData(`/api/students/${id}`);
+    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData(`/api/classData/${id}`);
     const [count, setCount] = useState(0);
     const [isStarted, setIsStarted] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -34,21 +38,21 @@ export default function CreateGrid({ isModalOpen }) {
     const currentIndex = useRef('');
     const startTable = useRef([]);
 
-    
+
     const [grid, setGrid] = useState([[{ isOpen: true, group: [] }]])
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [result, setResult] = useState(null);
 
-    useEffect(()=>{
-        if(!studentData){
+    useEffect(() => {
+        if (!studentData) {
             return
         }
         const result = studentData?.reduce((acc, user) => {
             acc[user.userId] = [user.profileNickname, user.classNumber];
             return acc;
-          }, {});
-  
-          setDisplayData(result);
+        }, {});
+
+        setDisplayData(result);
 
     }, [studentData])
 
@@ -252,8 +256,8 @@ export default function CreateGrid({ isModalOpen }) {
     const maxContainerHeight = 500;
 
     useEffect(() => {
-        const rowCount = classData?.gridData ? classData?.gridData.length : 0;
-        const colCount = classData?.gridData ? classData?.gridData[0].length : 0;
+        const rowCount = classData?.gridData ? classData?.gridData?.length : 0;
+        const colCount = classData?.gridData ? classData?.gridData[0]?.length : 0;
         // 1. 기본 gap, 비율
         const baseGap = 16;
         const deskRatio = 2 / 1;
@@ -482,7 +486,7 @@ export default function CreateGrid({ isModalOpen }) {
 
 
 
-
+    console.log(classData)
 
 
 
@@ -535,8 +539,9 @@ export default function CreateGrid({ isModalOpen }) {
                 <div className="w-[320px] h-[116px] outline-none  flex  text-[1.5rem] overflow-hidden p-[8px]" contentEditable="true"></div>
                 <div className="absolute right-0 bottom-0">떠든 사람</div>
             </div>
-            <table className="m-4 min-w-[600px] min-h-[320px] flex justify-center items-center"
-
+            <table
+                className="m-4 min-w-[600px] min-h-[320px] border-separate"
+                style={{ borderSpacing: `${deskStyle.gap}px ${deskStyle.gap}px` }}
                 onTouchStart={handleDragStart}
                 onMouseDown={handleDragStart}
                 onTouchMove={handleDragMove}
@@ -544,87 +549,79 @@ export default function CreateGrid({ isModalOpen }) {
                 onTouchEnd={handleDragEnd}
                 onMouseUp={handleDragEnd}
             >
-                <thead>
+                <thead />
+                <tbody className="flex justify-center">
+                    {value.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                            {row.map((a, colIndex) => {
+                                const bg = a.isSelected
+                                    ? "red"
+                                    : classData?.setting?.color ?? "#fdba74";
 
-                </thead>
-                <tbody className="flex flex-col"
-                    style={{ gap: deskStyle.gap }}>
-                    <AnimatePresence>
-                        {value.map((row, rowIndex) => (
-                            <tr
-                                key={rowIndex}
-                                style={{ gap: deskStyle.gap }}
-                                className="flex"
-                                transition={{ duration: 0.2 }}>
-                                {row.map((a, colIndex) => {
-                                    return (
-                                        a.isOpen
-                                            ? <td
-                                                key={colIndex}
-                                                style={{ width: deskStyle.width, height: deskStyle.height, backgroundColor: a.isSelected ? "red" : classData?.setting?.color ?? "#fdba74" }}
-                                                className={`text-[1rem]  flex select-none cursor-pointer z-[999]  rounded-lg flex justify-center items-center flex-wrap overflow-hidden`}>
-                                                {isDrawerOpen ?
-                                                    a.group.map((data, i) => {
-                                                        return (
-                                                            <div
-                                                                onMouseDown={(e) => {
-                                                                    // div 클릭 시 부모 td 기준 이벤트 전달
-                                                                    e.stopPropagation(); // div 자체 이벤트 버블링 막음
+                                return a.isOpen ? (
+                                    <td
+                                        key={colIndex}
+                                        style={{ width: deskStyle.width, height: deskStyle.height, backgroundColor: bg }}
+                                        className="text-[1rem] select-none cursor-pointer rounded-lg flex justify-center items-center flex-wrap overflow-hidden"
+                                    >
+                                        {isDrawerOpen ? (
+                                            a.group.map((data, i) => (
+                                                <div
+                                                    key={i}
+                                                    onMouseDown={(e) => {
+                                                        e.stopPropagation();
+                                                        const tdElement = e.currentTarget.closest("td");
+                                                        if (!tdElement) return;
 
-                                                                    const tdElement = e.currentTarget.closest("td"); // 부모 td 찾기
+                                                        const fakeEvent = {
+                                                            ...e,
+                                                            target: tdElement,
+                                                            currentTarget: tdElement,
+                                                            nativeEvent: e.nativeEvent,
+                                                            preventDefault: () => e.preventDefault(),
+                                                            stopPropagation: () => e.stopPropagation(),
+                                                        };
 
-                                                                    if (!tdElement) return;
-
-                                                                    // td 기준 fake 이벤트 생성
-                                                                    const fakeEvent = {
-                                                                        ...e,
-                                                                        target: tdElement,
-                                                                        currentTarget: tdElement,
-                                                                        nativeEvent: e.nativeEvent,
-                                                                        preventDefault: () => e.preventDefault(),
-                                                                        stopPropagation: () => e.stopPropagation()
-                                                                    };
-
-                                                                    handleDragStart(fakeEvent); // table 핸들러 호출
-                                                                }}
-                                                                key={i}
-                                                                style={{ backgroundColor: classData?.groupData[data]?.groupColor }}
-                                                                className=" w-[20px] h-[20px] rounded-full"></div>
-                                                        )
-                                                    })
-                                                    :
-                                                    <div key={a.id}>
-                                                        <AnimatePresence>
-                                                            {result && (
-                                                                <motion.div
-                                                                    key="text"
-                                                                    initial={isStarted ? { opacity: 0, y: 0 } : null}
-                                                                    animate={{ opacity: 1, y: 0 }}
-                                                                    exit={{ opacity: 0, y: 0 }}
-                                                                    transition={{ duration: 0.5 }}
-                                                                    className=" text-xl font-bold"
-
-                                                                >
-                                                                    {classData?.setting?.result === 0 ? displayData[result[rowIndex][colIndex]][0]
-                                                                    :classData?.setting?.result === 1 ? displayData[result[rowIndex][colIndex]][1]+ "." + displayData[result[rowIndex][colIndex]][0]
-                                                                    :displayData[result[rowIndex][colIndex]][1]}
-                                                                </motion.div>
-                                                            )}
-                                                        </AnimatePresence>
-                                                    </div>}
-
-                                                {/* {!isDrawerOpen && result && result[rowIndex] && result[rowIndex][colIndex]?.userId} */}
-                                            </td>
-                                            : <td
-                                                key={colIndex}
-                                                style={{ width: deskStyle.width, height: deskStyle.height }}
-                                                className={`select-none  z-[999] px-4 py-2 rounded-lg`} />
-                                    )
-
-                                })}
-                            </tr>
-                        ))}
-                    </AnimatePresence>
+                                                        handleDragStart(fakeEvent);
+                                                    }}
+                                                    style={{ backgroundColor: classData?.groupData?.[data]?.groupColor }}
+                                                    className="w-[20px] h-[20px] rounded-full"
+                                                />
+                                            ))
+                                        ) : (
+                                            <AnimatePresence mode="wait">
+                                                {result ? (
+                                                    <motion.div
+                                                        key={`${rowIndex}-${colIndex}-${result?.[rowIndex]?.[colIndex] ?? "empty"}`}
+                                                        initial={isStarted ? { opacity: 0, y: 0 } : false}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: 0 }}
+                                                        transition={{ duration: 0.5 }}
+                                                        className="text-xl font-bold"
+                                                    >
+                                                        {(() => {
+                                                            const userId = result?.[rowIndex]?.[colIndex];
+                                                            if (!userId) return null;
+                                                            const [nickname, classNumber] = displayData?.[userId] ?? ["", ""];
+                                                            if (classData?.setting?.result === 0) return nickname;
+                                                            if (classData?.setting?.result === 1) return `${classNumber}.${nickname}`;
+                                                            return classNumber;
+                                                        })()}
+                                                    </motion.div>
+                                                ) : null}
+                                            </AnimatePresence>
+                                        )}
+                                    </td>
+                                ) : (
+                                    <td
+                                        key={colIndex}
+                                        style={{ width: deskStyle.width, height: deskStyle.height }}
+                                        className="select-none rounded-lg"
+                                    />
+                                );
+                            })}
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 
@@ -636,10 +633,10 @@ export default function CreateGrid({ isModalOpen }) {
                 : <button onClick={(e) => seatChangeStart({ gridData: classData.gridData, groupData: classData.groupData, studentData: studentData, stopRef: stopRef, setRunning: setRunning, setTotal: setTotal, genRef: genRef, setProgress: setProgress, setResult: setResult, setIsStarted: setIsStarted, setError: setError })} className="mt-[32px] bg-orange-500 py-[16px] px-[24px] rounded-full text-[1.2rem] text-white font-bold ">자리배치 시작</button>}
 
             {/* <button onClick={handlePrint}>ddd</button> */}
-            <SetModal classData={classData}  studentData={studentData}/>
+            <SetModal classData={classData} studentData={studentData} />
             <SeatModal classData={classData} isModalOpen={isModalOpen} count={count} setCount={setCount} />
             <GroupModal isModalOpen={isModalOpen} />
-            <PrintModal value={value} deskStyle={deskStyle} result={result} displayData={displayData} classData={classData}/>
+            <PrintModal value={value} deskStyle={deskStyle} result={result} displayData={displayData} classData={classData} />
             <input id="my-drawer-4" type="checkbox" readOnly checked={isDrawerOpen} className="drawer-toggle" />
 
             <div className="drawer-side">

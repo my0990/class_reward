@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { mutate } from "swr";
+import { useParams } from "next/navigation";
 import _ from "lodash";
 
 export default function SeatModal({ classData, isModalOpen, count, setCount }) {
+    const params = useParams();
+    const id = params.id;
     const grid = classData.gridData;
     const [value, setValue] = useState([[]]);
     const startIndex = useRef('');
@@ -280,7 +283,7 @@ export default function SeatModal({ classData, isModalOpen, count, setCount }) {
 
         console.log(optimisticData)
         mutate(
-            "/api/fetchClassData",
+            `/api/fetchClassData/${id}`,
             optimisticData,
             false // 서버 요청 없이 즉시 반영
         );
@@ -290,7 +293,7 @@ export default function SeatModal({ classData, isModalOpen, count, setCount }) {
 
             const res = await fetch("/api/setGrid", {
                 method: "POST",
-                body: JSON.stringify({ updatedGrid: value.map(row => row.slice()) }),
+                body: JSON.stringify({ updatedGrid: value.map(row => row.slice()), classId: id }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -299,7 +302,7 @@ export default function SeatModal({ classData, isModalOpen, count, setCount }) {
 
         } catch (err) {
             console.log(err)
-            mutate("/api/fetchClassData", prevData, false);
+            mutate(`/api/fetchClassData/${id}`, prevData, false);
             alert("업데이트 실패! 😢");
         }
 
@@ -315,7 +318,6 @@ export default function SeatModal({ classData, isModalOpen, count, setCount }) {
         document.getElementById("seatModal").close();
         isModalOpen.current = false;
     }
-
 
 
     return (
