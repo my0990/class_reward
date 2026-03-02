@@ -21,7 +21,7 @@ export async function signupTeacherService({ email, password }) {
   }
 
   try {
-    const client = await connectDB();
+    const client = (await connectDB);
     const db = client.db("user");
 
     // ✅ 이메일 인증 필수
