@@ -44,7 +44,7 @@ export default function UserInfo({
       <div className={styles.speechBubble}>
         <div className="flex items-center justify-between text-[1rem]">
           <div className="py-[1rem] px-[8px] ml-[8px]">
-            <span className="font-bold">{userId}</span>님, 환영합니다
+            <span className="font-bold">{userId || "관리자"}</span>님, 환영합니다
           </div>
 
           <button
