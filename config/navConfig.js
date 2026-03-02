@@ -49,14 +49,14 @@ export const teacherNav = [
       ],
     },
   
-    {
-      key: "thermometer",
-      label: "학급 온도계",
-      href: (id) => `/teacher/dashboard/${id}/thermometer`,
-      icon: FireIcon,
-      activeMatch: (pathname, id) =>
-        pathname === `/teacher/dashboard/${id}/thermometer`,
-    },
+    // {
+    //   key: "thermometer",
+    //   label: "학급 온도계",
+    //   href: (id) => `/teacher/dashboard/${id}/thermometer`,
+    //   icon: FireIcon,
+    //   activeMatch: (pathname, id) =>
+    //     pathname === `/teacher/dashboard/${id}/thermometer`,
+    // },
   
     {
       key: "kiosk",
