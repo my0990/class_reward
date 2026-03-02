@@ -2,8 +2,9 @@ import useSWR from 'swr';
 
 // const fetcher = (url) => fetch(url).then((res) => res.json());
 const fetcher = async (url) => {
-  const res = await fetch(url);
-
+  const res = await fetch(url, {
+    cache: 'no-store'   // ⭐️ 이거 추가
+  });
   // 상태 코드 확인
   if (!res.ok) {
     const error = new Error('An error occurred while fetching the data.');

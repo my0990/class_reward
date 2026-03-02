@@ -1,6 +1,7 @@
+'use client'
 import HomePage from "./home/HomePage"
 
-export default async function Page() {
+export default function Page() {
 
 
     return (

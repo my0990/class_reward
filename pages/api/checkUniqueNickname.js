@@ -1,13 +1,14 @@
 import { connectDB } from '@/app/lib/database'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
-import {getToken} from "next-auth/jwt"
+import { ObjectId } from 'mongodb';
 
 
 export default async function handler(req, res) {
 
   const session = await getServerSession(req,res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
-  const {userId} = session;
+
+  const teacher_id = session.user._id;
   if (req.method === 'POST') {
     const db = (await connectDB).db('data');
     const checkExisting = await db.collection('class_data').findOne({ uniqueNickname: req.body.uniqueNickname });
@@ -16,9 +17,15 @@ export default async function handler(req, res) {
       res.status(422).json({ result: false, error: '이미 가입된 계정이에요!' });
       return;
     } else {
-      const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-      const code = token.code;
-      const response = await db.collection('class_data').updateOne({code: code},{$set: {uniqueNickname: req.body.uniqueNickname}})
+
+
+      const response = await db.collection('class_data').updateOne(
+        {teacher_id: ObjectId.createFromHexString(teacher_id),
+          classId: ObjectId.createFromHexString(req.body.classId)
+        },
+        {$set: {uniqueNickname: req.body.uniqueNickname}},
+        { upsert: true })
+
     }
 
 

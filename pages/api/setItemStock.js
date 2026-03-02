@@ -1,21 +1,26 @@
 import { connectDB } from '@/app/lib/database'
-import {getToken} from 'next-auth/jwt'
+import { getToken } from 'next-auth/jwt'
 import { ObjectId } from 'mongodb';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
 
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    const code = token.code;
-    // const {nickname, state} = req.body;
-    // MongoDB 연결
-    const {updatedItemStock, itemId} = req.body;
+    const session = await getServerSession(req, res, authOptions);
+    const teacher_id = session.user._id;
+  
+    const { updatedItemStock, itemId, classId } = req.body;
 
     const convertedItemId = itemId;
 
     const db = (await connectDB).db('data');
-    const response = await db.collection('class_data').updateOne({code: code, "itemList.itemId": convertedItemId},{$set : {'itemList.$.itemStock': parseInt(updatedItemStock)}})
+    const response = await db.collection('class_data').updateOne({
+      teacher_id: ObjectId.createFromHexString(teacher_id),
+      classId: ObjectId.createFromHexString(classId), 
+      "itemList.itemId": convertedItemId
+    }, { $set: { 'itemList.$.itemStock': parseInt(updatedItemStock) } })
     // const respojnse2 = await db.collection('user_data').updateMany({teacher:userId},{$set: {classData: req.body.data}},{upsert: false})
 
     // console.log(response2)

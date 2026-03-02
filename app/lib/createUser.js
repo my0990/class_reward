@@ -3,9 +3,7 @@ const CreateUser = async (
     id,
     password,
     admin,
-    teacher,
-    nickname,
-    gender
+
   ) => {
 
     const response = await fetch("/api/signup", {

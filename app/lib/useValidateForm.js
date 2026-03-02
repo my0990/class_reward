@@ -46,25 +46,27 @@ export const useValidateForm = ({
               password: form.pwd,
               role: form.role,
               redirect: false,
-              // callbackUrl: "/directory/market",
-              // callbackUrl: "/directory/market"
             });
-            console.log(logInResponse.status)
+
             if(logInResponse.status!== 200){
               setErrors({...errors, 'pwdCheck': '아이디와 비밀번호를 확인해주세요'})
             } else {
-              router.replace('/directory/dashboard')
+              if(form.role === 'teacher'){
+                router.replace('/teacher/classes')
+              } else {
+                router.replace('/student/dashboard')
+              }
+
             }
             break;
           case 'register': // 회원가입 로직
             const registerResponse = await CreateUser(
-              form.name,
               form.id,
               form.pwd,
               form.admin,
               form.teacher,
-              form.nickname,
-              form.gender
+
+
             );
   
             if (registerResponse) {

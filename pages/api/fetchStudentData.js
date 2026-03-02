@@ -11,11 +11,13 @@ export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
     const db = (await connectDB).db('data')
     let teacher = null;
-    if(session.role=== 'teacher'){
-        teacher = session.userId
+
+    if(session.user.role === 'teacher'){
+        teacher = session.user.userId
     } else {
-        teacher = session.teacher
+        teacher = session.user.teacher
     }
+
     const response = await db.collection('user_data').find({ teacher: teacher}).sort({ classNumber: 1 }).toArray()
     res.status(200).json(response); 
   }

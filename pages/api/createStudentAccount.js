@@ -2,23 +2,21 @@ import { connectDB } from '@/app/lib/database';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
 import { hash } from 'bcryptjs';
-import { getToken } from 'next-auth/jwt'
+import { ObjectId } from 'mongodb';
 export default async function handler(req, res) {
 
   if (req.method === 'POST') {
-    const { accountArr, uniqueNickname, updatedStudentArr } = req.body;
+    const { accountArr, uniqueNickname, updatedStudentArr, classId } = req.body;
     const nicknameData = {
-      "determiners": ["예쁜","화난","귀여운","배고픈","슬픈","푸른","비싼","밝은","부유한","귀여운","화난","똑똑한","게으른","배부른","신난","천재적인","순수한"
+      "determiners": ["예쁜", "화난", "귀여운", "배고픈", "슬픈", "푸른", "비싼", "밝은", "부유한", "귀여운", "화난", "똑똑한", "게으른", "배부른", "신난", "천재적인", "순수한"
       ],
 
-      "animals": ["호랑이","비버","강아지","부엉이","여우","치타","문어","고양이","미어캣","다람쥐","치와와","비글","오징어","하마","기린","판다","토끼","돌고래",
+      "animals": ["호랑이", "비버", "강아지", "부엉이", "여우", "치타", "문어", "고양이", "미어캣", "다람쥐", "치와와", "비글", "오징어", "하마", "기린", "판다", "토끼", "돌고래",
       ]
     }
 
     const session = await getServerSession(req, res, authOptions); //{user: {name: '아이묭', id: 'my0990}}
-    const { userId } = session;
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    const code = token.code;
+    const teacher_id = session.user._id;
     const randomUrlArr = [
       'https://cdn.pixabay.com/photo/2014/03/25/15/23/tangerine-296654_1280.png',
       'https://cdn.pixabay.com/photo/2022/11/01/19/52/tangerine-7563214_1280.png',
@@ -43,7 +41,8 @@ export default async function handler(req, res) {
             Math.floor(Math.random() * nicknameData.animals.length)
             ],
           profileState: '',
-          teacher: userId,
+          teacher_id: ObjectId.createFromHexString(teacher_id),
+          classId: ObjectId.createFromHexString(classId),
           classNumber: Number(a),
           profileUrl: randomUrlArr[Math.floor(Math.random() * randomUrlArr.length)],
           profileImgStorage: {},
@@ -52,27 +51,35 @@ export default async function handler(req, res) {
           role: 'student',
           exp: 0,
           titles: [],
-          itemList: []
+          itemList: [],
+
         })
     })
     // MongoDB 연결
-    const pwd = await hash('1234', 12)
+    const pwd = await hash('12345678', 12)
     const accountUserInfo = accountArr.map((a) => {
       return ({
         userId: uniqueNickname + a,
         password: pwd,
         role: 'student',
-        teacher: userId,
-        code: code
+        teacher_id: ObjectId.createFromHexString(teacher_id),
+        classId: ObjectId.createFromHexString(classId),
+
       }
       )
     })
     const db = (await connectDB).db('data');
     const response = await db.collection('user_data').insertMany(accountInfo)
-    const response2 = await db.collection('class_data').updateOne({code: code}, {$set: {studentAccount: updatedStudentArr}})
+    const response2 = await db.collection('class_data').updateOne(
+      {
+        teacher_id: ObjectId.createFromHexString(teacher_id),
+        classId: ObjectId.createFromHexString(classId),
+      },
+      { $set: { studentAccounts: updatedStudentArr } },
+      { upsert: true })
     const db2 = (await connectDB).db('user');
     const response3 = await db2.collection('users').insertMany(accountUserInfo)
-    
+
     res.status(201).json({ result: true, message: 'User created' });
 
 

@@ -1,86 +1,125 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectDB } from "@/app/lib/database";
 import { compare } from "bcryptjs";
 
-
 export const authOptions = {
-  // Configure one or more authentication providers
   providers: [
-    // GithubProvider({
-    //   clientId: process.env.GITHUB_CLIENT_ID,
-    //   clientSecret: process.env.GITHUB_SECRET_ID,
-    // }),
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_CLIENT_ID,
-    //   clientSecret: process.env.GOOGLE_SECRET_ID,
-    // }),
     CredentialsProvider({
-      // The name to display on the sign in form (e.g. 'Sign in with...')
-      name: 'credentials',
-      // The credentials is used to generate a suitable form on the sign in page.
-      // You can specify whatever fields you are expecting to be submitted.
-      // e.g. domain, username, password, 2FA token, etc.
-      // You can pass any HTML attribute to the <input> tag through the object.
+      name: "credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
-        password: { label: "Password", type: "password" }
+        role: { label: "Role", type: "text" }, // "student" | "teacher"
+        id: { label: "Student ID", type: "text" }, // student 전용
+        email: { label: "Email", type: "text" }, // teacher 전용
+        password: { label: "Password", type: "password" },
       },
 
-      async authorize(credentials, req) {
-        const {id, password,role} = credentials;
-        const db = (await connectDB).db('user');
-        // 기존의 가입된 아이디 체크하기
-        const user = await db.collection('users').findOne({$and:[ { role: role, userId: id}] });
-        if(!user){
-          return null
-        } 
-        const isCorrectPassword = await compare(
-            password,
-            user.password
-        )
-        if (!isCorrectPassword) {
-          return null;
+      async authorize(credentials) {
+        const role = String(credentials?.role ?? "");
+        const password = String(credentials?.password ?? "");
+        if (!role || !password) return null;
+
+        const db = (await connectDB).db("user");
+
+        let user = null;
+
+        // 🎓 학생: userId로 조회
+        if (role === "student") {
+          const id = String(credentials?.id ?? "").trim();
+          if (!id) return null;
+
+          user = await db.collection("users").findOne({
+            role: "student",
+            userId: id,
+          });
         }
 
+        // 👩‍🏫 교사: email로 조회
+        if (role === "teacher") {
+          const email = String(credentials?.email ?? "").trim().toLowerCase();
+          if (!email) return null;
 
-        // If no error and we have user data, return it
-        // Return null if user data could not be retrieved
-        return user;
-      }
-    })
+          user = await db.collection("users").findOne({
+            role: "teacher",
+            email,
+          });
+        }
+
+        if (!user) return null;
+
+        const hashed = user.passwordHash ?? user.password;
+        if (!hashed) return null;
+
+        const ok = await compare(password, hashed);
+        if (!ok) return null;
+
+        // ✅ role별로 필요한 최소 필드만 반환 (jwt/session에서 사용)
+        if (role === "teacher") {
+          return {
+            _id: user._id?.toString?.() ?? String(user._id),
+            role: "teacher",
+            email: user.email ?? null,
+            teacherId: user.teacherId ?? user.userId ?? null, // 너 DB 필드명에 맞춰 사용
+            code: user.code ?? null,
+          };
+        }
+
+        // student
+        return {
+          _id: user._id?.toString?.() ?? String(user._id),
+          role: "student",
+          userId: user.userId ?? null,
+          classId: user.classId ?? null, // 있으면 넣고, 없으면 null
+          code: user.code ?? null,
+        };
+      },
+    }),
   ],
 
   secret: process.env.NEXTAUTH_SECRET,
+
   session: {
-    strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60 //30일
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   callbacks: {
+    // ✅ JWT에 role별로 다르게 저장
     jwt: async ({ token, user }) => {
-
       if (user) {
-        token.user = {};
-        token.user.userId = user.userId
-        token.user.role = user.role
-        token.user.teacher = user.teacher
-        token.code = user.code
+        token.role = user.role;
+
+        if (user.role === "teacher") {
+          token.user = {
+            role: "teacher",
+            email: user.email ?? null,
+            _id: user._id.toString(),
+          };
+        } else if (user.role === "student") {
+          token.user = {
+            role: "student",
+            userId: user.userId ?? null,
+            classId: user.classId ?? null,
+            _id: user._id.toString(),
+          };
+        }
       }
       return token;
     },
-    session: async ({ session, token }) => {
-      session = token.user;  
 
+    // ✅ session에도 role별로 다르게 노출
+    session: async ({ session, token }) => {
+      session.user = token.user;
+      session.role = token.role;
+      session.code = token.code;
       return session;
     },
-
   },
 
-  pages:{
-    signIn: '/',
-    error: '/'
-  }
+  pages: {
+    signIn: "/",
+    error: "/",
+  },
 };
 
 const handler = NextAuth(authOptions);
