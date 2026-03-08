@@ -1,4 +1,4 @@
-import { connectDB } from '@/app/lib/database'
+import { connectDB } from '@/trash/lib/database'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
 import {getToken} from 'next-auth/jwt'
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
     const questId = new ObjectId();
 
-    console.log(scopeFilter)
+
     const response = await db.collection('quest').insertOne({_id: questId, ...scopeFilter, questName: questName, questGoal: questGoal, questReward: questReward, questExp: questExp, questTitle: questTitle, finished: [],  time: new Date(), pending: [] }, { upsert: true })
 
 

@@ -1,5 +1,5 @@
 import { hash } from 'bcryptjs';
-import { connectDB } from '@/app/lib/database';
+import { connectDB } from '@/trash/lib/database';
 import { v4 as uuidv4 } from 'uuid';
 
 if (!process.env.MONGODB_URI) throw new Error('env error');

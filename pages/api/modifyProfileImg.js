@@ -1,4 +1,4 @@
-import { connectDB } from '@/app/lib/database'
+import { connectDB } from '@/trash/lib/database'
 import {getToken} from 'next-auth/jwt'
 
 export default async function handler(req, res) {

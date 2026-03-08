@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectDB } from "@/app/lib/database";
+import { connectDB } from "@/trash/lib/database";
 import { compare } from "bcryptjs";
 
 export const authOptions = {

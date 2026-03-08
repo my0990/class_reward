@@ -1,4 +1,4 @@
-import { connectDB } from '@/app/lib/database'
+import { connectDB } from '@/trash/lib/database'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
 import {getToken} from 'next-auth/jwt'
@@ -14,7 +14,6 @@ export default async function handler(req, res) {
 
     // MongoDB 연결
 
-    
 
     const db = (await connectDB).db('data');
 

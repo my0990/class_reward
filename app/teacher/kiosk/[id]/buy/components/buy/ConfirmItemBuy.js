@@ -87,7 +87,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData, classId })
                         {userData.profileNickname} &#40;{userData.userId}&#41;
                     </div>
                     <div className="text-right text-[1.2rem] flex justify-end">
-                        <Link href="/kiosk">
+                        <Link href={`/teacher/kiosk/${classId}`}>
                             <div className="cursor-pointer text-[2rem] transition-all  hover:scale-110">
                                 처음으로
                             </div>

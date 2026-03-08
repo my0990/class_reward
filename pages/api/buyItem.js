@@ -1,4 +1,4 @@
-import { connectDB } from '@/app/lib/database'
+import { connectDB } from '@/trash/lib/database'
 import { ObjectId } from 'mongodb';
 import { getToken } from "next-auth/jwt"
 import { buildFilter } from '@/lib/api/buildFilter';

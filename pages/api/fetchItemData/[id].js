@@ -1,4 +1,4 @@
-import { connectDB } from '@/app/lib/database'
+import { connectDB } from '@/trash/lib/database'
 
 
 

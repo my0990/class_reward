@@ -1,14 +1,14 @@
-import { connectDB } from '@/app/lib/database'
+import { connectDB } from '@/trash/lib/database'
 import { ObjectId } from 'mongodb';
 import {getToken} from 'next-auth/jwt'
+import { buildFilter } from '@/lib/api/buildFilter';
 export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
     // const { url } = req.body;
 
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    const code = token.code;
+    const scopeFilter = await buildFilter(req, res, { classIdRequired: true });
 
     
     // MongoDB 연결
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     const db = (await connectDB).db('data');
 
 
-    const response = await db.collection('class_data').updateOne({code:code},{$set: {[newKey]: {url: req.body.data, price: 99999}}},{upsert: true})
+    const response = await db.collection('class_data').updateOne({...scopeFilter},{$set: {[newKey]: {url: req.body.data, price: 99999}}},{upsert: true})
 
 
 

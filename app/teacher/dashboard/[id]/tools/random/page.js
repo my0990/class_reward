@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import _ from "lodash";
 import { motion } from "framer-motion";
 import Modal from "./components/Modal";
-import util from "@/app/directory/dashboard/@teacher/home/utils/util";
+import util from "@/trash/directory/dashboard/@teacher/home/utils/util";
 import { useParams } from 'next/navigation';
 export default function Random() {
     const params = useParams();

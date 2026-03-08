@@ -1,4 +1,4 @@
-import { connectDB } from '@/app/lib/database'
+import { connectDB } from '@/trash/lib/database'
 import { buildFilter } from '@/lib/api/buildFilter';
 
 export default async function handler(req, res) {
