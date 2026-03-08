@@ -7,9 +7,10 @@ export default async function StudentLogin(){
 
     if (session) {
   
-      redirect("/directory/dashboard")
+      // redirect("/directory/dashboard")
     }
     return(
-        <AuthPage role="student"/>
+        // <AuthPage role="student"/>
+        <div> 준비중입니다</div>
     )
 }
