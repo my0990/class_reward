@@ -122,7 +122,7 @@ export default function DashboardContainer({ classId }) {
   const currencyEmoji = classData?.currencyEmoji ?? "💰"
   return (
 
-    <div className="pt-0 flex justify-center">
+    <div className="pt-0 flex justify-center mb-[48px]">
       <div className="w-[1410px] max-[1410px]:w-[1235px] max-[1235px]:w-[1060px] max-[1060px]:w-[885px] max-[885px]:w-[710px] max-[710px]:w-[535px] max-[535px]:w-[360px]">
         <DashboardBtns {...{ handleToggleAll, studentsData, isSelectedAll, onSend, hasSelectedStudent, onTake, currencyName }} />
         <StudentCardGrid {...{ studentsData, currencyEmoji, isStudentActive, toggleStudent, levelMap }} />

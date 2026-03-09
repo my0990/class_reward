@@ -39,13 +39,13 @@ export const teacherNav = [
           activeMatch: (pathname, id) =>
             pathname.startsWith(`/teacher/dashboard/${id}/quest`),
         },
-        {
-          key: "manage-profile",
-          label: "프로필 관리",
-          href: (id) => `/teacher/dashboard/${id}/profile`,
-          activeMatch: (pathname, id) =>
-            pathname === `/teacher/dashboard/${id}/profile`,
-        },
+        // {
+        //   key: "manage-profile",
+        //   label: "프로필 관리",
+        //   href: (id) => `/teacher/dashboard/${id}/profile`,
+        //   activeMatch: (pathname, id) =>
+        //     pathname === `/teacher/dashboard/${id}/profile`,
+        // },
       ],
     },
   

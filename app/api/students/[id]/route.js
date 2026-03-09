@@ -20,7 +20,7 @@ export async function GET(req, {params}) {
     classId: ObjectId.createFromHexString(id)
   };
 
-  const studentsData = await db.collection("user_data").find(filter).toArray();
+  const studentsData = await db.collection("user_data").find(filter).sort({ classNumber: 1 }).toArray();
   console.log(studentsData)
 
   return NextResponse.json(studentsData);
