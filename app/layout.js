@@ -59,26 +59,7 @@ export const viewport = {
   initialScale: 1,
 };
 export default async function RootLayout({ children }) {
-  // const session = await getServerSession(authOptions);
-  // let response = null;
-  // let response2 = null;
-  // let teacher = null;
-  // console.log(session)
-  // if (session) {
 
-
-  //   if (session.user.role === "teacher") {
-  //     teacher = session.user.userId
-  //   } else {
-  //     teacher = session.user.teacher
-  //   }
-  // }
-  // if (session) {
-  //   const db = (await connectDB).db('data');
-  //   response = await db.collection('user_data').findOne({ userId: session.user.userId })
-  //   response2 = await db.collection('thermometer').findOne({ userId: teacher })
-  // }
-  // console.log(response2)  
   const GA_MEASUREMENT_ID = "G-1XP2WLNQ01"
 
   return (

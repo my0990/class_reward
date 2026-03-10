@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectDB } from "@/trash/lib/database";
 import { compare } from "bcryptjs";
-
+import { ObjectId } from "mongodb";
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -84,8 +84,10 @@ export const authOptions = {
   },
 
   callbacks: {
+
     // ✅ JWT에 role별로 다르게 저장
     jwt: async ({ token, user }) => {
+
       if (user) {
         token.role = user.role;
 
@@ -104,14 +106,41 @@ export const authOptions = {
           };
         }
       }
+
+      if (token?.user?._id) {
+
+        try {
+          const db = (await connectDB).db("user");
+
+          const dbUser = await db.collection("users").findOne({
+            _id: ObjectId.createFromHexString(token.user._id),
+          });
+
+          if (!dbUser) {
+            token.invalidUser = true;
+            console.log(token)
+            return token;
+          }
+
+          token.invalidUser = false;
+
+          // 선택: DB 값으로 최신화
+
+        } catch (error) {
+          token.invalidUser = true;
+        }
+      }
+
       return token;
     },
 
     // ✅ session에도 role별로 다르게 노출
     session: async ({ session, token }) => {
+      if (token.invalidUser) {
+        return null;
+      }
       session.user = token.user;
       session.role = token.role;
-      session.code = token.code;
       return session;
     },
   },

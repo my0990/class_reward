@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 export default async function Home() {
   const session = await getServerSession(authOptions);
-  
+
   if (session && session.user.role === "teacher") {
     redirect("/teacher/classes")
   } else if (session && session.user.role === "student") {
