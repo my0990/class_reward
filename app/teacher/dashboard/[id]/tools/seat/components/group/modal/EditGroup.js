@@ -1,5 +1,5 @@
 import EditGroupCard from "./EditGroupCard";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
 import { mutate } from "swr";
 import { motion, AnimatePresence } from "framer-motion";

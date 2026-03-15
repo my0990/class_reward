@@ -2,7 +2,7 @@
 
 import ProfileSection from "./section/ProfileSection";
 import { useState, useEffect } from "react"
-import useMultiFetch from "@/hooks/useMultiFetch";
+import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import ProfileImgSettingModal from "./section/ProfileImgSettingModal";
 import usePendingAction from "@/hooks/usePendingAction";
@@ -19,12 +19,29 @@ export default function SettingContainer() {
     const [password, setPassword] = useState({ currentPassword: '', nextPassword: '', nextPasswordConfirm: '' })
     const [error, setError] = useState(null);
 
-    const { data = {}, isLoading, isError, results } = useMultiFetch([
-        { key: "classData", url: `/api/classData/${classId}` },
-        { key: "studentsData", url: `/api/students/${classId}` },
-        { key: "userData", url: '/api/user' },
-    ]);
-
+    const {
+        data: classData,
+        isLoading: isClassLoading,
+        isError: isClassError,
+        error: classError,
+        mutate: mutateClassData,
+      } = useFetchData(classId ? `/api/classData/${classId}` : null);
+    
+      const {
+        data: studentsData = [],
+        isLoading: isStudentsLoading,
+        isError: isStudentsError,
+        error: studentsError,
+        mutate: mutateStudentsData,
+      } = useFetchData(classId ? `/api/students/${classId}` : null);
+    
+      const {
+        data: userData,
+        isLoading: isUserLoading,
+        isError: isUserError,
+        error: userError,
+        mutate: mutateUserData,
+      } = useFetchData(`/api/user`);
 
     const [formData, setFormData] = useState({
         profileNickname: "",
@@ -57,7 +74,7 @@ export default function SettingContainer() {
             if (!res.ok || !data.result) {
                 throw new Error(data.message || "프로필 수정에 실패했습니다.");
             } else {
-                results.userData.mutate()
+                mutateUserData();
                 toast.success("프로필을 수정하였습니다")
             }
         })
@@ -116,16 +133,22 @@ export default function SettingContainer() {
             },
         }).then((res) => res.json()).then((data) => {
             if (data.result === true) {
-                results.classData.mutate();
+                mutateClassData();
                 toast.success('화폐 설정을 변경하였습니다')
             }
         })
     }
+    const isLoading =
+    isClassLoading || isStudentsLoading || isUserLoading;
+
+  const isError =
+    isClassError || isStudentsError || isUserError;
+
     if (isLoading) return <div>불러오는 중...</div>;
     if (isError) return <div>데이터 로드 실패</div>;
 
-    const { profileNickname, profileState, profileUrl } = data.userData;
-    const { currencyEmoji, currencyName } = data.classData;
+    const { profileNickname, profileState, profileUrl } = userData;
+    const { currencyEmoji, currencyName } = classData;
 
     return (
         <div className="flex ">

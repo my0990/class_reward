@@ -4,14 +4,14 @@ import QuestCard from "./QuestCard";
 import AddQuestBtn from "./AddQuestBtn";
 import AddQuestModal from "./AddQuestModal";
 import QuestDetailTemplate from "./detail/QuestDetailTemplate";
-import { fetchData } from "@/hooks/swrHooks";
+import { useFetchData } from "@/hooks/useFetchData";
 import { useState } from "react";
 
 export default function Quest({ role, classId }) {
 
-    const { data: questListData, isLoading: isQuestListLoading, isError: isQuestListError } = fetchData(`/api/fetchQuestList/${classId}`);
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData(`/api/classData/${classId}`);
-    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData(`/api/students/${classId}`);
+    const { data: questListData, isLoading: isQuestListLoading, isError: isQuestListError } = useFetchData(`/api/fetchQuestList/${classId}`);
+    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
+    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = useFetchData(`/api/students/${classId}`);
 
     const [isDetail, setIsDetail] = useState(false);
     const [questDetailData, setQuestDetailData] = useState({});

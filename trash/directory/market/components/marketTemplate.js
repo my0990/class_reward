@@ -8,7 +8,7 @@ import {
     TransitionGroup,
 } from 'react-transition-group';
 import ItemCard from "./ItemCard"
-import { fetchData } from "@/hooks/swrHooks"
+import { fetchData } from "@/hooks/useFetchData"
 
 
 

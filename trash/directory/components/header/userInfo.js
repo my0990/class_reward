@@ -4,7 +4,7 @@ import { signOut } from "next-auth/react"
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
 
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 
 export default function UserInfo({ session, isUserinfoClicked, setIsUserinfoClicked, profileiconRef , userData, classData }) {
 

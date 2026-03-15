@@ -12,17 +12,16 @@ export default async function handler(req, res) {
 
     const {currentPassword, nextPassword, } = req.body;
     // MongoDB 연결
-
+    console.log(req.body)
 
     const filter = role === 'teacher' ? { email: email, _id: ObjectId.createFromHexString(_id) } : { userId: userId, _id: ObjectId.createFromHexString(_id) }
 
     const db = (await connectDB).db('user');
     const response = await db.collection('users').findOne(filter);
-    console.log(filter)
     console.log(response)
     const isCorrectPassword = await compare(
         currentPassword,
-        response.passwordHash
+        response.passwordHash ?? response.password
     )
     const newPassword = await hash(nextPassword, 12)
 

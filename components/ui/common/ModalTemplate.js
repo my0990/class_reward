@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ModalTemplate({
@@ -14,10 +14,10 @@ export default function ModalTemplate({
   const isOpen = modalId === id;
   const modalRef = useRef(null);
 
-  const close = () => {
-    onClose?.();    // ✅ 여기서 cleanup 실행
+  const close = useCallback(() => {
+    onClose?.();
     setModalId(null);
-  };
+  }, [onClose]);
 
   // ESC 닫기
   useEffect(() => {

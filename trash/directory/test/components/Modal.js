@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 
 export default function DetailModal({ picked, isDetailClicked }) {
 

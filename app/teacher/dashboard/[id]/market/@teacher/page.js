@@ -4,9 +4,9 @@ import AddModal from "./components/addModal"
 import DeleteModal from "./components/deleteModal"
 import { useState, useRef } from "react"
 import ItemCard from "../components/ItemCard"
-import { fetchData } from "@/hooks/swrHooks";
-import { useParams } from 'next/navigation';
 
+import { useParams } from 'next/navigation';
+import { useFetchData } from "@/hooks/useFetchData"
 
 
 export default function MarketTemplate() {
@@ -16,7 +16,7 @@ export default function MarketTemplate() {
         data: classData,
         isLoading: isClassDataLoading,
         isError: isClassDataError,
-      } = fetchData(`/api/classData/${id}`);
+      } = useFetchData(`/api/classData/${id}`);
 
     
     const [pickedItem, setPickedItem] = useState();

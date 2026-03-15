@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 
 export default function NoticeDetail() {
   const { id, noticeId } = useParams();

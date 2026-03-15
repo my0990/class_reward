@@ -1,6 +1,6 @@
 import GroupCard from "./GroupCard";
 import { useState } from "react";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { mutate } from "swr";
 import { motion, AnimatePresence } from "framer-motion";
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import CardTemplate from "../card/CardTemplate";
 import { mutate } from "swr";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 
 export default function DetailModal({ picked, startExp, commonDifference }) {
     const [rotation, setRotation] = useState(0);

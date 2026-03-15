@@ -7,14 +7,12 @@ import { ObjectId } from "mongodb";
 
 export async function GET(req, {params}) {
     const session = await getServerSession(authOptions);
-    
-
-
+    console.log(session)
     const { id } = await params;
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const teacher_id = session.user._id;
-
+    const teacher_id = session.user.role === 'teacher' ? session.user._id : session.user.teacher_id;
+    
     const db = (await connectDB).db("data");
 
     const classData = await db.collection("class_data").findOne({
@@ -24,8 +22,6 @@ export async function GET(req, {params}) {
 
     if (!classData) return NextResponse.json({ message: "not found" }, { status: 404 });
 
-    // token, teacherId 같은 민감 정보 제거 후 반환
-    //   const { teacherId, ...safeData } = classData;
 
     return NextResponse.json(classData);
 }

@@ -4,7 +4,7 @@ import QuestCard from "./QuestCard";
 import AddQuestBtn from "./AddQuestBtn";
 import AddQuestModal from "./AddQuestModal";
 import QuestDetailTemplate from "./detail/QuestDetailTemplate";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { useState } from "react";
 
 export default function Quest({ role }) {

@@ -8,7 +8,7 @@ export default async function Home() {
   if (session && session.user.role === "teacher") {
     redirect("/teacher/classes")
   } else if (session && session.user.role === "student") {
-    redirect("/student/dashboard")
+    redirect(`/student/dashboard/${session.user.classId}`)
   } 
     
 

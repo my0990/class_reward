@@ -1,7 +1,7 @@
 'use client'
 import ClassesView from "./_component/Classes.view";
 import { useState } from "react";
-import { fetchData } from "@/hooks/swrHooks";
+import { useFetchData } from "@/hooks/useFetchData";
 import { useRouter } from "next/navigation";
 import { createClass } from "@/server-action/actions/class/createClass";
 import { mutate } from "swr";
@@ -23,7 +23,7 @@ export default function ClassesContainer() {
         }
         // 🔥 캐시 무효화
     };
-    const { data: classesData, isLoading: isClassesDataLoading, isError: isClassesDataError } = fetchData('/api/classes');
+    const { data: classesData, isLoading: isClassesDataLoading, isError: isClassesDataError } = useFetchData('/api/classes');
 
 
     if (isClassesDataLoading) return <div>Loading data...</div>;

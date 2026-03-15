@@ -102,13 +102,44 @@ export const teacherNav = [
     },
   ];
 
-export const studentNav = [
-    { key: "inventory", label: "창고 가기", href: "/directory/inventory", active: "/directory/inventory" },
-    { key: "market", label: "상점 가기", href: "/directory/market", active: "/directory/market" },
-    { key: "thermometer", label: "학급온도계", href: "/directory/thermometer", active: "/directory/thermometer" },
-    { key: "profile", label: "프로필 상점", href: "/directory/profile", active: "/directory/profile" },
-    { key: "quest", label: "퀘스트", href: "/directory/quest", active: (p) => /^\/directory\/quest/.test(p) || /^\/directory\/questDetail/.test(p) },
-];
+  export const studentNav = [
+    {
+      key: "inventory",
+      label: "창고 가기",
+      href: (id) => `/student/dashboard/${id}/inventory`,
+      activeMatch: (pathname, id) =>
+        pathname === `/student/dashboard/${id}/inventory`,
+    },
+    {
+      key: "market",
+      label: "상점 가기",
+      href: (id) => `/student/dashboard/${id}/market`,
+      activeMatch: (pathname, id) =>
+        pathname === `/student/dashboard/${id}/market`,
+    },
+    // {
+    //   key: "thermometer",
+    //   label: "학급온도계",
+    //   href: (id) => `/directory/${id}/thermometer`,
+    //   activeMatch: (pathname, id) =>
+    //     pathname === `/directory/${id}/thermometer`,
+    // },
+    // {
+    //   key: "profile",
+    //   label: "프로필 상점",
+    //   href: (id) => `/directory/${id}/profile`,
+    //   activeMatch: (pathname, id) =>
+    //     pathname === `/directory/${id}/profile`,
+    // },
+    // {
+    //   key: "quest",
+    //   label: "퀘스트",
+    //   href: (id) => `/student/directory/${id}/quest`,
+    //   activeMatch: (pathname, id) =>
+    //     pathname.startsWith(`/student/directory/${id}/quest`) ||
+    //     pathname.startsWith(`/student/directory/${id}/questDetail`),
+    // },
+  ];
 
 export const resolveNav = (role, pathname) => {
     const items = role === "teacher" ? teacherNav : studentNav;

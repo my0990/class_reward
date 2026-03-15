@@ -1,12 +1,11 @@
 
 import ItemBuyCard from "./ItemBuyCard";
-import { useState } from "react";
-import { fetchData } from "@/hooks/swrHooks";
+import { useFetchData } from "@/hooks/useFetchData";
 import Link from "next/link";
 
 export default function ItemPickTemplate({ setRequestData, classId }) {
     
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData(`/api/classData/${classId}`);
+    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
 
 
     const onClick = (a) => {

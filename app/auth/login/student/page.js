@@ -10,7 +10,7 @@ export default async function StudentLogin(){
       // redirect("/directory/dashboard")
     }
     return(
-        // <AuthPage role="student"/>
-        <div> 준비중입니다</div>
+        <AuthPage role="student"/>
+        // <div> 준비중입니다</div>
     )
 }

@@ -1,10 +1,10 @@
 'use client'
 
-import ThermometerObject from "@/app/components/thermometer/ThermometerObject";
-import DonationList from "@/app/components/thermometer/donation/DonationList";
+import ThermometerObject from "@/trash/components/thermometer/ThermometerObject";
+import DonationList from "@/trash/components/thermometer/donation/DonationList";
 
 import { useState, useRef, useEffect } from 'react';
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { useRouter } from "next/navigation";
 
 export default function ThermometerBoard({setRequestData}) {

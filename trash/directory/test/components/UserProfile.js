@@ -1,5 +1,5 @@
 'use client'
-import { fetchData} from "@/hooks/swrHooks";
+import { fetchData} from "@/hooks/useFetchData";
 import { useEffect } from "react";
 import { mutate } from "swr";
 import Modal from "./Modal";

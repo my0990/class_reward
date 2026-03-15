@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from "react";
-import Scale from "@/app/components/thermometer/Scale";
-import Degree from "@/app/components/thermometer/Degree";
+import Scale from "@/trash/components/thermometer/Scale";
+import Degree from "@/trash/components/thermometer/Degree";
 import { mutate } from "swr";
 
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import FinishQuestModal from "./finishQuestModal"
 import DeleteQuestCardModal from "./deleteQuestCardModal"
-import { fetchData } from "@/hooks/swrHooks"
+import { fetchData } from "@/hooks/useFetchData"
 import EditQuestModal from "./EditQuestModal"
 import ResetQuestModal from "./ResetQuestModal"
 

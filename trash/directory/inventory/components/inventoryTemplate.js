@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from "react";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { mutate } from "swr";
 
 

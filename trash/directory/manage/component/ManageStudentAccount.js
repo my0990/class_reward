@@ -4,7 +4,7 @@ import PickNumber from "./modal/PickNumber";
 import ResetModal from "./modal/ResetModal";
 import { useState } from "react";
 import { mutate } from "swr";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import CreateUniqueNickname from "./CreateUniqueNickname";
 export default function CreateStudentAccount() {
 

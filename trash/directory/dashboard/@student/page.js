@@ -1,5 +1,5 @@
 'use client'
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import ProfileImgModal from "./components/ProfileImgModal";
 import TitleModal from "./components/TitleModal";
 export default async function Page() {

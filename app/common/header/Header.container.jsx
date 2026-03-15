@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import useMultiFetch from "@/hooks/useMultiFetch";
+import { useFetchData } from "@/hooks/useFetchData";
 import { teacherNav, studentNav } from "@/config/navConfig";
 import HomeBtn from "./section/HomeBtn";
 import HeaderNav from "./widget/HeaderNav";
@@ -14,17 +14,20 @@ export default function HeaderContainer({ classId }) {
 
     // kiosk route면 헤더 숨김 (기존 로직 유지)
 
-
-    const { data, isLoading, isError, results } = useMultiFetch([
-        { key: "classData", url: `/api/classData/${classId}` },
-        { key: "userData", url: `/api/user` },
-    ]);
-
-    const { classData, userData } = data
+    const {
+        data: classData,
+        isLoading: isClassLoading,
+        isError: isClassError,
+      } = useFetchData(classId ? `/api/classData/${classId}` : null);
+    
+      const {
+        data: userData,
+        isLoading: isUserLoading,
+        isError: isUserError,
+      } = useFetchData(`/api/user`);
 
     // 메뉴 상태
-    const [openToolsMenu, setOpenToolsMenu] = useState(false);
-    const closeTimerRef = useRef(null);
+
 
     const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
     const [isUserInfoOpen, setIsUserInfoOpen] = useState(false);
@@ -40,6 +43,14 @@ export default function HeaderContainer({ classId }) {
     // tools hover 핸들러 (timeoutId를 지역변수로 두면 렌더 때마다 초기화되는 문제 있어서 ref로)
 
 
+    const isLoading =
+        isClassLoading ||
+        isUserLoading
+
+    const isError =
+        isClassError ||
+        isUserError 
+
 
 
     if (isLoading) {
@@ -54,7 +65,7 @@ export default function HeaderContainer({ classId }) {
     const { className = "", currencyEmoji, currencyName } = classData;
     const { profileUrl = "", role, userId, money } = userData;
     const navItems = userData.role === "teacher" ? teacherNav : studentNav
-    const homeHref = `/teacher/dashboard/${classId}`
+    const homeHref = `/${role}/dashboard/${classId}`
     const settingHref = `/${role}/dashboard/${classId}/setting`
 
     return (

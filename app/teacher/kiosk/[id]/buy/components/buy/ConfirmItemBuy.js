@@ -1,13 +1,13 @@
 import { useState } from "react";
 import FinishBuyModal from "./FinishBuyModal";
-import { fetchData } from "@/hooks/swrHooks";
+import { useFetchData } from "@/hooks/useFetchData";
 import Link from "next/link";
 import { mutate } from "swr";
 import { useRouter } from "next/navigation";
 export default function ConfirmItemBuy({ requestData, setRequestData, classId }) {
 
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
-    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData('/api/fetchStudentData');
+    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData('/api/fetchClassData');
+    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = useFetchData('/api/fetchStudentData');
 
     const route = useRouter();
     const [isLoading, setIsLoading] = useState(false);

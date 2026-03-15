@@ -2,7 +2,7 @@
 import Password from "./Password";
 import Profile from "./Profile"
 import { useState } from "react"
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 
 export default function SettingTemplate() {
     const [isProfile, setIsProfile] = useState(true);

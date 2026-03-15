@@ -3,7 +3,7 @@ import AddProfileImgModal from "./component/AddProfileImgModal"
 import ProfileCard from "./component/profileCard"
 import { useState, useEffect, useRef } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import EditProfileImgModal from "./component/EditProfileImgModal";
 
 

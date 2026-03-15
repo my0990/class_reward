@@ -9,16 +9,26 @@ import DashboardBtns from "./section/DashboardBtns";
 import StudentCardGrid from "./section/StudentCardGrid";
 import PointModal from "./widget/PointModal";
 import { toast, Toaster } from "react-hot-toast";
-import useMultiFetch from "@/hooks/useMultiFetch";
+import { useFetchData } from "@/hooks/useFetchData";
 
 export default function DashboardContainer({ classId }) {
   const [modalId, setModalId] = useState(null);
-  const { data = {}, isLoading, isError, results } = useMultiFetch([
-    { key: "classData", url: `/api/classData/${classId}` },
-    { key: "studentsData", url: `/api/students/${classId}` },
-  ]);
+  const {
+    data: classData,
+    isLoading: isClassLoading,
+    isError: isClassError,
+    error: classError,
+    mutate: mutateClassData,
+  } = useFetchData(classId ? `/api/classData/${classId}` : null);
 
-  const { classData, studentsData } = data;
+  const {
+    data: studentsData = [],
+    isLoading: isStudentsLoading,
+    isError: isStudentsError,
+    error: studentsError,
+    mutate: mutateStudentsData,
+  } = useFetchData(classId ? `/api/students/${classId}` : null);
+
 
 
 
@@ -115,6 +125,11 @@ export default function DashboardContainer({ classId }) {
     isSelectedAll ? clearAll() : selectAll();
   }, [isSelectedAll, clearAll, selectAll]);
 
+  const isLoading =
+    isClassLoading || isStudentsLoading 
+
+  const isError =
+    isClassError || isStudentsError 
 
   if (isLoading) return <div>불러오는 중...</div>;
   if (isError) return <div>데이터 로드 실패</div>;

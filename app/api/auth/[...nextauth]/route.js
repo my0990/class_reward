@@ -60,7 +60,7 @@ export const authOptions = {
             role: "teacher",
             email: user.email ?? null,
             teacherId: user.teacherId ?? user.userId ?? null, // 너 DB 필드명에 맞춰 사용
-            code: user.code ?? null,
+
           };
         }
 
@@ -70,7 +70,7 @@ export const authOptions = {
           role: "student",
           userId: user.userId ?? null,
           classId: user.classId ?? null, // 있으면 넣고, 없으면 null
-          code: user.code ?? null,
+          teacher_id: user.teacher_id.toString?.() ?? null
         };
       },
     }),
@@ -89,13 +89,13 @@ export const authOptions = {
     jwt: async ({ token, user }) => {
 
       if (user) {
-        token.role = user.role;
 
         if (user.role === "teacher") {
           token.user = {
             role: "teacher",
             email: user.email ?? null,
             _id: user._id.toString(),
+            teacher_id: user._id.toString()
           };
         } else if (user.role === "student") {
           token.user = {
@@ -103,6 +103,7 @@ export const authOptions = {
             userId: user.userId ?? null,
             classId: user.classId ?? null,
             _id: user._id.toString(),
+            teacher_id: user.teacher_id.toString()
           };
         }
       }
@@ -118,7 +119,6 @@ export const authOptions = {
 
           if (!dbUser) {
             token.invalidUser = true;
-            console.log(token)
             return token;
           }
 

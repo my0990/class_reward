@@ -3,14 +3,14 @@ import AddProfileImgModal from "./component/AddProfileImgModal"
 import ProfileCard from "./component/profileCard"
 import { useState, useEffect, useRef } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { fetchData } from "@/hooks/swrHooks";
+import { useFetchData } from "@/hooks/useFetchData";
 import EditProfileImgModal from "./component/EditProfileImgModal";
 
 
 export default function TeacherProfileTemplate({ classId}) {
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData(`/api/classData/${classId}`);
-    const { data: studentsData, isLoading: isStudentsDataLoading, isError: isStudentsDataError } = fetchData(`/api/students/${classId}`);
-    const { data: userData, isLoading: isUserDataLoading, isError: isUserDataError } = fetchData(`/api/user`);
+    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
+    const { data: studentsData, isLoading: isStudentsDataLoading, isError: isStudentsDataError } = useFetchData(`/api/students/${classId}`);
+    const { data: userData, isLoading: isUserDataLoading, isError: isUserDataError } = useFetchData(`/api/user`);
 
     const [modalData, setModalData] = useState({ isActive: null, price: null, url: null, urlId: null });
 

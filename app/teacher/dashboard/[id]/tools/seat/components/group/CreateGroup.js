@@ -1,6 +1,6 @@
 import GroupModal from "./modal/GroupModal";
 import { useState } from "react";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { useEffect } from "react";
 
 function shuffle(arr) {

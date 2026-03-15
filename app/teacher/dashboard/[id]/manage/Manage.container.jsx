@@ -5,7 +5,8 @@ import CreateModal from "./widzet/modal/CreateModal";
 import ResetModal from "./widzet/modal/ResetModal";
 import { useState } from "react";
 import CreateUniqueNickname from "./section/CreateUniqueNickname";
-import useMultiFetch from "@/hooks/useMultiFetch";
+import { useFetchData } from "@/hooks/useFetchData";
+
 import { useParams } from "next/navigation";
 import StudentGrid from "./section/studentGrid";
 import usePendingAction from "@/hooks/usePendingAction";
@@ -17,16 +18,29 @@ export default function ManageContainer() {
     const [modalId, setModalId] = useState(null);
     const [picked, setPicked] = useState(null);
 
-    const { data = {}, isLoading, isError, results } = useMultiFetch([
-        { key: "classData", url: `/api/classData/${classId}` },
-        { key: "studentsData", url: `/api/students/${classId}` },
-    ]);
+    const {
+        data: classData,
+        isLoading: isClassLoading,
+        isError: isClassError,
+        error: classError,
+        mutate: mutateClassData,
+    } = useFetchData(classId ? `/api/classData/${classId}` : null);
 
-    const { classData, studentsData } = data;
+    const {
+        data: studentsData = [],
+        isLoading: isStudentsLoading,
+        isError: isStudentsError,
+        error: studentsError,
+        mutate: mutateStudentsData,
+    } = useFetchData(classId ? `/api/students/${classId}` : null);
+
+
+
+
 
 
     const { runAction, isPending } = usePendingAction();
-    
+
     const onAccountDelete = () => {
         runAction("delete", async () => {
             fetch("/api/deleteAccount", {
@@ -36,17 +50,17 @@ export default function ManageContainer() {
                     "Content-Type": "application/json",
                 },
             }).then((res) => res.json()).then((data) => {
-    
+
                 if (data.result === true) {
                     results.classData.mutate();
                     results.studentsData.mutate();
                     setModalId(null);
                     toast.success('삭제완료')
-    
+
                 }
             })
         })
-        
+
     }
 
 
@@ -62,7 +76,11 @@ export default function ManageContainer() {
     const onDetailClick = (a) => openModal("DETAIL_ACCOUNT", a);
     const onDeleteClick = (a) => openModal("DELETE_ACCOUNT", a);
     const onCreateAccountclick = () => openModal("CREATE_ACCOUNT");
+    const isLoading =
+        isClassLoading || isStudentsLoading
 
+    const isError =
+        isClassError || isStudentsError
     if (isLoading) return <div>불러오는 중...</div>;
     if (isError) return <div>데이터 로드 실패</div>;
 
@@ -85,9 +103,15 @@ export default function ManageContainer() {
             </div>
             <CreateModal {...{ modalId, setModalId, classData, classId }} />
             <DeleteModal {...{ picked, modalId, setModalId, onAccountDelete, isPending }} />
-            <ResetModal picked={picked} classId={classId} />
-            <DetailModal picked={picked} startExp={startExp} commonDifference={commonDifference} />
-            <Toaster position="bottom-right"/>
+            <ResetModal {...{ picked, modalId, setModalId }} />
+            <DetailModal {...{
+                picked,
+                startExp,
+                commonDifference,
+                modalId,
+                setModalId,
+            }} />
+            <Toaster position="bottom-right" />
         </div>
     )
 }

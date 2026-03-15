@@ -1,0 +1,168 @@
+'use client'
+
+import ProfileSection from "./section/ProfileSection";
+import { useState, useEffect } from "react"
+import { useFetchData } from "@/hooks/useFetchData";
+import { useParams } from "next/navigation";
+import ProfileImgSettingModal from "./section/ProfileImgSettingModal";
+import usePendingAction from "@/hooks/usePendingAction";
+import { toast, Toaster } from "react-hot-toast";
+import PwdSection from "./section/PwdSection";
+
+export default function SettingContainer() {
+    const params = useParams();
+    const classId = params.id;
+
+    const [tab, setTab] = useState('profile');
+    const { runAction, isPending } = usePendingAction();
+
+    const [password, setPassword] = useState({ currentPassword: '', nextPassword: '', nextPasswordConfirm: '' })
+    const [error, setError] = useState(null);
+
+    const {
+        data: classData,
+        isLoading: isClassLoading,
+        isError: isClassError,
+        error: classError,
+        mutate: mutateClassData,
+    } = useFetchData(classId ? `/api/classData/${classId}` : null);
+
+    const {
+        data: studentsData = [],
+        isLoading: isStudentsLoading,
+        isError: isStudentsError,
+        error: studentsError,
+        mutate: mutateStudentsData,
+    } = useFetchData(classId ? `/api/students/${classId}` : null);
+
+    const {
+        data: userData,
+        isLoading: isUserLoading,
+        isError: isUserError,
+        error: userError,
+        mutate: mutateUserData,
+    } = useFetchData(`/api/user`);
+
+    const [formData, setFormData] = useState({
+        profileNickname: "",
+        profileState: "",
+        profileUrl: "",
+    });
+    const [currencyData, setCurrencyData] = useState({
+        currencyName: "",
+        currencyEmoji: ""
+    });
+    const onChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        runAction("editProfile", async () => {
+            const res = await fetch("/api/profileEdit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.result) {
+                throw new Error(data.message || "프로필 수정에 실패했습니다.");
+            } else {
+                mutateUserData();
+                toast.success("프로필을 수정하였습니다")
+            }
+        })
+    };
+
+    // password
+
+    const onPwdChange = (e) => {
+        const { name, value } = e.target;
+        setPassword({ ...password, [name]: value })
+    }
+    const onPwdSubmit = (e) => {
+        e.preventDefault();
+
+        if (
+            password.currentPassword === '' ||
+            password.nextPassword === '' ||
+            password.nextPasswordConfirm === ''
+        ) {
+            setError('비밀번호를 모두 입력해주세요')
+            return
+        }
+
+        if (password.nextPassword !== password.nextPasswordConfirm) {
+            setError('비밀번호를 확인해주세요')
+            return
+        }
+
+        // ⭐ 4자리 숫자 검사
+        const pwdRegex = /^\d{4}$/;
+
+        if (!pwdRegex.test(password.nextPassword)) {
+            setError('비밀번호는 숫자 4자리만 가능합니다')
+            return
+        }
+
+        fetch("/api/passwordEdit", {
+            method: "POST",
+            body: JSON.stringify(password),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.result === true) {
+                    toast.success('비밀번호를 변경하였습니다')
+                    setError('')
+                    setPassword({
+                        currentPassword: '',
+                        nextPassword: '',
+                        nextPasswordConfirm: ''
+                    })
+                } else {
+                    setError('비밀번호가 일치하지 않습니다.')
+                }
+            })
+    }
+
+    const isLoading =
+        isClassLoading || isStudentsLoading || isUserLoading;
+
+    const isError =
+        isClassError || isStudentsError || isUserError;
+
+    if (isLoading) return <div>불러오는 중...</div>;
+    if (isError) return <div>데이터 로드 실패</div>;
+
+    const { profileNickname, profileState, profileUrl } = userData;
+    const { currencyEmoji, currencyName } = classData;
+
+    return (
+        <div className="flex ">
+            <div className="flex flex-wrap justify-center ">
+                <div className="w-[160px] m-[20px] min-[600px]:m-[40px] min-[602px]:border-r-2 max-[601px]:border-b-2 max-[601px]:w-[280px] max-[601px]:justify-center">
+                    <h1 className={`text-[1.5rem] font-bold`}>설정</h1>
+                    <h2 onClick={() => setTab("profile")} id="profile" className={`cursor-pointer text-[1.1rem] mt-[32px]`}><span className={`${tab === "profile" ? "border-b-4 border-orange-500" : null}`}>프로필 관리</span></h2>
+                    <h2 onClick={() => setTab("pwd")} id="pwd" className={`cursor-pointer text-[1.1rem] mt-[16px] max-[600px]:mb-[40px] `}><span className={`${tab === "pwd" ? "border-b-4 border-orange-500" : null}`}>계정 관리</span></h2>
+
+                </div>
+                <div className="max-[600px]:w-[100%] flex justify-center">
+                    {tab === "profile" ? <ProfileSection {...{ profileNickname, profileState, profileUrl, setFormData, onSubmit, formData, onChange, isPending }} />
+                        : tab === "pwd" ? <PwdSection {...{ onPwdChange, password, onPwdSubmit, error }} />
+                            : null}
+                </div>
+            </div>
+            {/* <ProfileImgSettingModal /> */}
+            <Toaster position="bottom-right" />
+        </div>
+    )
+}

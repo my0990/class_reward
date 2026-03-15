@@ -5,7 +5,7 @@ import DropDown from "./dropdown";
 import UserInfo from "./userInfo";
 import { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 export default function Header({ session }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
     const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');

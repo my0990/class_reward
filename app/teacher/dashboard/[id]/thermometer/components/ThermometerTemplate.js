@@ -1,13 +1,13 @@
 'use client'
 
-import ThermometerObject from "@/app/components/thermometer/ThermometerObject";
-import DonationList from "@/app/components/thermometer/donation/DonationList";
+import ThermometerObject from "@/trash/components/thermometer/ThermometerObject";
+import DonationList from "@/trash/components/thermometer/donation/DonationList";
 import { useState, useRef, useEffect } from 'react';
 import Modal from "./Modal";
 import HandleThermo from "./HandleThermo";
 import Donation from "./Donation";
 
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 
 
 export default function ThermometerTemplate({ role , classId}) {

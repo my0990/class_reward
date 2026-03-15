@@ -1,6 +1,6 @@
 'use client'
 import ProfileImgSettingModal from "./ProfileImgSettingModal";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { useState, useEffect } from "react";
 
 export default function Profile({ }) {

@@ -1,5 +1,5 @@
 'use client'
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
 import _ from "lodash";
 import { motion } from "framer-motion";

@@ -1,5 +1,5 @@
 
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import ConfirmModal from "./ConfirmModal";

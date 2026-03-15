@@ -7,7 +7,7 @@ import InstallPrompt from "../../component/InstallPrompt";
 import SetCurrencyNameModal from "./components/SetCurrencyNameModal";
 
 
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import util from './utils/util'
 
 export default function Home() {

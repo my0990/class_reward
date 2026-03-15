@@ -1,6 +1,6 @@
 import SeatModal from "./modal/SeatModal";
 import PrintModal from "./modal/PrintModal"
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
 import GroupModal from "../group/modal/GroupModal";
 import Image from "next/image";

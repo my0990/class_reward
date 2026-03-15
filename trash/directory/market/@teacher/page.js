@@ -5,7 +5,7 @@ import DeleteModal from "./components/deleteModal"
 import { useState, useRef } from "react"
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import ItemCard from "../components/ItemCard"
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 
 
 

@@ -1,14 +1,13 @@
 
 import { useState, useEffect } from "react";
-import { fetchData } from "@/hooks/swrHooks";
+import { useFetchData } from "@/hooks/useFetchData";
 import ItemCard from "./ItemCard";
 import { useRouter } from "next/navigation";
 import ConfirmItemUse from "./ConfirmItemUse";
 
 export default function ItemPickTemplate({ requestData, setRequestData, classId }) {
 
-
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
+    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
     const { itemList } = requestData.userData;
 
     const [pickedItem, setPickedItem] = useState({});

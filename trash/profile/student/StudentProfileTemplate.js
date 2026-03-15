@@ -3,7 +3,7 @@
 import StudentProfileCard from "./component/StudentProfileCard"
 import ProfileBuyModal from "./component/ProfileBuyModal";
 import { useState, useEffect } from "react";
-import { fetchData } from "@/hooks/swrHooks";
+import { fetchData } from "@/hooks/useFetchData";
 
 export default function StudentProfileTemplate({ }) {
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');

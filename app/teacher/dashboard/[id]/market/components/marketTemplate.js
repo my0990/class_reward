@@ -8,13 +8,13 @@ import {
     TransitionGroup,
 } from 'react-transition-group';
 import ItemCard from "./ItemCard"
-import { fetchData } from "@/hooks/swrHooks"
 
+import { useFetchData } from "@/hooks/useFetchData";
 
 
 export default function MarketTemplate({ tmpItemList }) {
-    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
-    const { data: userData, isLoading: isUserLoading, isError: isUserError } = fetchData('/api/fetchUserData');
+    const { data: classData, isLoading: isClassLoading, isError: isClassError } = useFetchData('/api/fetchClassData');
+    const { data: userData, isLoading: isUserLoading, isError: isUserError } = useFetchData('/api/fetchUserData');
 
 
     const onBuy = (picked) => {

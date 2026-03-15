@@ -21,7 +21,7 @@ export async function GET(req, {params}) {
   };
 
   const studentsData = await db.collection("user_data").find(filter).sort({ classNumber: 1 }).toArray();
-  console.log(studentsData)
+
 
   return NextResponse.json(studentsData);
 }

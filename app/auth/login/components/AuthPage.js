@@ -89,10 +89,9 @@ export default function AuthPage({ role }) {
       }
 
       // 로그인 성공 후 이동
-      router.push(isTeacher ? "/teacher/classes" : "/student");
+      router.push(isTeacher ? "/teacher/classes" : "/");
       router.refresh();
     } catch (err) {
-      console.error(err);
       setError("네트워크 오류");
     } finally {
       setIsSubmitting(false);
