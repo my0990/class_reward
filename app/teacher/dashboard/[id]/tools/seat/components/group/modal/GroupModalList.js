@@ -1,11 +1,11 @@
 import GroupCard from "./GroupCard";
 import { useState } from "react";
-import { fetchData } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
 import { mutate } from "swr";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function GroupModalList({ setIsListPage, setSelectedGroup }) {
-    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData('/api/fetchClassData');
+    const { data: classData, isLoading: isClassLoading, isError: isClassError } = useFetchData('/api/fetchClassData');
     const [isLoading, setIsLoading] = useState(false);
 
     const groupNames = [

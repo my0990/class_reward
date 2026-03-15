@@ -1,5 +1,5 @@
 'use client'
-import { fetchData } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
 import _ from "lodash";
 import { motion } from "framer-motion";
@@ -10,8 +10,8 @@ export default function Random() {
     const params = useParams();
     const id = params.id;
 
-    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData(`/api/students/${id}`);
-    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData(`/api/classData/${id}`);
+    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = useFetchData(`/api/students/${id}`);
+    const { data: classData, isLoading: isClassLoading, isError: isClassError } = useFetchData(`/api/classData/${id}`);
 
 
     const [originalStudentArr, setOriginalStudentArr] = useState([]);

@@ -1,6 +1,6 @@
 import SeatModal from "./modal/SeatModal";
 import PrintModal from "./modal/PrintModal"
-import { fetchData } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
 import GroupModal from "../group/modal/GroupModal";
 import Image from "next/image";
@@ -20,8 +20,8 @@ export default function CreateGrid({ isModalOpen }) {
     const params = useParams();
     const id = params.id;
 
-    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = fetchData(`/api/students/${id}`);
-    const { data: classData, isLoading: isClassLoading, isError: isClassError } = fetchData(`/api/classData/${id}`);
+    const { data: studentData, isLoading: isStudentLoading, isError: isStudentError } = useFetchData(`/api/students/${id}`);
+    const { data: classData, isLoading: isClassLoading, isError: isClassError } = useFetchData(`/api/classData/${id}`);
     const [count, setCount] = useState(0);
     const [isStarted, setIsStarted] = useState(false);
     const [progress, setProgress] = useState(0);

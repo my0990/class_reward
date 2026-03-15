@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { fetchData } from "@/hooks/useFetchData";
-
+import { useFetchData } from "@/hooks/useFetchData";
 export default function NoticeDetail() {
   const { id, noticeId } = useParams();
 
-  const { data, isLoading, isError } = fetchData(`/api/notices/${noticeId}`);
+  const { data, isLoading, isError } = useFetchData(`/api/notices/${noticeId}`);
 
   if (isLoading) return <div>Loading data...</div>;
   if (isError || !data?.success) return <div>Error loading data</div>;

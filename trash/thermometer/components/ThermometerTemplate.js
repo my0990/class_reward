@@ -7,14 +7,13 @@ import Modal from "./Modal";
 import HandleThermo from "./HandleThermo";
 import Donation from "./Donation";
 
-import { fetchData } from "@/hooks/useFetchData";
-
+import { useFetchData } from "@/hooks/useFetchData";
 
 export default function ThermometerTemplate({ role , classId}) {
-    const { data: thermoData, isLoading: isThermoLoading, isError: isThermoError } = fetchData('/api/fetchThermometerData');
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData(`/api/classData/${classId}`);
-    const { data: studentsData, isLoading: isStudentsDataLoading, isError: isStudentsDataError } = fetchData(`/api/students/${classId}`);
-    const { data: userData, isLoading: isUserDataLoading, isError: isUserDataError } = fetchData(`/api/user`);
+    const { data: thermoData, isLoading: isThermoLoading, isError: isThermoError } = useFetchData('/api/fetchThermometerData');
+    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
+    const { data: studentsData, isLoading: isStudentsDataLoading, isError: isStudentsDataError } = useFetchData(`/api/students/${classId}`);
+    const { data: userData, isLoading: isUserDataLoading, isError: isUserDataError } = useFetchData(`/api/user`);
     const [rewardObj, setRewardObj] = useState({})
     const [inputWidth, setInputWidth] = useState(Array(11).fill(0));
     const inputMirrorRef = useRef([])
