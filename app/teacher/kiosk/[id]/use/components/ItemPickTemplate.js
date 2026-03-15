@@ -4,12 +4,12 @@ import { useFetchData } from "@/hooks/useFetchData";
 import ItemCard from "./ItemCard";
 import { useRouter } from "next/navigation";
 import ConfirmItemUse from "./ConfirmItemUse";
-
+import { mutate } from "swr";
 export default function ItemPickTemplate({ requestData, setRequestData, classId }) {
 
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
     const { itemList } = requestData.userData;
-
+    const [rotation, setRotation] = useState(0);
     const [pickedItem, setPickedItem] = useState({});
     const route = useRouter();
 
@@ -22,6 +22,12 @@ export default function ItemPickTemplate({ requestData, setRequestData, classId 
         setPickedItem(a);
         document.getElementById('confirmModal').showModal();
     }
+
+    const onRefresh = () => {
+        setRotation((prev) => prev + 360);
+        mutate(`/api/students/${classId}`)
+    }
+
     if (isClassDataLoading) return <div>Loading data...</div>;
     if (isClassDataError) return <div>Error loading data</div>;
 
@@ -40,8 +46,12 @@ export default function ItemPickTemplate({ requestData, setRequestData, classId 
                     <div onClick={onPrevious} className="flex items-center justify-center text-[2rem]" >이전</div>
 
                 </div>
-
-                <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
+                <div className="flex">
+                    <h1 className="text-[2.5rem] text-center">아이템을 선택하세요</h1>
+                    <div onClick={onRefresh} style={{ transform: `rotate(${rotation}deg)`, transition: "transform 0.5s ease-in-out" }} className=" flex items-center ml-5 cursor-pointer hover:scale-105 transition-all" >
+                        <svg width="32px" height="32px" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none" fillRule="evenodd" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" transform="matrix(0 1 1 0 2.5 2.5)"> <path d="m3.98652376 1.07807068c-2.38377179 1.38514556-3.98652376 3.96636605-3.98652376 6.92192932 0 4.418278 3.581722 8 8 8s8-3.581722 8-8-3.581722-8-8-8"></path> <path d="m4 1v4h-4" transform="matrix(1 0 0 -1 0 6)"></path> </g> </g></svg>
+                    </div>
+                </div>
                 <div className="flex items-center cursor-pointer hover:scale-110 transition-all">
                     <div className="  cursor-pointer hover:scale-110 transition-all">
 

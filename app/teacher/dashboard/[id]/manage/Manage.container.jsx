@@ -1,8 +1,8 @@
 'use client'
-import DeleteModal from "./widzet//modal/DeleteModal";
-import DetailModal from "./widzet//modal/DetailModal";
-import CreateModal from "./widzet/modal/CreateModal";
-import ResetModal from "./widzet/modal/ResetModal";
+import DeleteModal from "./widget/modal/DeleteModal";
+import DetailModal from "./widget/modal/DetailModal";
+import CreateModal from "./widget/modal/CreateModal";
+import ResetModal from "./widget/modal/ResetModal";
 import { useState } from "react";
 import CreateUniqueNickname from "./section/CreateUniqueNickname";
 import { useFetchData } from "@/hooks/useFetchData";
@@ -52,8 +52,8 @@ export default function ManageContainer() {
             }).then((res) => res.json()).then((data) => {
 
                 if (data.result === true) {
-                    results.classData.mutate();
-                    results.studentsData.mutate();
+                    mutateClassData();
+                    mutateStudentsData();
                     setModalId(null);
                     toast.success('삭제완료')
 

@@ -24,7 +24,7 @@ export default function CharacterPickTemplate({ type, requestData, setRequestDat
     const route = useRouter();
     const onRefresh = () => {
         setRotation((prev) => prev + 360);
-        mutate(`/api/fetchStudentData`)
+        mutate(`/api/students/${classId}`)
     }
     const onPrevious = () => {
         if (type === "buy") {

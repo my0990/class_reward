@@ -33,7 +33,7 @@ export default function CharacterPickTemplate({ type, requestData, setRequestDat
     }
     const onRefresh = () => {
         setRotation((prev) => prev + 360);
-        mutate(`/api/fetchStudentData`)
+        mutate(`/api/students/${classId}`)
     }
     if (isClassDataLoading || isStudentDataLoading) return <div>Loading data...</div>;
     if (isClassDataError || isStudentDataError) return <div>Error loading data</div>;

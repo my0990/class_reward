@@ -11,14 +11,13 @@ import DropDown from "./widget/dropdown";
 import UserIcon from "./section/UserIcon";
 export default function HeaderContainer({ classId }) {
     const pathname = usePathname();
-
     // kiosk route면 헤더 숨김 (기존 로직 유지)
 
     const {
         data: classData,
         isLoading: isClassLoading,
         isError: isClassError,
-      } = useFetchData(classId ? `/api/classData/${classId}` : null);
+      } = useFetchData( `/api/classData/${classId}`);
     
       const {
         data: userData,

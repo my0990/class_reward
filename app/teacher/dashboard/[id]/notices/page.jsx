@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { fetchData } from "@/hooks/useFetchData";
-
+import { useFetchData } from "@/hooks/useFetchData";
 export default function Notices() {
   const searchParams = useSearchParams();
 
@@ -14,7 +13,7 @@ export default function Notices() {
     data: noticesData,
     isLoading: isNoticesDataLoading,
     isError: isNoticesDataError,
-  } = fetchData(`/api/notices?page=${page}&limit=${limit}`);
+  } = useFetchData(`/api/notices?page=${page}&limit=${limit}`);
 
   const NOW = Date.now();
   const NEW_LIMIT = 1000 * 60 * 60 * 48; // 48시간

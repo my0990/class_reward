@@ -140,7 +140,7 @@ export const authOptions = {
         return null;
       }
       session.user = token.user;
-      session.role = token.role;
+      session.role = token.user.role;
       return session;
     },
   },

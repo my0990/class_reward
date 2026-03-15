@@ -81,7 +81,7 @@ export default function DashboardContainer({ classId }) {
       setModalId(null);
 
       // mutate(`/api/students/${classId}`);
-      results.studentsData.mutate();
+      mutateStudentsData();
     },
     [activeStudents, hasSelectedStudent, isSend, classId, clearAll]
   );

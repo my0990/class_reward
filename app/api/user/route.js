@@ -10,13 +10,18 @@ export async function GET(req) {
 
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     let userId = null;
-    userId = session.role === "teacher" ? session.user.email : session.user.userId;
+    
+    userId = session.user.role === "teacher" ? session.user.email : session.user.userId;
+
     const db = (await connectDB).db("data");
 
     const userData = await db.collection("user_data").findOne({
         userId: userId // ✅ 소유권 체크
     });
-
+    console.log('userData')
+    console.log(userData)
+    console.log(userId)
+    console.log(session)
     if (!userData) return NextResponse.json({ message: "not found" }, { status: 404 });
 
 

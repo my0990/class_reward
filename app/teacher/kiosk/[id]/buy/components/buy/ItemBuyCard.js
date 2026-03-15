@@ -22,7 +22,7 @@ export default function ItemBuyCard({onClick, itemData, currencyname}) {
         <div onClick={onClick} className=" p-[16px] w-[192px] h-[300px]  font-bold rounded-lg relative">
             {itemStock <= 0
                 ? <div className="absolute z-50 top-[50px]">
-                    <Image src={soldOut} />
+                    <Image src={soldOut} alt="item img" />
                 </div>
                 : null}
 
