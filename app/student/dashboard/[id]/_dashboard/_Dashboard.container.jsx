@@ -4,6 +4,9 @@ import ProfileImgModal from "./widget/ProfileImgModal";
 import TitleModal from "./widget/TitleModal";
 import { useState } from "react";
 import usePendingAction from "@/hooks/usePendingAction";
+import { selectProfileImg } from "@/server-action/actions/profile/profile.action";
+import { Toaster, toast } from "react-hot-toast";
+
 export default function Page({ classId }) {
 
     const { runAction, isPending } = usePendingAction();
@@ -46,7 +49,7 @@ export default function Page({ classId }) {
 
     const { startExp, commonDifference } = classData.expTable;
     const { currencyEmoji } = classData;
-    const { exp, titles, money, profileNickname, profileState, profileTitle, profileUrl, classNumber } = userData;
+    const { exp, titles, money, profileNickname, profileState, profileTitle, profileUrl, classNumber, userId } = userData;
     const findLargestSumUnderTarget = () => {
         if (userData && classData) {
             let k = Math.floor((-2 * startExp + commonDifference + Math.sqrt((2 * startExp - commonDifference) ** 2 + 8 * commonDifference * exp)) / (2 * commonDifference));
@@ -97,43 +100,24 @@ export default function Page({ classId }) {
         }))
     }
 
-    const onUpdateProfileImg = (e, a) => {
-        runAction("updateProfileImg", async () =>
-            fetch("/api/setProfileImg", {
-                method: "POST",
-                body: JSON.stringify({ userId: userData.userId, profileUrl: userData.profileImgStorage[a] }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }).then((res) => {
-                if (!res.ok) {
-                    alert('error')
+    const onSelectProfileImg = (e, a) => {
+        runAction("selectProfileImg", async () => {
+            const data = await selectProfileImg({
+                classId: classId,
+                userId: userId,
+                url: userData.profileImgStorage[a]
 
+            });
 
-                    return;
-                }
+            if (!data.result) {
+                toast.error(data.message || "프로필 이미지 수정 실패");
+                return;
+            }
 
-                return res.json()
-            }).then((data) => {
-
-                if (data.result === true) {
-
-
-                    mutate(
-                        "/api/fetchUserData",
-                        (prevItems) => {
-
-                            return { ...prevItems, profileUrl: userData.profileImgStorage[a] };
-                        },
-                        false // 서버 요청 없이 즉시 반영
-                    );
-
-                }
-
-            }).catch((error) => {
-
-            })
-        )   
+            await mutateUserData?.();
+            setModalId(null);
+            toast.success("프로필 이미지 수정 완료");
+        })
     }
     return (
 
@@ -161,7 +145,8 @@ export default function Page({ classId }) {
                 </div>
             </div>
             <TitleModal userData={userData} modalId={modalId} setModalId={setModalId} titles={titles} onUpdateTitle={onUpdateTitle} />
-            <ProfileImgModal userData={userData} modalId={modalId} setModalId={setModalId} onUpdateProfileImg={onUpdateProfileImg}/>
+            <ProfileImgModal userData={userData} modalId={modalId} setModalId={setModalId} onClick={onSelectProfileImg} />
+            <Toaster position="bottom-right" />
         </div>
 
     )

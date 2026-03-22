@@ -39,13 +39,13 @@ export const teacherNav = [
           activeMatch: (pathname, id) =>
             pathname.startsWith(`/teacher/dashboard/${id}/quest`),
         },
-        // {
-        //   key: "manage-profile",
-        //   label: "프로필 관리",
-        //   href: (id) => `/teacher/dashboard/${id}/profile`,
-        //   activeMatch: (pathname, id) =>
-        //     pathname === `/teacher/dashboard/${id}/profile`,
-        // },
+        {
+          key: "manage-profile",
+          label: "프로필 관리",
+          href: (id) => `/teacher/dashboard/${id}/profile`,
+          activeMatch: (pathname, id) =>
+            pathname === `/teacher/dashboard/${id}/profile`,
+        },
       ],
     },
   
@@ -124,13 +124,13 @@ export const teacherNav = [
     //   activeMatch: (pathname, id) =>
     //     pathname === `/directory/${id}/thermometer`,
     // },
-    // {
-    //   key: "profile",
-    //   label: "프로필 상점",
-    //   href: (id) => `/directory/${id}/profile`,
-    //   activeMatch: (pathname, id) =>
-    //     pathname === `/directory/${id}/profile`,
-    // },
+    {
+      key: "profile",
+      label: "프로필 상점",
+      href: (id) => `/student/dashboard/${id}/profile`,
+      activeMatch: (pathname, id) =>
+        pathname === `/student/dashboard/${id}/profile`,
+    },
     // {
     //   key: "quest",
     //   label: "퀘스트",

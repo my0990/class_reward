@@ -1,17 +1,8 @@
 
 
-export default function ProfileCard({ urlData, currencyName, setModalData, urlId, }) {
+export default function ProfileCard({ urlData, onClick, currencyName }) {
 
-    const onClick = () => {
-        document.getElementById('edit').showModal();
 
-        setModalData((prev) => ({
-            ...prev,
-            price: urlData.price,
-            urlId: urlId,
-            url: urlData.url
-        }))
-    }
 
     return (
 

@@ -1,7 +1,7 @@
 'use client'
 import { useState } from "react"
 import ThermometerBoard from "./ThermometerBoard";
-import CharacterPickTemplate from "../../common/character/CharacterPickTeplate";
+import CharacterPickTemplate from "../../../../app/teacher/kiosk/[id]/common/character/CharacterPickTeplate";
 import ThermometerDonation from "./ThermometerDonation";
 
 export default function ThermometerTemplate() {

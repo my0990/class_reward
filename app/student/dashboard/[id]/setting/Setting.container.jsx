@@ -104,10 +104,10 @@ export default function SettingContainer() {
         }
 
         // ⭐ 4자리 숫자 검사
-        const pwdRegex = /^\d{4}$/;
+        const pwdRegex = /^\d{4,8}$/;
 
         if (!pwdRegex.test(password.nextPassword)) {
-            setError('비밀번호는 숫자 4자리만 가능합니다')
+            setError('비밀번호는 4~8자리 숫자만 가능합니다')
             return
         }
 

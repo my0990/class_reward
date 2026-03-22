@@ -18,10 +18,6 @@ export async function GET(req) {
     const userData = await db.collection("user_data").findOne({
         userId: userId // ✅ 소유권 체크
     });
-    console.log('userData')
-    console.log(userData)
-    console.log(userId)
-    console.log(session)
     if (!userData) return NextResponse.json({ message: "not found" }, { status: 404 });
 
 

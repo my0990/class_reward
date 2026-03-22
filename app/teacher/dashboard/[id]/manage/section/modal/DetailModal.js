@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { mutate } from "swr";
-import CardTemplate from "../card/CardTemplate";
+import CardTemplate from "../../widget/card/CardTemplate";
 import { useFetchData } from "@/hooks/useFetchData";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 
@@ -126,11 +126,11 @@ export default function DetailModal({
                       key={item._id ?? `${item.date}-${item.type}-${index}`}
                       className="border-none text-center"
                     >
-                      <td>{item.type}</td>
+                      <td>{item?.name}</td>
                       <td>
                         <span
                           className={
-                            item.type === "출금"
+                            item?.type === "withDrawal"
                               ? "text-red-500"
                               : "text-green-500"
                           }

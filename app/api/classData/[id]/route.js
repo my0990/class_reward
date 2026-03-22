@@ -7,8 +7,6 @@ import { ObjectId } from "mongodb";
 
 export async function GET(req, {params}) {
     const session = await getServerSession(authOptions);
-    console.log('api classData')
-    console.log(session)
     const { id } = await params;
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -20,7 +18,6 @@ export async function GET(req, {params}) {
         classId: ObjectId.createFromHexString(id),
         teacher_id: ObjectId.createFromHexString(teacher_id) // ✅ 소유권 체크
     });
-    console.log(classData)
     if (!classData) return NextResponse.json({ message: "not found" }, { status: 404 });
 
 
