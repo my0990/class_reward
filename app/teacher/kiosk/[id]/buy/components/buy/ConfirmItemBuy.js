@@ -6,8 +6,19 @@ import { mutate } from "swr";
 import { useRouter } from "next/navigation";
 export default function ConfirmItemBuy({ requestData, setRequestData, classId }) {
 
-    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData('/api/fetchClassData');
-    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = useFetchData('/api/fetchStudentData');
+    const {
+        data: classData,
+        isLoading: isClassDataLoading,
+        isError: isClassDataError,
+        mutate: mutateClassData
+    } = useFetchData(`/api/classData/${classId}`);
+
+    const {
+        data: studentData,
+        isLoading: isStudentsDataLoading,
+        isError: isStudentsDataError,
+        mutate: mutateStudentData
+    } = useFetchData(`/api/students/${classId}`);
 
     const route = useRouter();
     const [isLoading, setIsLoading] = useState(false);
@@ -32,36 +43,15 @@ export default function ConfirmItemBuy({ requestData, setRequestData, classId })
 
                 if (data.result === true) {
                     document.getElementById('finishModal').showModal();
-                    mutate(
-                        "/api/fetchClassData",
-                        (prev) => {
-
-                            const updatedItemList = prev.itemList.map((item) => itemData.itemId === item.itemId ? { ...itemData, itemStock: itemData.itemStock - 1 } : item)
-
-                            return { ...prev, itemList: updatedItemList }
-                        },
-                        false // 서버 요청 없이 즉시 반영
-                    );
-                    mutate(
-                        "/api/fetchStudentData",
-                        (prev) => {
-                            const updatedStudentData = prev.map((student) => student.userId === userId ? { ...userData, money: userData.money - itemData.itemPrice, itemList: [...userData?.itemList, { ...itemData, itemId: data.itemId }] } : student)
-
-                            return updatedStudentData;
-                        },
-                        false // 서버 요청 없이 즉시 반영
-                    );
+                    mutateClassData()
+                    mutateStudentData()
                     setFetchItemId(data.itemId)
                 } else {
                     alert(data.message);
-                    if(data.message === '잔액부족'){
-                        mutate(
-                            "/api/fetchStudentData"
-                        );
+                    if (data.message === '잔액부족') {
+                        mutateStudentData()
                     } else {
-                        mutate(
-                            "/api/fetchClassData"
-                        );
+                        mutateClassData()
                     }
 
                     route.push('/kiosk')
@@ -72,8 +62,12 @@ export default function ConfirmItemBuy({ requestData, setRequestData, classId })
 
     }
 
-    if (isClassDataLoading || isStudentDataLoading) return <div>Loading data...</div>;
-    if (isClassDataError || isStudentDataError) return <div>Error loading data</div>;
+    const isDataLoading =
+        isClassDataLoading || isStudentsDataLoading
+
+    const isError = isClassDataError || isStudentsDataError
+    if (isDataLoading) return <div>불러오는 중...</div>;
+    if (isError) return <div>데이터 로드 실패</div>;
 
     const { currencyName } = classData;
 
@@ -145,7 +139,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData, classId })
                     <button onClick={onClick} className="bg-red-500 text-white rounded-full w-full py-[16px]">결제하기</button>
                 </div>
             </div>
-            <FinishBuyModal requestData={requestData} fetchItemId={fetchItemId} classId={classId}/>
+            <FinishBuyModal requestData={requestData} fetchItemId={fetchItemId} classId={classId} />
         </div>
     )
 }

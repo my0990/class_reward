@@ -57,7 +57,9 @@ export async function buyProfileImgService({ teacher_id, classId, pickedData, us
 
     const classObjectId = ObjectId.createFromHexString(classId);
     const teacherObjectId = ObjectId.createFromHexString(teacher_id);
-
+    console.log(balance)
+    console.log(balance)
+    console.log(balance)
     const db = (await connectDB).db('data');
 
     // console.log(req.body)

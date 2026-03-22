@@ -53,7 +53,7 @@ export default function ProfileContainer({ }) {
                 pickedData: pickedData,
                 classId: classId,
                 userId: userId,
-                balance: pickedData.price - money
+                balance: money - parseInt(pickedData.price) 
 
             });
 
