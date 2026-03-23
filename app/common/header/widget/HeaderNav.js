@@ -71,7 +71,7 @@ export default function HeaderNav({ navItems, pathname, classId }) {
                   flex items-center gap-1 cursor-pointer
                   transition-colors duration-200 hover:text-orange-500
                   ${highlight ? "text-orange-500" : "dark:text-white"}
-                  ${isActive ? "border-b-8 border-orange-400" : ""}
+                  ${isActive ? "border-b-8 border-orange-400" : "border-b-8 border-white"}
                 `}
               >
                 {Icon && <Icon className="w-5 h-5" />}
@@ -119,7 +119,7 @@ export default function HeaderNav({ navItems, pathname, classId }) {
             {hasSubmenu && (
               <ul
                 className={`
-                  absolute top-[58.5px] z-[999]
+                  absolute top-[62.5px] z-[1]
                   min-w-[180px]
                   dark:bg-zinc-800
                   border rounded-b-md bg-white

@@ -70,7 +70,7 @@ export default function HeaderContainer({ classId }) {
     return (
         <>
             <div className="border-b-2">
-                <div className="px-[48px] py-[16px] max-[980px]:p-[16px] items-center flex text-[1.2rem] justify-between text-gray-500 font-semibold">
+                <div className="px-[48px]  py-[16px] max-[980px]:p-[16px] items-center flex text-[1.2rem] justify-between text-gray-500 font-semibold">
 
 
                     <HomeBtn {...{ homeHref, className }} />
