@@ -21,7 +21,7 @@ export default function ItemCard(props) {
     return (
         <div className={`p-[16px] w-[192px] h-[300px] font-bold rounded-lg relative`} onClick={() => props.onClick(data)}>
             {data.itemStock <= 0
-                ? <div className="absolute z-50 top-[60px]" >
+                ? <div className="absolute top-[60px]" >
                     <Image src={soldOut} alt="soldout"/>
                 </div>
                 : null}

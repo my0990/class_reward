@@ -40,7 +40,7 @@ export default function HeaderNav({ navItems, pathname, classId }) {
   };
 
   return (
-    <ul className="flex max-[980px]:hidden relative z-50">
+    <ul className="flex max-[980px]:hidden relative ">
       {navItems.map((item) => {
         const hasSubmenu = !!item.submenu?.length;
         const isOpen = openKey === item.key;
@@ -119,14 +119,14 @@ export default function HeaderNav({ navItems, pathname, classId }) {
             {hasSubmenu && (
               <ul
                 className={`
-                  absolute top-[58.5px]
+                  absolute top-[58.5px] z-[999]
                   min-w-[180px]
                   dark:bg-zinc-800
                   border rounded-b-md bg-white
                   overflow-hidden
                   transition-all duration-200 ease-out
                   left-1/2 -translate-x-1/2
-                  border border-t-0 border-gray-200 border-2
+                  border border-t-0 border-gray-200 border-2 
                   ${isOpen
                     ? "opacity-100 translate-y-0 pointer-events-auto"
                     : "opacity-0 -translate-y-2 pointer-events-none"}
@@ -146,7 +146,7 @@ export default function HeaderNav({ navItems, pathname, classId }) {
                         className={`
                           block px-4 py-2 whitespace-nowrap
                           transition-colors
-                          hover:bg-orange-100 dark:hover:bg-zinc-700 text-center
+                          hover:bg-orange-100 dark:hover:bg-zinc-700 text-center 
                           ${subActive
                             ? "bg-orange-50 dark:bg-zinc-700 font-semibold"
                             : ""}
