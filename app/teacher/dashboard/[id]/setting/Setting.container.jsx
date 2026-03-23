@@ -4,7 +4,6 @@ import ProfileSection from "./section/ProfileSection";
 import { useState, useEffect } from "react"
 import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
-import ProfileImgSettingModal from "./section/ProfileImgSettingModal";
 import usePendingAction from "@/hooks/usePendingAction";
 import { toast, Toaster } from "react-hot-toast";
 import PwdSection from "./section/PwdSection";
@@ -105,7 +104,7 @@ export default function SettingContainer() {
             },
         }).then((res) => res.json()).then((data) => {
             if (data.result === true) {
-                toast.success('비밀번호를 변경하였습니다')
+                alert('비밀번호를 변경하였습니다')
                 setError('')
                 setPassword({ currentPassword: '', nextPassword: '', nextPasswordConfirm: '' })
 

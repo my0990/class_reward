@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
 function splitNavToSections(navItems) {
   const sections = [];
@@ -91,7 +92,8 @@ export default function DropDown({
   currencyName,
   navItems,
   userId,
-  role
+  role,
+  settingHref
 }) {
   const pathname = usePathname();
   const params = useParams();
@@ -146,6 +148,15 @@ export default function DropDown({
               <span className="ml-[4px]">{currencyName}</span>
             </div>
           </div>
+          <Link
+            href={settingHref}
+            className="block py-[1rem] py-[8px] mt-1"
+          >
+            <div className="flex items-center">
+              <Cog6ToothIcon className="w-5 h-5 mr-2" />
+              <div>설정</div>
+            </div>
+          </Link>
         </li>
 
         {/* 섹션형 메뉴 */}

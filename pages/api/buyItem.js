@@ -23,8 +23,6 @@ export default async function handler(req, res) {
     const ItemId = itemData.itemId;
     const response3 = await db.collection('user_data').findOne({ userId: userId, role: 'student' });
     const response5 = await db.collection('class_data').findOne({ teacher_id: ObjectId.createFromHexString(token.user.teacher_id), classId: ObjectId.createFromHexString(classId) });
-    console.log('response5')
-    console.log(response5)
     const { money } = response3;
 
     if (money < itemData.itemPrice) {

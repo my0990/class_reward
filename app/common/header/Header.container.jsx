@@ -85,7 +85,7 @@ export default function HeaderContainer({ classId }) {
             </div>
 
             {isHamburgerOpen ? (
-                <DropDown role={role} userId={userId} money={money} navItems={navItems} currencyEmoji={currencyEmoji}
+                <DropDown role={role} userId={userId} money={money} navItems={navItems} currencyEmoji={currencyEmoji} settingHref={settingHref}
                     currencyName={currencyName} />
             ) : null}
 

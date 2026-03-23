@@ -4,7 +4,7 @@ import styles from "./userinfo.module.css";
 import { signOut } from "next-auth/react";
 import { useRef, useEffect } from "react";
 import Link from "next/link";
-
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 export default function UserInfo({
   open,
   onClose,
@@ -51,7 +51,7 @@ export default function UserInfo({
           <button
             type="button"
             className="rounded-[20px] z-50 border-2 py-[4px] px-[8px] text-gray-500 border-gray-300 flex"
-            onClick={() => signOut({ callbackUrl: `${window.location.origin}/` })} 
+            onClick={() => signOut({ callbackUrl: `${window.location.origin}/` })}
             aria-label="로그아웃"
           >
             로그아웃
@@ -69,11 +69,12 @@ export default function UserInfo({
           <li>
             <Link
               href={settingHref}
-              className="block py-[1rem] px-[8px] ml-[8px]"
+              className="block py-[1rem] px-[8px] ml-[6px]"
               onClick={onClose}
             >
               <div className="flex items-center">
-                <span className="ml-[8px]">설정</span>
+                <Cog6ToothIcon className="w-5 h-5 mr-2" />
+                <div>설정</div>
               </div>
             </Link>
           </li>

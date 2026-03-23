@@ -27,13 +27,6 @@ export default function SettingContainer() {
         mutate: mutateClassData,
     } = useFetchData(classId ? `/api/classData/${classId}` : null);
 
-    const {
-        data: studentsData = [],
-        isLoading: isStudentsLoading,
-        isError: isStudentsError,
-        error: studentsError,
-        mutate: mutateStudentsData,
-    } = useFetchData(classId ? `/api/students/${classId}` : null);
 
     const {
         data: userData,
@@ -48,10 +41,7 @@ export default function SettingContainer() {
         profileState: "",
         profileUrl: "",
     });
-    const [currencyData, setCurrencyData] = useState({
-        currencyName: "",
-        currencyEmoji: ""
-    });
+
     const onChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -121,7 +111,7 @@ export default function SettingContainer() {
             .then((res) => res.json())
             .then((data) => {
                 if (data.result === true) {
-                    toast.success('비밀번호를 변경하였습니다')
+                    alert('비밀번호를 변경하였습니다')
                     setError('')
                     setPassword({
                         currentPassword: '',
@@ -135,10 +125,10 @@ export default function SettingContainer() {
     }
 
     const isLoading =
-        isClassLoading || isStudentsLoading || isUserLoading;
+        isClassLoading ||  isUserLoading;
 
     const isError =
-        isClassError || isStudentsError || isUserError;
+        isClassError ||  isUserError;
 
     if (isLoading) return <div>불러오는 중...</div>;
     if (isError) return <div>데이터 로드 실패</div>;

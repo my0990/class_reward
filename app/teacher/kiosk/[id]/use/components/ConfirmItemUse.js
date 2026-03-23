@@ -36,7 +36,6 @@ export default function ConfirmItemUse({ itemData, userData, classId }) {
                     alert(data.message);
 
                 }
-
                 mutate(
                     `/api/students/${classId}`,
                 );

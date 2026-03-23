@@ -17,7 +17,7 @@ export default function CharacterPickTemplate({ type, requestData, setRequestDat
 
         } else {
 
-
+            console.log(a)
             document.getElementById('my_modal_3').showModal()
             setRequestData(prev => ({ ...prev, userData: a }))
         }

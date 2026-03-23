@@ -9,10 +9,9 @@ export default async function handler(req, res) {
     const {userId,userPwd} = req.body;
 
     const user = await db.collection('users').findOne({ userId: userId, role: "student" });
-
     const isCorrectPassword = await compare(
         userPwd,
-        user.password
+        user.passwordHash ?? user.password
     )
     if(isCorrectPassword){
       res.status(200).json({ result: true, message: 'delete 성공'});

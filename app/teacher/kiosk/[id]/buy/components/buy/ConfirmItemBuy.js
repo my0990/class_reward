@@ -136,7 +136,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData, classId })
 
                 </div>
                 <div className="text-[1.8rem] flex justify-center mt-[64px] hover:scale-105 transition-all">
-                    <button onClick={onClick} className="bg-red-500 text-white rounded-full w-full py-[16px]">결제하기</button>
+                    <button onPointerUp={onClick} className="bg-red-500 text-white rounded-full w-full py-[16px]">결제하기</button>
                 </div>
             </div>
             <FinishBuyModal requestData={requestData} fetchItemId={fetchItemId} classId={classId} />
