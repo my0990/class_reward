@@ -47,7 +47,8 @@ export default function EditQuestModal({ currencyEmoji, questDetailData, setQues
 
   const onSubmit = async (e) => {
     e.preventDefault();
-
+    console.log("onsubmit")
+    console.log(input)
     if (!questDetailData?._id) return;
 
     const payload = {

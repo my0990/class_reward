@@ -22,7 +22,7 @@ export default function Quest({ role, classId }) {
 
     const { currencyEmoji, teacherId, currencyName } = classData;
     const studentCount = studentData.length
-
+    console.log(questListData)
     if (isDetail) {
         return (
             <QuestDetailTemplate setIsDetail={setIsDetail} role={role} classId={classId} classData={classData} studentData={studentData} questDetailData={questDetailData} setQuestDetailData={setQuestDetailData} />
