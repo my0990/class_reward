@@ -13,7 +13,7 @@ export default function TitleModal({ titles, modalId, setModalId, onUpdateTitle 
                         <div className="flex flex-wrap">
                             {titles.map((a, i) => {
                                 return (
-                                    <div key={i} onClick={(e) => onUpdateTitle(a)} className="m-[8px] cursor-pointer hover:scale-105 transition-all py-[4px] px-[32px] text-center text-[1.2rem]  bg-green-400 text-white font-bold rounded-lg">
+                                    <div key={i} onClick={(e) => onUpdateTitle(e, a)} className="m-[8px] cursor-pointer hover:scale-105 transition-all py-[4px] px-[32px] text-center text-[1.2rem]  bg-green-400 text-white font-bold rounded-lg">
                                         {a.title}
                                     </div>
                                 )

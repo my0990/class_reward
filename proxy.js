@@ -14,7 +14,7 @@ export async function proxy(req) {
     
     // 로그인 안했으면
     if (!token) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL("/", req.url));
     }
 
     // 학생이면 접근 차단

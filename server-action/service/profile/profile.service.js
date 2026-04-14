@@ -57,9 +57,6 @@ export async function buyProfileImgService({ teacher_id, classId, pickedData, us
 
     const classObjectId = ObjectId.createFromHexString(classId);
     const teacherObjectId = ObjectId.createFromHexString(teacher_id);
-    console.log(balance)
-    console.log(balance)
-    console.log(balance)
     const db = (await connectDB).db('data');
 
     // console.log(req.body)
@@ -93,5 +90,17 @@ export async function selectProfileImgService({ teacher_id, classId, url, userId
     };
 }
 
+export async function selectProfileTitleService({ teacher_id, classId, profileTitle, userId }) {
+
+    const classObjectId = ObjectId.createFromHexString(classId);
+    const teacherObjectId = ObjectId.createFromHexString(teacher_id);
+
+    const db = (await connectDB).db('data');
+    const response = await db.collection('user_data').updateOne({ classId: classObjectId, teacher_id: teacherObjectId, userId: userId }, { $set: { "profileTitle": profileTitle } }) 
+    
+    return {
+        result: true,
+    };
+}
 
 

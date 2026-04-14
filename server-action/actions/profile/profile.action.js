@@ -1,5 +1,5 @@
 'use server'
-import { createProfileImgService, updateProfileImgService, deleteProfileImgService, buyProfileImgService, selectProfileImgService } from "@/server-action/service/profile/profile.service";
+import { createProfileImgService, updateProfileImgService, deleteProfileImgService, buyProfileImgService, selectProfileImgService, selectProfileTitleService } from "@/server-action/service/profile/profile.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -150,3 +150,33 @@ export async function updateProfileImg({ url, price, classId, urlId }) {
     }
   }
 
+
+  export async function selectProfileTitle({ classId, userId, profileTitle}) {
+    try {
+      const session = await getServerSession(authOptions);
+      const teacher_id = session?.user?.teacher_id ?? null;
+
+  
+      const response = await selectProfileTitleService({
+        teacher_id: teacher_id,
+        classId,
+        profileTitle,
+        userId,
+
+      });
+  
+  
+      return {
+        result: true,
+        message: "칭호 수정 완료",
+        data: response,
+      };
+    } catch (error) {
+      console.error("error:", error);
+  
+      return {
+        result: false,
+        message: error.message || "칭호 수정 실패",
+      };
+    }
+  }

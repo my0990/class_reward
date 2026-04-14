@@ -119,7 +119,7 @@ export default function HeaderNav({ navItems, pathname, classId }) {
             {hasSubmenu && (
               <ul
                 className={`
-                  absolute top-[62.5px] z-[1]
+                  absolute top-[62.5px] z-50
                   min-w-[180px]
                   dark:bg-zinc-800
                   border rounded-b-md bg-white

@@ -4,7 +4,7 @@ import ProfileImgModal from "./widget/ProfileImgModal";
 import TitleModal from "./widget/TitleModal";
 import { useState } from "react";
 import usePendingAction from "@/hooks/usePendingAction";
-import { selectProfileImg } from "@/server-action/actions/profile/profile.action";
+import { selectProfileImg, selectProfileTitle } from "@/server-action/actions/profile/profile.action";
 import { Toaster, toast } from "react-hot-toast";
 
 export default function Page({ classId }) {
@@ -63,41 +63,25 @@ export default function Page({ classId }) {
         }
     };
 
-    const onUpdateTitle = (a) => {
-        runAction("updateTitle", async () => fetch("/api/setProfileTitle", {
-            method: "POST",
-            body: JSON.stringify({ userId: userData.userId, profileTitle: a.title }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => {
-            if (!res.ok) {
-                alert('error')
+    const onUpdateTitle = (e, a) => {
+        
+        runAction("selectProfileImg", async () => {
+            const data = await selectProfileTitle({
+                classId: classId,
+                userId: userId,
+                profileTitle: a.title
 
+            });
 
+            if (!data.result) {
+                toast.error(data.message || "칭호 수정 실패");
                 return;
             }
 
-            return res.json()
-        }).then((data) => {
-
-            if (data.result === true) {
-
-
-                mutate(
-                    "/api/fetchUserData",
-                    (prevItems) => {
-
-                        return { ...prevItems, profileTitle: a.title };
-                    },
-                    false // 서버 요청 없이 즉시 반영
-                );
-
-            }
-
-        }).catch((error) => {
-            alert('error')
-        }))
+            await mutateUserData?.();
+            setModalId(null);
+            toast.success("칭호 수정 완료");
+        })
     }
 
     const onSelectProfileImg = (e, a) => {
