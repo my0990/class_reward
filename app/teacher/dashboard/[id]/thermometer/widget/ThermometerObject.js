@@ -19,7 +19,7 @@ export default function ThermometerObject({ reward, currentDegree }) {
             <div className="w-[88px] translate-y-[18px] h-[340px] z-20 overflow-hidden bg-white  border-t-8 border-x-8  border-red-500  rounded-t-full  flex justify-center">
 
             </div>
-            <div className="absolute w-[48px] bg-red-500 z-30  bottom-[120px] rounded-t-full  " style={{ height: 30 + 'px' }}></div>
+            <div className="absolute w-[48px] bg-red-500 z-30  bottom-[120px] rounded-t-full  " style={{ height: 30 + (3.1 * currentDegree) + 'px' }}></div>
             {/* <div className="w-[160px] h-[160px] bg-white flex z-10  justify-center items-center border-8 border-red-500  rounded-full ">
                 <div className="w-[112px] h-[112px] bg-red-500   rounded-full  " />
             </div> */}

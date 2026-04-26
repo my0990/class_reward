@@ -12,7 +12,8 @@ export default function SettingModal({
     rewardObj,
     onRewardInputChange,
     requireCurrency,
-    onUpdateTemperatureSetting
+    onUpdateTemperatureSetting,
+    setRequireCurrency
 }) {
 
 
