@@ -68,7 +68,7 @@ export default function ProfileContainer() {
             setIsEdited(true)
         }
         if (/^[0-9]\d*$/.test(e.target.value) || e.target.value === '') {
-            setModalData(prev => ({...prev, price: e.target.value}))
+            setModalData(prev => ({ ...prev, price: e.target.value }))
         }
 
     }
@@ -85,6 +85,11 @@ export default function ProfileContainer() {
 
     const onUpdateProfileImg = (e) => {
         runAction("updateProfileUrl", async () => {
+            if (!modalData.price) {
+
+                toast.error("가격을 입력해주세요");
+                return;
+            }
             const data = await updateProfileImg({
                 url: modalData.url,
                 classId: classId,
@@ -96,6 +101,7 @@ export default function ProfileContainer() {
                 toast.error(data.message || "프로필 이미지 수정 실패");
                 return;
             }
+
 
             await mutateClassData?.();
             setModalId(null);
@@ -175,7 +181,7 @@ export default function ProfileContainer() {
                 </div>
             </div>
             <AddProfileImgModal {...{ modalId, setModalId, onChangeProfileImg, onCreateProfileImg, url, onAddModalClose, setUrl }} />
-            <UpdateProfileImgModal {...{setIsEdited, modalData, currencyEmoji, modalId, setModalId, onPriceChange, onUpdateProfileImg, onDeleteProfileImg, onUpdateModalClose, isEdited }} />
+            <UpdateProfileImgModal {...{ setIsEdited, modalData, currencyEmoji, modalId, setModalId, onPriceChange, onUpdateProfileImg, onDeleteProfileImg, onUpdateModalClose, isEdited }} />
             <Toaster position="bottom-right" />
         </div>
     )
