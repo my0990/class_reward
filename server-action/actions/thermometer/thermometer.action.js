@@ -2,7 +2,8 @@
 import { updateThermometerSettingService } from "@/server-action/service/thermometer/thermometer.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { updateManualDegreeService } from "@/server-action/service/thermometer/thermometer.service";
+import { updateManualDegreeService, donateCookieService } from "@/server-action/service/thermometer/thermometer.service";
+
 export async function updateThermometerSetting({ rewardObj, requireCurrency, classId }) {
   try {
     const session = await getServerSession(authOptions);
@@ -34,7 +35,7 @@ export async function updateThermometerSetting({ rewardObj, requireCurrency, cla
 
 
 
-export async function donate({ userId, amount, money, classId }) {
+export async function donate({ userId, amount, money, classId, degree }) {
   try {
     const session = await getServerSession(authOptions);
     const teacher_id = session?.user?._id ?? null;
@@ -52,7 +53,8 @@ export async function donate({ userId, amount, money, classId }) {
       amount,
       money,
       teacher_id,
-      classId
+      classId,
+      degree
     });
 
     return result;

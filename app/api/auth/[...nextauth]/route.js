@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectDB } from "@/trash/lib/database";
+// import { connectDB } from "@/trash/lib/database";
+import { connectDB } from "@/lib/mongodb";
 import { compare } from "bcryptjs";
 import { ObjectId } from "mongodb";
 export const authOptions = {
@@ -15,12 +16,13 @@ export const authOptions = {
       },
 
       async authorize(credentials) {
+        
         const role = String(credentials?.role ?? "");
         const password = String(credentials?.password ?? "");
         if (!role || !password) return null;
 
         const db = (await connectDB).db("user");
-
+        console.log("✅ db connected");
         let user = null;
 
         // 🎓 학생: userId로 조회

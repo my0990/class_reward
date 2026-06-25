@@ -1,26 +1,18 @@
 'use client'
 
 
-import SettingModal from "./section/SettingModal";
+
 import ThermometerObject from "./widget/ThermometerObject";
-import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import usePendingAction from "@/hooks/usePendingAction";
 import { updateManualDegree, updateThermometerSetting } from "@/server-action/actions/thermometer/thermometer.action";
 import { useFetchData } from "@/hooks/useFetchData";
 import { Toaster, toast } from "react-hot-toast";
-import TemperatureManageModal from "./section/TemperatureManageModal";
-// import DonationList from "./widget/DonationList";
-// import { useState, useRef, useEffect } from 'react';
-// import Modal from "./Modal";
-// import HandleThermo from "./HandleThermo";
+import { useRouter } from "next/navigation";
+export default function ThermometerTemplate({ }) {
 
-// import { useFetchData } from "@/hooks/useFetchData";
-
-export default function ThermometerContainer({ }) {
-
-
+    const route = useRouter();
     const { runAction, isPending } = usePendingAction();
     const params = useParams();
     const classId = params.id;
@@ -59,31 +51,6 @@ export default function ThermometerContainer({ }) {
             [degree]: value,
         }));
     };
-    // const { data: thermoData, isLoading: isThermoLoading, isError: isThermoError } = useFetchData('/api/fetchThermometerData');
-    // const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
-    // const { data: studentsData, isLoading: isStudentsDataLoading, isError: isStudentsDataError } = useFetchData(`/api/students/${classId}`);
-    // const { data: userData, isLoading: isUserDataLoading, isError: isUserDataError } = useFetchData(`/api/user`);
-    // const [rewardObj, setRewardObj] = useState({})
-    // const [inputWidth, setInputWidth] = useState(Array(11).fill(0));
-    // const inputMirrorRef = useRef([])
-    // const [handleThermoType, setHandleThermoType] = useState(null);
-
-    // if (isThermoLoading || isUserDataLoading || isClassDataLoading || isStudentsDataLoading) return <div>Loading data...</div>;
-    // if (isThermoError || isUserDataError || isClassDataError || isStudentsDataError) return <div>Error loading data</div>;
-
-    // const sum = Object.values(thermoData.donators).reduce((acc, value) => acc + value, 0)
-
-    // const temp = 23 + ((sum / thermoData.requireCurrency) + thermoData.adjustment) * 3.3;
-    // const handleThermo = (type) => {
-    //     document.getElementById('handleThermo').showModal()
-    //     setHandleThermoType(type)
-    // }
-    // if(role === "student" && thermoData.isActive !== false){
-    //     return(
-    //         <div>학급 온도계가 비활성화 되어있습니다.</div>
-    //     )
-    // }
-    // const { currencyEmoji, currencyName } = classData;
 
     const onUpdateTemperatureSetting = async () => {
 
@@ -149,14 +116,8 @@ export default function ThermometerContainer({ }) {
     const initialRequireCurrency = thermometerData.requireCurrency;
     const initialRewardObj = thermometerData.reward;
 
-    const totalDonatedCookies = Object.values(thermometerData.donators || {}).reduce(
-        (sum, amount) => sum + Number(amount || 0),
-        0
-    );
 
-    const classDegree = Math.floor(
-        totalDonatedCookies / thermometerData.requireCurrency
-    ) + thermometerData.manualDegree;
+    const classDegree = thermometerData.manualDegree;
 
     const ranking = Object.entries(thermometerData?.donators)
         .sort(([, a], [, b]) => b - a)
@@ -166,26 +127,33 @@ export default function ThermometerContainer({ }) {
             amount,
         }));
     return (
-        <div className="flex justify-center px-4 py-8">
-            <div className="w-full max-w-6xl rounded-[28px] border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.08)] md:p-8">
+        <div className="flex justify-center ">
+            <div className="w-full max-w-6xl rounded-[28px] border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.08)] md:p-8">
 
                 {/* 헤더 */}
-                <div className="mb-6 flex flex-col gap-4 border-b border-orange-100 pb-5 md:flex-row md:items-center md:justify-between">
+                <div className=" flex flex-col gap-4 border-b border-orange-100 pb-3 md:flex-row md:items-center md:justify-between">
+                    <div className="flex  cursor-pointer hover:scale-110 transition-all">
+
+                        <div className="h-[64px] w-[24px] flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M15.293 3.293 6.586 12l8.707 8.707 1.414-1.414L9.414 12l7.293-7.293-1.414-1.414z" /></svg>
+                        </div>
+
+                        <div onClick={() => route.push(`/teacher/kiosk/${classId}`)} className="flex items-center justify-center text-[2rem]" >이전</div>
+
+                    </div>
                     <div>
                         <div className="flex items-center">
-                            <h1 className="text-3xl font-extrabold tracking-tight text-orange-600 md:text-4xl mr-3">
+                            <h1 className="text-3xl font-extrabold tracking-tight text-orange-600 md:text-4xl">
                                 학급 온도계
                             </h1>
-                            <button onClick={() => setModalId("HANDLE_SETTING")}><Cog6ToothIcon className="w-8 h-8 text-orange-500 cursor-pointer hover:scale-110 transition-all" /></button>
+
                         </div>
-                        <p className="mt-1 text-sm text-orange-700/70 md:text-base">
-                            우리 반의 참여와 기부로 온도를 올려보세요
-                        </p>
+
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                        <button onClick={() => onManageModalOpen("increase")} className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600">
-                            온도 직접 조절
+                        <button onClick={() => route.push(`/teacher/kiosk/${classId}/thermometer/donate`)} className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600">
+                            기부하기
                         </button>
                         {/* <button onClick={() => onManageModalOpen("decrease")} className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-orange-600 ring-1 ring-orange-200 transition hover:bg-orange-50">
                             온도 내리기
@@ -225,8 +193,8 @@ export default function ThermometerContainer({ }) {
                         <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-orange-100">
                             <div className="mb-4 flex items-center justify-between">
                                 <h2 className="text-xl font-bold text-gray-800">현재 상태</h2>
-                            </div>
 
+                            </div>
                             <div className="space-y-4">
                                 {(() => {
                                     // reward 객체를 degree 기준으로 정렬
@@ -285,77 +253,58 @@ export default function ThermometerContainer({ }) {
                         </div>
 
                         {/* 랭킹 카드 */}
-                        <div className="min-h-[280px] rounded-3xl bg-white p-6 shadow-sm ring-1 ring-orange-100">
-                            <div className="mb-4 flex items-center justify-between">
-                                <h2 className="text-xl font-bold text-gray-800">기부천사 순위</h2>
-                                <span className="text-sm font-medium text-orange-500">TOP 랭킹</span>
-                            </div>
+                        <div className="h-[200px] overflow-y-auto rounded-2xl  bg-white">
+                            <table className="w-full table-fixed">
+                                <thead className="sticky top-0 z-10 bg-white">
+                                    <tr>
+                                        <th className="w-1/4 py-2 text-center">순위</th>
+                                        <th className="w-1/2 py-2 text-center">이름</th>
+                                        <th className="w-1/4 py-2 text-center">총 기부쿠키</th>
+                                    </tr>
+                                </thead>
 
-                            <div className="h-[200px] overflow-y-auto rounded-2xl  bg-white">
-                                <table className="w-full table-fixed">
-                                    <thead className="sticky top-0 z-10 bg-white">
-                                        <tr>
-                                            <th className="w-1/3 py-2 text-center">순위</th>
-                                            <th className="w-1/3 py-2 text-center">이름</th>
-                                            <th className="w-1/3 py-2 text-center">총 기부쿠키</th>
-                                        </tr>
-                                    </thead>
+                                <tbody>
+                                    {ranking.length > 0 ? (
+                                        ranking.map((item) => (
+                                            <tr
+                                                key={item.userId}
+                                                className=" last:border-0"
+                                            >
+                                                <td className="py-2 text-center font-bold">
+                                                    {item.rank === 1
+                                                        ? "🥇"
+                                                        : item.rank === 2
+                                                            ? "🥈"
+                                                            : item.rank === 3
+                                                                ? "🥉"
+                                                                : `${item.rank}위`}
+                                                </td>
 
-                                    <tbody>
-                                        {ranking.length > 0 ? (
-                                            ranking.map((item) => (
-                                                <tr
-                                                    key={item.userId}
-                                                    className=" last:border-0"
-                                                >
-                                                    <td className="py-2 text-center font-bold">
-                                                        {item.rank === 1
-                                                            ? "🥇"
-                                                            : item.rank === 2
-                                                                ? "🥈"
-                                                                : item.rank === 3
-                                                                    ? "🥉"
-                                                                    : `${item.rank}위`}
-                                                    </td>
+                                                <td className="py-2 text-center">
+                                                    {item.userId}
+                                                </td>
 
-                                                    <td className="py-2 text-center">
-                                                        {item.userId}
-                                                    </td>
-
-                                                    <td className="py-2 text-center font-semibold text-orange-600">
-                                                        {item.amount.toLocaleString()} 쿠키
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td
-                                                    colSpan={3}
-                                                    className="py-8 text-center text-gray-400"
-                                                >
-                                                    아직 기부자가 없습니다.
+                                                <td className="py-2 text-center font-semibold text-orange-600">
+                                                    {item.amount.toLocaleString()} 쿠키
                                                 </td>
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td
+                                                colSpan={3}
+                                                className="py-8 text-center text-gray-400"
+                                            >
+                                                아직 기부자가 없습니다.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <SettingModal
-                modalId={modalId}
-                setModalId={setModalId}
-                onRewardInputChange={onRewardInputChange}
-                rewardObj={rewardObj}
-                requireCurrency={requireCurrency}
-                setRequireCurrency={setRequireCurrency}
-                onUpdateTemperatureSetting={onUpdateTemperatureSetting} />
-            <TemperatureManageModal
-                modalId={modalId}
-                setModalId={setModalId}
-                onUpdateDegree={onUpdateDegree} />
             <Toaster position="bottom-right" />
         </div>
 

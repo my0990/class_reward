@@ -4,12 +4,12 @@ import { ObjectId } from "mongodb";
 export async function updateThermometerSettingService({ teacher_id, classId, rewardObj, requireCurrency }) {
 
 
-    const db = (await connectDB).db('data');
-    const response = await db.collection('thermometer').updateOne({ teacher_id: ObjectId.createFromHexString(teacher_id), classId: ObjectId.createFromHexString(classId) }, { $set: { "reward": rewardObj, "requireCurrency": requireCurrency } }, { upsert: true })
+  const db = (await connectDB).db('data');
+  const response = await db.collection('thermometer').updateOne({ teacher_id: ObjectId.createFromHexString(teacher_id), classId: ObjectId.createFromHexString(classId) }, { $set: { "reward": rewardObj, "requireCurrency": requireCurrency } }, { upsert: true })
 
-    return {
-        result: true,
-    };
+  return {
+    result: true,
+  };
 
 }
 
@@ -18,10 +18,15 @@ export async function donateCookieService({
   amount,
   money,
   teacher_id,
-  classId
+  classId,
+  degree
 }) {
+  console.log("degree: " ,degree)
   const db = (await connectDB).db("data");
-
+  const filter = {
+    teacher_id: ObjectId.createFromHexString(teacher_id),
+    classId: ObjectId.createFromHexString(classId),
+  };
   const numericAmount = Number(amount);
 
   if (!userId || !teacher_id) {
@@ -44,17 +49,19 @@ export async function donateCookieService({
 
   // 2. 온도계 기부 누적
   await db.collection("thermometer").updateOne(
-    { code },
+     filter ,
     {
       $inc: {
         [`donators.${userId}`]: numericAmount,
+        manualDegree: Number(degree)
       },
-    }
+    },
+    {upsert: true}
   );
 
   // 3. 히스토리 저장
   await db.collection("history").insertOne({
-    code,
+    filter,
     userId,
     balance: Number(money) - numericAmount,
     type: "withDrawal",

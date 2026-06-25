@@ -40,7 +40,7 @@ export default function Kiosk({classId}) {
 
                 <Link href={`/teacher/kiosk/${classId}/buy`}><button className="btn mb-[16px] px-[24px] border-4 hover:border-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white h-[40px] w-[200px]">아이템 구매하기</button></Link>
                 <Link href={`/teacher/kiosk/${classId}/use`}><button className="btn mb-[16px] px-[24px] border-4 hover:border-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white h-[40px] w-[200px]">아이템 사용하기</button></Link>
-                {/* <Link href="/kiosk/thermometer"><button className="btn px-[12px] border-4 hover:border-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white h-[40px] w-[200px]"><span className="text-[1.5rem]">🌡️</span> 학급 온도계</button></Link> */}
+                <Link href={`/teacher/kiosk/${classId}/thermometer`}><button className="btn px-[12px] border-4 hover:border-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white h-[40px] w-[200px]"><span className="text-[1.5rem]">🌡️</span> 학급 온도계</button></Link>
 
 
             </div>
