@@ -154,9 +154,7 @@ export default function ThermometerContainer({ }) {
         0
     );
 
-    const classDegree = Math.floor(
-        totalDonatedCookies / thermometerData.requireCurrency
-    ) + thermometerData.manualDegree;
+    const classDegree = thermometerData.manualDegree;
 
     const ranking = Object.entries(thermometerData?.donators)
         .sort(([, a], [, b]) => b - a)
