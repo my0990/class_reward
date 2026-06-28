@@ -35,9 +35,6 @@ export default function Quest({ role, classId }) {
                 <div className="flex items-center justify-between mr-[8px] w-[100%] text-[2rem] text-red-900 font-bold ">
                     <span className="border-l-8 border-orange-500 pl-[16px]">임무 목록</span>
                     {role === 'teacher' && <div onClick={() => document.getElementById('my_modal_2').showModal()}>
-                        {/* <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[40px] h-[40px]">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg> */}
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="cursor-pointer transition-all hover:scale-[120%] w-[40px] h-[40px] text-orange-400 hover:text-orange-500">
                             <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clipRule="evenodd" />
                         </svg>

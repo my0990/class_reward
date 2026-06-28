@@ -105,7 +105,7 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
                     <div className=" bg-white rounded-lg text-black w-[320px] p-[16px]">
                         <div className="text-[1.5rem] font-bold mb-[4px] text-orange-500">보상</div>
                         {questDetailData?.questReward && <div>- {questDetailData?.questReward}{classData?.currencyName}</div>}
-                        {questDetailData?.questExp && <div>- {questDetailData?.questExp}경험치</div>}
+                        {questDetailData?.questExp !==  0 && questDetailData?.questExp  && <div>- {questDetailData?.questExp}경험치</div>}
                         {questDetailData?.questTitle && <div>- 칭호 획득: {questDetailData?.questTitle}</div>}
                     </div>
                 </div>
