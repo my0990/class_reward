@@ -7,8 +7,9 @@ export default async function handler(req, res) {
 
 
   if (req.method === 'POST') {
+    console.log('test quest')
     console.log(req.body)
-    const { questName, questGoal, questReward, exp, title, questId } = req.body;
+    const { questName, questGoal, questReward, questExp, questTitle, questId } = req.body;
     console.log(questId)
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const code = token.code;
@@ -18,7 +19,7 @@ export default async function handler(req, res) {
     
     console.log(convertedQuestId)
     const db = (await connectDB).db('data');
-    const response = await db.collection('quest').updateOne({ code: code, _id: convertedQuestId},{$set: { questName: questName, questGoal: questGoal, questReward: questReward, questExp: exp, questTitle: title, time: new Date()} }, { upsert: true })
+    const response = await db.collection('quest').updateOne({ code: code, _id: convertedQuestId},{$set: { questName: questName, questGoal: questGoal, questReward: questReward, questExp: questExp, questTitle: questTitle, time: new Date()} }, { upsert: true })
 
 
     if(response){
