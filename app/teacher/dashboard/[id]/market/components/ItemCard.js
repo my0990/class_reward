@@ -20,6 +20,9 @@ export default function ItemCard(props) {
 
     return (
         <div className={`p-[16px] w-[192px] h-[300px] font-bold rounded-lg relative`} onClick={() => props.onClick(data)}>
+            <div className="flex justify-end">
+                남은 수량: {data.itemStock}
+            </div>
             {data.itemStock <= 0
                 ? <div className="absolute top-[60px]" >
                     <Image src={soldOut} alt="soldout"/>
