@@ -31,7 +31,7 @@ export default function MarketTemplate() {
     if (isClassDataError) return <div>Error loading data</div>;
 
 
-    const { currencyName, itemList } = classData;
+    const { currencyName, itemList, currencyEmoji } = classData;
 
     return (
         <div className="flex justify-center">
@@ -53,7 +53,7 @@ export default function MarketTemplate() {
                     </div>
                 </div>
                 <AddModal classId={id}/>
-                <DeleteModal pickedItem={pickedItem} currencyName={currencyName} classId={id}/>
+                <DeleteModal pickedItem={pickedItem} currencyName={currencyName} currencyEmoji={currencyEmoji} classId={id}/>
             </div>
         </div>
     )

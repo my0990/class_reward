@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions);
     const teacher_id = session.user._id;
   
-    const { updatedItemStock, itemId, classId } = req.body;
+    const { updatedItemStock, updatedItemPrice, itemId, classId } = req.body;
 
     const convertedItemId = itemId;
 
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       teacher_id: ObjectId.createFromHexString(teacher_id),
       classId: ObjectId.createFromHexString(classId), 
       "itemList.itemId": convertedItemId
-    }, { $set: { 'itemList.$.itemStock': parseInt(updatedItemStock) } })
+    }, { $set: { 'itemList.$.itemStock': parseInt(updatedItemStock), 'itemList.$.itemPrice': updatedItemPrice } })
     // const respojnse2 = await db.collection('user_data').updateMany({teacher:userId},{$set: {classData: req.body.data}},{upsert: false})
 
     // console.log(response2)
