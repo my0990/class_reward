@@ -81,7 +81,7 @@ export default function Kiosk({ classId }) {
             href: `/teacher/kiosk/${classId}/buy`,
             icon: '🛒',
             title: '아이템 구매하기',
-            desc: '쿠키로 아이템을 구매해요',
+            desc: '아이템을 구매해요',
         },
         {
             href: `/teacher/kiosk/${classId}/use`,
