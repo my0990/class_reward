@@ -1,24 +1,23 @@
 'use client'
 
-import AddModal from "./components/addModal"
-import DeleteModal from "./components/deleteModal"
+
+import { useFetchData } from "@/hooks/useFetchData";
+import AddModal from "./section/modal/AddModal";
+import DeleteModal from "./section/modal/DeleteModal";
 import { useState, useRef } from "react"
-import ItemCard from "../components/ItemCard"
-
+import ItemCard from "./widget/ItemCard"
 import { useParams } from 'next/navigation';
-import { useFetchData } from "@/hooks/useFetchData"
 
-
-export default function MarketTemplate() {
+export default function MarketContainer() {
     const params = useParams();
     const { id } = params;
     const {
         data: classData,
         isLoading: isClassDataLoading,
         isError: isClassDataError,
-      } = useFetchData(`/api/classData/${id}`);
+    } = useFetchData(`/api/classData/${id}`);
 
-    
+
     const [pickedItem, setPickedItem] = useState();
     const onDelete = (e) => {
         setPickedItem(e)
@@ -27,12 +26,11 @@ export default function MarketTemplate() {
 
     const nodeRef = useRef();
 
-    if (isClassDataLoading ) return <div>Loading data...</div>;
+    if (isClassDataLoading) return <div>Loading data...</div>;
     if (isClassDataError) return <div>Error loading data</div>;
 
 
     const { currencyName, itemList, currencyEmoji } = classData;
-
     return (
         <div className="flex justify-center">
             <div className=" min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
@@ -40,9 +38,9 @@ export default function MarketTemplate() {
                     {itemList?.map((a, i) =>
                     (
 
-                            <div key={i} className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a?.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} >
-                                <ItemCard data={a} currencyName={currencyName} onClick={onDelete} />
-                            </div>
+                        <div key={i} className={`m-[16px] w-[192px] flex justify-center items-center relative bg-orange-200 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)] rounded-lg ${a?.itemQuantity <= 0 ? "cursor-default" : "hover:scale-110 transition-all cursor-pointer"}`} >
+                            <ItemCard data={a} currencyName={currencyName} onClick={onDelete} />
+                        </div>
 
                     )
                     )}
@@ -52,8 +50,8 @@ export default function MarketTemplate() {
                         </svg>
                     </div>
                 </div>
-                <AddModal classId={id}/>
-                <DeleteModal pickedItem={pickedItem} currencyName={currencyName} currencyEmoji={currencyEmoji} classId={id}/>
+                <AddModal classId={id} />
+                <DeleteModal pickedItem={pickedItem} currencyName={currencyName} currencyEmoji={currencyEmoji} classId={id} />
             </div>
         </div>
     )

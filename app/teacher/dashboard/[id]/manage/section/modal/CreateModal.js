@@ -1,5 +1,3 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { mutate } from "swr";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 
 export default function CreateModal({ modalId, setModalId, onAccountToggle, onAccountCreate, isPending, nums, studentArr }) {
