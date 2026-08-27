@@ -8,7 +8,8 @@ export default function ModalTemplate({
   modalId,
   setModalId,
   children,
-  onClose
+  onClose,
+  className=""
 }) {
 
   const isOpen = modalId === id;
@@ -54,7 +55,7 @@ export default function ModalTemplate({
           <motion.div
             ref={modalRef}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl  min-w-[320px] shadow-xl"
+            className={`bg-white rounded-2xl min-w-[320px] max-w-[95vw] shadow-xl ${className}`}
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}

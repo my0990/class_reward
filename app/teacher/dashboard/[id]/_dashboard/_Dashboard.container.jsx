@@ -5,11 +5,11 @@ import { useMemo, useCallback, useState } from "react";
 import { calculateLevel } from "@/util/level/level.utils";
 import usePointInput from "@/hooks/dashboard/usePointInput";
 import { handlePoint } from "@/server-action/actions/class/handlePoint";
-import DashboardBtns from "./section/DashboardBtns";
-import StudentCardGrid from "./section/StudentCardGrid";
-import PointModal from "./widget/PointModal";
+import PointModal from "./components/point-modal/PointModal";
 import { toast, Toaster } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
+import StudentInfoCard from "./components/StudentInfoCard";
+
 
 export default function DashboardContainer({ classId }) {
   const [modalId, setModalId] = useState(null);
@@ -28,9 +28,6 @@ export default function DashboardContainer({ classId }) {
     error: studentsError,
     mutate: mutateStudentsData,
   } = useFetchData(classId ? `/api/students/${classId}` : null);
-
-
-
 
 
   // ✅ 변경: activeIdSet -> activeMap, activeStudents 추가
@@ -126,21 +123,63 @@ export default function DashboardContainer({ classId }) {
   }, [isSelectedAll, clearAll, selectAll]);
 
   const isLoading =
-    isClassLoading || isStudentsLoading 
+    isClassLoading || isStudentsLoading
 
   const isError =
-    isClassError || isStudentsError 
+    isClassError || isStudentsError
 
   if (isLoading) return <div>불러오는 중...</div>;
   if (isError) return <div>데이터 로드 실패</div>;
+
+  console.log(studentsData)
   const currencyName = classData?.currencyName ?? "원"
   const currencyEmoji = classData?.currencyEmoji ?? "💰"
   return (
 
     <div className="pt-0 flex justify-center mb-[48px]">
       <div className="w-[1410px] max-[1410px]:w-[1235px] max-[1235px]:w-[1060px] max-[1060px]:w-[885px] max-[885px]:w-[710px] max-[710px]:w-[535px] max-[535px]:w-[360px]">
-        <DashboardBtns {...{ handleToggleAll, studentsData, isSelectedAll, onSend, hasSelectedStudent, onTake, currencyName }} />
-        <StudentCardGrid {...{ studentsData, currencyEmoji, isStudentActive, toggleStudent, levelMap }} />
+        <div className="flex py-[16px] mr-[8px] justify-between">
+          <button
+            className="btn bg-orange-500 text-white ml-[8px]"
+            onClick={handleToggleAll}
+            disabled={studentsData.length === 0}
+          >
+            {isSelectedAll ? '모두 해제' : '모두 선택'}
+          </button>
+
+          <div>
+            <button
+              className="btn btn-success text-white mr-[16px]"
+              onClick={onSend}
+              disabled={!hasSelectedStudent}
+            >
+              {currencyName} 보내기
+            </button>
+
+            <button
+              className="btn bg-red-500 text-white"
+              onClick={onTake}
+              disabled={!hasSelectedStudent}
+            >
+              {currencyName} 빼앗기
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-wrap">
+          {studentsData.map((student) => {
+            const level = levelMap?.[student.userId] ?? 1
+            return (
+              <StudentInfoCard
+                key={student.userId}
+                data={student}
+                level={level}
+                currencyemoji={currencyEmoji}
+                isActive={isStudentActive(student)}
+                onClick={() => toggleStudent(student)}
+              />
+            )
+          })}
+        </div>
       </div>
       <PointModal id="HANDLE_POINT" toast={toast} clearAll={clearAll} isSend={isSend} handleClose={handleClose} activeIds={activeIds} modalId={modalId} setModalId={setModalId} display={display} actions={actions} />
       <Toaster position="bottom-right" />

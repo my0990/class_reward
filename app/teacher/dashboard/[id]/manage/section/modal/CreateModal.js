@@ -55,7 +55,7 @@ export default function CreateModal({ modalId, setModalId, onAccountToggle, onAc
 
           <button
             className="btn w-full bg-orange-300 hover:bg-orange-400 mt-[16px]"
-            onClick={() => onAccountCreate(close)}
+            onClick={() => onAccountCreate()}
             disabled={isPending('create')}
           >
             {isPending('create') ? "생성 중..." : "확인"}

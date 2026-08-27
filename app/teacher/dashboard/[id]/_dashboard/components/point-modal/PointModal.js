@@ -1,9 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { mutate } from "swr";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
-import usePointInput from "@/hooks/dashboard/usePointInput";
 import DialPad from "./DialPad";
 
 export default function PointModal({
@@ -22,15 +19,6 @@ export default function PointModal({
   return (
     <ModalTemplate id="HANDLE_POINT" modalId={modalId} setModalId={setModalId} onClose={()=>actions.clear()}>
       {({ close }) => {
-        // ✅ 숫자 입력 / 키보드 / activeKey / fontSize 는 hook이 담당
-
-
-        
-
-        // ✅ Enter 키로도 confirm이 되게: 훅이 onEnter를 지원한다면 아래처럼 연결 추천
-        // (usePointInput에서 onEnter(value)를 호출하도록 만들어두면 더 깔끔함)
-        // actions.setOnEnter?.(() => handleConfirm());
-
         return (
           <div
             className={`w-[320px] flex justify-center dark:bg-gray-400 ${

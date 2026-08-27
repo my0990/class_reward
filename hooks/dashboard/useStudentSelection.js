@@ -55,7 +55,6 @@ export default function useStudentSelection({ studentArr = [], setModalId }) {
 
     // ✅ 내부 구조가 필요하면
     activeMap,
-
     hasSelectedStudent,
     isSend,
     isSelectedAll,

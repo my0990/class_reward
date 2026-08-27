@@ -1,7 +1,7 @@
 import soldOut from "@/public/soldOut.png"
 import Image from "next/image";
 export default function ItemCard(props) {
-    // console.log(props.data)
+
     const { data } = props;
     function getByteB(str) {
         let byte = 0;
@@ -21,10 +21,10 @@ export default function ItemCard(props) {
     return (
         <div className={`p-[16px] w-[192px] h-[300px] font-bold rounded-lg relative`} onClick={() => props.onClick(data)}>
             {data.itemStock <= 0
-                ? <div className="absolute z-50 top-[60px]" >
+                ? <div className="absolute z-1 top-[60px]" >
                     <Image src={soldOut} alt="soldout"/>
                 </div>
-                : null}
+                : <div className={`${data.itemStock < 6 ? "text-red-500" : null} text-right`}>재고: {data.itemStock}</div>}
             <div className={`${data.itemStock <= 0 ? "opacity-30" : null}`}>
                 <div className="text-[130px] text-center leading-none">
                     {data.emoji}
