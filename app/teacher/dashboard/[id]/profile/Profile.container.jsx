@@ -1,7 +1,7 @@
 'use client'
-import UpdateProfileImgModal from "./section/modal/UpdateProfileImgModal";
-import AddProfileImgModal from "./section/modal/AddProfileImgModal";
-import ProfileCard from "./widget/profileCard";
+import UpdateProfileImgModal from "./components/modal/UpdateProfileImgModal";
+import AddProfileImgModal from "./components/modal/AddProfileImgModal";
+import ProfileCard from "./components/profileCard";
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";

@@ -1,7 +1,7 @@
 'use client'
 import { useFetchData } from "@/hooks/useFetchData";
-import ProfileImgModal from "./widget/ProfileImgModal";
-import TitleModal from "./widget/TitleModal";
+import ProfileImgModal from "./components/ProfileImgModal";
+import TitleModal from "./components/TitleModal";
 import { useState } from "react";
 import usePendingAction from "@/hooks/usePendingAction";
 import { selectProfileImg, selectProfileTitle } from "@/server-action/actions/profile/profile.action";

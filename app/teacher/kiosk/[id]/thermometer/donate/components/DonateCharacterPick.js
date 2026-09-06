@@ -5,7 +5,7 @@ import { useState } from "react";
 import { mutate } from "swr";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
-import CheckPwdModal from "./section/CheckPwdModal";
+import CheckPwdModal from "./CheckPwdModal";
 export default function DonateCharacterPick({ type, requestData, setRequestData }) {
     const params = useParams();
     const classId = params.id;

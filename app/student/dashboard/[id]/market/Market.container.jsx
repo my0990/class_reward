@@ -1,6 +1,6 @@
 'use client'
-import BuyModal from "./widget/buyModal";
-import ItemCard from "./widget/ItemCard"
+import BuyModal from "./components/buyModal";
+import ItemCard from "./components/ItemCard"
 import { useState, useRef } from "react"
 import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";

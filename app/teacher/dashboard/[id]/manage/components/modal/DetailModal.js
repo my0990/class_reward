@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { mutate } from "swr";
-import CardTemplate from "../../widget/card/CardTemplate";
+import CardTemplate from "../card/CardTemplate";
 import { useFetchData } from "@/hooks/useFetchData";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 

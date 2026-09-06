@@ -1,7 +1,7 @@
 'use client'
 
-import ProfileCard from "./widget/ProfileCard"
-import ProfileBuyModal from "./section/ProfileBuyModal";
+import ProfileCard from "./components/ProfileCard"
+import ProfileBuyModal from "./components/ProfileBuyModal";
 import { useState, useEffect } from "react";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";

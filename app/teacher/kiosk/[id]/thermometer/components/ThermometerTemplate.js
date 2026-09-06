@@ -2,7 +2,7 @@
 
 
 
-import ThermometerObject from "./widget/ThermometerObject";
+import ThermometerObject from "./ThermometerObject";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import usePendingAction from "@/hooks/usePendingAction";

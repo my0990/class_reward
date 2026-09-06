@@ -5,9 +5,9 @@ import { useFetchData } from "@/hooks/useFetchData";
 import { useRouter } from "next/navigation";
 import { createClass } from "@/server-action/actions/class/createClass";
 import { mutate } from "swr";
-import AddClassCard from "./_component/widget/AddClassCard";
-import ClassCard from "./_component/widget/ClassCard";
-import AddClassModal from "./_component/widget/AddClassModal";
+import AddClassCard from "./_component/components/AddClassCard";
+import ClassCard from "./_component/components/ClassCard";
+import AddClassModal from "./_component/components/AddClassModal";
 import { signOut } from "next-auth/react";
 export default function ClassesContainer() {
     const [modalId, setModalId] = useState(null);

@@ -3,10 +3,10 @@
 'use client';
 
 import { useFetchData } from "@/hooks/useFetchData";
-import AddModal from "./section/modal/AddModal";
-import DeleteModal from "./section/modal/DeleteModal";
+import AddModal from "./components/modal/AddModal";
+import DeleteModal from "./components/modal/DeleteModal";
 import { useState, useRef } from "react";
-import ItemCard from "./widget/ItemCard";
+import ItemCard from "./components/ItemCard";
 import { useParams } from "next/navigation";
 import { mutate } from "swr";
 import { createItem, deleteItem, updateItem } from "@/server-action/actions/market/market.action";

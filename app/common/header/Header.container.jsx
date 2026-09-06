@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
 import { teacherNav, studentNav } from "@/config/navConfig";
-import HomeBtn from "./section/HomeBtn";
-import HeaderNav from "./widget/HeaderNav";
-import UserInfo from "./widget/userInfo";
-import DropDown from "./widget/dropdown";
-import UserIcon from "./section/UserIcon";
+import HomeBtn from "./components/HomeBtn";
+import HeaderNav from "./components/HeaderNav";
+import UserInfo from "./components/userInfo";
+import DropDown from "./components/dropdown";
+import UserIcon from "./components/UserIcon";
 export default function HeaderContainer({ classId }) {
     const pathname = usePathname();
     // kiosk route면 헤더 숨김 (기존 로직 유지)

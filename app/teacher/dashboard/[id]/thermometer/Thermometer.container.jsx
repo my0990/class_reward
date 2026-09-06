@@ -1,8 +1,8 @@
 'use client'
 
 
-import SettingModal from "./section/SettingModal";
-import ThermometerObject from "./widget/ThermometerObject";
+import SettingModal from "./components/SettingModal";
+import ThermometerObject from "./components/ThermometerObject";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
@@ -10,8 +10,8 @@ import usePendingAction from "@/hooks/usePendingAction";
 import { updateManualDegree, updateThermometerSetting } from "@/server-action/actions/thermometer/thermometer.action";
 import { useFetchData } from "@/hooks/useFetchData";
 import { Toaster, toast } from "react-hot-toast";
-import TemperatureManageModal from "./section/TemperatureManageModal";
-// import DonationList from "./widget/DonationList";
+import TemperatureManageModal from "./components/TemperatureManageModal";
+// import DonationList from "./components/DonationList";
 // import { useState, useRef, useEffect } from 'react';
 // import Modal from "./Modal";
 // import HandleThermo from "./HandleThermo";

@@ -1,14 +1,14 @@
 'use client'
-import DeleteModal from "./section/modal/DeleteModal";
-import DetailModal from "./section/modal/DetailModal";
-import CreateModal from "./section/modal/CreateModal";
-import ResetModal from "./section/modal/ResetModal";
+import DeleteModal from "./components/modal/DeleteModal";
+import DetailModal from "./components/modal/DetailModal";
+import CreateModal from "./components/modal/CreateModal";
+import ResetModal from "./components/modal/ResetModal";
 import { useState, useMemo, useEffect, useCallback } from "react";
-import CreateUniqueNickname from "./section/CreateUniqueNickname";
+import CreateUniqueNickname from "./components/CreateUniqueNickname";
 import { useFetchData } from "@/hooks/useFetchData";
 
 import { useParams } from "next/navigation";
-import StudentGrid from "./section/studentGrid";
+import StudentGrid from "./components/studentGrid";
 import usePendingAction from "@/hooks/usePendingAction";
 import { Toaster, toast } from "react-hot-toast";
 

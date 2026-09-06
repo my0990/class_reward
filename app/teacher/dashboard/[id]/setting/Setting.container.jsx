@@ -1,13 +1,13 @@
 'use client'
 
-import ProfileSection from "./section/ProfileSection";
+import ProfileSection from "./components/ProfileSection";
 import { useState, useEffect } from "react"
 import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import usePendingAction from "@/hooks/usePendingAction";
 import { toast, Toaster } from "react-hot-toast";
-import PwdSection from "./section/PwdSection";
-import ClassSection from "./section/ClassSection";
+import PwdSection from "./components/PwdSection";
+import ClassSection from "./components/ClassSection";
 export default function SettingContainer() {
     const params = useParams();
     const classId = params.id;
