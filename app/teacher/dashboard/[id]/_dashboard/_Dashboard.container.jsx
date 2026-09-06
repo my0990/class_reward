@@ -17,24 +17,24 @@ export default function DashboardContainer({ classId }) {
     data: classData,
     isLoading: isClassLoading,
     isError: isClassError,
-    error: classError,
-    mutate: mutateClassData,
   } = useFetchData(classId ? `/api/classData/${classId}` : null);
 
+  // ✅ 포커스 복귀 시 재검증: 다른 탭/키오스크에서 같은 학생 잔액이 바뀐 뒤
+  // 이 화면으로 돌아왔을 때 스냅샷이 오래 남아있지 않도록 함
   const {
     data: studentsData = [],
     isLoading: isStudentsLoading,
     isError: isStudentsError,
-    error: studentsError,
     mutate: mutateStudentsData,
-  } = useFetchData(classId ? `/api/students/${classId}` : null);
+  } = useFetchData(classId ? `/api/students/${classId}` : null, {
+    revalidateOnFocus: true,
+  });
 
 
-  // ✅ 변경: activeIdSet -> activeMap, activeStudents 추가
   const {
-    activeIds,          // (선택) id만 필요하면 계속 사용 가능
-    activeStudents,     // ✅ [{userId, money}] 사용
-    activeMap,          // ✅ Map(userId -> money)
+    activeIds,             // 선택된 학생 userId 목록 (handleConfirm에서 최신 studentsData 조회에 사용)
+    activeStudentLabels,   // ✅ 확인 모달에 보여줄 "1번 홍길동" 형태 라벨
+    activeMap,             // ✅ Map(userId -> {money, classNumber, profileNickname})
     toggleStudent,
     selectAll,
     clearAll,
@@ -48,17 +48,27 @@ export default function DashboardContainer({ classId }) {
     setModalId,
   });
 
+  // ✅ point-modal 트리(PointModal/DialPad)는 이제 성공/실패 이후에 뭘 할지 몰라도 된다.
+  // 상태(선택된 학생, 모달, 목록)를 소유한 이 컨테이너가 성공/실패 처리를 전부 책임진다.
+  // - 실패(검증 실패 포함): throw -> DialPad가 잡아서 에러 토스트 표시, 입력값은 보존됨
+  // - 성공: 선택 해제 + 모달 닫기 + 목록 갱신 + 성공 토스트. 입력값은 usePointInput이 자동으로 비움
   const handleConfirm = useCallback(
     async (value) => {
-      if (!value) throw new Error("숫자를 입력해주세요")
-      if (!hasSelectedStudent) throw new Error("학생을 선택해주세요")
+      if (!value) throw new Error("숫자를 입력해주세요");
+      if (!hasSelectedStudent) throw new Error("학생을 선택해주세요");
 
-      // ✅ 변경: userId + money 같이 보냄
-      // (서버에서 before/after 기록하거나 검증할 때 유용)
-      const targetStudent = activeStudents.map((s) => ({
-        userId: s.userId,
-        money: s.money,
-      }));
+      // ✅ 선택 시점 스냅샷(activeStudents) 대신, 지금 화면이 갖고 있는 최신 studentsData에서
+      // money를 다시 조회해서 보낸다. 선택 이후 다른 탭/키오스크에서 잔액이 바뀌었더라도
+      // 서버에 기록되는 history balance가 그만큼 덜 어긋난다.
+      const studentById = new Map(studentsData.map((s) => [String(s.userId), s]));
+      const targetStudent = activeIds
+        .map((userId) => studentById.get(userId))
+        .filter(Boolean)
+        .map((s) => ({ userId: s.userId, money: s.money }));
+
+      if (targetStudent.length === 0) {
+        throw new Error("선택한 학생 정보를 찾을 수 없습니다. 새로고침 후 다시 시도해주세요.");
+      }
 
       const res = await handlePoint({
         classId,
@@ -68,19 +78,15 @@ export default function DashboardContainer({ classId }) {
       });
 
       if (!res?.success) {
-        alert(res?.message ?? "오류 발생");
-        return;
+        throw new Error(res?.message ?? "오류 발생");
       }
 
-      // ✅ 성공 후: 선택 해제 + 입력 초기화 + 모달 닫기(원하면)
       clearAll();
-      // actions.clear는 아래 훅 선언 이후라 여기선 직접 못 씀 (원하면 구조 바꿔줄게)
       setModalId(null);
-
-      // mutate(`/api/students/${classId}`);
       mutateStudentsData();
+      toast.success("완료");
     },
-    [activeStudents, hasSelectedStudent, isSend, classId, clearAll]
+    [activeIds, studentsData, hasSelectedStudent, isSend, classId, clearAll, mutateStudentsData]
   );
 
   const { display, actions } = usePointInput({
@@ -111,13 +117,6 @@ export default function DashboardContainer({ classId }) {
     return map;
   }, [studentsData, expTable.startExp, expTable.commonDifference]);
 
-  const handleClose = useCallback(
-    (close) => {
-      actions.clear?.();
-      close();
-    },
-    [actions]
-  );
   const handleToggleAll = useCallback(() => {
     isSelectedAll ? clearAll() : selectAll();
   }, [isSelectedAll, clearAll, selectAll]);
@@ -131,7 +130,6 @@ export default function DashboardContainer({ classId }) {
   if (isLoading) return <div>불러오는 중...</div>;
   if (isError) return <div>데이터 로드 실패</div>;
 
-  console.log(studentsData)
   const currencyName = classData?.currencyName ?? "원"
   const currencyEmoji = classData?.currencyEmoji ?? "💰"
   return (
@@ -181,7 +179,15 @@ export default function DashboardContainer({ classId }) {
           })}
         </div>
       </div>
-      <PointModal id="HANDLE_POINT" toast={toast} clearAll={clearAll} isSend={isSend} handleClose={handleClose} activeIds={activeIds} modalId={modalId} setModalId={setModalId} display={display} actions={actions} />
+      <PointModal
+        isSend={isSend}
+        currencyName={currencyName}
+        activeStudentLabels={activeStudentLabels}
+        modalId={modalId}
+        setModalId={setModalId}
+        display={display}
+        actions={actions}
+      />
       <Toaster position="bottom-right" />
     </div>
   );

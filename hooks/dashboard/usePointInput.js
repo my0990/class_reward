@@ -7,6 +7,12 @@ const BASE_FONT = 1.7;
 export default function usePointInput({ onEnter } = {}) {
   const [value, setValue] = useState("");
   const [activeKey, setActiveKey] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ✅ 중복 제출 방지: 버튼 클릭과 키보드 Enter가 둘 다 결국 이 submit()을 호출하므로,
+  // 잠금은 반드시 여기(공통 진입점)에 있어야 한다. DialPad 쪽에서만 막으면
+  // 키보드 Enter 연타는 그대로 뚫린다.
+  const isSubmittingRef = useRef(false);
 
   /* -------------------------------
      최신 value / onEnter 보존
@@ -43,18 +49,28 @@ export default function usePointInput({ onEnter } = {}) {
     setActiveKey("Backspace");
   };
 
-  // const submit = () => {
-  //   setActiveKey("Enter");
-  //   onEnterRef.current?.(valueRef.current);
-  // };
-  const submit = () => {
-    setActiveKey("Enter");
-    return onEnterRef.current?.(valueRef.current);
-  };
-
   const clear = () => {
     setValue("");
     setActiveKey(null);
+  };
+
+  // ✅ 성공 시에만 입력값을 자동으로 비움 (onEnter가 reject하면 clear() 호출 안 됨 -> 값 보존)
+  // ✅ 이미 처리 중이면 두 번째 호출은 조용히 무시 (버튼 연타 + 키보드 Enter 연타 모두 방어)
+  const submit = async () => {
+    if (isSubmittingRef.current) return;
+
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
+    setActiveKey("Enter");
+
+    try {
+      const result = await onEnterRef.current?.(valueRef.current);
+      clear();
+      return result;
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
+    }
   };
 
   /* -------------------------------
@@ -80,7 +96,9 @@ export default function usePointInput({ onEnter } = {}) {
       }
 
       if (e.key === "Enter") {
-        submit();
+        // 키보드 Enter는 DialPad의 try/catch를 거치지 않으므로,
+        // 실패 시 unhandled rejection만 막아준다 (에러 토스트는 버튼 클릭 경로에서만 표시됨).
+        submit().catch(() => {});
         return;
       }
     };
@@ -107,6 +125,7 @@ export default function usePointInput({ onEnter } = {}) {
       value,
       fontSize,
       activeKey,
+      isSubmitting,   // ✅ 버튼/키보드 어느 경로로 제출했든 동일하게 반영됨
     },
     actions: {
       onNumber: appendNumber,   // 숫자 버튼 클릭
