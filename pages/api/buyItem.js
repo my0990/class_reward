@@ -12,25 +12,53 @@ export default async function handler(req, res) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  // userId / classId / teacher_id는 클라이언트가 보낸 값을 신뢰하지 않고
-  // 서버가 들고 있는 로그인 토큰 값만 사용한다 (IDOR 방지).
-  if (!token?.user?.userId || !token?.user?.classId || !token?.user?.teacher_id) {
-    return res.status(401).json({ result: false, message: '로그인이 필요합니다.' });
-  }
-
   const { itemData } = req.body ?? {};
   if (!itemData?.itemId) {
     return res.status(400).json({ result: false, message: '잘못된 요청입니다.' });
   }
 
-  const userId = token.user.userId;
+  // 이 API는 두 가지 경로에서 호출된다.
+  //  1) 학생이 자기 계정으로 로그인해서 직접 구매 (student dashboard market)
+  //     → userId/classId/teacher_id를 클라이언트가 보낸 값이 아니라
+  //       서버가 들고 있는 로그인 토큰 값만 사용한다 (IDOR 방지).
+  //  2) 교사가 kiosk 기기에 로그인한 상태로 특정 학생을 대신 결제
+  //     (teacher/kiosk/[id]/buy) → 이 기기엔 학생 개별 로그인 세션이 없으므로
+  //     token은 교사 세션이고, userId/classId는 요청 본문에서 받는다.
+  //     대신 teacher_id는 반드시 토큰(로그인된 교사) 값만 쓰고, 아래에서
+  //     모든 DB 조회/수정을 teacher_id+classId로 다시 한 번 스코핑해서
+  //     이 교사 소유의 학급/학생이 아니면 절대 접근할 수 없게 막는다.
+  let teacher_id;
+  let classId;
+  let userId;
+
+  if (
+    token?.user?.role === 'student' &&
+    token?.user?.userId &&
+    token?.user?.classId &&
+    token?.user?.teacher_id
+  ) {
+    teacher_id = token.user.teacher_id;
+    classId = token.user.classId;
+    userId = token.user.userId;
+  } else if (token?.user?.role === 'teacher' && token?.user?.teacher_id) {
+    teacher_id = token.user.teacher_id;
+    classId = req.body?.classId;
+    userId = req.body?.userId;
+
+    if (!classId || !userId) {
+      return res.status(400).json({ result: false, message: '잘못된 요청입니다.' });
+    }
+  } else {
+    return res.status(401).json({ result: false, message: '로그인이 필요합니다.' });
+  }
+
   const ItemId = itemData.itemId;
 
   let teacherObjectId;
   let classObjectId;
   try {
-    teacherObjectId = ObjectId.createFromHexString(token.user.teacher_id);
-    classObjectId = ObjectId.createFromHexString(token.user.classId);
+    teacherObjectId = ObjectId.createFromHexString(teacher_id);
+    classObjectId = ObjectId.createFromHexString(classId);
   } catch {
     return res.status(400).json({ result: false, message: '잘못된 학급 정보입니다.' });
   }
@@ -59,7 +87,7 @@ export default async function handler(req, res) {
       }
 
       const studentData = await db.collection('user_data').findOne(
-        { userId, role: 'student' },
+        { userId, role: 'student', teacher_id: teacherObjectId, classId: classObjectId },
         { session }
       );
       if (!studentData) {
@@ -90,7 +118,7 @@ export default async function handler(req, res) {
 
       // 잔액이 충분할 때만 원자적으로 차감 (동시 요청에 의한 이중 지출 방지)
       const moneyUpdate = await db.collection('user_data').updateOne(
-        { userId, role: 'student', money: { $gte: price } },
+        { userId, role: 'student', teacher_id: teacherObjectId, classId: classObjectId, money: { $gte: price } },
         {
           $push: {
             itemList: {
