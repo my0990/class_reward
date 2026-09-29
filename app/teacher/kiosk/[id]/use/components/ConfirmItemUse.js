@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
+import { useItem } from "@/server-action/actions/item/item.action";
 export default function ConfirmItemUse({ itemData, userData, classId }) {
 
 
@@ -19,27 +20,21 @@ export default function ConfirmItemUse({ itemData, userData, classId }) {
             return
         } else {
             setIsLoading(true)
-            fetch("/api/useItem", {
-                method: "POST",
-                // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemName, userId: userId, balance: money, itemId: itemId, classId: classId }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }).then((res) => res.json()).then((data) => {
+            useItem({ itemName, userId, itemId, classId }).then((data) => {
 
-                if (data.result === true) {
+                if (data?.result === true) {
                     alert('아이템을 사용하였습니다')
-
-
-                } else if (data.message === '아이템이 존재하지 않음') {
-                    alert(data.message);
-
+                } else {
+                    alert(data?.message || '아이템 사용에 실패했습니다.');
                 }
                 mutate(
                     `/api/students/${classId}`,
                 );
                 route.push(`/teacher/kiosk/${classId}`);
+                setIsLoading(false);
+            }).catch((error) => {
+                console.error(error);
+                alert('네트워크 오류가 발생했습니다.');
                 setIsLoading(false);
             })
         }

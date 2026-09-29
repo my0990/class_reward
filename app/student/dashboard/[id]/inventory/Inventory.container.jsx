@@ -4,6 +4,7 @@ import { useFetchData } from "@/hooks/useFetchData";
 import { useState, useEffect } from "react";
 import { mutate } from "swr";
 import { useParams } from "next/navigation";
+import { useItem } from "@/server-action/actions/item/item.action";
 
 const EMPTY_DETAIL = {
     itemName: null,
@@ -59,32 +60,23 @@ export default function InventoryContainer() {
         setIsLoading(true);
 
         try {
-            const res = await fetch("/api/useItem", {
-
-                method: "POST",
-                body: JSON.stringify({
-                    itemName: itemDetail.itemName,
-                    userId,
-                    itemId: itemDetail.itemId,
-                    balance: money,
-                    classId: id
-                }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            const data = await useItem({
+                itemName: itemDetail.itemName,
+                itemId: itemDetail.itemId,
+                classId: id,
             });
 
-            const data = await res.json();
-
-            if (data.result === true) {
-                mutate(
-                    "/api/user",
-
-                );
+            if (data?.result === true) {
+                mutate("/api/user");
 
                 alert(`${itemDetail.itemName} 아이템을 사용하였습니다`);
                 setItemDetail(EMPTY_DETAIL);
+            } else {
+                alert(data?.message || '아이템 사용에 실패했습니다.');
             }
+        } catch (error) {
+            console.error(error);
+            alert('네트워크 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
         }

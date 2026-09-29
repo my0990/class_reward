@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
+import { useItem } from "@/server-action/actions/item/item.action";
 
 export default function FinishBuyModal({ requestData, fetchItemId, classId }) {
     const { itemName, itemPrice } = requestData.itemData;
@@ -14,16 +15,9 @@ export default function FinishBuyModal({ requestData, fetchItemId, classId }) {
             return
         } else {
             setIsLoading(true)
-            fetch("/api/useItem", {
-                method: "POST",
-                // itemName, userId, itemId, teacher, userName, itemPrice
-                body: JSON.stringify({ itemName: itemName, userId: userId, balance: money - itemPrice, itemId: fetchItemId, classId: classId }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }).then((res) => res.json()).then((data) => {
+            useItem({ itemName, userId, itemId: fetchItemId, classId }).then((data) => {
 
-                if (data.result === true) {
+                if (data?.result === true) {
                     alert('아이템을 사용하였습니다');
                     mutate(
                         `/api/students/${classId}`,
@@ -31,8 +25,13 @@ export default function FinishBuyModal({ requestData, fetchItemId, classId }) {
                     );
                     route.push(`/teacher/kiosk/${classId}`)
                 } else {
+                    alert(data?.message || '아이템 사용에 실패했습니다.');
                     setIsLoading(false)
                 }
+            }).catch((error) => {
+                console.error(error);
+                alert('네트워크 오류가 발생했습니다.');
+                setIsLoading(false);
             })
         }
 

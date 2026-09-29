@@ -8,6 +8,7 @@ import usePendingAction from "@/hooks/usePendingAction";
 import { toast, Toaster } from "react-hot-toast";
 import PwdSection from "./components/PwdSection";
 import { updateProfile, updatePassword } from "@/server-action/actions/setting/setting.action";
+import { updateCurrencyName } from "@/server-action/actions/class/classSetting.action";
 import ClassSection from "./components/ClassSection";
 export default function SettingContainer() {
     const params = useParams();
@@ -118,17 +119,24 @@ export default function SettingContainer() {
 
     const onCurrencySubmit = (e) => {
         e.preventDefault();
-        fetch("/api/setCurrencyName", {
-            method: "POST",
-            body: JSON.stringify({ data: currencyData, classId: classId }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then((res) => res.json()).then((data) => {
-            if (data.result === true) {
+        runAction("updateCurrencyName", async () => {
+            const data = await updateCurrencyName({
+                classId,
+                currencyName: currencyData.currencyName,
+                currencyEmoji: currencyData.currencyEmoji,
+            });
+
+            if (data?.result === true) {
                 mutateClassData();
                 toast.success('화폐 설정을 변경하였습니다')
+            } else {
+                toast.error(data?.message || '화폐 설정 변경에 실패했습니다.')
             }
+        }, {
+            onError: (error) => {
+                console.error(error);
+                toast.error('화폐 설정 변경에 실패했습니다.')
+            },
         })
     }
     const isLoading =
