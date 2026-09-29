@@ -1,5 +1,4 @@
 import CharacterCard from "./CharacterCard"
-import DonateAmountModal from "./DonateAmountModal";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate } from "swr";
@@ -79,7 +78,6 @@ export default function DonateCharacterPick({ type, requestData, setRequestData 
                     </div>
                 </div>
             </div>
-            {/* <DonateAmountModal type={type} requestData={requestData} setRequestData={setRequestData} /> */}
             <CheckPwdModal type={type} requestData={requestData} setRequestData={setRequestData} />
         </div>
 
