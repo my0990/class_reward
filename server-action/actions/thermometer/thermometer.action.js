@@ -9,6 +9,12 @@ export async function updateThermometerSetting({ rewardObj, requireCurrency, cla
     const session = await getServerSession(authOptions);
     const teacher_id = session?.user?._id ?? null;
 
+    if (!teacher_id) {
+      return {
+        result: false,
+        message: "로그인이 필요합니다.",
+      };
+    }
 
     const response = await updateThermometerSettingService({
       teacher_id: teacher_id,

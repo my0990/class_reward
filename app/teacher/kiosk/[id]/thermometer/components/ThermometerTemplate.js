@@ -1,109 +1,23 @@
 'use client'
 
+import ThermometerObject from "@/components/thermometer/ThermometerObject";
+import { useParams, useRouter } from "next/navigation";
+import { Toaster } from "react-hot-toast";
+import { useThermometerBoard } from "@/hooks/thermometer/useThermometerBoard";
 
-
-import ThermometerObject from "./ThermometerObject";
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import usePendingAction from "@/hooks/usePendingAction";
-import { updateManualDegree, updateThermometerSetting } from "@/server-action/actions/thermometer/thermometer.action";
-import { useFetchData } from "@/hooks/useFetchData";
-import { Toaster, toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 export default function ThermometerTemplate({ }) {
-
     const route = useRouter();
-    const { runAction, isPending } = usePendingAction();
     const params = useParams();
     const classId = params.id;
-    const { data: thermometerData, isLoading: isThermometerDataLoading, isError: isThermometerDataError, mutate: mutateThermometerData, } = useFetchData(`/api/thermometer/${classId}`);
-    const [modalId, setModalId] = useState(null);
-    const [rewardObj, setRewardObj] = useState({});
-    const [requireCurrency, setRequireCurrency] = useState("");
-    const [type, setType] = useState(null);
-    const DEFAULT_REWARD_OBJ = {
-        10: "",
-        20: "",
-        30: "",
-        40: "",
-        50: "",
-        60: "",
-        70: "",
-        80: "",
-        90: "",
-        100: "",
-    };
 
-    // ⭐ 핵심: 기본값 + 서버값 merge
-    useEffect(() => {
-        if (!thermometerData) return
-        setRewardObj({
-            ...DEFAULT_REWARD_OBJ,
-            ...initialRewardObj
-        });
-        setRequireCurrency(initialRequireCurrency);
-    }, [thermometerData]);
-
-    // 값 변경
-    const onRewardInputChange = (degree, value) => {
-        setRewardObj((prev) => ({
-            ...prev,
-            [degree]: value,
-        }));
-    };
-
-    const onUpdateTemperatureSetting = async () => {
-
-
-        runAction("updateThermoSetting", async () => {
-            const data = await updateThermometerSetting({ classId, rewardObj, requireCurrency });
-
-            if (!data.result) {
-                toast.error(data.message || "수정 실패");
-                // alert('실패')
-                setModalId(null)
-                return;
-            }
-            // alert('성공')
-            await mutateThermometerData?.();
-            setModalId(null)
-            toast.success("수정 완료");
-        })
-    }
-
-    const onUpdateDegree = async ({ degreeChange, type }) => {
-        runAction("updateDegree", async () => {
-            const data = await updateManualDegree({ classId, type, degreeChange });
-
-            if (!data.result) {
-                toast.error(data.message || "수정 실패");
-                // alert('실패')
-                setModalId(null)
-                return;
-            }
-            // alert('성공')
-            await mutateThermometerData?.();
-            setModalId(null)
-            if (type === "increase") {
-                toast.success("온도를 올렸습니다")
-            } else {
-                toast.success("온도를 내렸습니다")
-            }
-        })
-
-    }
-
-    const onManageModalOpen = (type) => {
-        setType(type)
-        setModalId("HANDLE_TEMPERATURE")
-    }
-    const isLoading =
-        isThermometerDataLoading
-
-
-    const isError =
-        isThermometerDataError
-
+    const {
+        thermometerData,
+        isLoading,
+        isError,
+        requireCurrency,
+        classDegree,
+        ranking,
+    } = useThermometerBoard(classId);
 
     if (isLoading) {
         return <div>불러오는 중...</div>;
@@ -113,19 +27,6 @@ export default function ThermometerTemplate({ }) {
         return <div>데이터 로드 실패</div>;
     }
 
-    const initialRequireCurrency = thermometerData.requireCurrency;
-    const initialRewardObj = thermometerData.reward;
-
-
-    const classDegree = thermometerData.manualDegree;
-
-    const ranking = Object.entries(thermometerData?.donators)
-        .sort(([, a], [, b]) => b - a)
-        .map(([userId, amount], index) => ({
-            rank: index + 1,
-            userId,
-            amount,
-        }));
     return (
         <div className="flex justify-center ">
             <div className="w-full max-w-6xl rounded-[28px] border border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.08)] md:p-8">
@@ -155,9 +56,6 @@ export default function ThermometerTemplate({ }) {
                         <button onClick={() => route.push(`/teacher/kiosk/${classId}/thermometer/donate`)} className="rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600">
                             기부하기
                         </button>
-                        {/* <button onClick={() => onManageModalOpen("decrease")} className="rounded-xl bg-white px-4 py-3 text-sm font-bold text-orange-600 ring-1 ring-orange-200 transition hover:bg-orange-50">
-                            온도 내리기
-                        </button> */}
                     </div>
                 </div>
 

@@ -10,38 +10,41 @@ export default function CheckPwdModal({ type, requestData, setRequestData }) {
         document.getElementById('my_modal_3').close()
 
     }
-    const onClick = (e) => {
+    const onClick = async (e) => {
         if (isLoading) {
-            return
-        } else {
-            setIsLoading(true)
-            fetch("/api/checkPwd", {
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const res = await fetch("/api/checkPwd", {
                 method: "POST",
                 body: JSON.stringify({ userId: requestData.userData.userId, userPwd: pwdRef.current.value }),
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }).then((res) => res.json()).then((data) => {
+            });
 
-                if (data.result === true) {
-                    if (type === "buy") {
-                        setRequestData(prev => ({...prev, step: "confirmItemBuy"}))
-                    } else if(type === "use") {
-                        setRequestData(prev => ({...prev, step: "confirmItemUse"}))
-                    } else {
-                        setRequestData(prev => ({...prev, step: "SELECT_AMOUNT"}))
-                    }
+            const data = await res.json();
 
-
+            if (data.result === true) {
+                if (type === "buy") {
+                    setRequestData(prev => ({ ...prev, step: "confirmItemBuy" }))
+                } else if (type === "use") {
+                    setRequestData(prev => ({ ...prev, step: "confirmItemUse" }))
                 } else {
-                    alert('비밀번호를 확인해주세요')
-                    pwdRef.current.value = ""
-                    setIsLoading(false)
-                    // onCloseModal()
+                    setRequestData(prev => ({ ...prev, step: "SELECT_AMOUNT" }))
                 }
-            })
+            } else {
+                alert(data.message || '비밀번호를 확인해주세요');
+                pwdRef.current.value = "";
+            }
+        } catch (error) {
+            alert('비밀번호 확인 중 오류가 발생했습니다.');
+        } finally {
+            setIsLoading(false);
         }
-
     }
     const pwdRef = useRef();
     useEffect(() => {
