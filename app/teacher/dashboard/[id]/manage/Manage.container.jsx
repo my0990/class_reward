@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import StudentGrid from "./components/studentGrid";
 import usePendingAction from "@/hooks/usePendingAction";
 import { Toaster, toast } from "react-hot-toast";
+import { ManageProvider } from "./components/ManageContext";
 
 import { createStudentAccount, deleteStudentAccount, resetPwd } from "@/server-action/actions/account/account.action";
 export default function ManageContainer() {
@@ -31,7 +32,6 @@ export default function ManageContainer() {
         data: classData,
         isLoading: isClassLoading,
         isError: isClassError,
-        error: classError,
         mutate: mutateClassData,
     } = useFetchData(classId ? `/api/classData/${classId}` : null);
 
@@ -39,7 +39,6 @@ export default function ManageContainer() {
         data: studentsData = [],
         isLoading: isStudentsLoading,
         isError: isStudentsError,
-        error: studentsError,
         mutate: mutateStudentsData,
     } = useFetchData(classId ? `/api/students/${classId}` : null);
 
@@ -153,35 +152,58 @@ export default function ManageContainer() {
 
     if (isLoading) return <div>불러오는 중...</div>;
     if (isError) return <div>데이터 로드 실패</div>;
-
+    // ✅ 로딩/에러 둘 다 아니어도 classData 자체가 없을 수 있음(예: 학급이 삭제된 경우) —
+    // 방어 없이 바로 destructure하면 여기서 렌더링이 통째로 크래시남
+    if (!classData) return <div>학급 정보를 찾을 수 없습니다.</div>;
 
     const { currencyEmoji, currencyName, expTable } = classData;
     const { startExp, commonDifference } = expTable;
+
+    // ✅ manage 트리 전체(StudentGrid + 모달 4개)가 공유하는 상태/액션을 한 곳에 모음.
+    // 각 자식은 이제 이 중 필요한 것만 useManageContext()로 꺼내 쓰고, 컨테이너는
+    // 모달마다 다른 조합의 props를 일일이 릴레이하지 않는다.
+    const manageContextValue = {
+        modalId,
+        setModalId,
+        picked,
+        studentArr,
+        nums,
+        currencyEmoji,
+        currencyName,
+        startExp,
+        commonDifference,
+        studentsData,
+        isPending,
+        onAccountToggle,
+        onAccountCreate,
+        onAccountDelete,
+        onPwdReset,
+        onResetClick,
+        onDetailClick,
+        onDeleteClick,
+    };
+
     return (
-        <div>
+        <ManageProvider value={manageContextValue}>
             <div>
                 <div>
-                    {classData?.uniqueNickname
-                        ? <div className="overflow-x-auto">
-                            <div className="text-end">
-                                <button className="border-2 bg-orange-300 rounded-lg p-[8px] cursor-pointer border-none font-bold hover:bg-orange-400" onClick={onCreateAccountclick}>계정 생성</button>
+                    <div>
+                        {classData?.uniqueNickname
+                            ? <div className="overflow-x-auto">
+                                <div className="text-end">
+                                    <button className="border-2 bg-orange-300 rounded-lg p-[8px] cursor-pointer border-none font-bold hover:bg-orange-400" onClick={onCreateAccountclick}>계정 생성</button>
+                                </div>
+                                <StudentGrid />
                             </div>
-                            <StudentGrid {...{ currencyEmoji, currencyName, studentsData, onDetailClick, onResetClick, onDeleteClick }} />
-                        </div>
-                        : <CreateUniqueNickname classId={classId} />}
+                            : <CreateUniqueNickname classId={classId} />}
+                    </div>
                 </div>
+                <CreateModal />
+                <DeleteModal />
+                <ResetModal />
+                <DetailModal />
+                <Toaster position="bottom-right" />
             </div>
-            <CreateModal {...{ modalId, setModalId, onAccountToggle, onAccountCreate, isPending, nums, studentArr }} />
-            <DeleteModal {...{ picked, modalId, setModalId, onAccountDelete, isPending }} />
-            <ResetModal {...{ picked, modalId, setModalId, onPwdReset }} />
-            <DetailModal {...{
-                picked,
-                startExp,
-                commonDifference,
-                modalId,
-                setModalId,
-            }} />
-            <Toaster position="bottom-right" />
-        </div>
+        </ManageProvider>
     )
 }

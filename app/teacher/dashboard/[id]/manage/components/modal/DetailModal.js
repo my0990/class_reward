@@ -3,6 +3,7 @@ import { mutate } from "swr";
 import CardTemplate from "../card/CardTemplate";
 import { useFetchData } from "@/hooks/useFetchData";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
+import { useManageContext } from "../ManageContext";
 
 function formatDate(dateString) {
   if (!dateString) return "-";
@@ -24,13 +25,8 @@ function getAmountText(type, amount) {
   return `${type === "입금" ? "+" : "-"}${amount}`;
 }
 
-export default function DetailModal({
-  picked,
-  startExp,
-  commonDifference,
-  modalId,
-  setModalId,
-}) {
+export default function DetailModal() {
+  const { picked, startExp, commonDifference, modalId, setModalId } = useManageContext();
   const [rotation, setRotation] = useState(0);
 
   const userId = picked?.userId;

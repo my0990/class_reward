@@ -1,8 +1,8 @@
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
+import { useManageContext } from "../ManageContext";
 
-export default function CreateModal({ modalId, setModalId, onAccountToggle, onAccountCreate, isPending, nums, studentArr }) {
-
-
+export default function CreateModal() {
+  const { modalId, setModalId, onAccountToggle, onAccountCreate, isPending, nums, studentArr } = useManageContext();
 
   return (
     <ModalTemplate id="CREATE_ACCOUNT" modalId={modalId} setModalId={setModalId}>

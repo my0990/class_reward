@@ -104,9 +104,23 @@ export async function deleteStudentAccountService({ student, classNumber, teache
   const db = (await connectDB).db('user');
   const db2 = (await connectDB).db('data')
 
-  const response = await db.collection('users').deleteOne({ userId: student })
-  const response2 = await db2.collection('user_data').deleteOne({ userId: student })
+  // ✅ teacher_id/classId로 범위를 제한해서 이 교사가 실제 담임인 학생만 지울 수 있게 한다.
+  // (이전엔 userId만으로 매칭해서, 원리적으로는 다른 교사의 학생 계정도 지울 수 있었음.
+  //  바로 아래 resetPwdService는 이미 이렇게 스코핑되어 있었음)
+  const response = await db.collection('users').deleteOne({
+    userId: student,
+    teacher_id: teacherObjectId,
+    classId: classObjectId,
+  })
+  const response2 = await db2.collection('user_data').deleteOne({
+    userId: student,
+    teacher_id: teacherObjectId,
+    classId: classObjectId,
+  })
 
+  if (response.deletedCount === 0 && response2.deletedCount === 0) {
+    throw new Error("해당 학생 계정을 찾을 수 없거나 삭제 권한이 없습니다.")
+  }
 
   let newKey = "studentAccounts." + classNumber
 

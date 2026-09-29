@@ -1,23 +1,16 @@
+import { calculateLevel } from "@/util/level/level.utils";
+
 export default function CardTemplate({ picked, startExp, commonDifference }) {
 
-    const findLargestSumUnderTarget = () => {
-        if(picked){
-            let k = Math.floor((-2 * startExp + commonDifference + Math.sqrt((2 * startExp - commonDifference) ** 2 + 8 * commonDifference * picked.exp)) / (2 * commonDifference));
-            let sumK = (k / 2) * (2 * startExp + (k - 1) * commonDifference);
-
-        if(sumK > picked.exp){
-            return k
-        } else {
-            return k+1
-        }
-    }
-    };
+    const level = picked
+        ? calculateLevel({ exp: picked.exp, startExp, commonDifference })
+        : null;
 
     return (
         <div className="w-[352px] h-[500px] bg-orange-200 p-[16px] rounded-xl">
             <div >
                 <div className="flex items-center relative">
-                    <div className="w-[50px] h-[50px] rounded-full bg-white border-4 border-orange-400 z-50 flex justify-center items-center font-bold">lv {picked && findLargestSumUnderTarget()}</div>
+                    <div className="w-[50px] h-[50px] rounded-full bg-white border-4 border-orange-400 z-50 flex justify-center items-center font-bold">lv {level}</div>
                     <div className=" h-[40px] bg-white absolute left-[30px] border-4 border-orange-400 rounded-xl pl-[24px] pr-[16px] font-bold flex items-center">{picked?.profileNickname}</div>
                 </div>
             </div>

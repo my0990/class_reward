@@ -12,19 +12,23 @@ export default function CreateUniqueNickname({classId}) {
             return
         } else {
             setIsLoading(true);
-            if (ref.current.value === '') {
+            // ✅ 앞뒤 공백 제거: 한번 생성하면 수정이 불가능한 필드라서,
+            // 공백이 그대로 들어가면 학생 로그인 아이디에 영구히 공백이 박힘
+            const value = ref.current.value.trim();
+
+            if (value === '') {
 
                 setError("아무것도 입력되어 있지 않습니다")
                 setIsLoading(false);
                 return
-            } else if (/\d/.test(ref.current.value)) {
+            } else if (/\d/.test(value)) {
                 setError("숫자는 입력할 수 없습니다")
                 setIsLoading(false);
                 return
             }
             fetch("/api/checkUniqueNickname", {
                 method: "POST",
-                body: JSON.stringify({ uniqueNickname: ref.current.value, classId: classId }),
+                body: JSON.stringify({ uniqueNickname: value, classId: classId }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -34,9 +38,14 @@ export default function CreateUniqueNickname({classId}) {
                     alert('고유 별명을 등록하였습니다.')
                     mutate(`/api/classData/${classId}`)
                 } else {
-                    setError(ref.current.value + '은(는) 이미 존재하는 별명입니다.')
+                    setError(data.error || (value + '은(는) 이미 존재하는 별명입니다.'))
                     setIsLoading(false);
                 }
+            }).catch(() => {
+                // ✅ 네트워크 오류나 서버가 JSON이 아닌 응답을 줬을 때(res.json() 실패 포함)
+                // isLoading이 계속 true로 남아 "확인" 버튼이 영원히 막히는 문제를 방지
+                setError("요청 중 오류가 발생했습니다. 다시 시도해주세요.")
+                setIsLoading(false);
             })
         }
 

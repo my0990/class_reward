@@ -1,5 +1,11 @@
-export default function StudentGrid({currencyEmoji, currencyName, studentsData, onDetailClick, onResetClick, onDeleteClick}) {
-    return(
+"use client";
+
+import { useManageContext } from "./ManageContext";
+
+export default function StudentGrid() {
+    const { currencyEmoji, currencyName, studentsData, onDetailClick, onResetClick, onDeleteClick } = useManageContext();
+
+    return (
         <table className="table text-[1.2rem]">
         {/* head */}
         <thead>
