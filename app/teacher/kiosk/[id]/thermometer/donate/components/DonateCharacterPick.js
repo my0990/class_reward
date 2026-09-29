@@ -1,6 +1,6 @@
 import CharacterCard from "./CharacterCard"
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { mutate } from "swr";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
@@ -8,6 +8,14 @@ import CheckPwdModal from "./CheckPwdModal";
 export default function DonateCharacterPick({ type, requestData, setRequestData }) {
     const params = useParams();
     const classId = params.id;
+
+    // 키오스크는 장시간 켜둔 채로 여러 학생을 처리하므로,
+    // 다른 기기(교사 대시보드 등)에서 잔액이 바뀌어도 화면이 갱신되지 않아
+    // 실제로는 잔액이 부족한데도 화면엔 충분한 것처럼 보일 수 있다.
+    // 이 화면에 진입할 때마다 최신 잔액을 다시 가져온다.
+    useEffect(() => {
+        mutate(`/api/students/${classId}`);
+    }, [classId]);
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
     const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = useFetchData(`/api/students/${classId}`);
     const route = useRouter();
