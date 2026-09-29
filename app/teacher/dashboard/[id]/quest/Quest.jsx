@@ -5,11 +5,14 @@ import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
 import QuestCard from "./components/QuestCard";
 import AddQuestModal from "./components/modal/AddQuestModal";
+import QuestDetailTemplate from "./components/detail/QuestDetailTemplate";
 
 export default function Quest() {
     const params = useParams();
     const classId = params.id;
     const [modalId, setModalId] = useState(null);
+    const [isDetail, setIsDetail] = useState(false);
+    const [questDetailData, setQuestDetailData] = useState(null);
 
     const {
         data: questListData,
@@ -81,6 +84,20 @@ export default function Quest() {
         setIsDetail(true);
     };
 
+    if (isDetail && questDetailData) {
+        return (
+            <QuestDetailTemplate
+                classData={classData}
+                studentData={studentData}
+                classId={classId}
+                role="teacher"
+                questDetailData={questDetailData}
+                setQuestDetailData={setQuestDetailData}
+                setIsDetail={setIsDetail}
+            />
+        );
+    }
+
     return (
         <main className="flex justify-center">
             <section
@@ -137,6 +154,7 @@ export default function Quest() {
                                 data={quest}
                                 classId={classId}
                                 studentCount={studentCount}
+                                role="teacher"
                                 onDetail={onOpenQuestDetail}
                             />
                         ))
