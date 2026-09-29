@@ -164,3 +164,30 @@ export async function resetPwdService({ student, teacher_id, classId }) {
   };
 }
 
+export async function checkUniqueNicknameService({ teacher_id, classId, uniqueNickname }) {
+
+  if (!uniqueNickname || !uniqueNickname.trim()) {
+    throw new Error("별명을 입력해주세요.");
+  }
+
+  const classObjectId = ObjectId.createFromHexString(classId);
+  const teacherObjectId = ObjectId.createFromHexString(teacher_id);
+
+  const db = (await connectDB).db("data");
+
+  const checkExisting = await db.collection('class_data').findOne({ uniqueNickname });
+
+  if (checkExisting) {
+    throw new Error("이미 가입된 계정이에요!");
+  }
+
+  await db.collection('class_data').updateOne(
+    {
+      teacher_id: teacherObjectId,
+      classId: classObjectId,
+    },
+    { $set: { uniqueNickname } },
+    { upsert: true })
+
+  return { result: true, message: '닉네임 등록 성공' };
+}

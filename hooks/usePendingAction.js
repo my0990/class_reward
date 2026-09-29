@@ -37,9 +37,14 @@ export default function usePendingAction() {
    * runAction("saveProfile", fn)
    * runAction("deleteStudent", id, fn)
    */
-  const runAction = useCallback(async (action, idOrFn, maybeFn, options = {}) => {
-    const id = typeof idOrFn === "function" ? undefined : idOrFn;
-    const fn = typeof idOrFn === "function" ? idOrFn : maybeFn;
+  const runAction = useCallback(async (action, idOrFn, maybeFnOrOptions, maybeOptions) => {
+    // 지원하는 두 가지 호출 형태:
+    //   runAction(action, fn, options?)          - id가 필요 없는 액션
+    //   runAction(action, id, fn, options?)       - id로 구분해야 하는 액션
+    const hasId = typeof idOrFn !== "function";
+    const id = hasId ? idOrFn : undefined;
+    const fn = hasId ? maybeFnOrOptions : idOrFn;
+    const options = (hasId ? maybeOptions : maybeFnOrOptions) ?? {};
 
     const { onSuccess, onError } = options;
 

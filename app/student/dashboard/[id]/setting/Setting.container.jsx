@@ -8,6 +8,7 @@ import ProfileImgSettingModal from "./components/ProfileImgSettingModal";
 import usePendingAction from "@/hooks/usePendingAction";
 import { toast, Toaster } from "react-hot-toast";
 import PwdSection from "./components/PwdSection";
+import { updateProfile, updatePassword } from "@/server-action/actions/setting/setting.action";
 
 export default function SettingContainer() {
     const params = useParams();
@@ -53,16 +54,9 @@ export default function SettingContainer() {
     const onSubmit = async (e) => {
         e.preventDefault();
         runAction("editProfile", async () => {
-            const res = await fetch("/api/profileEdit", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
-            const data = await res.json();
-            if (!res.ok || !data.result) {
-                throw new Error(data.message || "프로필 수정에 실패했습니다.");
+            const data = await updateProfile(formData);
+            if (!data?.result) {
+                throw new Error(data?.message || "프로필 수정에 실패했습니다.");
             } else {
                 mutateUserData();
                 toast.success("프로필을 수정하였습니다")
@@ -101,27 +95,26 @@ export default function SettingContainer() {
             return
         }
 
-        fetch("/api/passwordEdit", {
-            method: "POST",
-            body: JSON.stringify(password),
-            headers: {
-                "Content-Type": "application/json",
+        runAction("changePassword", async () => {
+            const data = await updatePassword(password);
+
+            if (data?.result === true) {
+                alert('비밀번호를 변경하였습니다')
+                setError('')
+                setPassword({
+                    currentPassword: '',
+                    nextPassword: '',
+                    nextPasswordConfirm: ''
+                })
+            } else {
+                setError(data?.message || '비밀번호가 일치하지 않습니다.')
+            }
+        }, {
+            onError: (error) => {
+                console.error(error);
+                setError('요청 중 오류가 발생했습니다. 다시 시도해주세요.')
             },
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.result === true) {
-                    alert('비밀번호를 변경하였습니다')
-                    setError('')
-                    setPassword({
-                        currentPassword: '',
-                        nextPassword: '',
-                        nextPasswordConfirm: ''
-                    })
-                } else {
-                    setError('비밀번호가 일치하지 않습니다.')
-                }
-            })
     }
 
     const isLoading =

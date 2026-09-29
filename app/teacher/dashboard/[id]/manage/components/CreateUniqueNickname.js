@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef } from "react"
 import { mutate } from "swr";
+import { checkUniqueNickname } from "@/server-action/actions/account/account.action";
 export default function CreateUniqueNickname({classId}) {
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -26,13 +27,7 @@ export default function CreateUniqueNickname({classId}) {
                 setIsLoading(false);
                 return
             }
-            fetch("/api/checkUniqueNickname", {
-                method: "POST",
-                body: JSON.stringify({ uniqueNickname: value, classId: classId }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }).then((res) => res.json()).then((data) => {
+            checkUniqueNickname({ uniqueNickname: value, classId: classId }).then((data) => {
 
                 if (data.result === true) {
                     alert('고유 별명을 등록하였습니다.')
@@ -42,7 +37,7 @@ export default function CreateUniqueNickname({classId}) {
                     setIsLoading(false);
                 }
             }).catch(() => {
-                // ✅ 네트워크 오류나 서버가 JSON이 아닌 응답을 줬을 때(res.json() 실패 포함)
+                // ✅ 네트워크 오류나 서버 액션 호출 자체가 실패했을 때
                 // isLoading이 계속 true로 남아 "확인" 버튼이 영원히 막히는 문제를 방지
                 setError("요청 중 오류가 발생했습니다. 다시 시도해주세요.")
                 setIsLoading(false);

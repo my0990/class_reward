@@ -1,5 +1,5 @@
 'use server'
-import { createStudentAccountService, deleteStudentAccountService, resetPwdService } from "@/server-action/service/account/account.service";
+import { createStudentAccountService, deleteStudentAccountService, resetPwdService, checkUniqueNicknameService } from "@/server-action/service/account/account.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function createStudentAccount({
@@ -96,6 +96,33 @@ export async function resetPwd({ student, classId }) {
     return {
       result: false,
       message: error.message || "계정 삭제 실패",
+    };
+  }
+}
+
+
+export async function checkUniqueNickname({ uniqueNickname, classId }) {
+  try {
+    const session = await getServerSession(authOptions);
+    const teacher_id = session?.user?._id ?? null;
+
+    if (!teacher_id) {
+      return { result: false, error: "로그인이 필요합니다." };
+    }
+
+    const response = await checkUniqueNicknameService({
+      teacher_id,
+      classId,
+      uniqueNickname,
+    });
+
+    return response;
+  } catch (error) {
+    console.error("checkUniqueNickname error:", error);
+
+    return {
+      result: false,
+      error: error.message || "별명 등록에 실패했습니다.",
     };
   }
 }
