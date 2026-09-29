@@ -1,8 +1,22 @@
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
+import { useMarketContext } from "../MarketContext";
 
-export default function DeleteModal({ onStockChange, modalId, isEdited, setModalId, pickedItem, onSetItemStock, itemStock, price, currencyEmoji, onItemPriceChange, onDeleteModalClose, onDeleteItem}) {
-
-
+export default function DeleteModal() {
+    const {
+        onStockChange,
+        modalId,
+        isEdited,
+        setModalId,
+        pickedItem,
+        onSetItemStock,
+        itemStock,
+        price,
+        currencyEmoji,
+        onItemPriceChange,
+        onDeleteModalClose,
+        onDeleteItem,
+        isPending,
+    } = useMarketContext();
 
     return (
         <ModalTemplate
@@ -13,6 +27,9 @@ export default function DeleteModal({ onStockChange, modalId, isEdited, setModal
             className="w-[520px]"
         >
             {({ close }) => (
+                // 닫힘 애니메이션 도중(모달이 닫힌 뒤 pickedItem이 초기화되는 짧은 구간)
+                // pickedItem이 null일 수 있으므로 방어적으로 렌더링을 건너뛴다.
+                !pickedItem ? null : (
                 <div className="relative max-w-[520px] min-[600px]:p-[24px] p-[16px] dark:bg-orange-200">
                     <button
                         type="button"
@@ -84,8 +101,11 @@ export default function DeleteModal({ onStockChange, modalId, isEdited, setModal
                                 onSubmit={onSetItemStock}
                                 className="w-[48%] max-[600px]:w-[100%]"
                             >
-                                <button className="w-[100%] bg-red-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] hover:bg-red-500">
-                                    수정
+                                <button
+                                    disabled={isPending("updateItem", pickedItem.itemId)}
+                                    className="w-[100%] bg-red-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] hover:bg-red-500 disabled:opacity-50"
+                                >
+                                    {isPending("updateItem", pickedItem.itemId) ? "수정 중..." : "수정"}
                                 </button>
                             </form>
                         ) : (
@@ -93,8 +113,11 @@ export default function DeleteModal({ onStockChange, modalId, isEdited, setModal
                                 onSubmit={onDeleteItem}
                                 className="w-[48%] max-[600px]:w-[100%]"
                             >
-                                <button className="w-[100%] bg-red-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] hover:bg-red-500">
-                                    삭제
+                                <button
+                                    disabled={isPending("deleteItem", pickedItem.itemId)}
+                                    className="w-[100%] bg-red-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] hover:bg-red-500 disabled:opacity-50"
+                                >
+                                    {isPending("deleteItem", pickedItem.itemId) ? "삭제 중..." : "삭제"}
                                 </button>
                             </form>
                         )}
@@ -108,6 +131,7 @@ export default function DeleteModal({ onStockChange, modalId, isEdited, setModal
                         </button>
                     </div>
                 </div>
+                )
             )}
         </ModalTemplate>
     )

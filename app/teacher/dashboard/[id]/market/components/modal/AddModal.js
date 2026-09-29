@@ -1,8 +1,23 @@
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
-export default function AddModal({ emoji, setEmoji, modalId, setModalId, onAddModalInputChange, onAddModalClose, addModalInputData, onCreateItem, isError }) {
+import { useMarketContext } from "../MarketContext";
 
+export default function AddModal() {
+    const {
+        emoji,
+        setEmoji,
+        modalId,
+        setModalId,
+        onAddModalInputChange,
+        onAddModalClose,
+        addModalInputData,
+        onCreateItem,
+        isError,
+        isPending,
+    } = useMarketContext();
+
+    const isCreating = isPending("createItem");
 
     return (
         <ModalTemplate id="CREATE_ITEM" modalId={modalId} setModalId={setModalId} onClose={onAddModalClose} className="w-[840px]">
@@ -72,7 +87,7 @@ export default function AddModal({ emoji, setEmoji, modalId, setModalId, onAddMo
                             <div className="flex flex-col relative">
                                 <form onSubmit={onCreateItem}>
                                     {isError && <div className="text-center text-red-500 absolute top-[-27px] left-[50%] translate-x-[-50%]">모두 입력해주세요</div>}
-                                    <button className="w-[100%] bg-orange-300 h-[40px] roundd-xl mb-[16px] text-white rounded-xl hover:bg-orange-500">만들기</button>
+                                    <button disabled={isCreating} className="w-[100%] bg-orange-300 h-[40px] roundd-xl mb-[16px] text-white rounded-xl hover:bg-orange-500 disabled:opacity-50">{isCreating ? "생성 중..." : "만들기"}</button>
                                 </form>
                                 <button onClick={close} className=" h-[40px] hover:text-white hover:bg-orange-300 rounded-xl hover:bg-orange-500">취소</button>
                             </div>
@@ -82,10 +97,5 @@ export default function AddModal({ emoji, setEmoji, modalId, setModalId, onAddMo
                 </div>
             )}
         </ModalTemplate>
-
-
-
-
-
     )
 }

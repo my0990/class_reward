@@ -12,12 +12,13 @@ import { mutate } from "swr";
 import { createItem, deleteItem, updateItem } from "@/server-action/actions/market/market.action";
 import usePendingAction from "@/hooks/usePendingAction";
 import { Toaster, toast } from "react-hot-toast";
+import { MarketProvider } from "./components/MarketContext";
 
 export default function MarketContainer() {
     const params = useParams();
     const classId = params.id;
 
-    const { runAction } = usePendingAction();
+    const { runAction, isPending } = usePendingAction();
 
     const {
         data: classData,
@@ -41,7 +42,6 @@ export default function MarketContainer() {
         emoji: "",
     });
 
-    const [isLoading, setIsLoading] = useState(false);
     const [isEdited, setIsEdited] = useState(false);
 
     const onAddModalInputChange = (e) => {
@@ -77,7 +77,8 @@ export default function MarketContainer() {
                 addModalInputData.itemName === "" ||
                 addModalInputData.itemPrice === "" ||
                 addModalInputData.itemStock === "" ||
-                addModalInputData.itemExplanation === ""
+                addModalInputData.itemExplanation === "" ||
+                !emoji
             ) {
                 setIsError(true);
                 return;
@@ -314,13 +315,41 @@ export default function MarketContainer() {
         return <div>Error loading data</div>;
     }
 
+    if (!classData) {
+        return <div>학급 정보를 찾을 수 없습니다.</div>;
+    }
+
     const {
         currencyName,
         itemList,
         currencyEmoji,
     } = classData;
 
+    const marketContextValue = {
+        modalId,
+        setModalId,
+        emoji,
+        setEmoji,
+        addModalInputData,
+        onAddModalInputChange,
+        onAddModalClose,
+        onCreateItem,
+        isError,
+        isPending,
+        pickedItem,
+        itemStock: pickedItem?.itemStock ?? "",
+        price: pickedItem?.itemPrice ?? "",
+        currencyEmoji,
+        isEdited,
+        onStockChange,
+        onItemPriceChange,
+        onSetItemStock,
+        onDeleteModalClose,
+        onDeleteItem,
+    };
+
     return (
+        <MarketProvider value={marketContextValue}>
         <div className="flex justify-center">
             <div className="w-[240px] min-[464px]:w-[464px] min-[688px]:w-[688px] min-[912px]:w-[912px] min-[1136px]:w-[1136px]">
                 <div
@@ -335,7 +364,7 @@ export default function MarketContainer() {
                                 items-center justify-center rounded-lg
                                 bg-orange-200
                                 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)]
-                                ${item?.itemQuantity <= 0
+                                ${item?.itemStock <= 0
                                     ? "cursor-default"
                                     : "cursor-pointer transition-all hover:scale-110"
                                 }
@@ -373,36 +402,13 @@ export default function MarketContainer() {
                     </div>
                 </div>
 
-                <AddModal
-                    emoji={emoji}
-                    setEmoji={setEmoji}
-                    modalId={modalId}
-                    setModalId={setModalId}
-                    onAddModalInputChange={onAddModalInputChange}
-                    onAddModalClose={onAddModalClose}
-                    addModalInputData={addModalInputData}
-                    onCreateItem={onCreateItem}
-                    isError={isError}
-                />
+                <AddModal />
 
-                <DeleteModal
-                    modalId={modalId}
-                    setModalId={setModalId}
-                    pickedItem={pickedItem}
-                    itemStock={pickedItem?.itemStock ?? ""}
-                    price={pickedItem?.itemPrice ?? ""}
-                    currencyEmoji={currencyEmoji}
-                    isEdited={isEdited}
-                    isLoading={isLoading}
-                    onStockChange={onStockChange}
-                    onItemPriceChange={onItemPriceChange}
-                    onSetItemStock={onSetItemStock}
-                    onDeleteModalClose={onDeleteModalClose}
-                    onDeleteItem={onDeleteItem}
-                />
+                <DeleteModal />
 
                 <Toaster position="bottom-right" />
             </div>
         </div>
+        </MarketProvider>
     );
 }
