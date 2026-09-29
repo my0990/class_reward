@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import DialBtn from "./DialBtn";
 import { mutate } from "swr";
-import { update } from "lodash";
-export default function Modal({ studentArr, currencyName, targetStudent, clearAll, isSend, setStudentArr }) {
+import { handlePoint } from "@/server-action/actions/class/handlePoint";
+export default function Modal({ studentArr, currencyName, targetStudent, clearAll, isSend, setStudentArr, classId }) {
     const [point, setPoint] = useState(null);
     const [fontSize, setFontSize] = useState(1.7);
     const [activeKey, setActiveKey] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    console.log(studentArr)
     const onClick = (e) => {
         if (point === null) {
             setPoint(e.target.value.toString())
@@ -26,81 +25,77 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
         setFontSize(1.7)
     }
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
 
         if (point === null || point === '') {
             alert('숫자를 입력해주세요')
             return;
         }
-        if (isLoading === true) {
-            return
-        } else {
-            setIsLoading(true)
-            fetch("/api/handlePoint", {
-                method: "POST",
-                body: JSON.stringify({ targetStudent: targetStudent, point: point, isSend: isSend }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }).then((res) => res.json()).then((data) => {
-                if (data.result === true) {
-                    const message = targetStudent.map((a, i) => a.userId)
-                    if (isSend) {
-                        alert(message + '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
+        if (isLoading) {
+            return;
+        }
 
-                    } else {
-                        alert(message + '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
+        setIsLoading(true);
 
-                    }
-                    clearAll();
-                    const activeIds = targetStudent.map(student => student._id);
-                    const updatedStudentArr = studentArr.map(student => {
+        try {
+            // 서버 쪽 권한/검증 로직(server action)만 신뢰: 학생 목록은 userId/money만 최소로 전달
+            const payload = targetStudent.map((s) => ({ userId: s.userId, money: s.money }));
+            const res = await handlePoint({ classId, targetStudent: payload, point, isSend });
+
+            if (!res?.success) {
+                throw new Error(res?.message || '처리 중 오류가 발생했습니다.');
+            }
+
+            const message = targetStudent.map((a, i) => a.userId)
+            if (isSend) {
+                alert(message + '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
+            } else {
+                alert(message + '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
+            }
+
+            clearAll();
+            const activeIds = targetStudent.map(student => student._id);
+            const updatedStudentArr = studentArr.map(student => {
+                if (activeIds.includes(student._id)) {
+                    const updatedMoney = isSend ? Number(student.money) + Number(point) : Number(student.money) - Number(point)
+                    return {
+                        ...student,
+                        money: updatedMoney,// 원하는 만큼 증가
+                        isactive: false
+                    };
+                } else {
+                    return student;
+                }
+            });
+            setStudentArr(updatedStudentArr)
+
+            mutate(
+                `/api/students/${classId}`,
+                (prev) => {
+                    if (!prev) return prev;
+
+                    return prev.map(student => {
                         if (activeIds.includes(student._id)) {
                             const updatedMoney = isSend ? Number(student.money) + Number(point) : Number(student.money) - Number(point)
                             return {
                                 ...student,
-                                money: updatedMoney,// 원하는 만큼 증가
-                                isactive: false
+                                money: updatedMoney// 원하는 만큼 증가
                             };
-                        }  else {
-                            return student;
                         }
-
+                        return student;
                     });
-                    console.log(updatedStudentArr)
-                    setStudentArr(updatedStudentArr)
-                    mutate(
-                        "/api/fetchStudentData",
-                        (prev) => {
+                },
+                false // 서버 요청 없이 즉시 반영
+            );
 
-
-                            const updatedStudentData = prev.map(student => {
-                                if (activeIds.includes(student._id)) {
-                                    const updatedMoney = isSend ? Number(student.money) + Number(point) : Number(student.money) - Number(point)
-                                    return {
-                                        ...student,
-                                        money: updatedMoney// 원하는 만큼 증가
-                                    };
-                                } 
-                                return student;
-                            });
-                            console.log(updatedStudentData)
-                            // return prev.map((a, i) => a.isactive === true ? { ...a, money: isSend ? Number(a.money) + Number(point) : Number(a.money) - Number(point) } : a);
-                            return updatedStudentData;
-                            // return prev;
-                        },
-                        false // 서버 요청 없이 즉시 반영
-                    );
-
-                    modalClose();
-                    document.getElementById('modal').close();
-                    setIsLoading(false);
-
-                }
-            })
+            modalClose();
+            document.getElementById('modal').close();
+        } catch (error) {
+            alert(error.message || '처리 중 오류가 발생했습니다.');
+        } finally {
+            setIsLoading(false);
         }
-
     }
 
 
@@ -180,7 +175,7 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
                         <DialBtn isactive={activeKey === "Backspace" ? 1 : 0}><div className="w-[32px] h-[32px]" onClick={onBackspace} ><svg clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m22 6.002c0-.552-.448-1-1-1h-12.628c-.437 0-.853.191-1.138.523-1.078 1.256-3.811 4.439-4.993 5.816-.16.187-.241.418-.241.65s.08.464.24.651c1.181 1.38 3.915 4.575 4.994 5.836.285.333.701.524 1.14.524h12.626c.552 0 1-.447 1-1 0-2.577 0-9.423 0-12zm-7.991 4.928 1.71-1.711c.146-.146.339-.219.531-.219.404 0 .75.324.75.749 0 .194-.073.385-.219.532l-1.711 1.71 1.728 1.728c.147.147.22.339.22.531 0 .427-.349.75-.75.75-.192 0-.384-.073-.531-.219l-1.728-1.728-1.728 1.728c-.146.146-.339.219-.531.219-.401 0-.75-.323-.75-.75 0-.192.073-.384.22-.531l1.728-1.728-1.788-1.787c-.146-.147-.219-.338-.219-.531 0-.426.346-.75.751-.75.192 0 .384.073.53.219z" fillRule="nonzero" /></svg></div></DialBtn>
                         <DialBtn value={'0'} onClick={onClick} isactive={activeKey === "0" ? 1 : 0}>0</DialBtn>
                         <form onSubmit={onSubmit}>
-                            <DialBtn color={'red'} isactive={activeKey === "Enter" ? 1 : 0}><button className="outline-0">입력</button></DialBtn>
+                            <DialBtn color={'red'} isactive={activeKey === "Enter" ? 1 : 0}><button type="submit" disabled={isLoading} className="outline-0 disabled:opacity-50">{isLoading ? "처리중" : "입력"}</button></DialBtn>
                         </form>
                     </ul>
                 </div>

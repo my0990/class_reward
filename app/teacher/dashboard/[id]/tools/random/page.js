@@ -238,7 +238,7 @@ export default function Random() {
 
             </div>
             {/* currencyName, targetStudent, clearAll */}
-            <Modal setStudentArr={setStudentArr} targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll}/>
+            <Modal setStudentArr={setStudentArr} targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll} classId={id}/>
         </div>
     )
 }
