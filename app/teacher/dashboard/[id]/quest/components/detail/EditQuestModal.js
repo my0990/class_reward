@@ -240,6 +240,9 @@
 'use client'
 import { useEffect, useState } from "react"
 import { mutate } from "swr"
+import { toast } from "react-hot-toast"
+import usePendingAction from "@/hooks/usePendingAction"
+import { editQuest } from "@/server-action/actions/quest/quest.action"
 
 const makeInitialInput = (questDetailData) => ({
   name: questDetailData?.questName ?? '',
@@ -254,6 +257,8 @@ const hasTextValue = (value) => value.trim() !== "";
 
 export default function EditQuestModal({ currencyEmoji, questDetailData, setQuestDetailData, classId }) {
   const [input, setInput] = useState(() => makeInitialInput(questDetailData));
+  const { runAction, isPending } = usePendingAction();
+  const isSubmitting = isPending("editQuest", questDetailData?._id);
 
   useEffect(() => {
     setInput(makeInitialInput(questDetailData));
@@ -280,45 +285,55 @@ export default function EditQuestModal({ currencyEmoji, questDetailData, setQues
     }
   };
 
-  const onSubmit = async (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
 
     if (!questDetailData?._id) return;
 
-    const payload = {
-      questId: questDetailData._id,
-      questName: input.name,
-      questGoal: input.goal,
-      questReward: hasNumberValue(input.reward) ? Number(input.reward) : 0,
-      questExp: hasNumberValue(input.exp) ? Number(input.exp) : 0,
-      questTitle: hasTextValue(input.title) ? input.title : '',
-      classId: classId,
-    };
+    runAction(
+      "editQuest",
+      questDetailData._id,
+      async () => {
+        const payload = {
+          questId: questDetailData._id,
+          questName: input.name,
+          questGoal: input.goal,
+          questReward: hasNumberValue(input.reward) ? Number(input.reward) : 0,
+          questExp: hasNumberValue(input.exp) ? Number(input.exp) : 0,
+          questTitle: hasTextValue(input.title) ? input.title : '',
+          classId: classId,
+        };
 
-    const res = await fetch("/api/editQuest", {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" },
-    });
+        const data = await editQuest(payload);
 
-    const data = await res.json();
+        if (!data?.result) {
+          throw new Error(data?.message || "퀘스트 수정에 실패했습니다.");
+        }
 
-    if (data.result === true) {
-      document.getElementById('editQuestModal').close();
+        document.getElementById('editQuestModal').close();
 
-      const nextQuest = {
-        ...questDetailData,
-        questName: payload.questName,
-        questGoal: payload.questGoal,
-        questReward: payload.questReward,
-        questExp: payload.questExp,
-        questTitle: payload.questTitle,
-        classId: classId,
-      };
+        const nextQuest = {
+          ...questDetailData,
+          questName: payload.questName,
+          questGoal: payload.questGoal,
+          questReward: payload.questReward,
+          questExp: payload.questExp,
+          questTitle: payload.questTitle,
+          classId: classId,
+        };
 
-      setQuestDetailData(nextQuest);
-      mutate(`/api/fetchQuestList/${classId}`);
-    }
+        setQuestDetailData(nextQuest);
+        await mutate(`/api/fetchQuestList/${classId}`);
+
+        return data;
+      },
+      {
+        onError: (error) => {
+          console.error(error);
+          toast.error(error?.message || "퀘스트 수정에 실패했습니다.");
+        },
+      }
+    );
   };
 
   const onCloseModal = () => {
@@ -443,8 +458,11 @@ export default function EditQuestModal({ currencyEmoji, questDetailData, setQues
           </div>
 
           <form onSubmit={onSubmit}>
-            <button className="btn mt-[16px] w-[100%] bg-orange-500 border-0 text-white m-auto text-[1.2rem] focus:outline-none">
-              확인
+            <button
+              disabled={isSubmitting}
+              className="btn mt-[16px] w-[100%] bg-orange-500 border-0 text-white m-auto text-[1.2rem] focus:outline-none disabled:opacity-60"
+            >
+              {isSubmitting ? "수정 중..." : "확인"}
             </button>
           </form>
 

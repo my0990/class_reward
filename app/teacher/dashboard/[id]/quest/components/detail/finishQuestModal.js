@@ -1,6 +1,8 @@
 'use client';
 
 import { mutate } from "swr";
+import usePendingAction from "@/hooks/usePendingAction";
+import { finishQuest } from "@/server-action/actions/quest/quest.action";
 
 export default function FinishQuestModal({
   rewardedUserData = [],
@@ -10,6 +12,9 @@ export default function FinishQuestModal({
   classId,
   setQuestDetailData,
 }) {
+  const { runAction, isPending } = usePendingAction();
+  const isFinishing = isPending("finishQuest", questData?._id);
+
   const closeModal = () => {
     document.getElementById('my_modal_2')?.close();
   };
@@ -26,24 +31,18 @@ export default function FinishQuestModal({
   const expText = formatNumber(questData?.questExp);
   const titleText = questData?.questTitle ? String(questData.questTitle) : '';
 
-  const onSubmit = async (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      const res = await fetch("/api/finishQuest", {
-        method: "POST",
-        body: JSON.stringify({
-          classId,
-          questData,
-          rewarded: rewardedUserData.map((obj) => ({
-            userId: obj.userId,
-            money: obj.money,
-          })),
-        }),
-        headers: { "Content-Type": "application/json" },
+    runAction("finishQuest", questData?._id, async () => {
+      const data = await finishQuest({
+        classId,
+        questData,
+        rewarded: rewardedUserData.map((obj) => ({
+          userId: obj.userId,
+          money: obj.money,
+        })),
       });
-
-      const data = await res.json();
 
       if (data?.result === true) {
         // ✅ finished에 userId 배열 추가 (중복 방지)
@@ -71,10 +70,14 @@ export default function FinishQuestModal({
       } else {
         alert(data?.message ?? "처리 실패");
       }
-    } catch (err) {
-      console.error(err);
-      alert("네트워크 오류");
-    }
+
+      return data;
+    }, {
+      onError: (error) => {
+        console.error(error);
+        alert(error?.message || "네트워크 오류");
+      },
+    });
   };
 
   return (
@@ -100,8 +103,8 @@ export default function FinishQuestModal({
           </div>
 
           <form onSubmit={onSubmit} className="mt-[32px]">
-            <button className="btn mt-[16px] w-[100%] bg-orange-500 border-0 text-white m-auto focus:outline-none text-[1.1rem]">
-              확인
+            <button disabled={isFinishing} className="btn mt-[16px] w-[100%] bg-orange-500 border-0 text-white m-auto focus:outline-none text-[1.1rem] disabled:opacity-60">
+              {isFinishing ? "처리 중..." : "확인"}
             </button>
           </form>
 

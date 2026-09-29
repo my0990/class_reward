@@ -369,6 +369,7 @@ import { mutate } from "swr";
 import { toast } from "react-hot-toast";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import usePendingAction from "@/hooks/usePendingAction";
+import { createQuest } from "@/server-action/actions/quest/quest.action";
 
 const INITIAL_INPUT = {
     questName: "",
@@ -497,26 +498,9 @@ export default function AddQuestModal({
                     classId,
                 };
 
-                const response = await fetch(
-                    "/api/addQuest",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-                        body: JSON.stringify(payload),
-                    }
-                );
+                const result = await createQuest(payload);
 
-                const result = await response
-                    .json()
-                    .catch(() => null);
-
-                if (
-                    !response.ok ||
-                    !result?.result
-                ) {
+                if (!result?.result) {
                     throw new Error(
                         result?.message ||
                         "퀘스트 등록에 실패했습니다."

@@ -1,0 +1,114 @@
+"use server";
+
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+import {
+  createQuestService,
+  editQuestService,
+  deleteQuestService,
+  resetQuestService,
+  finishQuestService,
+} from "@/server-action/service/quest/quest.service";
+
+async function requireTeacherId() {
+  const session = await getServerSession(authOptions);
+  return session?.user?._id ?? null;
+}
+
+export async function createQuest({
+  classId,
+  questName,
+  questGoal,
+  questReward,
+  questExp,
+  questTitle,
+}) {
+  const teacher_id = await requireTeacherId();
+  if (!teacher_id) {
+    return { result: false, message: "로그인이 필요합니다." };
+  }
+
+  try {
+    return await createQuestService({
+      teacher_id,
+      classId,
+      questName,
+      questGoal,
+      questReward,
+      questExp,
+      questTitle,
+    });
+  } catch (err) {
+    return { result: false, message: err?.message || "퀘스트 추가에 실패했습니다." };
+  }
+}
+
+export async function editQuest({
+  classId,
+  questId,
+  questName,
+  questGoal,
+  questReward,
+  questExp,
+  questTitle,
+}) {
+  const teacher_id = await requireTeacherId();
+  if (!teacher_id) {
+    return { result: false, message: "로그인이 필요합니다." };
+  }
+
+  try {
+    return await editQuestService({
+      teacher_id,
+      classId,
+      questId,
+      questName,
+      questGoal,
+      questReward,
+      questExp,
+      questTitle,
+    });
+  } catch (err) {
+    return { result: false, message: err?.message || "퀘스트 수정에 실패했습니다." };
+  }
+}
+
+export async function deleteQuest({ classId, questId }) {
+  const teacher_id = await requireTeacherId();
+  if (!teacher_id) {
+    return { result: false, message: "로그인이 필요합니다." };
+  }
+
+  try {
+    return await deleteQuestService({ teacher_id, classId, questId });
+  } catch (err) {
+    return { result: false, message: err?.message || "퀘스트 삭제에 실패했습니다." };
+  }
+}
+
+export async function resetQuest({ classId, questId }) {
+  const teacher_id = await requireTeacherId();
+  if (!teacher_id) {
+    return { result: false, message: "로그인이 필요합니다." };
+  }
+
+  try {
+    return await resetQuestService({ teacher_id, classId, questId });
+  } catch (err) {
+    return { result: false, message: err?.message || "퀘스트 초기화에 실패했습니다." };
+  }
+}
+
+export async function finishQuest({ classId, questData, rewarded }) {
+  const teacher_id = await requireTeacherId();
+  if (!teacher_id) {
+    return { result: false, message: "로그인이 필요합니다." };
+  }
+
+  try {
+    return await finishQuestService({ teacher_id, classId, questData, rewarded });
+  } catch (err) {
+    return { result: false, message: err?.message || "지급에 실패했습니다." };
+  }
+}

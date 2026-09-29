@@ -62,6 +62,7 @@ import { mutate } from "swr";
 import { toast } from "react-hot-toast";
 
 import usePendingAction from "@/hooks/usePendingAction";
+import { deleteQuest } from "@/server-action/actions/quest/quest.action";
 
 export default function QuestCard({
     data,
@@ -109,22 +110,12 @@ export default function QuestCard({
             "deleteQuest",
             questId,
             async () => {
-                const response = await fetch("/api/deleteQuest", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        questId,
-                        classId,
-                    }),
+                const result = await deleteQuest({
+                    questId,
+                    classId,
                 });
 
-                const result = await response
-                    .json()
-                    .catch(() => null);
-
-                if (!response.ok || !result?.result) {
+                if (!result?.result) {
                     throw new Error(
                         result?.message ||
                         "퀘스트 삭제에 실패했습니다."
