@@ -2,58 +2,63 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate } from "swr";
 
-export default function BuyModal({ buyList, money, currencyName, currencyEmoji, userId, classId }) {
+export default function BuyModal({ buyList, money, currencyName, currencyEmoji, classId }) {
     const router = useRouter();
 
 
     const [isLoading, setIsLoading] = useState(false);
     const left = (money - buyList?.itemPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        if (isLoading) {
-            return
-        } else {
-            setIsLoading(true)
-            if (money < buyList.itemPrice) {
-                alert('돈이 모자랍니다')
-                setIsLoading(false);
-                document.getElementById('buy').close()
-                return
-            }
-            fetch("/api/buyItem", {
+
+        if (isLoading) return;
+
+        if (money < buyList.itemPrice) {
+            alert('돈이 모자랍니다');
+            document.getElementById('buy').close();
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const res = await fetch("/api/buyItem", {
                 method: "POST",
-                body: JSON.stringify({ itemData: buyList, balance: left, userId: userId, classId: classId }),
+                body: JSON.stringify({ itemData: buyList }),
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }).then((res) => res.json()).then((data) => {
-                if (data.result === true) {
-                    alert('구매완료');
+            });
 
+            const data = await res.json();
+
+            if (data.result === true) {
+                alert('구매완료');
+
+                mutate(
+                    `/api/classData/${classId}`
+                );
+                mutate(
+                    "/api/user",
+                );
+            } else {
+                alert(data.message);
+                if (data.message === '잔액부족') {
+                    mutate(
+                        "/api/user"
+                    );
+                } else {
                     mutate(
                         `/api/classData/${classId}`
                     );
-                    mutate(
-                        "/api/user",
-                    );
-                } else {
-                    alert(data.message);
-                    if (data.message === '잔액부족') {
-                        mutate(
-                            "/api/user"
-                        );
-                    } else {
-                        mutate(
-                            `/api/classData/${classId}`
-                        );
-                    }
                 }
-            })
-            document.getElementById('buy').close();
+            }
+        } catch (error) {
+            alert('구매 처리 중 오류가 발생했습니다.');
+        } finally {
             setIsLoading(false);
-
+            document.getElementById('buy').close();
         }
-
     }
 
 
@@ -93,7 +98,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
                 <div className={`mb-[32px] ${buyList?.itemStock < 3 ? "text-red-500 font-bold" : null}`}>남은 수량: {buyList?.itemStock}</div>
                 <div className="text-[1rem] flex justify-between max-[600px]:flex-col">
                     <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
-                        <button className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] outline-none hover:bg-orange-500">구입</button>
+                        <button disabled={isLoading} className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] outline-none hover:bg-orange-500 disabled:opacity-50">{isLoading ? "처리 중..." : "구입"}</button>
                     </form>
                     <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px] hover:bg-gray-300" onClick={() => document.getElementById('buy').close()}>취소</button>
                 </div>
