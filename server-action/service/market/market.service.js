@@ -1,6 +1,7 @@
 // server-action/service/item/item.service.js
 import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
 
 export async function createItemService({
   teacher_id,
@@ -19,19 +20,21 @@ export async function createItemService({
     throw new Error("classId가 없습니다.");
   }
 
-  if (!itemName) {
+  const trimmedName = String(itemName ?? "").trim();
+  if (!trimmedName) {
     throw new Error("아이템 이름을 입력해주세요.");
   }
 
-  const numericPrice = Number(itemPrice);
-  const numericStock = Number(itemStock);
+  // 가격/재고는 항상 0 이상의 정수(number)로 저장한다. 문자열로 저장되면 구매가 실패한다.
+  const numericPrice = toNonNegativeInt(itemPrice);
+  const numericStock = toNonNegativeInt(itemStock);
 
-  if (Number.isNaN(numericPrice) || numericPrice < 0) {
-    throw new Error("아이템 가격이 올바르지 않습니다.");
+  if (numericPrice === null) {
+    throw new Error("아이템 가격은 0 이상의 정수로 입력해주세요.");
   }
 
-  if (Number.isNaN(numericStock) || numericStock < 0) {
-    throw new Error("아이템 재고가 올바르지 않습니다.");
+  if (numericStock === null) {
+    throw new Error("아이템 재고는 0 이상의 정수로 입력해주세요.");
   }
 
   const db = (await connectDB).db("data");
@@ -48,7 +51,7 @@ export async function createItemService({
         itemList: {
           itemId,
           itemPrice: numericPrice,
-          itemName,
+          itemName: trimmedName,
           itemStock: numericStock,
           itemExplanation,
           emoji,

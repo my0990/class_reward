@@ -29,7 +29,7 @@ export async function handlePointService({ teacher_id, classId, targetStudent, p
     { userId: { $in: userIds }, teacher_id: ObjectId.createFromHexString(teacher_id), classId: ObjectId.createFromHexString(classId)},
     { $inc: { money: inc } }
   );
-  const historyArray = targetStudent.map((a) => ({ teacher_id, classId, userId: a.userId, balance: parseInt(a.money) + inc, type: isSend ? "입금" : "출금", name: isSend ? "선생님에게 받음" : "선생님에게 뺏김", amount: point, date: new Date(), expiresAfter: new Date() }))
+  const historyArray = targetStudent.map((a) => ({ teacher_id, classId, userId: a.userId, balance: parseInt(a.money) + inc, type: isSend ? "입금" : "출금", name: isSend ? "선생님에게 받음" : "선생님에게 뺏김", amount, date: new Date(), expiresAfter: new Date() }))
   const response2 = await db.collection('history').insertMany(historyArray)
   return {
     success: true,

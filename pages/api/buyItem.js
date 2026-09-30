@@ -1,6 +1,7 @@
 import { connectDB } from '@/lib/mongodb'
 import { ObjectId } from 'mongodb';
 import { getToken } from "next-auth/jwt"
+import { toNonNegativeInt } from '@/util/number/toNonNegativeInt';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -86,6 +87,23 @@ export default async function handler(req, res) {
         throw Object.assign(new Error('존재하지 않는 아이템입니다.'), { status: 404 });
       }
 
+      // 예전 데이터 중 가격/재고가 문자열("100")로 저장된 아이템이 있다.
+      // 문자열이면 MongoDB 조건($gte, $gt)이 숫자와 비교되지 않아 구매가 실패하므로
+      // 정수로 변환해서 쓰고, 이번 트랜잭션 안에서 DB 값도 정수로 고쳐 둔다.
+      const price = toNonNegativeInt(item.itemPrice);
+      const stock = toNonNegativeInt(item.itemStock);
+      if (price === null || stock === null) {
+        throw Object.assign(new Error('아이템 가격 또는 재고 정보가 올바르지 않습니다. 선생님께 문의해 주세요.'), { status: 500 });
+      }
+
+      if (item.itemPrice !== price || item.itemStock !== stock) {
+        await db.collection('class_data').updateOne(
+          { teacher_id: teacherObjectId, classId: classObjectId, 'itemList.itemId': ItemId },
+          { $set: { 'itemList.$.itemPrice': price, 'itemList.$.itemStock': stock } },
+          { session }
+        );
+      }
+
       const studentData = await db.collection('user_data').findOne(
         { userId, role: 'student', teacher_id: teacherObjectId, classId: classObjectId },
         { session }
@@ -93,8 +111,6 @@ export default async function handler(req, res) {
       if (!studentData) {
         throw Object.assign(new Error('사용자 정보를 찾을 수 없습니다.'), { status: 404 });
       }
-
-      const price = item.itemPrice;
 
       if (studentData.money < price) {
         throw Object.assign(new Error('잔액부족'), { status: 400 });

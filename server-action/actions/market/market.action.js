@@ -3,6 +3,7 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
 import { createItemService, deleteItemService, updateItemService } from "@/server-action/service/market/market.service";
 
 export async function createItem({
@@ -140,17 +141,17 @@ export async function updateItem({
           };
       }
 
-      const itemStock = Number(updatedItemStock);
-      const itemPrice = Number(updatedItemPrice);
+      const itemStock = toNonNegativeInt(updatedItemStock);
+      const itemPrice = toNonNegativeInt(updatedItemPrice);
 
-      if (!Number.isInteger(itemStock) || itemStock < 0) {
+      if (itemStock === null) {
           return {
               result: false,
               message: "재고는 0 이상의 정수로 입력해 주세요.",
           };
       }
 
-      if (!Number.isInteger(itemPrice) || itemPrice < 0) {
+      if (itemPrice === null) {
           return {
               result: false,
               message: "가격은 0 이상의 정수로 입력해 주세요.",
