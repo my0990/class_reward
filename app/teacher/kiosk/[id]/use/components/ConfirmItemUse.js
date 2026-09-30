@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 import { useItem } from "@/server-action/actions/item/item.action";
-export default function ConfirmItemUse({ itemData, userData, classId }) {
+export default function ConfirmItemUse({ itemData, userData, classId, kioskToken }) {
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -10,7 +10,6 @@ export default function ConfirmItemUse({ itemData, userData, classId }) {
         document.getElementById('confirmModal').close();
     }
     const route = useRouter();
-    console.log(itemData, userData)
     const onSubmit = (data) => {
 
         const { itemName, itemId } = itemData;
@@ -20,7 +19,7 @@ export default function ConfirmItemUse({ itemData, userData, classId }) {
             return
         } else {
             setIsLoading(true)
-            useItem({ itemName, userId, itemId, classId }).then((data) => {
+            useItem({ itemName, userId, itemId, classId, kioskToken }).then((data) => {
 
                 if (data?.result === true) {
                     alert('아이템을 사용하였습니다')

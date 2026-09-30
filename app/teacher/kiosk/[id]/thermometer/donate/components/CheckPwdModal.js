@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { checkKioskPassword } from "@/server-action/actions/kiosk/kiosk.action";
 
 
 export default function CheckPwdModal({ type, requestData, setRequestData }) {
@@ -18,23 +19,17 @@ export default function CheckPwdModal({ type, requestData, setRequestData }) {
         setIsLoading(true);
 
         try {
-            const res = await fetch("/api/checkPwd", {
-                method: "POST",
-                body: JSON.stringify({ userId: requestData.userData.userId, userPwd: pwdRef.current.value }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            // 비밀번호가 맞으면 이 학생 전용 결제 토큰(kioskToken, 3분 유효)을 받는다.
+            const data = await checkKioskPassword({ userId: requestData.userData.userId, userPwd: pwdRef.current.value });
 
-            const data = await res.json();
-
-            if (data.result === true) {
+            if (data?.result === true) {
+                const kioskToken = data.kioskToken;
                 if (type === "buy") {
-                    setRequestData(prev => ({ ...prev, step: "confirmItemBuy" }))
+                    setRequestData(prev => ({ ...prev, kioskToken, step: "confirmItemBuy" }))
                 } else if (type === "use") {
-                    setRequestData(prev => ({ ...prev, step: "confirmItemUse" }))
+                    setRequestData(prev => ({ ...prev, kioskToken, step: "confirmItemUse" }))
                 } else {
-                    setRequestData(prev => ({ ...prev, step: "SELECT_AMOUNT" }))
+                    setRequestData(prev => ({ ...prev, kioskToken, step: "SELECT_AMOUNT" }))
                 }
             } else {
                 alert(data.message || '비밀번호를 확인해주세요');

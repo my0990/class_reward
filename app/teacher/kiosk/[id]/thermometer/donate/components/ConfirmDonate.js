@@ -65,7 +65,7 @@ export default function ConfirmDonate({ requestData, setRequestData, classId }) 
     const handleDonateConfirm = async ({ userId, amount, money, classId, degree }) => {
 
         runAction("handleDonateConfirm", async () => {
-            const data = await donate({ userId, amount, money, classId, degree });
+            const data = await donate({ userId, amount, classId, kioskToken: requestData.kioskToken });
 
             if (!data.result) {
                 toast.error(data.message || "수정 실패");

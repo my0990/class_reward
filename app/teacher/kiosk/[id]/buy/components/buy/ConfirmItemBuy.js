@@ -4,6 +4,7 @@ import { useFetchData } from "@/hooks/useFetchData";
 import Link from "next/link";
 import { mutate } from "swr";
 import { useRouter } from "next/navigation";
+import { buyItem } from "@/server-action/actions/market/market.action";
 export default function ConfirmItemBuy({ requestData, setRequestData, classId }) {
 
     const {
@@ -33,13 +34,7 @@ export default function ConfirmItemBuy({ requestData, setRequestData, classId })
             return
         } else {
             setIsLoading(true)
-            fetch("/api/buyItem", {
-                method: "POST",
-                body: JSON.stringify({ itemData: itemData, userId: userId, balance: money - itemData?.itemPrice, classId: classId }),
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            }).then((res) => res.json()).then((data) => {
+            buyItem({ itemId: itemData?.itemId, userId, classId, kioskToken: requestData.kioskToken }).then((data) => {
 
                 if (data.result === true) {
                     document.getElementById('finishModal').showModal();
@@ -54,8 +49,11 @@ export default function ConfirmItemBuy({ requestData, setRequestData, classId })
                         mutateClassData()
                     }
 
-                    route.push('/kiosk')
+                    route.push(`/teacher/kiosk/${classId}`)
                 }
+                setIsLoading(false);
+            }).catch(() => {
+                alert('구매 처리 중 오류가 발생했습니다.');
                 setIsLoading(false);
             })
         }

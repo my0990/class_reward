@@ -15,7 +15,7 @@ export default function FinishBuyModal({ requestData, fetchItemId, classId }) {
             return
         } else {
             setIsLoading(true)
-            useItem({ itemName, userId, itemId: fetchItemId, classId }).then((data) => {
+            useItem({ itemName, userId, itemId: fetchItemId, classId, kioskToken: requestData.kioskToken }).then((data) => {
 
                 if (data?.result === true) {
                     alert('아이템을 사용하였습니다');

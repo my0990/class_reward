@@ -2,42 +2,28 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { resolveStudentTarget, StudentTargetError } from "@/lib/auth/studentTarget";
 import { useItemService } from "@/server-action/service/item/item.service";
 
 // 이 액션은 두 경로에서 호출된다.
 //  1) 학생이 자기 계정으로 로그인해서 직접 인벤토리에서 사용 (student dashboard inventory)
-//     → userId/classId/teacher_id를 세션 값만 신뢰한다.
-//  2) 교사가 kiosk 기기에 로그인한 상태로 특정 학생을 대신 사용 처리
-//     (teacher/kiosk 사용/구매 흐름) → 이 기기엔 학생 개별 로그인 세션이 없으므로
-//     세션은 교사이고, userId/classId는 파라미터로 받는다. teacher_id는 반드시
-//     세션(로그인된 교사) 값만 쓰고, service에서 teacher_id+classId로 다시 스코핑한다.
-export async function useItem({ userId, itemId, itemName, classId }) {
+//  2) 교사 키오스크에서 학생이 비밀번호를 확인한 뒤 사용 → kioskToken 필요
+// 누구의 아이템인지는 resolveStudentTarget(lib/auth/studentTarget)이 정한다.
+export async function useItem({ userId, itemId, itemName, classId, kioskToken }) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return { result: false, message: "로그인이 필요합니다." };
+    let target;
+    try {
+      target = resolveStudentTarget(session, { userId, classId, kioskToken });
+    } catch (error) {
+      if (error instanceof StudentTargetError) return { result: false, message: error.message };
+      throw error;
     }
 
-    let teacher_id;
-    let targetUserId;
-    let targetClassId;
-
-    if (session.user.role === "student" && session.user.userId && session.user.classId && session.user.teacher_id) {
-      teacher_id = session.user.teacher_id;
-      targetUserId = session.user.userId;
-      targetClassId = session.user.classId;
-    } else if (session.user.role === "teacher" && session.user.teacher_id) {
-      teacher_id = session.user.teacher_id;
-      targetUserId = userId;
-      targetClassId = classId;
-    } else {
-      return { result: false, message: "로그인이 필요합니다." };
-    }
-
-    if (!targetUserId || !targetClassId) {
-      return { result: false, message: "잘못된 요청입니다." };
-    }
+    const teacher_id = target.teacher_id;
+    const targetUserId = target.userId;
+    const targetClassId = target.classId;
 
     return await useItemService({
       teacher_id,

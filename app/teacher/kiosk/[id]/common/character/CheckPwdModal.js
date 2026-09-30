@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { checkKioskPassword } from "@/server-action/actions/kiosk/kiosk.action";
 
 
 export default function CheckPwdModal({ type, requestData, setRequestData }) {
@@ -15,30 +16,29 @@ export default function CheckPwdModal({ type, requestData, setRequestData }) {
             return
         } else {
             setIsLoading(true)
-            fetch("/api/checkPwd", {
-                method: "POST",
-                body: JSON.stringify({ userId: requestData.userData.userId, userPwd: pwdRef.current.value }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }).then((res) => res.json()).then((data) => {
+            // 비밀번호가 맞으면 서버가 이 학생 전용 결제 토큰(kioskToken, 3분 유효)을 준다.
+            // 다음 단계의 구매/사용 요청에 이 토큰을 같이 보내야 처리된다.
+            checkKioskPassword({ userId: requestData.userData.userId, userPwd: pwdRef.current.value }).then((data) => {
 
-                if (data.result === true) {
+                if (data?.result === true) {
+                    const kioskToken = data.kioskToken
                     if (type === "buy") {
-                        setRequestData(prev => ({...prev, step: "confirmItemBuy"}))
+                        setRequestData(prev => ({...prev, kioskToken, step: "confirmItemBuy"}))
                     } else if(type === "use") {
-                        setRequestData(prev => ({...prev, step: "confirmItemUse"}))
+                        setRequestData(prev => ({...prev, kioskToken, step: "confirmItemUse"}))
                     } else {
-                        setRequestData(prev => ({...prev, step: "confirmThermometer"}))
+                        setRequestData(prev => ({...prev, kioskToken, step: "confirmThermometer"}))
                     }
 
 
                 } else {
-                    alert('비밀번호를 확인해주세요')
+                    alert(data?.message || '비밀번호를 확인해주세요')
                     pwdRef.current.value = ""
                     setIsLoading(false)
-                    // onCloseModal()
                 }
+            }).catch(() => {
+                alert('비밀번호 확인 중 오류가 발생했습니다.')
+                setIsLoading(false)
             })
         }
 

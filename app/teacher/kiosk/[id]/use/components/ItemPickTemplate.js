@@ -69,7 +69,7 @@ export default function ItemPickTemplate({ requestData, setRequestData, classId 
                     )
                 })}
             </div>
-            <ConfirmItemUse userData={requestData.userData} itemData={pickedItem} classId={classId} />
+            <ConfirmItemUse userData={requestData.userData} itemData={pickedItem} classId={classId} kioskToken={requestData.kioskToken} />
         </div >
     )
 }

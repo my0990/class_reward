@@ -1,6 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate } from "swr";
+import { buyItem } from "@/server-action/actions/market/market.action";
 
 export default function BuyModal({ buyList, money, currencyName, currencyEmoji, classId }) {
     const router = useRouter();
@@ -22,15 +23,8 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
         setIsLoading(true);
 
         try {
-            const res = await fetch("/api/buyItem", {
-                method: "POST",
-                body: JSON.stringify({ itemData: buyList }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            const data = await res.json();
+            // 학생 로그인 세션 기준으로 본인만 구매된다 (서버에서 확인).
+            const data = await buyItem({ itemId: buyList?.itemId });
 
             if (data.result === true) {
                 alert('구매완료');

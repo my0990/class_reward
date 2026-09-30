@@ -4,7 +4,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
-import { createItemService, deleteItemService, updateItemService } from "@/server-action/service/market/market.service";
+import { resolveStudentTarget, StudentTargetError } from "@/lib/auth/studentTarget";
+import { buyItemService, createItemService, deleteItemService, updateItemService } from "@/server-action/service/market/market.service";
 
 export async function createItem({
   itemName,
@@ -183,5 +184,33 @@ export async function updateItem({
                   ? error.message
                   : "아이템 수정 중 오류가 발생했습니다.",
       };
+  }
+}
+
+// 학생 아이템 구매 (예전 pages/api/buyItem)
+// - 학생 로그인: 본인만 구매
+// - 교사 키오스크: 학생 비밀번호 확인 후 받은 kioskToken이 있어야 구매
+export async function buyItem({ itemId, userId, classId, kioskToken }) {
+  try {
+    if (!itemId) {
+      return { result: false, message: "잘못된 요청입니다." };
+    }
+
+    const session = await getServerSession(authOptions);
+
+    let target;
+    try {
+      target = resolveStudentTarget(session, { userId, classId, kioskToken });
+    } catch (error) {
+      if (error instanceof StudentTargetError) return { result: false, message: error.message };
+      throw error;
+    }
+
+    const { itemId: purchasedItemId } = await buyItemService({ ...target, itemId });
+
+    return { result: true, message: "구매 완료", itemId: purchasedItemId };
+  } catch (error) {
+    if (!error?.status || error.status >= 500) console.error("buyItem action error:", error);
+    return { result: false, message: error?.message || "구매 처리 중 오류가 발생했습니다." };
   }
 }
