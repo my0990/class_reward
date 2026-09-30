@@ -3,7 +3,7 @@ import AuthBtn from "./authBtn"
 import AuthInput from "./authInput"
 import Link from "next/link"
 import PrivacyCheckModal from "./PrivacyCheckModal"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { teacherSignupAction } from "@/server-action/actions/auth/signup"
@@ -29,6 +29,14 @@ export default function SignUpView() {
     const [isVerifyingCode, setIsVerifyingCode] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quota, setQuota] = useState(null); // optional
+    // 인증 코드 재전송 대기 시간(초). 서버도 같은 이메일은 1분에 1번만 보내준다.
+    const [sendCooldown, setSendCooldown] = useState(0);
+
+    useEffect(() => {
+        if (sendCooldown <= 0) return;
+        const timer = setTimeout(() => setSendCooldown((sec) => sec - 1), 1000);
+        return () => clearTimeout(timer);
+    }, [sendCooldown]);
 
     const emailOk = useMemo(() => {
         const email = String(form.email ?? "").trim();
@@ -37,7 +45,7 @@ export default function SignUpView() {
 
     const codeOk = useMemo(() => /^\d{6}$/.test(String(form.emailCode ?? "").trim()), [form.emailCode]);
 
-    const canSendCode = useMemo(() => emailOk && !isSendingCode, [emailOk, isSendingCode]);
+    const canSendCode = useMemo(() => emailOk && !isSendingCode && sendCooldown <= 0, [emailOk, isSendingCode, sendCooldown]);
     const canVerifyCode = useMemo(() => emailOk && codeOk && !isVerifyingCode, [emailOk, codeOk, isVerifyingCode]);
 
     const onChange = (e) => {
@@ -86,8 +94,11 @@ export default function SignUpView() {
 
             if (!data?.success) {
                 setError(data?.message ?? "인증 코드 전송 실패");
+                if (data?.retryAfterSec) setSendCooldown(data.retryAfterSec);
                 return;
             }
+
+            setSendCooldown(60);
 
             if (data?.quota) setQuota(data.quota);
             alert("인증 코드를 전송했습니다");
@@ -194,7 +205,7 @@ export default function SignUpView() {
                             disabled={!canSendCode}
                             className="btn bg-orange-500 dark:hover:bg-orange-300 border-0 text-white whitespace-nowrap"
                         >
-                            {isSendingCode ? "전송중" : "코드전송"}
+                            {isSendingCode ? "전송중" : sendCooldown > 0 ? `${sendCooldown}초` : "코드전송"}
                         </button>
                     </div>
 

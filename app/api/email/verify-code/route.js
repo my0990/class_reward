@@ -1,21 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import crypto from "crypto";
-
-// 🔒 send-code에서 쓴 것과 동일해야 함
-const EMAIL_CODE_HMAC_KEY = process.env.EMAIL_CODE_HMAC_KEY;
-
-function normalizeEmail(email) {
-  return String(email ?? "").trim().toLowerCase();
-}
-
-function hashCode(code) {
-  if (!EMAIL_CODE_HMAC_KEY) throw new Error("EMAIL_CODE_HMAC_KEY missing");
-  return crypto
-    .createHmac("sha256", EMAIL_CODE_HMAC_KEY)
-    .update(code)
-    .digest("hex");
-}
+import { normalizeEmail, hashCode } from "@/lib/auth/email";
 
 export async function POST(req) {
   try {
