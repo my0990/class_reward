@@ -25,41 +25,38 @@ export async function useItemService({
 
   // ✅ userId만으로 매칭하지 않고 teacher_id+classId로도 스코핑해서
   // 이 교사의 이 학급 학생이 아니면 아이템을 건드릴 수 없게 막는다.
-  const studentData = await db.collection("user_data").findOne({
+  const studentFilter = {
     userId,
     role: "student",
     teacher_id: teacherObjectId,
     classId: classObjectId,
-  });
+  };
 
-  if (!studentData) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
-  }
-
-  const item = studentData.itemList?.find((i) => i.itemId === itemId);
-  if (!item) {
-    throw new Error("아이템이 존재하지 않음");
-  }
-
-  const response = await db.collection("user_data").updateOne(
-    { userId, role: "student", teacher_id: teacherObjectId, classId: classObjectId },
-    { $pull: { itemList: { itemId } } }
+  // 조회 후 삭제를 따로 하면, 동시에 두 번 눌렀을 때 둘 다 "있음"으로 보고
+  // 사용 기록이 두 번 남는다. 아이템이 있을 때만 한 번에 빼고, 빼기 전 문서를 받는다.
+  const before = await db.collection("user_data").findOneAndUpdate(
+    { ...studentFilter, "itemList.itemId": itemId },
+    { $pull: { itemList: { itemId } } },
+    { returnDocument: "before" }
   );
 
-  if (response.matchedCount === 0) {
-    throw new Error("아이템 사용에 실패했습니다.");
+  if (!before) {
+    const studentExists = await db.collection("user_data").countDocuments(studentFilter, { limit: 1 });
+    throw new Error(studentExists ? "아이템이 존재하지 않음" : "사용자 정보를 찾을 수 없습니다.");
   }
+
+  const item = before.itemList.find((i) => i.itemId === itemId);
 
   await db.collection("history").insertOne({
     teacher_id: teacherObjectId,
     classId: classObjectId,
     userId,
-    balance: studentData.money,
+    balance: before.money,
     type: "출금",
     amount: 0,
     date: new Date(),
     expiresAfter: new Date(),
-    name: "아이템 사용 (" + (itemName || item.itemName) + ")",
+    name: "아이템 사용 (" + (item?.itemName || itemName) + ")",
   });
 
   return { result: true, message: "useItem 성공" };

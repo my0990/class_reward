@@ -90,18 +90,25 @@ export async function updateProfileImg({ url, price, classId, urlId }) {
     }
   }
 
-  export async function buyProfileImg({ classId, userId, pickedData, balance}) {
+  // 학생이 직접 구매: 학생 세션의 userId/classId/teacher_id만 쓴다 (다른 학생 대신 결제 방지).
+  // 가격·이미지 주소·잔액은 클라이언트 값을 받지 않고 서버가 계산한다.
+  export async function buyProfileImg({ classId, userId, pickedData, urlId }) {
     try {
       const session = await getServerSession(authOptions);
-      const teacher_id = session?.user?.teacher_id ?? null;
+      const user = session?.user;
 
-  
+      let target;
+      if (user?.role === "student" && user.userId && user.classId && user.teacher_id) {
+        target = { teacher_id: user.teacher_id, classId: user.classId, userId: user.userId };
+      } else if (user?.role === "teacher" && user.teacher_id) {
+        target = { teacher_id: user.teacher_id, classId, userId };
+      } else {
+        return { result: false, message: "로그인이 필요합니다." };
+      }
+
       const response = await buyProfileImgService({
-        teacher_id: teacher_id,
-        classId,
-        pickedData,
-        userId,
-        balance
+        ...target,
+        urlId: urlId ?? pickedData?.urlId,
       });
   
   

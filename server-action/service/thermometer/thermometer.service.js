@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
 
 export async function updateThermometerSettingService({ teacher_id, classId, rewardObj, requireCurrency }) {
   if (!teacher_id) {
@@ -25,13 +26,20 @@ export async function donateCookieService({
     throw new Error("필수 정보가 없습니다.");
   }
 
-  const numericAmount = Number(amount);
-  if (!numericAmount || numericAmount <= 0) {
+  // 쿠키는 정수 단위: 1.5개, 음수, "abc" 같은 값은 거부한다.
+  const numericAmount = toNonNegativeInt(amount);
+  if (!numericAmount) {
     throw new Error("기부 수량이 올바르지 않습니다.");
   }
 
-  const teacherObjectId = ObjectId.createFromHexString(teacher_id);
-  const classObjectId = ObjectId.createFromHexString(classId);
+  let teacherObjectId;
+  let classObjectId;
+  try {
+    teacherObjectId = ObjectId.createFromHexString(teacher_id);
+    classObjectId = ObjectId.createFromHexString(classId);
+  } catch {
+    throw new Error("잘못된 학급 정보입니다.");
+  }
   const filter = { teacher_id: teacherObjectId, classId: classObjectId };
 
   const client = await connectDB;

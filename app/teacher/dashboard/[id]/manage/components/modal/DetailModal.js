@@ -20,9 +20,14 @@ function formatDate(dateString) {
   return `${date.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`;
 }
 
+// 예전 데이터에는 "deposit"/"withDrawal"이, 지금 데이터에는 "입금"/"출금"이 섞여 있다.
+function isDepositType(type) {
+  return type === "입금" || type === "deposit";
+}
+
 function getAmountText(type, amount) {
   if (!amount) return null;
-  return `${type === "입금" ? "+" : "-"}${amount}`;
+  return `${isDepositType(type) ? "+" : "-"}${amount}`;
 }
 
 export default function DetailModal() {
@@ -126,9 +131,9 @@ export default function DetailModal() {
                       <td>
                         <span
                           className={
-                            item?.type === "withDrawal"
-                              ? "text-red-500"
-                              : "text-green-500"
+                            isDepositType(item?.type)
+                              ? "text-green-500"
+                              : "text-red-500"
                           }
                         >
                           {getAmountText(item.type, item.amount)}

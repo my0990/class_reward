@@ -7,7 +7,6 @@ import { handlePointService } from "@/server-action/service/class/handlePointSer
 export async function handlePoint({ classId, targetStudent, point, isSend }) {
     const session = await getServerSession(authOptions);
     const teacher_id = session?.user?._id ?? null;
-    console.log(targetStudent)
     if (!teacher_id) {
         return { success: false, message: "unauthorized" };
     }

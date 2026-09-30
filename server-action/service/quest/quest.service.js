@@ -230,7 +230,7 @@ export async function finishQuestService({
         const historyArray = userIds.map((userId) => ({
           ...scopeFilter,
           userId,
-          type: "deposit",
+          type: "입금",
           amount: questReward,
           name: "퀘스트 완료",
           date: new Date(),
