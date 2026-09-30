@@ -1,0 +1,30 @@
+# push / PR마다 GitHub 서버에서 테스트를 자동으로 돌린다.
+# 결과는 GitHub의 커밋·PR 옆에 ✅/❌로 표시된다. (Vercel 배포를 막지는 않는다)
+name: test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # mongodb-memory-server가 내려받는 MongoDB 실행 파일을 캐시해서 다음 실행을 빠르게 한다
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npm ci
+
+      - run: npm test
