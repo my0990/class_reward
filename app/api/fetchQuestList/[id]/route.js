@@ -1,28 +1,19 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { ObjectId } from "mongodb";
+import { withApiHandler, requireTeacher, parseObjectId } from "@/lib/api/routeHelpers";
 
-export async function GET(req, {params}) {
-  const session = await getServerSession(authOptions);
+// 학급 퀘스트 목록 (교사)
+export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const teacher_id = session.user._id;
+  const classObjectId = parseObjectId(id, "학급 id");
+  const { teacherObjectId } = await requireTeacher();
 
   const db = (await connectDB).db("data");
+  const quests = await db
+    .collection("quest")
+    .find({ teacher_id: teacherObjectId, classId: classObjectId }, { projection: { code: 0 } })
+    .sort({ time: -1 })
+    .toArray();
 
-  const filter = {
-    teacher_id: ObjectId.createFromHexString(teacher_id), // 또는 teacherId 필드명에 맞게 수정
-    classId: ObjectId.createFromHexString(id)
-  };
-
-  const response = await db.collection('quest').find({ ...filter }, { projection: { code: 0 } }).sort({ time: '-1' }).toArray();
-
-  return NextResponse.json(response);
-}
-
-
+  return NextResponse.json(quests);
+});

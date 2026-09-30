@@ -6,7 +6,8 @@ export async function GET(req, { params }) {
   try {
     const { id } = await params; // ✅ /api/notices/:id
 
-    if (!ObjectId.isValid(id)) {
+    // isValid는 12글자 아무 문자열도 통과시켜서 24자리 hex만 허용한다.
+    if (typeof id !== "string" || !/^[0-9a-f]{24}$/i.test(id)) {
       return NextResponse.json(
         { success: false, message: "잘못된 id" },
         { status: 400 }
@@ -18,7 +19,7 @@ export async function GET(req, { params }) {
 
     const notice = await db
       .collection("notices")
-      .findOne({ _id: new ObjectId(id) });
+      .findOne({ _id: ObjectId.createFromHexString(id) });
 
     if (!notice) {
       return NextResponse.json(

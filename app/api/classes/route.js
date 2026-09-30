@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectDB } from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { withApiHandler, requireTeacher } from "@/lib/api/routeHelpers";
 
-export async function GET(req) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const teacher_id = session.user._id;
+// 교사의 학급 목록
+export const GET = withApiHandler(async () => {
+  const { teacherObjectId } = await requireTeacher();
 
-  const db = (await connectDB).db("data")
+  const db = (await connectDB).db("data");
   const classes = await db
     .collection("classes")
-    .find({ teacher_id: ObjectId.createFromHexString(teacher_id) })
+    .find({ teacher_id: teacherObjectId })
     .toArray();
+
   return NextResponse.json(classes);
-}
+});
