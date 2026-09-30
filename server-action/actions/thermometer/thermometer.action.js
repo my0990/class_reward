@@ -1,4 +1,5 @@
 'use server'
+import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 import { updateThermometerSettingService } from "@/server-action/service/thermometer/thermometer.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -7,15 +8,9 @@ import { updateManualDegreeService, donateCookieService } from "@/server-action/
 
 export async function updateThermometerSetting({ rewardObj, requireCurrency, classId }) {
   try {
-    const session = await getServerSession(authOptions);
-    const teacher_id = session?.user?._id ?? null;
-
-    if (!teacher_id) {
-      return {
-        result: false,
-        message: "로그인이 필요합니다.",
-      };
-    }
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const teacher_id = auth.teacher_id;
 
     const response = await updateThermometerSettingService({
       teacher_id: teacher_id,
@@ -71,16 +66,9 @@ export async function donate({ userId, amount, classId, kioskToken }) {
 export async function updateManualDegree({ classId, degreeChange, type }) {
 
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return {
-        result: false,
-        message: "로그인이 필요합니다.",
-      };
-    }
-
-    const teacher_id = session?.user?._id ?? null;
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const teacher_id = auth.teacher_id;
 
     const result = await updateManualDegreeService({
       teacher_id,

@@ -1,15 +1,15 @@
 'use server'
+import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { createClassService } from "@/server-action/service/class/createClassService";
 
 export async function createClass({className}) {
-    const session = await getServerSession(authOptions);
-    const teacher_id = session?.user?._id ?? null;
+    const teacher_id = await getTeacherId();
 
     if (!teacher_id) {
-        return { success: false, message: "unauthorized" };
+        return { success: false, message: "교사 계정으로 로그인해야 합니다." };
     }
 
 

@@ -1,36 +1,88 @@
 import { ObjectId } from "mongodb";
 import { connectDB } from "@/lib/mongodb";
 import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
-export async function createProfileImgService({ teacher_id, classId, url }) {
+const HEX24 = /^[0-9a-f]{24}$/i;
 
-    const classObjectId = ObjectId.createFromHexString(classId);
-    const teacherObjectId = ObjectId.createFromHexString(teacher_id);
-    const itemId = new ObjectId()
-    const newKey = "profileImgStorage." + itemId
+function toScope({ teacher_id, classId }) {
+    try {
+        return {
+            teacher_id: ObjectId.createFromHexString(teacher_id),
+            classId: ObjectId.createFromHexString(classId),
+        };
+    } catch {
+        throw new Error("잘못된 학급 정보입니다.");
+    }
+}
+
+// urlId는 DB 필드 경로("profileImgStorage.<urlId>")에 들어가므로 ObjectId 형식만 허용한다.
+function assertUrlId(urlId) {
+    if (typeof urlId !== "string" || !HEX24.test(urlId)) {
+        throw new Error("잘못된 프로필 이미지입니다.");
+    }
+}
+
+// 이미지 주소는 http(s) 주소만 허용 (javascript: 같은 값 차단)
+function normalizeImageUrl(url) {
+    const value = String(url ?? "").trim();
+    if (!/^https?:\/\/\S+$/i.test(value) || value.length > 2000) {
+        throw new Error("이미지 주소는 http:// 또는 https://로 시작해야 합니다.");
+    }
+    return value;
+}
+
+// 새 이미지는 교사가 가격을 정할 때까지 사실상 살 수 없도록 99999로 등록한다 (기존 동작 유지).
+export const DEFAULT_PROFILE_IMG_PRICE = 99999;
+
+export async function createProfileImgService({ teacher_id, classId, url }) {
+    const scope = toScope({ teacher_id, classId });
+    const imageUrl = normalizeImageUrl(url);
+    const itemId = new ObjectId().toHexString();
     const db = (await connectDB).db('data');
 
-
-    const response = await db.collection('class_data').updateOne({ teacher_id: teacherObjectId, classId: classObjectId }, { $set: { [newKey]: { url: url, price: 99999 } } }, { upsert: true })
-
-
+    // upsert 금지: 학급 문서가 없으면 잘못된 요청이다.
+    const response = await db.collection('class_data').updateOne(
+        scope,
+        { $set: { ["profileImgStorage." + itemId]: { url: imageUrl, price: DEFAULT_PROFILE_IMG_PRICE } } }
+    );
+    if (response.matchedCount === 0) {
+        throw new Error("학급 정보를 찾을 수 없습니다.");
+    }
 
     return {
         result: true,
+        urlId: itemId,
     };
 }
 
 export async function updateProfileImgService({ teacher_id, classId, price, url, urlId }) {
+    const scope = toScope({ teacher_id, classId });
+    assertUrlId(urlId);
 
-    const classObjectId = ObjectId.createFromHexString(classId);
-    const teacherObjectId = ObjectId.createFromHexString(teacher_id);
+    // 화면 입력값은 문자열("100")로 오므로 정수로 저장한다. 문자열로 저장되면 구매가 깨진다.
+    const numericPrice = toNonNegativeInt(price);
+    if (numericPrice === null) {
+        throw new Error("가격은 0 이상의 정수로 입력해주세요.");
+    }
 
-    const modifyKey = "profileImgStorage." + urlId
-    // const {nickname, state} = req.body;
-    // MongoDB 연결
+    const key = "profileImgStorage." + urlId;
     const db = (await connectDB).db('data');
 
-    const updatedData = { price: price, url: url }
-    const response = await db.collection('class_data').updateOne({ teacher_id: teacherObjectId, classId: classObjectId }, { $set: { [modifyKey]: updatedData } }, { upsert: true })
+    const classData = await db.collection('class_data').findOne(
+        { ...scope, [key]: { $exists: true } },
+        { projection: { [key]: 1 } }
+    );
+    const current = classData?.profileImgStorage?.[urlId];
+    if (!current) {
+        throw new Error("프로필 이미지를 찾을 수 없습니다.");
+    }
+
+    // 주소는 바뀐 경우에만 검사해서 저장한다 (예전에 등록된 주소는 그대로 둔다).
+    const update = { [key + ".price"]: numericPrice };
+    if (url !== undefined && url !== current.url) {
+        update[key + ".url"] = normalizeImageUrl(url);
+    }
+
+    await db.collection('class_data').updateOne({ ...scope, [key]: { $exists: true } }, { $set: update });
 
     return {
         result: true,
@@ -38,17 +90,20 @@ export async function updateProfileImgService({ teacher_id, classId, price, url,
 }
 
 export async function deleteProfileImgService({ teacher_id, classId, urlId }) {
-
-    const classObjectId = ObjectId.createFromHexString(classId);
-    const teacherObjectId = ObjectId.createFromHexString(teacher_id);
+    const scope = toScope({ teacher_id, classId });
+    assertUrlId(urlId);
 
     const db = (await connectDB).db('data');
-    const deleteKey = "profileImgStorage." + urlId
+    const key = "profileImgStorage." + urlId;
 
     const response = await db.collection('class_data').updateOne(
-        { teacher_id: teacherObjectId, classId: classObjectId },
-        { $unset: { [deleteKey]: "" } }
+        { ...scope, [key]: { $exists: true } },
+        { $unset: { [key]: "" } }
     );
+    if (response.matchedCount === 0) {
+        throw new Error("프로필 이미지를 찾을 수 없습니다.");
+    }
+
     return {
         result: true,
     };
@@ -148,30 +203,49 @@ export async function buyProfileImgService({ teacher_id, classId, userId, urlId 
 
 
 
+/** 학생이 가진(구입한) 이미지 중에서만 프로필 사진으로 고를 수 있다. */
 export async function selectProfileImgService({ teacher_id, classId, url, userId }) {
-
-    const classObjectId = ObjectId.createFromHexString(classId);
-    const teacherObjectId = ObjectId.createFromHexString(teacher_id);
+    const scope = toScope({ teacher_id, classId });
+    if (!userId || typeof url !== "string" || !url) {
+        throw new Error("잘못된 요청입니다.");
+    }
 
     const db = (await connectDB).db('data');
-    const response = await db.collection('user_data').updateOne({ classId: classObjectId, teacher_id: teacherObjectId, userId: userId }, { $set: { "profileUrl": url } }) 
-    
+    const studentFilter = { ...scope, userId, role: "student" };
+    const student = await db.collection('user_data').findOne(studentFilter, { projection: { profileImgStorage: 1 } });
+    if (!student) {
+        throw new Error("사용자 정보를 찾을 수 없습니다.");
+    }
+
+    const owned = Object.values(student.profileImgStorage ?? {}).includes(url);
+    if (!owned) {
+        throw new Error("구입한 프로필 이미지만 선택할 수 있습니다.");
+    }
+
+    await db.collection('user_data').updateOne(studentFilter, { $set: { profileUrl: url } });
+
     return {
         result: true,
     };
 }
 
+/** 학생이 받은 칭호(titles) 중에서만 고를 수 있다. */
 export async function selectProfileTitleService({ teacher_id, classId, profileTitle, userId }) {
-
-    const classObjectId = ObjectId.createFromHexString(classId);
-    const teacherObjectId = ObjectId.createFromHexString(teacher_id);
+    const scope = toScope({ teacher_id, classId });
+    if (!userId || typeof profileTitle !== "string" || !profileTitle) {
+        throw new Error("잘못된 요청입니다.");
+    }
 
     const db = (await connectDB).db('data');
-    const response = await db.collection('user_data').updateOne({ classId: classObjectId, teacher_id: teacherObjectId, userId: userId }, { $set: { "profileTitle": profileTitle } }) 
-    
+    const response = await db.collection('user_data').updateOne(
+        { ...scope, userId, role: "student", "titles.title": profileTitle },
+        { $set: { profileTitle } }
+    );
+    if (response.matchedCount === 0) {
+        throw new Error("받은 칭호만 선택할 수 있습니다.");
+    }
+
     return {
         result: true,
     };
 }
-
-

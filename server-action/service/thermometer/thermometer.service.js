@@ -7,8 +7,26 @@ export async function updateThermometerSettingService({ teacher_id, classId, rew
     throw new Error("로그인이 필요합니다.");
   }
 
+  // 1도 올리는 데 필요한 쿠키 수: 1 이상의 정수 (0이나 문자열이면 기부 계산이 깨진다)
+  const numericRequire = toNonNegativeInt(requireCurrency);
+  if (!numericRequire) {
+    throw new Error("1도에 필요한 쿠키 수는 1 이상의 정수로 입력해주세요.");
+  }
+
+  if (!rewardObj || typeof rewardObj !== "object" || Array.isArray(rewardObj)) {
+    throw new Error("보상 설정이 올바르지 않습니다.");
+  }
+
+  let filter;
+  try {
+    filter = { teacher_id: ObjectId.createFromHexString(teacher_id), classId: ObjectId.createFromHexString(classId) };
+  } catch {
+    throw new Error("잘못된 학급 정보입니다.");
+  }
+
   const db = (await connectDB).db('data');
-  const response = await db.collection('thermometer').updateOne({ teacher_id: ObjectId.createFromHexString(teacher_id), classId: ObjectId.createFromHexString(classId) }, { $set: { "reward": rewardObj, "requireCurrency": requireCurrency } }, { upsert: true })
+  // 학급 소유권은 action(authorizeTeacherClass)에서 확인한다. 온도계는 처음 설정할 때 만들어지므로 upsert 유지.
+  await db.collection('thermometer').updateOne(filter, { $set: { reward: rewardObj, requireCurrency: numericRequire } }, { upsert: true })
 
   return {
     result: true,

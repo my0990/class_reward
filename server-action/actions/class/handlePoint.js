@@ -1,15 +1,16 @@
 "use server";
+import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 import { handlePointService } from "@/server-action/service/class/handlePointService";
 export async function handlePoint({ classId, targetStudent, point, isSend }) {
-    const session = await getServerSession(authOptions);
-    const teacher_id = session?.user?._id ?? null;
-    if (!teacher_id) {
-        return { success: false, message: "unauthorized" };
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) {
+        return { success: false, message: auth.message };
     }
+    const teacher_id = auth.teacher_id;
 
     try {
         // ✅ teacher_idId를 서비스로 넘겨서 권한/검증 확장 가능

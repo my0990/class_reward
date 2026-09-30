@@ -1,5 +1,6 @@
 // server-action/action/item/item.action.js
 "use server";
+import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -16,16 +17,9 @@ export async function createItem({
   classId,
 }) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return {
-        result: false,
-        message: "로그인이 필요합니다.",
-      };
-    }
-
-    const teacher_id = session?.user?._id ?? null;
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const teacher_id = auth.teacher_id;
 
     const result = await createItemService({
       teacher_id,
@@ -57,14 +51,9 @@ export async function deleteItem({
   itemId,
 }) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?._id) {
-      return {
-        result: false,
-        message: "로그인이 필요합니다.",
-      };
-    }
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const teacher_id = auth.teacher_id;
 
     if (!classId || !itemId) {
       return {
@@ -74,7 +63,7 @@ export async function deleteItem({
     }
 
     const data = await deleteItemService({
-      teacher_id: session.user._id,
+      teacher_id,
       classId,
       itemId,
     });
@@ -104,14 +93,9 @@ export async function updateItem({
   updatedItemPrice,
 }) {
   try {
-      const session = await getServerSession(authOptions);
-
-      if (!session?.user?._id) {
-          return {
-              result: false,
-              message: "로그인이 필요합니다.",
-          };
-      }
+      const auth = await authorizeTeacherClass(classId);
+      if (!auth.ok) return { result: false, message: auth.message };
+      const teacher_id = auth.teacher_id;
 
       if (!classId || !itemId) {
           return {
@@ -160,7 +144,7 @@ export async function updateItem({
       }
 
       const data = await updateItemService({
-          teacher_id: session.user._id,
+          teacher_id,
           classId,
           itemId,
           itemStock,

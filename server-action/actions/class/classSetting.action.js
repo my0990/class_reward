@@ -1,4 +1,5 @@
 "use server";
+import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -6,12 +7,9 @@ import { updateCurrencyNameService } from "@/server-action/service/class/classSe
 
 export async function updateCurrencyName({ classId, currencyName, currencyEmoji }) {
   try {
-    const session = await getServerSession(authOptions);
-    const teacher_id = session?.user?._id ?? null;
-
-    if (!teacher_id) {
-      return { result: false, message: "로그인이 필요합니다." };
-    }
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const teacher_id = auth.teacher_id;
 
     return await updateCurrencyNameService({
       teacher_id,

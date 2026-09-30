@@ -1,4 +1,5 @@
 "use server";
+import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -11,10 +12,6 @@ import {
   finishQuestService,
 } from "@/server-action/service/quest/quest.service";
 
-async function requireTeacherId() {
-  const session = await getServerSession(authOptions);
-  return session?.user?._id ?? null;
-}
 
 export async function createQuest({
   classId,
@@ -24,10 +21,11 @@ export async function createQuest({
   questExp,
   questTitle,
 }) {
-  const teacher_id = await requireTeacherId();
-  if (!teacher_id) {
-    return { result: false, message: "로그인이 필요합니다." };
+  const auth = await authorizeTeacherClass(classId);
+  if (!auth.ok) {
+    return { result: false, message: auth.message };
   }
+  const teacher_id = auth.teacher_id;
 
   try {
     return await createQuestService({
@@ -53,10 +51,11 @@ export async function editQuest({
   questExp,
   questTitle,
 }) {
-  const teacher_id = await requireTeacherId();
-  if (!teacher_id) {
-    return { result: false, message: "로그인이 필요합니다." };
+  const auth = await authorizeTeacherClass(classId);
+  if (!auth.ok) {
+    return { result: false, message: auth.message };
   }
+  const teacher_id = auth.teacher_id;
 
   try {
     return await editQuestService({
@@ -75,10 +74,11 @@ export async function editQuest({
 }
 
 export async function deleteQuest({ classId, questId }) {
-  const teacher_id = await requireTeacherId();
-  if (!teacher_id) {
-    return { result: false, message: "로그인이 필요합니다." };
+  const auth = await authorizeTeacherClass(classId);
+  if (!auth.ok) {
+    return { result: false, message: auth.message };
   }
+  const teacher_id = auth.teacher_id;
 
   try {
     return await deleteQuestService({ teacher_id, classId, questId });
@@ -88,10 +88,11 @@ export async function deleteQuest({ classId, questId }) {
 }
 
 export async function resetQuest({ classId, questId }) {
-  const teacher_id = await requireTeacherId();
-  if (!teacher_id) {
-    return { result: false, message: "로그인이 필요합니다." };
+  const auth = await authorizeTeacherClass(classId);
+  if (!auth.ok) {
+    return { result: false, message: auth.message };
   }
+  const teacher_id = auth.teacher_id;
 
   try {
     return await resetQuestService({ teacher_id, classId, questId });
@@ -101,10 +102,11 @@ export async function resetQuest({ classId, questId }) {
 }
 
 export async function finishQuest({ classId, questData, rewarded }) {
-  const teacher_id = await requireTeacherId();
-  if (!teacher_id) {
-    return { result: false, message: "로그인이 필요합니다." };
+  const auth = await authorizeTeacherClass(classId);
+  if (!auth.ok) {
+    return { result: false, message: auth.message };
   }
+  const teacher_id = auth.teacher_id;
 
   try {
     return await finishQuestService({ teacher_id, classId, questData, rewarded });

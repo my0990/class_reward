@@ -1,4 +1,5 @@
 'use server'
+import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 import { createStudentAccountService, deleteStudentAccountService, resetPwdService, checkUniqueNicknameService } from "@/server-action/service/account/account.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -9,8 +10,9 @@ export async function createStudentAccount({
   classId,
 }) {
   try {
-    const session = await getServerSession(authOptions);
-    const teacher_id = session?.user?._id ?? null;
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const teacher_id = auth.teacher_id;
 
     if (!Array.isArray(accountArr) || accountArr.length === 0) {
       throw new Error("생성할 계정을 선택해주세요.");
@@ -43,8 +45,9 @@ export async function createStudentAccount({
 
 export async function deleteStudentAccount({ student, classNumber, classId }) {
   try {
-    const session = await getServerSession(authOptions);
-    const teacher_id = session?.user?._id ?? null;
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const teacher_id = auth.teacher_id;
 
 
     const response = await deleteStudentAccountService({
@@ -73,8 +76,9 @@ export async function deleteStudentAccount({ student, classNumber, classId }) {
 
 export async function resetPwd({ student, classId }) {
   try {
-    const session = await getServerSession(authOptions);
-    const teacher_id = session?.user?._id ?? null;
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const teacher_id = auth.teacher_id;
 
 
     const response = await resetPwdService({
@@ -103,12 +107,9 @@ export async function resetPwd({ student, classId }) {
 
 export async function checkUniqueNickname({ uniqueNickname, classId }) {
   try {
-    const session = await getServerSession(authOptions);
-    const teacher_id = session?.user?._id ?? null;
-
-    if (!teacher_id) {
-      return { result: false, error: "로그인이 필요합니다." };
-    }
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, error: auth.message };
+    const teacher_id = auth.teacher_id;
 
     const response = await checkUniqueNicknameService({
       teacher_id,
