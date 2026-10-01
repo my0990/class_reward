@@ -12,7 +12,8 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:audit": "node scripts/db/audit.mjs"
+    "db:audit": "node scripts/db/audit.mjs",
+    "db:fix": "node scripts/db/fix.mjs"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.6",
