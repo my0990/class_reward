@@ -68,30 +68,19 @@ export default function ManageContainer() {
         if (accountArr.length === 0) return; // 아무것도 선택 안 했으면 중단(원하면 메시지)
 
         runAction("create", async () => {
-            const updatedStudentArr = Object.fromEntries(
-                Object.entries(studentArr).map(([key, value]) => [
-                    key,
-                    value === true ? "생성됨" : value,
-                ])
-            );
-
-
-            const data = await createStudentAccount({
-                accountArr,
-                updatedStudentArr,
-                uniqueNickname: classData?.uniqueNickname,
-                classId,
-            });
+            // 아이디(별명+번호)와 "생성됨" 표시는 서버가 정한다.
+            const data = await createStudentAccount({ accountArr, classId });
 
             if (!data.result) {
                 toast.error(data.message || "생성 실패");
+                await mutateClassData?.();
                 return;
             }
 
             await mutateClassData?.();
             await mutateStudentsData?.();
             setModalId(null)
-            toast.success("생성 완료");
+            toast.success(data.message || "생성 완료");
         })
     }
     const onAccountDelete = () => {
