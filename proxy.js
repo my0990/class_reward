@@ -8,19 +8,25 @@ export async function proxy(req) {
   });
 
   const { pathname } = req.nextUrl;
+  const role = token?.user?.role;
 
-  // teacher 전용 페이지
+  // 관리자 페이지: 로그인 화면 말고는 관리자만
+  // (최종 확인은 페이지/액션에서 ADMIN_EMAILS까지 다시 본다)
+  if (pathname.startsWith("/admin")) {
+    if (pathname === "/admin/login") return NextResponse.next();
+    if (role !== "admin") {
+      return NextResponse.redirect(new URL("/admin/login", req.url));
+    }
+    return NextResponse.next();
+  }
+
+  // teacher 전용 페이지: 교사만 (학생·관리자는 차단)
   if (pathname.startsWith("/teacher")) {
-    
-    // 로그인 안했으면
     if (!token) {
       return NextResponse.redirect(new URL("/", req.url));
     }
-
-    // 학생이면 접근 차단
-    if (token.user.role === "student") {
-      console.log('moved')
-      return NextResponse.redirect(new URL("/", req.url));
+    if (role !== "teacher") {
+      return NextResponse.redirect(new URL(role === "admin" ? "/admin" : "/", req.url));
     }
   }
 
@@ -28,5 +34,5 @@ export async function proxy(req) {
 }
 
 export const config = {
-  matcher: ["/teacher/:path*"],
+  matcher: ["/teacher/:path*", "/admin/:path*"],
 };

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { parseIntParam } from "@/lib/api/routeHelpers";
+import { NOTICE_SORT } from "@/server-action/service/admin/notice.service";
 
 export async function GET(req) {
   try {
@@ -19,7 +20,7 @@ export async function GET(req) {
       db
         .collection("notices")
         .find()
-        .sort({ createdAt: -1 })
+        .sort(NOTICE_SORT) // 고정 공지 먼저
         .skip(skip)
         .limit(limit)
         .toArray(),
@@ -27,7 +28,7 @@ export async function GET(req) {
     ]);
 
     return NextResponse.json({
-      notices: notices.map((n) => ({ ...n, _id: n._id.toString() })),
+      notices: notices.map(({ authorEmail, pinnedAt, ...n }) => ({ ...n, _id: n._id.toString() })),
       total,
       page,
       limit,

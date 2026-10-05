@@ -9,7 +9,9 @@ export default async function Home() {
     redirect("/teacher/classes")
   } else if (session && session.user.role === "student") {
     redirect(`/student/dashboard/${session.user.classId}`)
-  } 
+  } else if (session && session.user.role === "admin") {
+    redirect("/admin")
+  }
     
 
   return (

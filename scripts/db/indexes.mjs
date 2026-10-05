@@ -12,6 +12,7 @@ const APPLY = process.argv.includes("--apply");
 const client = await connect();
 const data = client.db("data");
 const user = client.db("user");
+const admins = client.db("admins");
 
 // 빈 문자열/없는 값은 중복 검사에서 제외 (학생은 email이 없고, 교사는 userId가 없을 수 있다)
 const nonEmpty = (field) => ({ [field]: { $gt: "" } });
@@ -29,6 +30,11 @@ const PLAN = [
   [user, "email_verifications", { email: 1 }, { unique: true, name: "email_unique" }, "인증 요청 이메일당 1개"],
   [user, "kiosk_pwd_attempts", { teacher_id: 1, userId: 1 }, { unique: true, name: "teacher_user_unique" }, "키오스크 비밀번호 시도 기록"],
   [user, "kiosk_pwd_attempts", { updatedAt: 1 }, { expireAfterSeconds: 24 * 60 * 60, name: "updatedAt_ttl_1d" }, "키오스크 시도 기록 하루 뒤 자동 삭제"],
+  [admins, "accounts", { email: 1 }, { unique: true, name: "email_unique" }, "관리자 이메일 중복 금지"],
+  [admins, "admin_login_attempts", { email: 1 }, { unique: true, name: "email_unique" }, "관리자 로그인 시도 기록"],
+  [admins, "admin_login_attempts", { updatedAt: 1 }, { expireAfterSeconds: 24 * 60 * 60, name: "updatedAt_ttl_1d" }, "관리자 로그인 시도 기록 하루 뒤 자동 삭제"],
+  [admins, "notices", { pinned: -1, pinnedAt: -1, createdAt: -1 }, {}, "공지 목록 (고정 먼저)"],
+  [admins, "audit_log", { at: -1 }, {}, "관리자 작업 기록 (최신순)"],
 ];
 
 const sameKey = (a, b) => JSON.stringify(a) === JSON.stringify(b);

@@ -4,12 +4,13 @@ import { connectDB } from "@/lib/mongodb";
 import { compare } from "bcryptjs";
 import { ObjectId } from "mongodb";
 import { recheckUser } from "@/lib/auth/sessionCheck";
+import { authorizeAdmin, isAdminEmail, ADMIN_SESSION_MS } from "@/lib/auth/adminAuth";
 export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        role: { label: "Role", type: "text" }, // "student" | "teacher"
+        role: { label: "Role", type: "text" }, // "student" | "teacher" | "admin"
         id: { label: "Student ID", type: "text" }, // student 전용
         email: { label: "Email", type: "text" }, // teacher 전용
         password: { label: "Password", type: "password" },
@@ -20,6 +21,15 @@ export const authOptions = {
         const role = String(credentials?.role ?? "");
         const password = String(credentials?.password ?? "");
         if (!role || !password) return null;
+
+        // 🛠️ 관리자: admins.accounts + ADMIN_EMAILS 허용 목록 (lib/auth/adminAuth)
+        if (role === "admin") {
+          const admin = await authorizeAdmin((await connectDB).db("admins"), {
+            email: credentials?.email,
+            password,
+          });
+          return admin ? { ...admin, role: "admin" } : null;
+        }
 
         const db = (await connectDB).db("user");
         let user = null;
@@ -54,6 +64,9 @@ export const authOptions = {
 
         const ok = await compare(password, hashed);
         if (!ok) return null;
+
+        // 관리자 대시보드의 "최근 접속" 통계용
+        await db.collection("users").updateOne({ _id: user._id }, { $set: { lastSeenAt: new Date() } }).catch(() => {});
 
         // ✅ role별로 필요한 최소 필드만 반환 (jwt/session에서 사용)
         if (role === "teacher") {
@@ -107,16 +120,33 @@ export const authOptions = {
             _id: user._id.toString(),
             teacher_id: user.teacher_id?.toString() ?? null
           };
+        } else if (user.role === "admin") {
+          token.user = {
+            role: "admin",
+            email: user.email,
+            _id: user._id,
+            expiresAt: Date.now() + ADMIN_SESSION_MS, // 관리자는 12시간 뒤 다시 로그인
+          };
         }
       }
 
       // 계정이 아직 있는지는 5분에 한 번만 DB로 확인한다 (lib/auth/sessionCheck)
       await recheckUser(token, {
         justSignedIn: Boolean(user),
+        // 확인하는 김에 lastSeenAt(최근 접속)도 갱신한다 → 5분에 한 번 쓰기
         findUserById: async (id) => {
-          const db = (await connectDB).db("user");
-          return db.collection("users").findOne(
-            { _id: ObjectId.createFromHexString(id), disabled: { $ne: true } },
+          const client = await connectDB;
+          const _id = ObjectId.createFromHexString(id);
+          const $set = { lastSeenAt: new Date() };
+          if (token.user.role === "admin") {
+            if (!isAdminEmail(token.user.email)) return null; // ADMIN_EMAILS에서 빠짐
+            return client.db("admins").collection("accounts").findOneAndUpdate(
+              { _id }, { $set }, { projection: { _id: 1 } }
+            );
+          }
+          return client.db("user").collection("users").findOneAndUpdate(
+            { _id, disabled: { $ne: true } },
+            { $set },
             { projection: { _id: 1 } }
           );
         },
@@ -128,6 +158,9 @@ export const authOptions = {
     // ✅ session에도 role별로 다르게 노출
     session: async ({ session, token }) => {
       if (token.invalidUser) {
+        return null;
+      }
+      if (token.user?.role === "admin" && Date.now() > (token.user.expiresAt ?? 0)) {
         return null;
       }
       session.user = token.user;

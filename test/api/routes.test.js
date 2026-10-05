@@ -330,6 +330,22 @@ describe("/api/notices (로그인 불필요)", () => {
     expect(body.notices).toHaveLength(5);
   });
 
+  it("고정 공지가 먼저 오고, 관리자 이메일은 내보내지 않는다", async () => {
+    const col = mongo.client.db("admins").collection("notices");
+    await col.deleteMany({});
+    const pinnedId = new ObjectId();
+    await col.insertMany([
+      { title: "최신", createdAt: new Date(2026, 5, 1), authorEmail: "boss@test.com" },
+      { _id: pinnedId, title: "고정", createdAt: new Date(2026, 0, 1), pinned: true, pinnedAt: new Date(2026, 0, 2), authorEmail: "boss@test.com" },
+    ]);
+    const { body } = await call(noticesRoute, { url: "http://localhost/api/notices" });
+    expect(body.notices.map((n) => n.title)).toEqual(["고정", "최신"]);
+    expect(body.notices[0]).not.toHaveProperty("authorEmail");
+
+    const detail = await call(noticeRoute, { id: pinnedId.toHexString() });
+    expect(detail.body.notice).not.toHaveProperty("authorEmail");
+  });
+
   it("공지 상세: 잘못된 id는 400, 없는 id는 404", async () => {
     expect((await call(noticeRoute, { id: "123456789012" })).status).toBe(400);
     expect((await call(noticeRoute, { id: new ObjectId().toHexString() })).status).toBe(404);

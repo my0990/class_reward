@@ -33,6 +33,7 @@ npm run dev                  # http://localhost:3000
 | `EMAIL_CODE_HMAC_KEY` | 이메일 인증 코드 해시용 키 |
 | `RESEND_API_KEY` | Resend API 키 (교사 회원가입 인증 메일) |
 | `MAIL_FROM` | 인증 메일 보내는 주소 |
+| `ADMIN_EMAILS` | 관리자 이메일 (쉼표로 여러 개). 여기 없는 이메일은 관리자 계정이 있어도 로그인 불가 |
 
 > 실제 값은 절대 커밋하지 않는다. `.env*.local`은 `.gitignore`에 들어 있다.
 
@@ -100,3 +101,18 @@ test/helpers/           테스트 공용 헬퍼 (메모리 DB)
 - **돈이 오가는 작업은 트랜잭션 + 조건부 차감**(`money: { $gte: price }`)으로 동시 요청을 막는다.
 - **숫자는 정수(number)로 저장한다.** 입력값은 `toNonNegativeInt`로 변환한다. 문자열 가격이 저장되면 구매가 실패한다.
 - **없는 문서를 `upsert`로 만들지 않는다.** 학급 문서는 학급을 만들 때만 생긴다.
+
+## 관리자
+
+- 주소: `/admin/login` → `/admin`(대시보드), `/admin/notices`(공지 등록·수정·삭제·고정)
+- 계정 만들기 (비밀번호는 화면에 안 보이게 입력, 10자 이상):
+  ```bash
+  # 1) .env.local(그리고 Vercel)에 ADMIN_EMAILS=you@example.com
+  npm run admin:create -- --email you@example.com
+  npm run admin:create -- --email you@example.com --reset   # 비밀번호 바꾸기 + 잠금 풀기
+  ```
+- 계정은 `admins.accounts`에 따로 저장한다 (교사 계정과 같은 이메일이어도 된다).
+- 보안: 5번 틀리면 15분 잠금, 세션 12시간, `ADMIN_EMAILS`에서 빼면 5분 안에 권한이 사라진다.
+  관리자 세션으로는 교사/학생 화면과 API를 쓸 수 없다.
+- 관리자 작업(로그인, 공지 등록/수정/삭제/고정)은 `admins.audit_log`에 남는다.
+- 대시보드는 개수만 보여준다 (교사 목록 없음). "최근 접속"은 로그인과 5분마다의 세션 확인 때 갱신되는 `lastSeenAt` 기준이다.

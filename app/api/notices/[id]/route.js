@@ -28,10 +28,11 @@ export async function GET(req, { params }) {
       );
     }
 
+    const { authorEmail, pinnedAt, ...rest } = notice; // 관리자 이메일은 내보내지 않는다
     return NextResponse.json({
       notice: {
-        ...notice,
-        _id: notice._id.toString(),
+        ...rest,
+        _id: rest._id.toString(),
       },
     });
   } catch (err) {

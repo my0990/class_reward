@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "db:audit": "node scripts/db/audit.mjs",
     "db:fix": "node scripts/db/fix.mjs",
-    "db:indexes": "node scripts/db/indexes.mjs"
+    "db:indexes": "node scripts/db/indexes.mjs",
+    "admin:create": "node scripts/admin/create.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

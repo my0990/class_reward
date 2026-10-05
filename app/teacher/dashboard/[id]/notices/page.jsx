@@ -51,7 +51,10 @@ export default function Notices() {
             return (
               <Link href={`notices/${n._id}`} key={String(n._id)}>
                 <div className="bg-orange-100 p-5 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer my-4">
-                  <div className="flex">
+                  <div className="flex items-center">
+                    {n.pinned && (
+                      <span className="badge badge-sm border-0 bg-orange-200 text-orange-800 mr-2 shrink-0">📌 고정</span>
+                    )}
                     <h2 className="font-semibold text-lg">{n.title}</h2>
                     {isNew && (
                       <div className="badge badge-secondary bg-red-500 ml-2">
@@ -84,7 +87,7 @@ export default function Notices() {
         {/* 페이지네이션 (스타일 최대한 심플하게 유지) */}
         <div className="flex items-center justify-center gap-3 mt-8">
           <Link
-            href={`/announcements?page=${page - 1}`}
+            href={`?page=${page - 1}`}
             className={`px-4 py-2 rounded-full border ${
               hasPrev ? "cursor-pointer hover:bg-gray-100" : "pointer-events-none opacity-40"
             }`}
@@ -97,7 +100,7 @@ export default function Notices() {
           </div>
 
           <Link
-            href={`/announcements?page=${page + 1}`}
+            href={`?page=${page + 1}`}
             className={`px-4 py-2 rounded-full border ${
               hasNext ? "cursor-pointer hover:bg-gray-100" : "pointer-events-none opacity-40"
             }`}
