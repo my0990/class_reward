@@ -55,8 +55,8 @@ export default function DetailModal() {
       setModalId={setModalId}
     >
       {() => (
-        <div className="flex max-w-[960px] flex-wrap justify-between p-6 max-[1000px]:max-w-[560px]">
-          <div className="mr-5 flex max-w-[352px] justify-center rounded-xl bg-green-400 p-[8px]">
+        <div className="flex max-w-[880px] flex-wrap justify-between gap-y-4 p-6 max-[900px]:max-w-[520px] max-[900px]:justify-center max-[480px]:p-3">
+          <div className="mr-5 flex max-w-[352px] justify-center rounded-xl bg-green-400 p-[8px] max-[900px]:mr-0">
             <CardTemplate
               picked={picked}
               startExp={startExp}
@@ -64,7 +64,7 @@ export default function DetailModal() {
             />
           </div>
 
-          <div className="h-[500px] w-[520px] max-w-full overflow-auto max-[1000px]:mt-4">
+          <div className="h-[500px] w-[460px] max-w-full overflow-auto max-[900px]:h-[420px] max-[900px]:w-full">
             <div className="mb-[16px] flex items-center justify-between">
               <h1 className="ml-6 text-[1.8rem] font-bold">
                 화폐 및 아이템 사용 기록
@@ -122,7 +122,7 @@ export default function DetailModal() {
                     <th>종류</th>
                     <th>내용</th>
                     <th>돈</th>
-                    <th>잔액</th>
+                    <th className="max-[480px]:hidden">잔액</th>
                     <th>날짜</th>
                   </tr>
                 </thead>
@@ -140,7 +140,7 @@ export default function DetailModal() {
                         </span>
                       </td>
                       {/* 긴 내용은 ...으로 줄이고, 마우스를 올리면 전체 내용 */}
-                      <td className="max-w-[220px]">
+                      <td className="max-w-[170px] max-[480px]:max-w-[110px]">
                         <div className="truncate" title={item?.name}>
                           {item?.name}
                         </div>
@@ -156,7 +156,7 @@ export default function DetailModal() {
                           {getAmountText(item.type, item.amount)}
                         </span>
                       </td>
-                      <td>{item.balance}</td>
+                      <td className="max-[480px]:hidden">{item.balance}</td>
                       <td className="text-[0.8rem] leading-tight text-gray-500" title={formatFullDate(item.date)}>
                         {(() => {
                           const { day, time } = formatHistoryDateParts(item.date);
