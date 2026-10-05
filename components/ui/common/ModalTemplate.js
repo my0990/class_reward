@@ -13,6 +13,11 @@ export default function ModalTemplate({
 }) {
 
   const isOpen = modalId === id;
+
+  // className에 max-w-를 넘기면 기본값(max-w-[95vw])을 빼야 한다.
+  // 둘 다 붙이면 CSS 파일에서 뒤에 오는 max-w-[95vw]가 이겨서, 넘긴 max-w가 무시된다.
+  // (예: 퀘스트 등록 모달이 max-w-[600px] 대신 화면 너비로 늘어나 오른쪽이 비어 보였음)
+  const hasMaxWidth = /(^|\s)max-w-/.test(className);
   const modalRef = useRef(null);
 
   const close = useCallback(() => {
@@ -55,7 +60,7 @@ export default function ModalTemplate({
           <motion.div
             ref={modalRef}
             onClick={(e) => e.stopPropagation()}
-            className={`bg-white rounded-2xl min-w-[320px] max-w-[95vw] shadow-xl ${className}`}
+            className={`bg-white rounded-2xl min-w-[320px] ${hasMaxWidth ? "" : "max-w-[95vw]"} shadow-xl ${className}`}
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
