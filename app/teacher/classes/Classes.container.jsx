@@ -8,10 +8,50 @@ import { mutate } from "swr";
 import AddClassCard from "./_component/components/AddClassCard";
 import ClassCard from "./_component/components/ClassCard";
 import AddClassModal from "./_component/components/AddClassModal";
+import DeleteClassModal from "./_component/components/DeleteClassModal";
+import DeletedClassList from "./_component/components/DeletedClassList";
+import { deleteClass, restoreClass } from "@/server-action/actions/class/classDelete.action";
+import usePendingAction from "@/hooks/usePendingAction";
+import { Toaster, toast } from "react-hot-toast";
 import { signOut } from "next-auth/react";
 export default function ClassesContainer() {
     const [modalId, setModalId] = useState(null);
+    const [deleteTarget, setDeleteTarget] = useState(null);
     const router = useRouter();
+    const { runAction, isPending } = usePendingAction();
+    const { data: deletedClasses } = useFetchData('/api/classes/trash');
+
+    const refreshLists = () => Promise.all([mutate('/api/classes'), mutate('/api/classes/trash')]);
+
+    const onDeleteClick = (cls) => {
+        setDeleteTarget(cls);
+        setModalId("DELETE_CLASS");
+    };
+
+    const onDeleteConfirm = (confirmName) => {
+        runAction("deleteClass", async () => {
+            const res = await deleteClass({ classId: String(deleteTarget._id), confirmName });
+            if (!res.result) {
+                toast.error(res.message);
+                return;
+            }
+            setModalId(null);
+            await refreshLists();
+            toast.success(res.message);
+        }).catch(() => toast.error("학급 삭제 중 오류가 발생했습니다."));
+    };
+
+    const onRestore = (cls) => {
+        runAction("restoreClass", String(cls._id), async () => {
+            const res = await restoreClass({ classId: String(cls._id) });
+            if (!res.result) {
+                toast.error(res.message);
+                return;
+            }
+            await refreshLists();
+            toast.success(res.message);
+        }).catch(() => toast.error("학급 복구 중 오류가 발생했습니다."));
+    };
 
     const onCardClick = (id) => {
         router.push(`/teacher/dashboard/${id}`);
@@ -49,16 +89,29 @@ export default function ClassesContainer() {
                                         xl:grid-cols-4
                                         ">
                         {classesData.map(cls => (
-                            <ClassCard key={cls._id} cls={cls} onClick={() => onCardClick(cls._id)} />
+                            <ClassCard key={cls._id} cls={cls} onClick={() => onCardClick(cls._id)} onDelete={onDeleteClick} />
                         ))}
                         <AddClassCard onClick={() => setModalId("ADD_CLASS")} />
                     </div>
+
+                    <DeletedClassList
+                        classes={deletedClasses}
+                        onRestore={onRestore}
+                        isRestoring={(id) => isPending("restoreClass", String(id))}
+                    />
                 </div>
             </div>
             <AddClassModal
                 modalId={modalId}
                 setModalId={setModalId}
                 onCreateClass={onCreateClass} />
+            <DeleteClassModal
+                modalId={modalId}
+                setModalId={setModalId}
+                target={deleteTarget}
+                onConfirm={onDeleteConfirm}
+                isDeleting={isPending("deleteClass")} />
+            <Toaster position="bottom-right" />
         </div>
     )
 }

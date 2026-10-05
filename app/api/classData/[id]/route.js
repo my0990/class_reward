@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { withApiHandler, requireMember, parseObjectId } from "@/lib/api/routeHelpers";
+import { withApiHandler, requireMember, parseObjectId, requireActiveClass } from "@/lib/api/routeHelpers";
 
 // 학급 설정/마켓/프로필 이미지 등 학급 정보 (교사 + 그 반 학생)
 export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
   const classObjectId = parseObjectId(id, "학급 id");
   const { teacherObjectId } = await requireMember({ classId: id });
+  await requireActiveClass(teacherObjectId, classObjectId);
 
   const db = (await connectDB).db("data");
   const classData = await db.collection("class_data").findOne({

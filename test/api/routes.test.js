@@ -36,6 +36,13 @@ async function call(route, { id, url = "http://localhost/api/test" } = {}) {
   return { status: res.status, body: await res.json() };
 }
 
+// 학급 문서(classes) — 학급 조회 API는 휴지통에 없는 학급만 허용한다
+async function seedClassDocs(...scopes) {
+  for (const sc of scopes) {
+    await mongo.db.collection("classes").insertOne({ _id: sc.classObjectId, teacher_id: sc.teacherObjectId, className: "반" });
+  }
+}
+
 beforeEach(() => {
   getServerSession.mockReset();
 });
@@ -113,6 +120,8 @@ describe("/api/classes 학생 수", () => {
 });
 
 describe("/api/classData/[id]", () => {
+  beforeEach(() => seedClassDocs(scope, other));
+
   it("교사: 자기 학급 정보를 준다", async () => {
     await seedClassData(mongo.db, scope, { className: "우리반" });
     asTeacher();
@@ -147,6 +156,8 @@ describe("/api/classData/[id]", () => {
 });
 
 describe("/api/students/[id]", () => {
+  beforeEach(() => seedClassDocs(scope, other));
+
   it("교사: 자기 학급 학생만 번호순으로 준다", async () => {
     await seedStudent(mongo.db, scope, { userId: "s2", classNumber: 2 });
     await seedStudent(mongo.db, scope, { userId: "s1", classNumber: 1 });
@@ -165,6 +176,8 @@ describe("/api/students/[id]", () => {
 });
 
 describe("/api/fetchQuestList/[id]", () => {
+  beforeEach(() => seedClassDocs(scope, other));
+
   it("교사: 자기 학급 퀘스트만 준다", async () => {
     await mongo.db.collection("quest").insertMany([
       { teacher_id: scope.teacherObjectId, classId: scope.classObjectId, questName: "우리 퀘스트", time: 1 },
@@ -213,6 +226,8 @@ describe("/api/fetchHistory/[id]", () => {
 });
 
 describe("/api/thermometer/[id]", () => {
+  beforeEach(() => seedClassDocs(scope, other));
+
   it("설정이 없으면 기본값을 준다", async () => {
     asTeacher();
     const { status, body } = await call(thermometerRoute, { id: scope.classId });
@@ -295,5 +310,22 @@ describe("/api/notices (로그인 불필요)", () => {
   it("공지 상세: 잘못된 id는 400, 없는 id는 404", async () => {
     expect((await call(noticeRoute, { id: "123456789012" })).status).toBe(400);
     expect((await call(noticeRoute, { id: new ObjectId().toHexString() })).status).toBe(404);
+  });
+});
+
+describe("휴지통(삭제된) 학급", () => {
+  it("학급 목록에서 숨겨지고, 학급 조회 API는 404", async () => {
+    await mongo.db.collection("classes").insertMany([
+      { _id: scope.classObjectId, teacher_id: scope.teacherObjectId, className: "삭제된반", deletedAt: new Date(), purgeAt: new Date(Date.now() + 86400000) },
+      { teacher_id: scope.teacherObjectId, className: "남은반" },
+    ]);
+    await seedClassData(mongo.db, scope);
+    asTeacher();
+    expect((await call(classesRoute)).body.map((c) => c.className)).toEqual(["남은반"]);
+    for (const route of [classDataRoute, studentsRoute, questRoute, thermometerRoute]) {
+      const { status, body } = await call(route, { id: scope.classId });
+      expect(status).toBe(404);
+      expect(body.error).toBe("삭제된 학급입니다.");
+    }
   });
 });

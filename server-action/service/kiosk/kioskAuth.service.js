@@ -44,6 +44,7 @@ export async function verifyStudentPasswordService({ teacher_id, userId, userPwd
     userId: String(userId),
     role: "student",
     teacher_id: teacherObjectId,
+    disabled: { $ne: true },
   });
 
   const hashed = user?.passwordHash ?? user?.password;

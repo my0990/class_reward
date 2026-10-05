@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { withApiHandler, requireMember, parseObjectId } from "@/lib/api/routeHelpers";
+import { withApiHandler, requireMember, parseObjectId, requireActiveClass } from "@/lib/api/routeHelpers";
 
 const DEFAULT_THERMOMETER = {
   manualDegree: 0,       // 선생님이 직접 올린 온도
@@ -17,6 +17,7 @@ export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
   const classObjectId = parseObjectId(id, "학급 id");
   const { teacherObjectId } = await requireMember({ classId: id });
+  await requireActiveClass(teacherObjectId, classObjectId);
 
   const db = (await connectDB).db("data");
   const thermometerData = await db.collection("thermometer").findOne({

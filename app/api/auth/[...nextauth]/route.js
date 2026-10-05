@@ -32,6 +32,7 @@ export const authOptions = {
           user = await db.collection("users").findOne({
             role: "student",
             userId: id,
+            disabled: { $ne: true }, // 학급이 휴지통에 있으면 로그인 불가
           });
         }
 
@@ -115,7 +116,7 @@ export const authOptions = {
         findUserById: async (id) => {
           const db = (await connectDB).db("user");
           return db.collection("users").findOne(
-            { _id: ObjectId.createFromHexString(id) },
+            { _id: ObjectId.createFromHexString(id), disabled: { $ne: true } },
             { projection: { _id: 1 } }
           );
         },

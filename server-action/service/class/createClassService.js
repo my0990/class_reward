@@ -5,7 +5,11 @@ export async function createClassService({ className, teacher_id }) {
     const db = (await connectDB).db('data');
 
 
-    const existingCount = await db.collection("classes").countDocuments({ teacher_id });
+    // teacher_id는 ObjectId로 저장되어 있다 (예전엔 문자열로 세서 제한이 한 번도 걸리지 않았음). 휴지통 학급은 제외.
+    const existingCount = await db.collection("classes").countDocuments({
+        teacher_id: ObjectId.createFromHexString(teacher_id),
+        deletedAt: { $exists: false },
+    });
 
     if (existingCount >= 20) {
         throw new Error("학급은 최대 20개까지만 생성할 수 있습니다.");

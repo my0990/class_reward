@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { withApiHandler, requireTeacher, parseObjectId } from "@/lib/api/routeHelpers";
+import { withApiHandler, requireTeacher, parseObjectId, requireActiveClass } from "@/lib/api/routeHelpers";
 
 // 학급 퀘스트 목록 (교사)
 export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
   const classObjectId = parseObjectId(id, "학급 id");
   const { teacherObjectId } = await requireTeacher();
+  await requireActiveClass(teacherObjectId, classObjectId);
 
   const db = (await connectDB).db("data");
   const quests = await db
