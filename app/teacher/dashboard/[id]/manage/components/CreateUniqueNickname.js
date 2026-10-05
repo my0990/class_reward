@@ -46,8 +46,8 @@ export default function CreateUniqueNickname({classId}) {
 
     }
     return (
-        <div className="text-[1.4rem]">
-            <fieldset className="border-2 border-black p-[16px] rounded-xl">
+        <div className="text-[1.05rem] sm:text-[1.4rem]">
+            <fieldset className="border-2 border-black p-[12px] sm:p-[16px] rounded-xl">
                 <legend>
                     고유 닉네임 입력
                 </legend>

@@ -56,7 +56,7 @@ export default function DetailModal() {
     >
       {() => (
         <div className="flex max-w-[880px] flex-wrap justify-between gap-y-4 p-6 max-[900px]:max-w-[520px] max-[900px]:justify-center max-[480px]:p-3">
-          <div className="mr-5 flex max-w-[352px] justify-center rounded-xl bg-green-400 p-[8px] max-[900px]:mr-0">
+          <div className="mr-5 flex w-full max-w-[352px] justify-center rounded-xl bg-green-400 p-[8px] max-[900px]:mr-0">
             <CardTemplate
               picked={picked}
               startExp={startExp}
