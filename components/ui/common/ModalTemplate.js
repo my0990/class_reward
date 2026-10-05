@@ -54,7 +54,7 @@ export default function ModalTemplate({
         <motion.div
           // 창이 화면보다 길면 바깥(배경)이 스크롤된다. items-center로 가운데 정렬하면
           // 화면보다 긴 창은 위아래가 잘려서 스크롤로도 볼 수 없으므로, m-auto로 가운데 정렬한다.
-          className="fixed inset-0 z-50 flex overflow-y-auto overscroll-contain bg-black/40 p-[12px]"
+          className="fixed inset-0 z-50 flex overflow-y-auto overscroll-contain bg-black/40 p-[16px]"
           onClick={onOutsideClick}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -73,14 +73,15 @@ export default function ModalTemplate({
               damping: 25
             }}
           >
-            {/* 모든 화면에서 오른쪽 위에 닫기 버튼 (바깥 클릭·ESC도 그대로 동작) */}
+            {/* 모든 화면에서 오른쪽 위에 닫기 버튼 (바깥 클릭·ESC도 그대로 동작)
+                창 모서리 바깥쪽에 걸쳐 둬서 창 안의 스크롤바·내용을 가리지 않는다 */}
             {!hideCloseButton && (
               <button
                 type="button"
                 onClick={close}
                 aria-label="닫기"
                 className="
-                  absolute right-[8px] top-[8px] z-10 flex h-[36px] w-[36px]
+                  absolute right-[-10px] top-[-10px] z-10 flex h-[36px] w-[36px]
                   items-center justify-center rounded-full bg-white/90 text-gray-500
                   shadow ring-1 ring-gray-200 hover:bg-gray-50 hover:text-gray-700 active:scale-95
                 "

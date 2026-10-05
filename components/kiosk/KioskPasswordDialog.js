@@ -57,27 +57,27 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
 
   return (
     <dialog id={KIOSK_PWD_DIALOG_ID} ref={dialogRef} className="modal modal-middle">
+      <div className="relative w-[calc(100%-24px)] max-w-[400px] justify-self-center">
+      {/* 닫기 버튼: 창(스크롤 영역) 바깥 모서리에 걸쳐 둬서 스크롤바를 가리지 않게 */}
+      <form method="dialog" className="absolute right-[-10px] top-[-10px] z-10">
+        <button
+          aria-label="닫기"
+          className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-white text-orange-300 shadow ring-1 ring-orange-100 active:scale-95"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-5 w-5" aria-hidden="true">
+            <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
+      </form>
       <div
         className="
-          modal-box relative flex max-w-[400px] flex-col items-center
+          modal-box relative flex w-full max-w-[400px] flex-col items-center
           max-h-[calc(100dvh-24px)] overflow-x-hidden overflow-y-auto
           rounded-[36px] bg-gradient-to-b from-orange-50 to-amber-50 px-[24px] pb-[28px] pt-[28px]
           [@media(max-height:760px)]:pt-[18px] [@media(max-height:760px)]:pb-[20px]
           shadow-[0_20px_60px_rgba(251,146,60,0.25)]
         "
       >
-        {/* 닫기 버튼 (태블릿·휴대폰에서 바깥을 누르기 어려울 때) */}
-        <form method="dialog" className="absolute right-[12px] top-[12px] z-10">
-          <button
-            aria-label="닫기"
-            className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-white/90 text-orange-300 shadow ring-1 ring-orange-100 active:scale-95"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-5 w-5" aria-hidden="true">
-              <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
-            </svg>
-          </button>
-        </form>
-
         {/* 장식용 동그라미 */}
         <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-200/40" />
         <span aria-hidden="true" className="pointer-events-none absolute -left-8 top-24 h-16 w-16 rounded-full bg-orange-200/40" />
@@ -120,6 +120,7 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
         <div className="mt-[10px] min-h-[22px] text-center text-[0.95rem] font-semibold text-rose-500" role="alert">
           {error}
         </div>
+      </div>
       </div>
 
       <form method="dialog" className="modal-backdrop">

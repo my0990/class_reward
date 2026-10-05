@@ -65,8 +65,8 @@ export default function DetailModal() {
           </div>
 
           <div className="h-[500px] w-[460px] max-w-full overflow-auto max-[900px]:h-[420px] max-[900px]:w-full">
-            {/* 새로고침은 제목 바로 옆에 (오른쪽 위는 창 닫기 버튼 자리) */}
-            <div className="mb-[16px] flex items-center gap-[8px] pr-[44px]">
+            {/* 새로고침은 제목 바로 옆에 */}
+            <div className="mb-[16px] flex items-center gap-[8px] pr-[12px]">
               <h1 className="ml-[8px] text-[1.5rem] font-bold sm:text-[1.8rem]">
                 화폐 및 아이템 사용 기록
               </h1>
