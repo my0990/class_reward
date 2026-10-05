@@ -17,7 +17,7 @@ function getAmountText(type, amount) {
 }
 
 export default function DetailModal() {
-  const { picked, startExp, commonDifference, modalId, setModalId } = useManageContext();
+  const { picked, startExp, commonDifference, modalId, setModalId, studentsData, onDetailClick } = useManageContext();
   const [rotation, setRotation] = useState(0);
 
   const userId = picked?.userId;
@@ -63,11 +63,44 @@ export default function DetailModal() {
     if (index !== slide) setSlide(index);
   };
 
-  // 다른 학생을 열면 항상 프로필부터
+  // 목록에서 학생을 열면 항상 프로필부터 (창 안에서 이전/다음으로 넘길 때는 보던 장을 유지)
   useEffect(() => {
+    if (!isOpen) return;
     setSlide(0);
     sliderRef.current?.scrollTo({ left: 0 });
-  }, [userId, isOpen]);
+  }, [isOpen]);
+
+  // 이전/다음 학생 (학생 관리 목록과 같은 번호순)
+  const historyRef = useRef(null);
+  const students = studentsData ?? [];
+  const currentIndex = students.findIndex((s) => s.userId === userId);
+  const prevStudent = currentIndex > 0 ? students[currentIndex - 1] : null;
+  const nextStudent = currentIndex >= 0 && currentIndex < students.length - 1 ? students[currentIndex + 1] : null;
+  const goToStudent = (student) => {
+    if (student) onDetailClick(student);
+  };
+
+  // 학생이 바뀌면 사용 기록 스크롤을 맨 위로
+  useEffect(() => {
+    if (historyRef.current) historyRef.current.scrollTop = 0;
+  }, [userId]);
+
+  // PC 키보드 ← →로 이전/다음 학생
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e) => {
+      if (e.target instanceof HTMLElement && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+      if (e.key === "ArrowLeft" && prevStudent) {
+        e.preventDefault();
+        goToStudent(prevStudent);
+      } else if (e.key === "ArrowRight" && nextStudent) {
+        e.preventDefault();
+        goToStudent(nextStudent);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   const onRefresh = () => {
     if (!historyKey) return;
@@ -125,6 +158,7 @@ export default function DetailModal() {
           </section>
 
           <section
+            ref={historyRef}
             aria-label="화폐 및 아이템 사용 기록"
             className="h-[500px] w-[460px] shrink-0 overflow-y-auto max-[900px]:h-[min(500px,70dvh)] max-[900px]:w-full max-[900px]:snap-start max-[900px]:snap-always"
           >
@@ -267,8 +301,44 @@ export default function DetailModal() {
               />
             ))}
           </div>
+
+          {/* 이전 / 다음 학생 */}
+          {students.length > 1 && currentIndex >= 0 && (
+            <nav className="mt-[14px] flex items-center justify-between gap-[8px] border-t border-orange-100 pt-[12px]" aria-label="다른 학생 보기">
+              <StudentNavButton direction="prev" student={prevStudent} onClick={() => goToStudent(prevStudent)} />
+              <span className="shrink-0 text-[0.85rem] font-semibold text-gray-400">
+                {currentIndex + 1} / {students.length}
+              </span>
+              <StudentNavButton direction="next" student={nextStudent} onClick={() => goToStudent(nextStudent)} />
+            </nav>
+          )}
         </div>
       )}
     </ModalTemplate>
+  );
+}
+
+// 이전/다음 학생 버튼: 옆 학생의 번호·별명을 미리 보여준다. 끝이면 흐리게.
+function StudentNavButton({ direction, student, onClick }) {
+  const isPrev = direction === "prev";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={!student}
+      aria-label={isPrev ? "이전 학생" : "다음 학생"}
+      className={`
+        flex min-w-0 max-w-[45%] items-center gap-[6px] rounded-full px-[12px] py-[8px]
+        text-[0.9rem] font-semibold text-orange-500 transition
+        hover:bg-orange-50 active:scale-95
+        disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-transparent disabled:active:scale-100
+        ${isPrev ? "" : "flex-row-reverse text-right"}
+      `}
+    >
+      <span className="shrink-0 text-[1.2rem] leading-none">{isPrev ? "‹" : "›"}</span>
+      <span className="truncate">
+        {student ? `${student.classNumber ?? ""}번 ${student.profileNickname ?? student.userId}` : isPrev ? "처음" : "마지막"}
+      </span>
+    </button>
   );
 }
