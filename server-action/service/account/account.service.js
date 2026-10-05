@@ -147,42 +147,109 @@ export async function createStudentAccountService({ teacher_id, classId, account
 }
 
 
-export async function deleteStudentAccountService({ student, classNumber, teacher_id, classId }) {
-
-  const classObjectId = ObjectId.createFromHexString(classId);
-  const teacherObjectId = ObjectId.createFromHexString(teacher_id);
-  // MongoDB 연결
-  const db = (await connectDB).db('user');
-  const db2 = (await connectDB).db('data')
-
-  // ✅ teacher_id/classId로 범위를 제한해서 이 교사가 실제 담임인 학생만 지울 수 있게 한다.
-  // (이전엔 userId만으로 매칭해서, 원리적으로는 다른 교사의 학생 계정도 지울 수 있었음.
-  //  바로 아래 resetPwdService는 이미 이렇게 스코핑되어 있었음)
-  const response = await db.collection('users').deleteOne({
-    userId: student,
-    teacher_id: teacherObjectId,
-    classId: classObjectId,
-  })
-  const response2 = await db2.collection('user_data').deleteOne({
-    userId: student,
-    teacher_id: teacherObjectId,
-    classId: classObjectId,
-  })
-
-  if (response.deletedCount === 0 && response2.deletedCount === 0) {
-    throw new Error("해당 학생 계정을 찾을 수 없거나 삭제 권한이 없습니다.")
+/**
+ * 학생 계정 삭제
+ * 같은 번호로 새 계정을 만들면 아이디가 같아지므로, 이 학생 아이디로 남은 기록도 함께 지운다.
+ * (지우지 않으면 이전 학생의 거래 기록·기부·퀘스트 완료가 새 학생에게 보인다)
+ * - 로그인 계정(users), 학생 데이터(user_data), 거래 기록(history), 키오스크 비밀번호 시도 기록
+ * - 온도계 기부자 목록(donators.<아이디>)에서 제외. 학급 온도(manualDegree)는 학급 전체 결과라 그대로 둔다.
+ * - 퀘스트 완료/대기 목록에서 제외
+ * - class_data.studentAccounts.<번호>를 false로 (다시 만들 수 있게)
+ * 모두 하나의 트랜잭션으로 처리한다. 번호는 화면 값이 아니라 DB의 classNumber를 쓴다.
+ */
+export async function deleteStudentAccountService({ student, teacher_id, classId }) {
+  if (!student || typeof student !== "string") {
+    throw new Error("삭제할 학생 정보가 올바르지 않습니다.");
   }
 
-  let newKey = "studentAccounts." + classNumber
+  let teacherObjectId;
+  let classObjectId;
+  try {
+    teacherObjectId = ObjectId.createFromHexString(teacher_id);
+    classObjectId = ObjectId.createFromHexString(classId);
+  } catch {
+    throw new Error("잘못된 학급 정보입니다.");
+  }
 
-  const response3 = await db2.collection('class_data').updateOne({
-    teacher_id: teacherObjectId,
-    classId: classObjectId
-  }, { $set: { [newKey]: false } })
+  const scope = { teacher_id: teacherObjectId, classId: classObjectId };
+  const userId = student;
 
+  const client = await connectDB;
+  const data = client.db("data");
+  const userDb = client.db("user");
+  const session = client.startSession();
+
+  let removed = null;
+
+  try {
+    await session.withTransaction(async () => {
+      const studentData = await data.collection("user_data").findOne(
+        { ...scope, userId, role: "student" },
+        { session, projection: { classNumber: 1 } }
+      );
+      const login = await userDb.collection("users").findOne(
+        { ...scope, userId, role: "student" },
+        { session, projection: { _id: 1 } }
+      );
+      if (!studentData && !login) {
+        throw new Error("해당 학생 계정을 찾을 수 없거나 삭제 권한이 없습니다.");
+      }
+
+      await userDb.collection("users").deleteOne({ ...scope, userId, role: "student" }, { session });
+      await data.collection("user_data").deleteOne({ ...scope, userId, role: "student" }, { session });
+
+      // 거래 기록: 예전 기록은 교사·학급 id가 문자열이거나 없는 경우가 있어서 함께 지운다.
+      const history = await data.collection("history").deleteMany(
+        {
+          userId,
+          $or: [
+            { teacher_id: teacherObjectId },
+            { teacher_id: teacher_id },
+            { teacher_id: { $exists: false } },
+          ],
+        },
+        { session }
+      );
+
+      // 아이디가 DB 필드 경로로 쓰이므로 "."이나 "$"가 들어간 (예전) 아이디는 건너뛴다.
+      const thermometer = /^[^.$]+$/.test(userId)
+        ? await data.collection("thermometer").updateMany(
+            { ...scope, [`donators.${userId}`]: { $exists: true } },
+            { $unset: { [`donators.${userId}`]: "" } },
+            { session }
+          )
+        : { modifiedCount: 0 };
+
+      const quests = await data.collection("quest").updateMany(
+        { ...scope, $or: [{ finished: userId }, { pending: userId }] },
+        { $pull: { finished: userId, pending: userId } },
+        { session }
+      );
+
+      await userDb.collection("kiosk_pwd_attempts").deleteMany({ teacher_id: teacherObjectId, userId }, { session });
+
+      const classNumber = studentData?.classNumber;
+      if (Number.isInteger(classNumber)) {
+        await data.collection("class_data").updateOne(
+          scope,
+          { $set: { [`studentAccounts.${classNumber}`]: false } },
+          { session }
+        );
+      }
+
+      removed = {
+        history: history.deletedCount,
+        thermometer: thermometer.modifiedCount,
+        quests: quests.modifiedCount,
+      };
+    });
+  } finally {
+    await session.endSession();
+  }
 
   return {
     result: true,
+    removed,
   };
 }
 

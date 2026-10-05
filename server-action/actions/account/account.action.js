@@ -48,7 +48,6 @@ export async function deleteStudentAccount({ student, classNumber, classId }) {
       teacher_id: teacher_id,
       classId,
       student,
-      classNumber,
     });
 
     //   revalidatePath(`/dashboard/teacher/${classId}`);

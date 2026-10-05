@@ -163,3 +163,85 @@ describe("resetPwdService (비밀번호 초기화)", () => {
     );
   });
 });
+
+describe("deleteStudentAccountService (학생 계정 삭제)", () => {
+  async function seedStudentWithRecords() {
+    await seedClassData(mongo.db, scope, { uniqueNickname: "오렌지" });
+    await create([1, 2]);
+    await mongo.db.collection("history").insertMany([
+      { userId: "오렌지1", teacher_id: scope.teacherObjectId, classId: scope.classObjectId, name: "새 형식" },
+      { userId: "오렌지1", teacher_id: scope.teacher_id, classId: scope.classId, name: "예전 문자열 id" },
+      { userId: "오렌지1", name: "예전 id 없음" },
+      { userId: "오렌지2", teacher_id: scope.teacherObjectId, name: "다른 학생" },
+    ]);
+    await mongo.db.collection("thermometer").insertOne({
+      ...{ teacher_id: scope.teacherObjectId, classId: scope.classObjectId },
+      manualDegree: 7,
+      donators: { 오렌지1: 50, 오렌지2: 20 },
+    });
+    await mongo.db.collection("quest").insertOne({
+      teacher_id: scope.teacherObjectId,
+      classId: scope.classObjectId,
+      questName: "책 읽기",
+      finished: ["오렌지1", "오렌지2"],
+      pending: ["오렌지1"],
+    });
+    await mongo.client.db("user").collection("kiosk_pwd_attempts").insertOne({ teacher_id: scope.teacherObjectId, userId: "오렌지1", failedCount: 3 });
+  }
+
+  const remove = (student, s = scope) =>
+    deleteStudentAccountService({ teacher_id: s.teacher_id, classId: s.classId, student });
+
+  it("계정과 함께 거래 기록·기부자 목록·퀘스트 완료 목록에서도 지운다 (학급 온도는 유지)", async () => {
+    await seedStudentWithRecords();
+
+    const res = await remove("오렌지1");
+
+    expect(res.removed).toEqual({ history: 3, thermometer: 1, quests: 1 });
+    expect(await users().countDocuments({ userId: "오렌지1" })).toBe(0);
+    expect(await userData().countDocuments({ userId: "오렌지1" })).toBe(0);
+    expect(await mongo.db.collection("history").countDocuments({ userId: "오렌지1" })).toBe(0);
+
+    const t = await mongo.db.collection("thermometer").findOne({});
+    expect(t.donators).toEqual({ 오렌지2: 20 });
+    expect(t.manualDegree).toBe(7);
+
+    const q = await mongo.db.collection("quest").findOne({});
+    expect(q.finished).toEqual(["오렌지2"]);
+    expect(q.pending).toEqual([]);
+
+    expect(await mongo.client.db("user").collection("kiosk_pwd_attempts").countDocuments()).toBe(0);
+    expect((await classData()).studentAccounts["1"]).toBe(false);
+  });
+
+  it("다른 학생의 데이터는 건드리지 않는다", async () => {
+    await seedStudentWithRecords();
+    await remove("오렌지1");
+    expect(await users().countDocuments({ userId: "오렌지2" })).toBe(1);
+    expect(await mongo.db.collection("history").countDocuments({ userId: "오렌지2" })).toBe(1);
+    expect((await classData()).studentAccounts["2"]).toBe("생성됨");
+  });
+
+  it("같은 번호로 새로 만들면 이전 학생의 기록이 보이지 않는다", async () => {
+    await seedStudentWithRecords();
+    await remove("오렌지1");
+    await create([1]);
+
+    const fresh = await userData().findOne({ userId: "오렌지1" });
+    expect(fresh.money).toBe(0);
+    expect(await mongo.db.collection("history").countDocuments({ userId: "오렌지1" })).toBe(0);
+    expect((await mongo.db.collection("thermometer").findOne({})).donators["오렌지1"]).toBeUndefined();
+  });
+
+  it("다른 교사는 지울 수 없고 아무것도 바뀌지 않는다", async () => {
+    await seedStudentWithRecords();
+    await expect(remove("오렌지1", { ...scope, teacher_id: other.teacher_id })).rejects.toThrow("찾을 수 없거나");
+    expect(await users().countDocuments({ userId: "오렌지1" })).toBe(1);
+    expect(await mongo.db.collection("history").countDocuments({ userId: "오렌지1" })).toBe(3);
+  });
+
+  it("없는 학생이면 에러", async () => {
+    await seedClassData(mongo.db, scope, { uniqueNickname: "오렌지" });
+    await expect(remove("오렌지9")).rejects.toThrow("찾을 수 없거나");
+  });
+});
