@@ -155,8 +155,16 @@ try {
         log.push(`  → 변경됨 ${r.modifiedCount}건`);
       }
     }
-    const left = await col.countDocuments({ amount: { $type: "string" } });
-    if (APPLY && left) log.push(`  ⚠️ 정수로 바꾸지 못한 amount ${left}건 남음`);
+    // DB 안의 $convert(to: "int")는 21억이 넘는 값을 바꾸지 못한다. 남은 것은 하나씩 숫자로 바꾼다.
+    const leftOps = [];
+    for await (const h of col.find({ amount: { $type: "string" } }, { projection: { amount: 1 } })) {
+      if (isIntString(h.amount)) {
+        leftOps.push({ col, op: { updateOne: { filter: { _id: h._id, amount: h.amount }, update: { $set: { amount: toInt(h.amount) } } } } });
+      } else {
+        noteBroken("거래 기록 amount", h.amount);
+      }
+    }
+    if (leftOps.length) await run("거래 기록 amount 중 큰 숫자 → 숫자", leftOps);
   }
 
   console.log(
