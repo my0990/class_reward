@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
 import { toast } from "react-hot-toast";
 import usePendingAction from "@/hooks/usePendingAction";
 import { updateManualDegree, updateThermometerSetting } from "@/server-action/actions/thermometer/thermometer.action";
@@ -30,12 +30,18 @@ export function useThermometerBoard(classId) {
     isLoading,
     isError,
     mutate: mutateThermometerData,
-  } = useFetchData(classId ? `/api/thermometer/${classId}` : null);
+  } = useFetchData(classId ? `/api/thermometer/${classId}` : null, LIVE_REFRESH);
 
   const [modalId, setModalId] = useState(null);
   const [rewardObj, setRewardObj] = useState({});
   const [requireCurrency, setRequireCurrency] = useState("");
   const [type, setType] = useState(null);
+
+  // 설정 입력칸은 "설정 값(보상·1도당 쿠키 수)"이 바뀔 때만 다시 채운다.
+  // 15초마다 새로고침되면서 기부로 온도만 바뀐 경우에는, 교사가 입력 중인 설정을 덮어쓰지 않는다.
+  const settingsKey = thermometerData
+    ? JSON.stringify([thermometerData.reward ?? null, thermometerData.requireCurrency ?? null])
+    : null;
 
   useEffect(() => {
     if (!thermometerData) return;
@@ -44,7 +50,8 @@ export function useThermometerBoard(classId) {
       ...(thermometerData.reward ?? {}),
     });
     setRequireCurrency(thermometerData.requireCurrency);
-  }, [thermometerData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settingsKey]);
 
   const onRewardInputChange = (degree, value) => {
     setRewardObj((prev) => ({

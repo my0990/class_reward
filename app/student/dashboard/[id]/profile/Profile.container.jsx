@@ -3,7 +3,7 @@
 import ProfileCard from "./components/ProfileCard"
 import ProfileBuyModal from "./components/ProfileBuyModal";
 import { useState, useEffect } from "react";
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import usePendingAction from "@/hooks/usePendingAction";
 import { buyProfileImg } from "@/server-action/actions/profile/profile.action";
@@ -14,7 +14,7 @@ export default function ProfileContainer({ }) {
     const classId = params.id;
     const { runAction, isPending } = usePendingAction();
     const { data: classData, isLoading: isClassLoading, isError: isClassError } = useFetchData(`/api/classData/${classId}`);
-    const { data: userData, isLoading: isUserLoading, isError: isUserError, mutate: mutateUserData } = useFetchData('/api/user');
+    const { data: userData, isLoading: isUserLoading, isError: isUserError, mutate: mutateUserData } = useFetchData('/api/user', STUDENT_REFRESH);
     const [modalId, setModalId] = useState(null);
     const [pickedData, setPickedData] = useState({ price: null, url: null });
 

@@ -1,5 +1,5 @@
 'use client'
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import ProfileImgModal from "./components/ProfileImgModal";
 import TitleModal from "./components/TitleModal";
 import { useState } from "react";
@@ -24,7 +24,7 @@ export default function Page({ classId }) {
         isError: isUserError,
         error: userError,
         mutate: mutateUserData,
-    } = useFetchData(`/api/user`);
+    } = useFetchData(`/api/user`, STUDENT_REFRESH);
     const [modalId, setModalId] = useState(null);
     const isLoading =
         isClassLoading ||

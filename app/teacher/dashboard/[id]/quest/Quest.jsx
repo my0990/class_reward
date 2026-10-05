@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
 import QuestCard from "./components/QuestCard";
 import AddQuestModal from "./components/modal/AddQuestModal";
 import QuestDetailTemplate from "./components/detail/QuestDetailTemplate";
@@ -41,7 +41,8 @@ export default function Quest() {
     } = useFetchData(
         classId
             ? `/api/students/${classId}`
-            : null
+            : null,
+        LIVE_REFRESH
     );
 
     const isLoading =

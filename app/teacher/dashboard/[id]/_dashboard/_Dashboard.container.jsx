@@ -7,7 +7,7 @@ import usePointInput from "@/hooks/dashboard/usePointInput";
 import { handlePoint } from "@/server-action/actions/class/handlePoint";
 import PointModal from "./components/point-modal/PointModal";
 import { toast, Toaster } from "react-hot-toast";
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
 import StudentInfoCard from "./components/StudentInfoCard";
 
 
@@ -19,16 +19,13 @@ export default function DashboardContainer({ classId }) {
     isError: isClassError,
   } = useFetchData(classId ? `/api/classData/${classId}` : null);
 
-  // ✅ 포커스 복귀 시 재검증: 다른 탭/키오스크에서 같은 학생 잔액이 바뀐 뒤
-  // 이 화면으로 돌아왔을 때 스냅샷이 오래 남아있지 않도록 함
+  // ✅ 키오스크에서 구매·기부해도 교사 화면 잔액이 따라오도록 15초마다 + 포커스 복귀 시 새로고침
   const {
     data: studentsData = [],
     isLoading: isStudentsLoading,
     isError: isStudentsError,
     mutate: mutateStudentsData,
-  } = useFetchData(classId ? `/api/students/${classId}` : null, {
-    revalidateOnFocus: true,
-  });
+  } = useFetchData(classId ? `/api/students/${classId}` : null, LIVE_REFRESH);
 
 
   const {

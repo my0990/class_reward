@@ -2,7 +2,7 @@
 
 import ProfileSection from "./components/ProfileSection";
 import { useState, useEffect } from "react"
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import ProfileImgSettingModal from "./components/ProfileImgSettingModal";
 import usePendingAction from "@/hooks/usePendingAction";
@@ -35,7 +35,7 @@ export default function SettingContainer() {
         isError: isUserError,
         error: userError,
         mutate: mutateUserData,
-    } = useFetchData(`/api/user`);
+    } = useFetchData(`/api/user`, STUDENT_REFRESH);
 
     const [formData, setFormData] = useState({
         profileNickname: "",

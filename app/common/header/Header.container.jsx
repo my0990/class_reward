@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { teacherNav, studentNav } from "@/config/navConfig";
 import HomeBtn from "./components/HomeBtn";
 import HeaderNav from "./components/HeaderNav";
@@ -23,7 +23,7 @@ export default function HeaderContainer({ classId }) {
         data: userData,
         isLoading: isUserLoading,
         isError: isUserError,
-      } = useFetchData(`/api/user`);
+      } = useFetchData(`/api/user`, STUDENT_REFRESH);
 
     // 메뉴 상태
 

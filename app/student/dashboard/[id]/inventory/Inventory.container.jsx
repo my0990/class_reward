@@ -1,6 +1,6 @@
 'use client';
 
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useState, useEffect } from "react";
 import { mutate } from "swr";
 import { useParams } from "next/navigation";
@@ -16,7 +16,7 @@ const EMPTY_DETAIL = {
 };
 
 export default function InventoryContainer() {
-    const { data: userData, isLoading: isUserLoading, isError: isUserError, } = useFetchData('/api/user');
+    const { data: userData, isLoading: isUserLoading, isError: isUserError, } = useFetchData('/api/user', STUDENT_REFRESH);
     const { id } = useParams();
     const [itemList, setItemList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);

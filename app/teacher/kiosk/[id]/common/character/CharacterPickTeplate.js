@@ -3,10 +3,10 @@ import CheckPwdModal from "./CheckPwdModal"
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { mutate } from "swr";
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
 export default function CharacterPickTemplate({ type, requestData, setRequestData, classId }) {
     const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
-    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = useFetchData(`/api/students/${classId}`);
+    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = useFetchData(`/api/students/${classId}`, LIVE_REFRESH);
     const route = useRouter();
     const [rotation, setRotation] = useState(0);
 

@@ -2,7 +2,7 @@
 import BuyModal from "./components/buyModal";
 import ItemCard from "./components/ItemCard"
 import { useState, useRef } from "react"
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 
 export default function MarketContainer() {
@@ -15,7 +15,7 @@ export default function MarketContainer() {
         mutate: mutateClassData,
     } = useFetchData(id ? `/api/classData/${id}` : null);
 
-    const { data: userData, isLoading: isUserLoading, isError: isUserError } = useFetchData('/api/user');
+    const { data: userData, isLoading: isUserLoading, isError: isUserError } = useFetchData('/api/user', STUDENT_REFRESH);
 
 
     const onBuy = (picked) => {

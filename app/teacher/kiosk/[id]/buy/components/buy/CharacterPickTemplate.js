@@ -1,7 +1,7 @@
 
 import CheckPwdModal from "../../../common/character/CheckPwdModal";
 import CharacterCard from "../../../common/character/CharacterCard";
-import { useFetchData } from "@/hooks/useFetchData";
+import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { mutate } from "swr";
@@ -17,7 +17,7 @@ export default function CharacterPickTemplate({ type, requestData, setRequestDat
         data: studentData,
         isLoading: isStudentsDataLoading,
         isError: isStudentsDataError,
-    } = useFetchData(`/api/students/${classId}`);
+    } = useFetchData(`/api/students/${classId}`, LIVE_REFRESH);
 
     const { itemName, itemPrice, itemExplanation, itemStock, emoji } = requestData.itemData;
     const [rotation, setRotation] = useState(0);
