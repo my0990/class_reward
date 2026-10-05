@@ -1,7 +1,9 @@
 import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-export async function createClassService({ className, teacher_id }) {
-    if (!className) throw new Error('학급 이름 필요');
+import { normalizeClassName } from "@/server-action/service/class/renameClass.service";
+export async function createClassService({ className: rawName, teacher_id }) {
+    const { name: className, error } = normalizeClassName(rawName);
+    if (error) throw new Error(error);
     const db = (await connectDB).db('data');
 
 

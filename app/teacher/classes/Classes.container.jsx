@@ -10,6 +10,8 @@ import ClassCard from "./_component/components/ClassCard";
 import AddClassModal from "./_component/components/AddClassModal";
 import DeleteClassModal from "./_component/components/DeleteClassModal";
 import DeletedClassList from "./_component/components/DeletedClassList";
+import RenameClassModal from "./_component/components/RenameClassModal";
+import { renameClass } from "@/server-action/actions/class/renameClass.action";
 import { deleteClass, restoreClass } from "@/server-action/actions/class/classDelete.action";
 import usePendingAction from "@/hooks/usePendingAction";
 import { Toaster, toast } from "react-hot-toast";
@@ -17,6 +19,7 @@ import { signOut } from "next-auth/react";
 export default function ClassesContainer() {
     const [modalId, setModalId] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
+    const [renameTarget, setRenameTarget] = useState(null);
     const router = useRouter();
     const { runAction, isPending } = usePendingAction();
     const { data: deletedClasses } = useFetchData('/api/classes/trash');
@@ -39,6 +42,24 @@ export default function ClassesContainer() {
             await refreshLists();
             toast.success(res.message);
         }).catch(() => toast.error("학급 삭제 중 오류가 발생했습니다."));
+    };
+
+    const onRenameClick = (cls) => {
+        setRenameTarget(cls);
+        setModalId("RENAME_CLASS");
+    };
+
+    const onRenameConfirm = (className) => {
+        runAction("renameClass", async () => {
+            const res = await renameClass({ classId: String(renameTarget._id), className });
+            if (!res.result) {
+                toast.error(res.message);
+                return;
+            }
+            setModalId(null);
+            await mutate('/api/classes');
+            toast.success(res.message);
+        }).catch(() => toast.error("학급 이름 변경 중 오류가 발생했습니다."));
     };
 
     const onRestore = (cls) => {
@@ -88,7 +109,7 @@ export default function ClassesContainer() {
                                         xl:grid-cols-4
                                         ">
                         {classesData.map(cls => (
-                            <ClassCard key={cls._id} cls={cls} onClick={() => onCardClick(cls._id)} onDelete={onDeleteClick} />
+                            <ClassCard key={cls._id} cls={cls} onClick={() => onCardClick(cls._id)} onRename={onRenameClick} onDelete={onDeleteClick} />
                         ))}
                         <AddClassCard onClick={() => setModalId("ADD_CLASS")} />
                     </div>
@@ -104,6 +125,12 @@ export default function ClassesContainer() {
                 modalId={modalId}
                 setModalId={setModalId}
                 onCreateClass={onCreateClass} />
+            <RenameClassModal
+                modalId={modalId}
+                setModalId={setModalId}
+                target={renameTarget}
+                onConfirm={onRenameConfirm}
+                isSaving={isPending("renameClass")} />
             <DeleteClassModal
                 modalId={modalId}
                 setModalId={setModalId}

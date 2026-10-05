@@ -17,7 +17,8 @@ export default function AddClassModal({ modalId, setModalId, onCreateClass }) {
           <input
             type="text"
             name="className"
-            placeholder="학급 이름"
+            placeholder="학급 이름 (30자까지)"
+            maxLength={30}
             className="border p-2 w-full mb-4"
             autoComplete="off"
             ref={inputRef}
