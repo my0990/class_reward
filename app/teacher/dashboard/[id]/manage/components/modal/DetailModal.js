@@ -133,6 +133,7 @@ export default function DetailModal() {
               <table className="table">
                 <thead>
                   <tr className="text-center">
+                    <th>종류</th>
                     <th>내용</th>
                     <th>돈</th>
                     <th>잔액</th>
@@ -147,12 +148,12 @@ export default function DetailModal() {
                       key={item._id ?? `${item.date}-${item.type}-${index}`}
                       className={`border-none text-center ${kind.row}`}
                     >
-                      <td className="text-left">
-                        <span className={`mr-[6px] inline-block whitespace-nowrap rounded-full px-[6px] py-[1px] text-[0.7rem] ${kind.badge}`}>
+                      <td>
+                        <span className={`inline-block whitespace-nowrap rounded-full px-[8px] py-[2px] text-[0.75rem] ${kind.badge}`}>
                           {kind.icon} {kind.label}
                         </span>
-                        {item?.name}
                       </td>
+                      <td>{item?.name}</td>
                       <td>
                         <span
                           className={
