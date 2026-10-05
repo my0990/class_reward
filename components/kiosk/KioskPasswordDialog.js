@@ -15,11 +15,13 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
   const [error, setError] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [textMode, setTextMode] = useState(false);
+  const [shakeKey, setShakeKey] = useState(0);
 
   const reset = () => {
     setPwd("");
     setError("");
     setTextMode(false);
+    setShakeKey(0);
   };
 
   // 다른 학생을 고르면 처음부터
@@ -45,6 +47,7 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
       }
       setError(data?.message || "비밀번호를 확인해주세요.");
       setPwd("");
+      setShakeKey((k) => k + 1);
     } catch {
       setError("비밀번호 확인 중 오류가 발생했습니다.");
     } finally {
@@ -54,13 +57,37 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
 
   return (
     <dialog id={KIOSK_PWD_DIALOG_ID} ref={dialogRef} className="modal modal-middle">
-      <div className="modal-box flex flex-col items-center bg-orange-50 p-[24px] min-[600px]:p-[40px] dark:bg-orange-200">
-        <div className="text-center text-[1.6rem]">
-          <span className="bg-orange-200 px-[6px]">
-            {userData?.classNumber}. {userData?.profileNickname}
-          </span>
+      <div
+        className="
+          modal-box relative flex max-w-[400px] flex-col items-center overflow-hidden
+          rounded-[36px] bg-gradient-to-b from-orange-50 to-amber-50 px-[24px] pb-[24px] pt-[32px]
+          shadow-[0_20px_60px_rgba(251,146,60,0.25)]
+        "
+      >
+        {/* 장식용 동그라미 */}
+        <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-200/40" />
+        <span aria-hidden="true" className="pointer-events-none absolute -left-8 top-24 h-16 w-16 rounded-full bg-orange-200/40" />
+
+        <div className="relative">
+          {userData?.profileUrl ? (
+            <img
+              src={userData.profileUrl}
+              alt=""
+              className="h-[84px] w-[84px] rounded-full border-4 border-white object-cover shadow-[0_4px_12px_rgba(251,146,60,0.35)]"
+            />
+          ) : (
+            <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full border-4 border-white bg-orange-200 text-[2rem] shadow">🍊</div>
+          )}
+          <span className="absolute -bottom-1 -right-1 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-[1rem] shadow">🔒</span>
         </div>
-        <div className="mt-[4px] text-gray-500">비밀번호를 눌러주세요</div>
+
+        <div className="relative mt-[12px] text-center">
+          <div className="text-[1.35rem] font-extrabold text-orange-600">
+            {userData?.classNumber != null && <span className="mr-[6px] text-orange-300">{userData.classNumber}번</span>}
+            {userData?.profileNickname}
+          </div>
+          <div className="mt-[2px] text-[0.95rem] text-orange-400">비밀번호를 눌러주세요</div>
+        </div>
 
         <PasswordKeypad
           value={pwd}
@@ -73,9 +100,10 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
           isActive={() => Boolean(dialogRef.current?.open)}
           textMode={textMode}
           onToggleTextMode={() => setTextMode((v) => !v)}
+          shakeKey={shakeKey}
         />
 
-        <div className="mt-[12px] min-h-[24px] text-center text-red-500" role="alert">
+        <div className="mt-[12px] min-h-[24px] text-center text-[0.95rem] font-semibold text-rose-500" role="alert">
           {error}
         </div>
       </div>
