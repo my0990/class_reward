@@ -57,6 +57,7 @@ export async function useItemService({
     date: new Date(),
     expiresAfter: new Date(),
     name: "아이템 사용 (" + (item?.itemName || itemName) + ")",
+    kind: "itemUse", // 거래 내역 화면에서 아이템 사용 줄을 구분하는 표시
   });
 
   return { result: true, message: "useItem 성공" };

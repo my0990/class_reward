@@ -27,7 +27,7 @@ describe("useItemService (아이템 사용)", () => {
     expect(student.money).toBe(500); // 사용은 돈이 들지 않는다
 
     const history = await mongo.db.collection("history").findOne({ userId: "s1" });
-    expect(history).toMatchObject({ name: "아이템 사용 (사탕)", amount: 0, balance: 500 });
+    expect(history).toMatchObject({ name: "아이템 사용 (사탕)", kind: "itemUse", amount: 0, balance: 500 });
   });
 
   it("없는 아이템이면 에러", async () => {

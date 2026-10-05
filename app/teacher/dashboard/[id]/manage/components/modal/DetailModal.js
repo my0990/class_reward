@@ -29,6 +29,11 @@ function isDepositType(type) {
   return type === "입금" || type === "deposit";
 }
 
+// 아이템 사용 기록인지: 새 기록은 kind로, 예전 기록은 이름("아이템 사용 (...)")으로 구분
+function isItemUse(item) {
+  return item?.kind === "itemUse" || /^아이템 사용/.test(item?.name ?? "");
+}
+
 function getAmountText(type, amount) {
   if (!amount) return null;
   return `${isDepositType(type) ? "+" : "-"}${amount}`;
@@ -138,7 +143,7 @@ export default function DetailModal() {
                   {rows.map((item, index) => (
                     <tr
                       key={item._id ?? `${item.date}-${item.type}-${index}`}
-                      className="border-none text-center"
+                      className={`border-none text-center ${isItemUse(item) ? "bg-amber-50" : ""}`}
                     >
                       <td>{item?.name}</td>
                       <td>
