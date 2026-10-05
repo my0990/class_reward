@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
+import { useFetchData } from "@/hooks/useFetchData";
+import { switchClassPath } from "../utils/classPath";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
 function splitNavToSections(navItems) {
@@ -101,6 +103,9 @@ export default function DropDown({
 
   const sections = useMemo(() => splitNavToSections(navItems), [navItems]);
 
+  // 교사: 휴대폰 메뉴에서도 다른 학급으로 바꿀 수 있게 (보던 메뉴 유지)
+  const { data: classes } = useFetchData(role === "teacher" ? "/api/classes" : null);
+
   return (
     <nav className="border-b-2 min-[979px]:hidden dark:text-white" aria-label="Mobile menu">
       <ul>
@@ -138,6 +143,32 @@ export default function DropDown({
             </button>
           </div>
         </li>
+
+        {/* 학급 바꾸기 (교사) */}
+        {role === "teacher" && (classes?.length ?? 0) > 1 && (
+          <li className="mt-[0.5rem]">
+            <div className="px-[16px] text-[0.95rem] text-gray-500 dark:text-gray-300">학급 바꾸기</div>
+            <ul className="mt-[0.25rem]">
+              {classes.map((cls) => {
+                const isCurrent = String(cls._id) === String(id);
+                return (
+                  <li key={cls._id}>
+                    <Link
+                      href={isCurrent ? pathname : switchClassPath(pathname, id, cls._id, "teacher")}
+                      prefetch={false}
+                      className={`flex items-center justify-between py-[0.5rem] px-[16px] text-[1.2rem] ${isCurrent ? "text-orange-400 font-semibold" : ""}`}
+                      aria-current={isCurrent ? "page" : undefined}
+                    >
+                      <span>{isCurrent ? "✓ " : ""}{cls.className}</span>
+                      <span className="text-sm text-gray-400">{cls.studentsCount ?? 0}명</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mx-[16px] mt-[0.5rem] border-b border-gray-200 dark:border-zinc-700" />
+          </li>
+        )}
 
         {/* 포인트 */}
         <li className="py-[0.5rem] px-[16px] text-[1.2rem]">
