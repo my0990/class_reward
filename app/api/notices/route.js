@@ -27,7 +27,6 @@ export async function GET(req) {
     ]);
 
     return NextResponse.json({
-      success: true,
       notices: notices.map((n) => ({ ...n, _id: n._id.toString() })),
       total,
       page,
@@ -36,7 +35,7 @@ export async function GET(req) {
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { success: false, message: "공지 불러오기 실패" },
+      { error: "공지 불러오기 실패" },
       { status: 500 }
     );
   }

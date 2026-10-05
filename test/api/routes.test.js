@@ -145,6 +145,28 @@ describe("/api/classData/[id]", () => {
     expect(body.className).toBe("우리반");
   });
 
+  it("학생에게는 교사용 정보(고유 별명, 계정 생성 현황 등)를 빼고 준다", async () => {
+    await seedClassData(mongo.db, scope, {
+      className: "우리반",
+      currencyName: "쿠키",
+      uniqueNickname: "오렌지",
+      studentAccounts: { 1: "생성됨" },
+      setting: { color: "#fff" },
+    });
+    asStudent("s1");
+    const { body } = await call(classDataRoute, { id: scope.classId });
+    expect(body.className).toBe("우리반");
+    expect(body.currencyName).toBe("쿠키");
+    expect(body.itemList).toEqual([]);
+    expect(body.uniqueNickname).toBeUndefined();
+    expect(body.studentAccounts).toBeUndefined();
+    expect(body.teacher_id).toBeUndefined();
+
+    asTeacher();
+    const teacherView = (await call(classDataRoute, { id: scope.classId })).body;
+    expect(teacherView.uniqueNickname).toBe("오렌지");
+  });
+
   it("학생: 같은 선생님의 다른 반은 403", async () => {
     const sameTeacherOtherClass = { ...scope, classObjectId: new ObjectId() };
     sameTeacherOtherClass.classId = sameTeacherOtherClass.classObjectId.toHexString();

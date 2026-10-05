@@ -50,14 +50,14 @@ export async function POST(req) {
     if (!result.success) {
       const headers = result.retryAfterSec ? { "Retry-After": String(result.retryAfterSec) } : undefined;
       return NextResponse.json(
-        { success: false, message: result.message, retryAfterSec: result.retryAfterSec },
+        { error: result.message, retryAfterSec: result.retryAfterSec },
         { status: result.status, headers }
       );
     }
 
-    return NextResponse.json({ success: true, message: "인증 코드를 전송했습니다" });
+    return NextResponse.json({ message: "인증 코드를 전송했습니다" });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ success: false, message: "코드 전송 실패" }, { status: 500 });
+    return NextResponse.json({ error: "코드 전송 실패" }, { status: 500 });
   }
 }

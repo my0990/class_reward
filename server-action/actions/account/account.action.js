@@ -101,7 +101,7 @@ export async function resetPwd({ student, classId }) {
 export async function checkUniqueNickname({ uniqueNickname, classId }) {
   try {
     const auth = await authorizeTeacherClass(classId);
-    if (!auth.ok) return { result: false, error: auth.message };
+    if (!auth.ok) return { result: false, message: auth.message };
     const teacher_id = auth.teacher_id;
 
     const response = await checkUniqueNicknameService({
@@ -116,7 +116,7 @@ export async function checkUniqueNickname({ uniqueNickname, classId }) {
 
     return {
       result: false,
-      error: error.message || "별명 등록에 실패했습니다.",
+      message: error.message || "별명 등록에 실패했습니다.",
     };
   }
 }

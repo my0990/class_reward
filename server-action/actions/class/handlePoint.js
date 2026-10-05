@@ -8,7 +8,7 @@ import { handlePointService } from "@/server-action/service/class/handlePointSer
 export async function handlePoint({ classId, targetStudent, point, isSend }) {
     const auth = await authorizeTeacherClass(classId);
     if (!auth.ok) {
-        return { success: false, message: auth.message };
+        return { result: false, message: auth.message };
     }
     const teacher_id = auth.teacher_id;
 
@@ -22,9 +22,12 @@ export async function handlePoint({ classId, targetStudent, point, isSend }) {
             isSend,
         });
 
-        return res; // { success: true/false, data/message }
+        // 서비스는 { success, data | message }를 준다 → action 공통 형식 { result, message, data }로
+        return res.success
+            ? { result: true, message: "완료", data: res.data }
+            : { result: false, message: res.message };
     } catch (err) {
         // 너 스타일대로면 throw 해도 되고, 안전하게 success false로 내려도 됨.
-        throw new Error(err?.message || "handlePoint failed");
+        return { result: false, message: err?.message || "포인트 처리에 실패했습니다." };
     }
 }

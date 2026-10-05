@@ -21,7 +21,7 @@ export default function Notices() {
   if (isNoticesDataLoading) return <div>Loading data...</div>;
   if (isNoticesDataError) return <div>Error loading data</div>;
 
-  // API가 { success, notices, total, page, limit } 형식일 때
+  // API가 { notices, total, page, limit } 형식일 때
   const notices = noticesData?.notices ?? [];
   const total = noticesData?.total ?? 0;
 

@@ -9,7 +9,7 @@ export async function GET(req, { params }) {
     // isValid는 12글자 아무 문자열도 통과시켜서 24자리 hex만 허용한다.
     if (typeof id !== "string" || !/^[0-9a-f]{24}$/i.test(id)) {
       return NextResponse.json(
-        { success: false, message: "잘못된 id" },
+        { error: "잘못된 id" },
         { status: 400 }
       );
     }
@@ -23,13 +23,12 @@ export async function GET(req, { params }) {
 
     if (!notice) {
       return NextResponse.json(
-        { success: false, message: "공지 없음" },
+        { error: "공지 없음" },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
-      success: true,
       notice: {
         ...notice,
         _id: notice._id.toString(),
@@ -38,7 +37,7 @@ export async function GET(req, { params }) {
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { success: false, message: "서버 오류" },
+      { error: "서버 오류" },
       { status: 500 }
     );
   }

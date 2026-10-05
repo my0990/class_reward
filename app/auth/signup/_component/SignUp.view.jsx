@@ -92,8 +92,8 @@ export default function SignUpView() {
             });
             const data = await res.json();
 
-            if (!data?.success) {
-                setError(data?.message ?? "인증 코드 전송 실패");
+            if (!res.ok) {
+                setError(data?.error ?? "인증 코드 전송 실패");
                 if (data?.retryAfterSec) setSendCooldown(data.retryAfterSec);
                 return;
             }
@@ -123,9 +123,9 @@ export default function SignUpView() {
             });
             const data = await res.json();
 
-            if (!data?.success) {
+            if (!res.ok) {
                 setIsEmailVerified(false);
-                setError(data?.message ?? "인증 실패");
+                setError(data?.error ?? "인증 실패");
                 return;
             }
 
@@ -157,12 +157,13 @@ export default function SignUpView() {
               password: form.pwd,
             });
         
-            if (!data?.success) {
+            if (!data?.result) {
               setError(data?.message ?? "회원가입 실패");
               return;
             }
         
             const loginRes = await signIn("credentials", {
+              role: "teacher",
               email: form.email,
               password: form.pwd,
               redirect: false,

@@ -33,7 +33,7 @@ export default function CreateUniqueNickname({classId}) {
                     alert('고유 별명을 등록하였습니다.')
                     mutate(`/api/classData/${classId}`)
                 } else {
-                    setError(data.error || (value + '은(는) 이미 존재하는 별명입니다.'))
+                    setError(data.message || (value + '은(는) 이미 존재하는 별명입니다.'))
                     setIsLoading(false);
                 }
             }).catch(() => {

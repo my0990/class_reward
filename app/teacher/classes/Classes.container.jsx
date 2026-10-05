@@ -58,14 +58,13 @@ export default function ClassesContainer() {
     };
 
     const onCreateClass = async ({ className }) => {
-        try {
-            await createClass({ className });
-            mutate('/api/classes')
-
-        } catch (err) {
-            alert(err.message)
+        const res = await createClass({ className }).catch(() => null);
+        if (!res?.result) {
+            toast.error(res?.message || "학급 생성에 실패했습니다.");
+            return;
         }
-        // 🔥 캐시 무효화
+        await mutate('/api/classes');
+        toast.success(res.message);
     };
     const { data: classesData, isLoading: isClassesDataLoading, isError: isClassesDataError } = useFetchData('/api/classes');
 

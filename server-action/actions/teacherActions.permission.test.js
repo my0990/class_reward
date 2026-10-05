@@ -56,7 +56,7 @@ describe("학생 세션으로는 교사용 action이 실행되지 않는다", ()
     await seedStudent(mongo.db, scope, { userId: "s1", money: 0 });
     asStudent("s1");
     const res = await handlePoint({ classId: scope.classId, targetStudent: [{ userId: "s1" }], point: 1000, isSend: true });
-    expect(res.success).toBe(false);
+    expect(res.result).toBe(false);
     expect((await getStudent(mongo.db, "s1")).money).toBe(0);
   });
 
@@ -67,7 +67,7 @@ describe("학생 세션으로는 교사용 action이 실행되지 않는다", ()
     expect((await updateManualDegree({ classId: scope.classId, degreeChange: 50, type: "increase" })).result).toBe(false);
     expect((await updateCurrencyName({ classId: scope.classId, currencyName: "해킹", currencyEmoji: "💀" })).result).toBe(false);
     expect((await createProfileImg({ classId: scope.classId, createdProfileImgUrl: "https://x.com/a.png" })).result).toBe(false);
-    expect((await createClass({ className: "가짜반" })).success).toBe(false);
+    expect((await createClass({ className: "가짜반" })).result).toBe(false);
 
     expect(await count("quest")).toBe(0);
     expect(await count("thermometer")).toBe(0);
@@ -84,7 +84,7 @@ describe("교사도 남의 학급에는 실행할 수 없다", () => {
     asTeacher(scope);
 
     expect((await createItem({ classId: other.classId, itemName: "a", itemPrice: 1, itemStock: 1 })).result).toBe(false);
-    expect((await handlePoint({ classId: other.classId, targetStudent: [{ userId: "outsider" }], point: 10, isSend: true })).success).toBe(false);
+    expect((await handlePoint({ classId: other.classId, targetStudent: [{ userId: "outsider" }], point: 10, isSend: true })).result).toBe(false);
     expect((await updateThermometerSetting({ classId: other.classId, rewardObj: {}, requireCurrency: 10 })).result).toBe(false);
 
     expect((await getStudent(mongo.db, "outsider")).money).toBe(0);

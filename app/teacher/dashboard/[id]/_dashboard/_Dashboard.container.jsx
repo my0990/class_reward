@@ -74,7 +74,7 @@ export default function DashboardContainer({ classId }) {
         isSend,
       });
 
-      if (!res?.success) {
+      if (!res?.result) {
         throw new Error(res?.message ?? "오류 발생");
       }
 

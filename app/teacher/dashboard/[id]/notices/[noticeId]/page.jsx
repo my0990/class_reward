@@ -9,7 +9,7 @@ export default function NoticeDetail() {
   const { data, isLoading, isError } = useFetchData(`/api/notices/${noticeId}`);
 
   if (isLoading) return <div>Loading data...</div>;
-  if (isError || !data?.success) return <div>Error loading data</div>;
+  if (isError || !data?.notice) return <div>Error loading data</div>;
 
   const notice = data.notice;
 

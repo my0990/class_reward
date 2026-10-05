@@ -43,7 +43,7 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
             const payload = targetStudent.map((s) => ({ userId: s.userId, money: s.money }));
             const res = await handlePoint({ classId, targetStudent: payload, point, isSend });
 
-            if (!res?.success) {
+            if (!res?.result) {
                 throw new Error(res?.message || '처리 중 오류가 발생했습니다.');
             }
 

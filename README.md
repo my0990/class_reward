@@ -68,6 +68,13 @@ util/                   숫자 변환 등 공용 함수
 test/helpers/           테스트 공용 헬퍼 (메모리 DB)
 ```
 
+## 응답 형식 규칙
+
+- **server action**: 항상 `{ result: boolean, message?: string, data?: any }`를 돌려준다. 실패를 throw하지 않는다.
+  (서비스 함수는 실패 시 Error를 던지고, action이 잡아서 `{ result: false, message }`로 바꾼다)
+- **API 라우트(`app/api`)**: 성공하면 데이터를 그대로(200), 실패하면 `{ error: "메시지" }`와 HTTP 상태코드(400/401/403/404/429/500).
+  화면에서는 `res.ok`로 성공 여부를 보고, 실패 메시지는 `data.error`를 쓴다. (`useFetchData`가 이미 이렇게 처리한다)
+
 ## 보안 규칙 (코드를 고칠 때 지켜야 할 것)
 
 - **교사용 action은 `authorizeTeacherClass(classId)`로 시작한다.** 로그인 여부만 보면 학생도 실행할 수 있다.
