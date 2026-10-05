@@ -5,7 +5,7 @@ import { useFetchData } from "@/hooks/useFetchData";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import { useManageContext } from "../ManageContext";
 import { HISTORY_KINDS, getHistoryKind, isDepositType } from "../../utils/historyKind";
-import { formatHistoryDate, formatFullDate } from "../../utils/historyDate";
+import { formatHistoryDateParts, formatFullDate } from "../../utils/historyDate";
 
 // app/api/fetchHistory의 기본값/최대값과 맞춘다
 const HISTORY_PAGE_SIZE = 50;
@@ -152,8 +152,16 @@ export default function DetailModal() {
                         </span>
                       </td>
                       <td>{item.balance}</td>
-                      <td className="whitespace-nowrap text-[0.85rem] text-gray-500" title={formatFullDate(item.date)}>
-                        {formatHistoryDate(item.date)}
+                      <td className="text-[0.8rem] leading-tight text-gray-500" title={formatFullDate(item.date)}>
+                        {(() => {
+                          const { day, time } = formatHistoryDateParts(item.date);
+                          return (
+                            <>
+                              <div className="whitespace-nowrap">{day}</div>
+                              {time && <div className="whitespace-nowrap text-gray-400">{time}</div>}
+                            </>
+                          );
+                        })()}
                       </td>
                     </tr>
                     );

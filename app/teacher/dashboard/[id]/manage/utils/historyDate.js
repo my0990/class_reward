@@ -17,19 +17,26 @@ function dayDiff(a, b) {
   return Math.round((startB - startA) / 86400000);
 }
 
-export function formatHistoryDate(value, now = new Date()) {
+/** 날짜와 시간을 따로 돌려준다 (표에서 두 줄로 보여주기용) */
+export function formatHistoryDateParts(value, now = new Date()) {
   const d = toDate(value);
-  if (!d) return "-";
+  if (!d) return { day: "-", time: "" };
 
   const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const diff = dayDiff(d, now);
 
-  if (diff === 0) return `오늘 ${time}`;
-  if (diff === 1) return `어제 ${time}`;
-  if (d.getFullYear() !== now.getFullYear()) {
-    return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${time}`;
-  }
-  return `${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAYS[d.getDay()]}) ${time}`;
+  let day;
+  if (diff === 0) day = "오늘";
+  else if (diff === 1) day = "어제";
+  else if (d.getFullYear() !== now.getFullYear()) day = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+  else day = `${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAYS[d.getDay()]})`;
+
+  return { day, time };
+}
+
+export function formatHistoryDate(value, now = new Date()) {
+  const { day, time } = formatHistoryDateParts(value, now);
+  return time ? `${day} ${time}` : day;
 }
 
 export function formatFullDate(value) {
