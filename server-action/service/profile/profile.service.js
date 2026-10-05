@@ -98,7 +98,7 @@ export async function deleteProfileImgService({ teacher_id, classId, urlId }) {
 
     const response = await db.collection('class_data').updateOne(
         { ...scope, [key]: { $exists: true } },
-        { $unset: { [key]: "" } }
+        { $unset: { [key]: "" }, $pull: { profileImgOrder: urlId } } // 순서 목록에서도 뺀다
     );
     if (response.matchedCount === 0) {
         throw new Error("프로필 이미지를 찾을 수 없습니다.");
@@ -262,9 +262,18 @@ export async function reorderProfileImgsService({ teacher_id, classId, orderedId
     }
 
     const db = (await connectDB).db('data');
-    const res = await db.collection('class_data').updateOne(scope, { $set: { profileImgOrder: ids } });
-    if (res.matchedCount === 0) {
+    const classData = await db.collection('class_data').findOne(scope, { projection: { profileImgStorage: 1 } });
+    if (!classData) {
         throw new Error("학급 정보를 찾을 수 없습니다.");
     }
-    return { result: true };
+
+    // 이 학급에 실제로 있는 이미지만 순서에 넣는다 (없는 id·지워진 id는 버림)
+    const existing = new Set(Object.keys(classData.profileImgStorage ?? {}));
+    const valid = ids.filter((id) => existing.has(id));
+    if (valid.length === 0) {
+        throw new Error("순서 정보가 올바르지 않습니다.");
+    }
+
+    await db.collection('class_data').updateOne(scope, { $set: { profileImgOrder: valid } });
+    return { result: true, saved: valid.length };
 }

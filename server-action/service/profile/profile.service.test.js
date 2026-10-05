@@ -178,12 +178,35 @@ describe("프로필 이미지 등록/수정/삭제 (교사)", () => {
 });
 
 describe("reorderProfileImgsService (프로필 이미지 순서)", () => {
+  const ID2 = new ObjectId().toHexString();
+  async function seedTwo() {
+    await seedClassData(mongo.db, scope, {
+      profileImgStorage: { [URL_ID]: { url: IMG_URL, price: 100 }, [ID2]: { url: "https://example.com/b.png", price: 50 } },
+    });
+  }
+  const orderOf = async () => (await mongo.db.collection("class_data").findOne({ classId: scope.classObjectId })).profileImgOrder;
+
   it("순서를 profileImgOrder에 저장한다", async () => {
-    await seedProfileImg(100);
-    const id2 = new ObjectId().toHexString();
-    await reorderProfileImgsService({ teacher_id: scope.teacher_id, classId: scope.classId, orderedIds: [id2, URL_ID] });
-    const doc = await mongo.db.collection("class_data").findOne({ classId: scope.classObjectId });
-    expect(doc.profileImgOrder).toEqual([id2, URL_ID]);
+    await seedTwo();
+    await reorderProfileImgsService({ teacher_id: scope.teacher_id, classId: scope.classId, orderedIds: [ID2, URL_ID] });
+    expect(await orderOf()).toEqual([ID2, URL_ID]);
+  });
+
+  it("학급에 없는 이미지 id는 버리고 실제 있는 것만 저장한다", async () => {
+    await seedTwo();
+    const ghost = new ObjectId().toHexString();
+    await reorderProfileImgsService({ teacher_id: scope.teacher_id, classId: scope.classId, orderedIds: [ghost, ID2, URL_ID] });
+    expect(await orderOf()).toEqual([ID2, URL_ID]);
+    await expect(
+      reorderProfileImgsService({ teacher_id: scope.teacher_id, classId: scope.classId, orderedIds: [ghost] })
+    ).rejects.toThrow("순서 정보");
+  });
+
+  it("이미지를 지우면 순서 목록에서도 빠진다", async () => {
+    await seedTwo();
+    await reorderProfileImgsService({ teacher_id: scope.teacher_id, classId: scope.classId, orderedIds: [ID2, URL_ID] });
+    await deleteProfileImgService({ teacher_id: scope.teacher_id, classId: scope.classId, urlId: ID2 });
+    expect(await orderOf()).toEqual([URL_ID]);
   });
 
   it.each([[["a.b"]], [[]], [[URL_ID, URL_ID]]])("잘못된 순서 %j는 거부", async (ids) => {

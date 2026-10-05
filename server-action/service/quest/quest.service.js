@@ -47,6 +47,7 @@ export async function createQuestService({
     finished: [],
     pending: [],
     time: new Date(),
+    // order는 일부러 넣지 않는다: 새 퀘스트는 목록 맨 위에 보이게 (fetchQuestList 정렬 규칙)
   });
 
   return {
@@ -273,14 +274,23 @@ export async function reorderQuestsService({ teacher_id, classId, orderedIds }) 
     throw new Error("순서 정보가 올바르지 않습니다.");
   }
 
-  const db = (await connectDB).db("data");
-  // 이 학급 퀘스트만 바뀐다 (다른 학급 id가 섞여 있어도 scopeFilter에 걸리지 않음)
-  await db.collection("quest").bulkWrite(
-    questIds.map((_id, order) => ({
-      updateOne: { filter: { ...scopeFilter, _id }, update: { $set: { order } } },
-    })),
-    { ordered: false }
-  );
+  const client = await connectDB;
+  const db = client.db("data");
+  const session = client.startSession();
+  try {
+    // 한 트랜잭션으로: 중간에 끊겨도 일부만 새 순서가 되는 일이 없다.
+    // 이 학급 퀘스트만 바뀐다 (다른 학급 id가 섞여 있어도 scopeFilter에 걸리지 않음)
+    await session.withTransaction(async () => {
+      await db.collection("quest").bulkWrite(
+        questIds.map((_id, order) => ({
+          updateOne: { filter: { ...scopeFilter, _id }, update: { $set: { order } } },
+        })),
+        { ordered: false, session }
+      );
+    });
+  } finally {
+    await session.endSession();
+  }
 
   return { result: true };
 }

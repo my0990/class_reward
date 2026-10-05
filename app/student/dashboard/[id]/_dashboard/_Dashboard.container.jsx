@@ -129,7 +129,7 @@ export default function Page({ classId }) {
                 </div>
             </div>
             <TitleModal userData={userData} modalId={modalId} setModalId={setModalId} titles={titles} onUpdateTitle={onUpdateTitle} />
-            <ProfileImgModal userData={userData} modalId={modalId} setModalId={setModalId} onClick={onSelectProfileImg} />
+            <ProfileImgModal userData={userData} profileImgOrder={classData?.profileImgOrder} modalId={modalId} setModalId={setModalId} onClick={onSelectProfileImg} />
             <Toaster position="bottom-right" />
         </div>
 
