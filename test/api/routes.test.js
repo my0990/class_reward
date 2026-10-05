@@ -167,11 +167,12 @@ describe("/api/students/[id]", () => {
     expect(body.map((s) => s.userId)).toEqual(["s1", "s2"]);
   });
 
-  it("교사: 다른 교사의 학급 id로는 빈 목록", async () => {
+  it("교사: 다른 교사의 학급 id로는 404 (학생 목록을 주지 않음)", async () => {
     await seedStudent(mongo.db, other, { userId: "outsider" });
     asTeacher();
-    const { body } = await call(studentsRoute, { id: other.classId });
-    expect(body).toEqual([]);
+    const { status, body } = await call(studentsRoute, { id: other.classId });
+    expect(status).toBe(404);
+    expect(body.error).toBe("학급 정보를 찾을 수 없습니다.");
   });
 });
 
