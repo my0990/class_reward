@@ -11,6 +11,30 @@ import { switchClassPath } from "../utils/classPath";
 export default function ClassSwitcher({ classId, className, homeHref }) {
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
+  const closeTimer = useRef(null);
+  const openedByHover = useRef(false); // 마우스로 열린 상태에서 ▾를 클릭해도 닫히지 않게
+
+  // 마우스: ▾에 올리면 열리고, ▾와 목록 밖으로 나가면 0.2초 뒤 닫힌다 (목록으로 옮겨가는 사이 안 닫히게).
+  // 터치(태블릿·휴대폰)는 hover가 없으므로 기존처럼 눌러서 연다.
+  const cancelClose = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = null;
+  };
+  const onHoverEnter = (e) => {
+    if (e.pointerType !== "mouse") return;
+    cancelClose();
+    openedByHover.current = true;
+    setOpen(true);
+  };
+  const onHoverLeave = (e) => {
+    if (e.pointerType !== "mouse") return;
+    cancelClose();
+    closeTimer.current = setTimeout(() => {
+      openedByHover.current = false;
+      setOpen(false);
+    }, 200);
+  };
+  useEffect(() => cancelClose, []);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -58,7 +82,9 @@ export default function ClassSwitcher({ classId, className, homeHref }) {
 
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen((v) => (openedByHover.current ? true : !v))}
+        onPointerEnter={onHoverEnter}
+        onPointerLeave={onHoverLeave}
         aria-label="다른 학급 선택"
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -79,6 +105,8 @@ export default function ClassSwitcher({ classId, className, homeHref }) {
       {open && (
         <div
           role="listbox"
+          onPointerEnter={onHoverEnter}
+          onPointerLeave={onHoverLeave}
           className="
             absolute left-0 top-full z-50 mt-[8px]
             min-w-[240px] max-h-[60vh] overflow-auto
