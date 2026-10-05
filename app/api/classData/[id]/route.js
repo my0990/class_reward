@@ -12,6 +12,7 @@ const STUDENT_FIELDS = {
   expTable: 1,
   itemList: 1,
   profileImgStorage: 1,
+  profileImgOrder: 1,
 };
 
 // 학급 설정/마켓/프로필 이미지 등 학급 정보 (교사 + 그 반 학생)

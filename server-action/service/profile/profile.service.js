@@ -249,3 +249,22 @@ export async function selectProfileTitleService({ teacher_id, classId, profileTi
         result: true,
     };
 }
+
+/** 학급 프로필 이미지 순서 바꾸기 (드래그) — 순서만 profileImgOrder에 저장 */
+export async function reorderProfileImgsService({ teacher_id, classId, orderedIds }) {
+    const scope = toScope({ teacher_id, classId });
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0 || orderedIds.length > 500) {
+        throw new Error("순서 정보가 올바르지 않습니다.");
+    }
+    const ids = orderedIds.map(String);
+    if (ids.some((id) => !HEX24.test(id)) || new Set(ids).size !== ids.length) {
+        throw new Error("순서 정보가 올바르지 않습니다.");
+    }
+
+    const db = (await connectDB).db('data');
+    const res = await db.collection('class_data').updateOne(scope, { $set: { profileImgOrder: ids } });
+    if (res.matchedCount === 0) {
+        throw new Error("학급 정보를 찾을 수 없습니다.");
+    }
+    return { result: true };
+}

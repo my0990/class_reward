@@ -252,3 +252,35 @@ export async function finishQuestService({
     await session.endSession();
   }
 }
+
+/**
+ * 퀘스트 순서 바꾸기: orderedIds 순서대로 order(0,1,2...)를 저장한다.
+ * 목록은 order 오름차순으로 정렬되고, order가 없는 새 퀘스트는 맨 위에 나온다.
+ */
+export async function reorderQuestsService({ teacher_id, classId, orderedIds }) {
+  const scopeFilter = toScopeFilter({ teacher_id, classId });
+
+  if (!Array.isArray(orderedIds) || orderedIds.length === 0 || orderedIds.length > 500) {
+    throw new Error("순서 정보가 올바르지 않습니다.");
+  }
+  let questIds;
+  try {
+    questIds = orderedIds.map((id) => ObjectId.createFromHexString(String(id)));
+  } catch {
+    throw new Error("순서 정보가 올바르지 않습니다.");
+  }
+  if (new Set(orderedIds.map(String)).size !== orderedIds.length) {
+    throw new Error("순서 정보가 올바르지 않습니다.");
+  }
+
+  const db = (await connectDB).db("data");
+  // 이 학급 퀘스트만 바뀐다 (다른 학급 id가 섞여 있어도 scopeFilter에 걸리지 않음)
+  await db.collection("quest").bulkWrite(
+    questIds.map((_id, order) => ({
+      updateOne: { filter: { ...scopeFilter, _id }, update: { $set: { order } } },
+    })),
+    { ordered: false }
+  );
+
+  return { result: true };
+}

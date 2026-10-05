@@ -9,7 +9,11 @@ import { useState, useRef } from "react";
 import ItemCard from "./components/ItemCard";
 import { useParams } from "next/navigation";
 import { mutate } from "swr";
-import { createItem, deleteItem, updateItem } from "@/server-action/actions/market/market.action";
+import { createItem, deleteItem, updateItem, reorderItems } from "@/server-action/actions/market/market.action";
+import SortableList from "@/components/sortable/SortableList";
+import useReorder from "@/hooks/useReorder";
+
+const getItemId = (item) => item.itemId;
 import usePendingAction from "@/hooks/usePendingAction";
 import { Toaster, toast } from "react-hot-toast";
 import { MarketProvider } from "./components/MarketContext";
@@ -30,6 +34,15 @@ export default function MarketContainer() {
     const [modalId, setModalId] = useState(null);
 
     const nodeRef = useRef();
+
+    // 드래그로 순서 바꾸기 (편집 모드에서만)
+    const [isReordering, setIsReordering] = useState(false);
+    const { ordered: orderedItems, onReorder, isSaving: isSavingOrder } = useReorder(
+        classData?.itemList,
+        getItemId,
+        (orderedIds) => reorderItems({ classId, orderedIds }),
+        () => mutate(`/api/classData/${classId}`)
+    );
 
     const [isError, setIsError] = useState(false);
     const [emoji, setEmoji] = useState(null);
@@ -352,19 +365,43 @@ export default function MarketContainer() {
         <MarketProvider value={marketContextValue}>
         <div className="flex justify-center">
             <div className="w-[240px] min-[464px]:w-[464px] min-[688px]:w-[688px] min-[912px]:w-[912px] min-[1136px]:w-[1136px]">
-                <div
-                    ref={nodeRef}
-                    className="flex flex-wrap p-[8px]"
-                >
-                    {itemList?.map((item) => (
+                {/* 순서 바꾸기 */}
+                {(itemList?.length ?? 0) > 1 && (
+                    <div className="flex items-center justify-end gap-[8px] px-[24px] pt-[16px]">
+                        {isReordering && (
+                            <span className="text-[0.85rem] text-gray-500">
+                                {isSavingOrder ? "저장 중..." : "카드를 끌어서 순서를 바꾸세요 (태블릿은 길게 눌러서)"}
+                            </span>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => setIsReordering((v) => !v)}
+                            className={`rounded-full px-[14px] py-[6px] text-[0.9rem] font-bold transition ${
+                                isReordering ? "bg-orange-500 text-white" : "bg-white text-orange-500 ring-1 ring-orange-300 hover:bg-orange-50"
+                            }`}
+                        >
+                            {isReordering ? "완료" : "↕ 순서 바꾸기"}
+                        </button>
+                    </div>
+                )}
+
+                <div ref={nodeRef} className="p-[8px]">
+                <SortableList
+                    items={orderedItems}
+                    getId={getItemId}
+                    onReorder={onReorder}
+                    enabled={isReordering}
+                    layout="grid"
+                    className="flex flex-wrap"
+                    itemClassName="m-[16px]"
+                    renderItem={(item) => (
                         <div
-                            key={item.itemId}
                             className={`
-                                relative m-[16px] flex w-[192px]
+                                relative flex w-[192px]
                                 items-center justify-center rounded-lg
                                 bg-orange-200
                                 shadow-[4.4px_4.4px_1.2px_rgba(0,0,0,0.15)]
-                                ${item?.itemStock <= 0
+                                ${item?.itemStock <= 0 || isReordering
                                     ? "cursor-default"
                                     : "cursor-pointer transition-all hover:scale-110"
                                 }
@@ -376,7 +413,8 @@ export default function MarketContainer() {
                                 onClick={onDeleteModalOpen}
                             />
                         </div>
-                    ))}
+                    )}
+                >
 
                     <div
                         className="
@@ -400,6 +438,7 @@ export default function MarketContainer() {
                             />
                         </svg>
                     </div>
+                </SortableList>
                 </div>
 
                 <AddModal />

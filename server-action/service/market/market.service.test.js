@@ -10,7 +10,7 @@ import {
 
 vi.mock("@/lib/mongodb", async () => (await import("@/test/helpers/testMongo")).mongodbMock);
 
-const { createItemService, updateItemService, deleteItemService, buyItemService } = await import(
+const { createItemService, updateItemService, deleteItemService, buyItemService, reorderItemsService } = await import(
   "./market.service.js"
 );
 
@@ -264,5 +264,33 @@ describe("buyItemService (아이템 구매)", () => {
     const s1 = await getStudent(mongo.db, "s1");
     const s2 = await getStudent(mongo.db, "s2");
     expect(s1.money + s2.money).toBe(1900);
+  });
+});
+
+describe("reorderItemsService (아이템 순서 바꾸기)", () => {
+  const mk = (id, extra = {}) => ({ itemId: id, itemName: id, itemPrice: 10, itemStock: 5, ...extra });
+  const reorder = (orderedIds, s = scope) => reorderItemsService({ teacher_id: s.teacher_id, classId: s.classId, orderedIds });
+
+  it("요청한 순서대로 바꾸고 가격·재고 등 내용은 그대로", async () => {
+    await seedClassData(mongo.db, scope, { itemList: [mk("a", { itemStock: 1 }), mk("b"), mk("c", { itemPrice: 99 })] });
+    await reorder(["c", "a", "b"]);
+    const items = await getItems();
+    expect(items.map((i) => i.itemId)).toEqual(["c", "a", "b"]);
+    expect(items[0].itemPrice).toBe(99);
+    expect(items[1].itemStock).toBe(1);
+  });
+
+  it("요청에 없는 아이템(그사이 새로 등록된 것)은 뒤에 남고, 없는 id는 무시", async () => {
+    await seedClassData(mongo.db, scope, { itemList: [mk("a"), mk("b"), mk("new")] });
+    await reorder(["b", "ghost", "a"]);
+    expect((await getItems()).map((i) => i.itemId)).toEqual(["b", "a", "new"]);
+  });
+
+  it("다른 학급에는 영향 없음 / 잘못된 요청 거부", async () => {
+    await seedClassData(mongo.db, scope, { itemList: [mk("a"), mk("b")] });
+    await expect(reorder(["b", "a"], other)).rejects.toThrow("학급 정보를 찾을 수 없습니다.");
+    expect((await getItems()).map((i) => i.itemId)).toEqual(["a", "b"]);
+    await expect(reorder([])).rejects.toThrow("순서 정보");
+    await expect(reorder(["a", "a"])).rejects.toThrow("순서 정보");
   });
 });

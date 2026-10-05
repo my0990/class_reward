@@ -1,6 +1,12 @@
 'use client';
 
 import { useState } from "react";
+import { mutate } from "swr";
+import SortableList from "@/components/sortable/SortableList";
+import useReorder from "@/hooks/useReorder";
+import { reorderQuests } from "@/server-action/actions/quest/quest.action";
+
+const getQuestId = (quest) => String(quest.questId ?? quest._id);
 import { useParams } from "next/navigation";
 import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
 import QuestCard from "./components/QuestCard";
@@ -54,6 +60,15 @@ export default function Quest() {
         isQuestListError ||
         isClassDataError ||
         isStudentDataError;
+
+    // 드래그로 순서 바꾸기 (편집 모드에서만) — 훅은 조기 return보다 위에 있어야 한다
+    const [isReordering, setIsReordering] = useState(false);
+    const { ordered: orderedQuests, onReorder, isSaving: isSavingOrder } = useReorder(
+        Array.isArray(questListData) ? questListData : [],
+        getQuestId,
+        (orderedIds) => reorderQuests({ classId, orderedIds }),
+        () => mutate(`/api/fetchQuestList/${classId}`)
+    );
 
     if (isLoading) {
         return <div>Loading data...</div>;
@@ -148,17 +163,42 @@ export default function Quest() {
                 </header>
 
                 <div className="w-full">
+                    {questList.length > 1 && (
+                        <div className="mt-[12px] flex items-center justify-end gap-[8px]">
+                            {isReordering && (
+                                <span className="text-[0.8rem] text-red-900/60">
+                                    {isSavingOrder ? "저장 중..." : "끌어서 순서 바꾸기 (태블릿은 길게 눌러서)"}
+                                </span>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => setIsReordering((v) => !v)}
+                                className={`rounded-full px-[12px] py-[4px] text-[0.85rem] font-bold transition ${
+                                    isReordering ? "bg-orange-500 text-white" : "bg-white text-orange-500 ring-1 ring-orange-300 hover:bg-orange-50"
+                                }`}
+                            >
+                                {isReordering ? "완료" : "↕ 순서 바꾸기"}
+                            </button>
+                        </div>
+                    )}
+
                     {questList.length > 0 ? (
-                        questList.map((quest) => (
-                            <QuestCard
-                                key={quest.questId ?? quest._id}
-                                data={quest}
-                                classId={classId}
-                                studentCount={studentCount}
-                                role="teacher"
-                                onDetail={onOpenQuestDetail}
-                            />
-                        ))
+                        <SortableList
+                            items={orderedQuests}
+                            getId={getQuestId}
+                            onReorder={onReorder}
+                            enabled={isReordering}
+                            layout="vertical"
+                            renderItem={(quest) => (
+                                <QuestCard
+                                    data={quest}
+                                    classId={classId}
+                                    studentCount={studentCount}
+                                    role="teacher"
+                                    onDetail={onOpenQuestDetail}
+                                />
+                            )}
+                        />
                     ) : (
                         <div className="py-[48px] text-center text-red-900">
                             등록된 퀘스트가 없습니다.

@@ -1,6 +1,6 @@
 'use server'
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
-import { createProfileImgService, updateProfileImgService, deleteProfileImgService, buyProfileImgService, selectProfileImgService, selectProfileTitleService } from "@/server-action/service/profile/profile.service";
+import { createProfileImgService, updateProfileImgService, deleteProfileImgService, buyProfileImgService, selectProfileImgService, selectProfileTitleService, reorderProfileImgsService } from "@/server-action/service/profile/profile.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { resolveStudentTarget, StudentTargetError } from "@/lib/auth/studentTarget";
@@ -201,5 +201,17 @@ export async function updateProfileImg({ url, price, classId, urlId }) {
         result: false,
         message: error.message || "칭호 수정 실패",
       };
+    }
+  }
+
+  // 학급 프로필 이미지 순서 바꾸기 (드래그)
+  export async function reorderProfileImgs({ classId, orderedIds }) {
+    try {
+      const auth = await authorizeTeacherClass(classId);
+      if (!auth.ok) return { result: false, message: auth.message };
+      await reorderProfileImgsService({ teacher_id: auth.teacher_id, classId, orderedIds });
+      return { result: true, message: "순서를 바꿨습니다." };
+    } catch (error) {
+      return { result: false, message: error.message || "순서를 저장하지 못했습니다." };
     }
   }

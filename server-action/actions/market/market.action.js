@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
 import { resolveStudentTarget, StudentTargetError } from "@/lib/auth/studentTarget";
-import { buyItemService, createItemService, deleteItemService, updateItemService } from "@/server-action/service/market/market.service";
+import { buyItemService, createItemService, deleteItemService, updateItemService, reorderItemsService } from "@/server-action/service/market/market.service";
 
 export async function createItem({
   itemName,
@@ -196,5 +196,19 @@ export async function buyItem({ itemId, userId, classId, kioskToken }) {
   } catch (error) {
     if (!error?.status || error.status >= 500) console.error("buyItem action error:", error);
     return { result: false, message: error?.message || "구매 처리 중 오류가 발생했습니다." };
+  }
+}
+
+// 마켓 아이템 순서 바꾸기 (드래그)
+export async function reorderItems({ classId, orderedIds }) {
+  try {
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+
+    await reorderItemsService({ teacher_id: auth.teacher_id, classId, orderedIds });
+    return { result: true, message: "순서를 바꿨습니다." };
+  } catch (error) {
+    console.error("reorderItems error:", error);
+    return { result: false, message: error.message || "순서를 저장하지 못했습니다." };
   }
 }

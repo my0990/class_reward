@@ -13,7 +13,8 @@ export const GET = withApiHandler(async (req, { params }) => {
   const quests = await db
     .collection("quest")
     .find({ teacher_id: teacherObjectId, classId: classObjectId }, { projection: { code: 0 } })
-    .sort({ time: -1 })
+    // 교사가 드래그로 정한 순서(order) → 없으면(새 퀘스트) 맨 위, 같으면 최신순
+    .sort({ order: 1, time: -1 })
     .toArray();
 
   return NextResponse.json(quests);

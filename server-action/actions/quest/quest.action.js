@@ -10,6 +10,7 @@ import {
   deleteQuestService,
   resetQuestService,
   finishQuestService,
+  reorderQuestsService,
 } from "@/server-action/service/quest/quest.service";
 
 
@@ -112,5 +113,19 @@ export async function finishQuest({ classId, questData, rewarded }) {
     return await finishQuestService({ teacher_id, classId, questData, rewarded });
   } catch (err) {
     return { result: false, message: err?.message || "지급에 실패했습니다." };
+  }
+}
+
+// 퀘스트 순서 바꾸기 (드래그)
+export async function reorderQuests({ classId, orderedIds }) {
+  const auth = await authorizeTeacherClass(classId);
+  if (!auth.ok) {
+    return { result: false, message: auth.message };
+  }
+  try {
+    await reorderQuestsService({ teacher_id: auth.teacher_id, classId, orderedIds });
+    return { result: true, message: "순서를 바꿨습니다." };
+  } catch (err) {
+    return { result: false, message: err?.message || "순서를 저장하지 못했습니다." };
   }
 }

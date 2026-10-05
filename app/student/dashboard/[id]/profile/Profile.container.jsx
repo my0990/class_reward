@@ -3,6 +3,7 @@
 import ProfileCard from "./components/ProfileCard"
 import ProfileBuyModal from "./components/ProfileBuyModal";
 import { useState, useEffect } from "react";
+import { orderedProfileImgIds } from "@/util/profile/profileImgOrder";
 import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import usePendingAction from "@/hooks/usePendingAction";
@@ -74,7 +75,7 @@ export default function ProfileContainer({ }) {
             <div className="flex justify-center">
                 <div className="min-[1136px]:w-[1136px] min-[912px]:w-[912px] min-[688px]:w-[688px] min-[464px]:w-[464px] w-[240px]">
                     <div className="flex p-[8px] flex-wrap">
-                        {Object.keys(classData?.profileImgStorage).map((a, i) => {
+                        {orderedProfileImgIds(classData?.profileImgStorage, classData?.profileImgOrder).map((a, i) => {
                             const owned = userData?.profileImgStorage && userData?.profileImgStorage[a] ? true : false
                             return (
                                 < ProfileCard key={i} owned={owned} onClick={e => onBuyModalOpen(e, a)} profileImgData={classData?.profileImgStorage[a]} currencyName={currencyName} />

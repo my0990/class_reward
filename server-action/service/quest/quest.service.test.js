@@ -28,7 +28,7 @@ vi.mock("@/lib/mongodb", () => ({
   connectDB: connectDBPromise,
 }));
 
-const { createQuestService, finishQuestService } = await import(
+const { createQuestService, finishQuestService, reorderQuestsService } = await import(
   "./quest.service.js"
 );
 
@@ -214,5 +214,32 @@ describe("finishQuestService", () => {
         rewarded: [],
       })
     ).rejects.toThrow("잘못된 요청입니다.");
+  });
+});
+
+describe("reorderQuestsService (퀘스트 순서 바꾸기)", () => {
+  it("요청한 순서대로 order를 저장하고, 다른 교사의 퀘스트는 바꾸지 않는다", async () => {
+    const q = [];
+    for (const name of ["가", "나", "다"]) {
+      q.push((await createQuestService({ teacher_id: TEACHER_ID, classId: CLASS_ID, questName: name })).questId);
+    }
+    const otherQuest = (await createQuestService({ teacher_id: OTHER_TEACHER_ID, classId: OTHER_CLASS_ID, questName: "남의 것" })).questId;
+
+    await reorderQuestsService({ teacher_id: TEACHER_ID, classId: CLASS_ID, orderedIds: [q[2], q[0], q[1], otherQuest] });
+
+    const sorted = await db
+      .collection("quest")
+      .find({ classId: ObjectId.createFromHexString(CLASS_ID) })
+      .sort({ order: 1, time: -1 })
+      .toArray();
+    expect(sorted.map((x) => x.questName)).toEqual(["다", "가", "나"]);
+    const others = await db.collection("quest").findOne({ _id: ObjectId.createFromHexString(otherQuest) });
+    expect(others.order).toBeUndefined();
+  });
+
+  it("잘못된 id는 거부", async () => {
+    await expect(
+      reorderQuestsService({ teacher_id: TEACHER_ID, classId: CLASS_ID, orderedIds: ["abc"] })
+    ).rejects.toThrow("순서 정보");
   });
 });

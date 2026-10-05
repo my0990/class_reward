@@ -10,7 +10,7 @@ import {
 
 vi.mock("@/lib/mongodb", async () => (await import("@/test/helpers/testMongo")).mongodbMock);
 
-const { buyProfileImgService, createProfileImgService, updateProfileImgService, deleteProfileImgService } = await import(
+const { buyProfileImgService, createProfileImgService, updateProfileImgService, deleteProfileImgService, reorderProfileImgsService } = await import(
   "./profile.service.js"
 );
 
@@ -174,5 +174,22 @@ describe("프로필 이미지 등록/수정/삭제 (교사)", () => {
     await seedProfileImg(100);
     await deleteProfileImgService({ teacher_id: scope.teacher_id, classId: scope.classId, urlId: URL_ID });
     expect(await getStorage()).toEqual({});
+  });
+});
+
+describe("reorderProfileImgsService (프로필 이미지 순서)", () => {
+  it("순서를 profileImgOrder에 저장한다", async () => {
+    await seedProfileImg(100);
+    const id2 = new ObjectId().toHexString();
+    await reorderProfileImgsService({ teacher_id: scope.teacher_id, classId: scope.classId, orderedIds: [id2, URL_ID] });
+    const doc = await mongo.db.collection("class_data").findOne({ classId: scope.classObjectId });
+    expect(doc.profileImgOrder).toEqual([id2, URL_ID]);
+  });
+
+  it.each([[["a.b"]], [[]], [[URL_ID, URL_ID]]])("잘못된 순서 %j는 거부", async (ids) => {
+    await seedProfileImg(100);
+    await expect(
+      reorderProfileImgsService({ teacher_id: scope.teacher_id, classId: scope.classId, orderedIds: ids })
+    ).rejects.toThrow("순서 정보");
   });
 });

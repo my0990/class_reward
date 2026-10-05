@@ -310,3 +310,68 @@ export async function buyItemService({ teacher_id, classId, userId, itemId }) {
     await session.endSession();
   }
 }
+
+/**
+ * 마켓 아이템 순서 바꾸기
+ * orderedIds 순서대로 itemList를 다시 배열한다. DB 안에서 한 번에 처리해서,
+ * 그사이 학생이 사서 재고가 바뀌어도 그 값을 덮어쓰지 않는다.
+ * orderedIds에 없는 아이템(그사이 새로 등록된 것 등)은 맨 뒤에 그대로 둔다.
+ */
+export async function reorderItemsService({ teacher_id, classId, orderedIds }) {
+  if (!Array.isArray(orderedIds) || orderedIds.length === 0 || orderedIds.length > 500) {
+    throw new Error("순서 정보가 올바르지 않습니다.");
+  }
+  const ids = orderedIds.map(String);
+  if (new Set(ids).size !== ids.length) {
+    throw new Error("순서 정보가 올바르지 않습니다.");
+  }
+
+  let scope;
+  try {
+    scope = {
+      teacher_id: ObjectId.createFromHexString(teacher_id),
+      classId: ObjectId.createFromHexString(classId),
+    };
+  } catch {
+    throw new Error("잘못된 학급 정보입니다.");
+  }
+
+  const db = (await connectDB).db("data");
+  const result = await db.collection("class_data").updateOne(scope, [
+    {
+      $set: {
+        itemList: {
+          $concatArrays: [
+            // 1) 요청한 순서대로 (없는 id는 건너뜀)
+            {
+              $filter: {
+                input: {
+                  $map: {
+                    input: ids,
+                    as: "id",
+                    in: { $first: { $filter: { input: { $ifNull: ["$itemList", []] }, as: "e", cond: { $eq: ["$$e.itemId", "$$id"] } } } },
+                  },
+                },
+                as: "x",
+                cond: { $eq: [{ $type: "$$x" }, "object"] },
+              },
+            },
+            // 2) 요청에 없던 아이템은 원래 순서대로 뒤에
+            {
+              $filter: {
+                input: { $ifNull: ["$itemList", []] },
+                as: "e",
+                cond: { $not: [{ $in: ["$$e.itemId", ids] }] },
+              },
+            },
+          ],
+        },
+      },
+    },
+  ]);
+
+  if (result.matchedCount === 0) {
+    throw new Error("학급 정보를 찾을 수 없습니다.");
+  }
+  return { result: true };
+}
