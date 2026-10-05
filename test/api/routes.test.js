@@ -166,6 +166,21 @@ describe("/api/fetchHistory/[id]", () => {
     expect(body.map((h) => h.name)).toEqual(["new", "old"]);
   });
 
+  it("기본 50건, limit으로 늘릴 수 있고 최대 500건", async () => {
+    await seedStudent(mongo.db, scope, { userId: "s1" });
+    await mongo.db.collection("history").insertMany(
+      Array.from({ length: 520 }, (_, i) => ({ userId: "s1", name: `h${i}`, date: new Date(2026, 8, 1, 0, 0, i) }))
+    );
+    asTeacher();
+    const base = "http://localhost/api/fetchHistory/s1";
+    expect((await call(historyRoute, { id: "s1", url: base })).body).toHaveLength(50);
+    const page2 = (await call(historyRoute, { id: "s1", url: `${base}?limit=100` })).body;
+    expect(page2).toHaveLength(100);
+    expect(page2[0].name).toBe("h519"); // 최신순
+    expect((await call(historyRoute, { id: "s1", url: `${base}?limit=99999` })).body).toHaveLength(500);
+    expect((await call(historyRoute, { id: "s1", url: `${base}?limit=abc` })).body).toHaveLength(50);
+  });
+
   it("다른 교사의 학생 내역은 403", async () => {
     await seedStudent(mongo.db, other, { userId: "outsider" });
     asTeacher();

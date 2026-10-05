@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { withApiHandler, requireTeacher } from "@/lib/api/routeHelpers";
+import { withApiHandler, requireTeacher, parseIntParam } from "@/lib/api/routeHelpers";
+
+const HISTORY_PAGE_DEFAULT = 50;
+const HISTORY_PAGE_MAX = 500;
 
 // 학생 거래 내역 (담임 교사만)
 export const GET = withApiHandler(async (req, { params }) => {
   const { teacherObjectId } = await requireTeacher();
   const { id: userId } = await params;
+  // 최근 것부터 limit건만 준다 (기본 50, 최대 500). 화면의 "더 보기"가 limit을 늘려서 다시 요청한다.
+  const limit = parseIntParam(new URL(req.url).searchParams.get("limit"), {
+    defaultValue: HISTORY_PAGE_DEFAULT,
+    min: 1,
+    max: HISTORY_PAGE_MAX,
+  });
 
   const db = (await connectDB).db("data");
 
@@ -22,7 +31,8 @@ export const GET = withApiHandler(async (req, { params }) => {
   const history = await db
     .collection("history")
     .find({ userId }, { projection: { code: 0 } })
-    .sort({ date: -1 })
+    .sort({ date: -1, _id: -1 })
+    .limit(limit)
     .toArray();
 
   return NextResponse.json(history);

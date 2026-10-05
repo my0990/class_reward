@@ -1,9 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { mutate } from "swr";
 import CardTemplate from "../card/CardTemplate";
 import { useFetchData } from "@/hooks/useFetchData";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import { useManageContext } from "../ManageContext";
+
+// app/api/fetchHistory의 기본값/최대값과 맞춘다
+const HISTORY_PAGE_SIZE = 50;
+const HISTORY_PAGE_MAX = 500;
 
 function formatDate(dateString) {
   if (!dateString) return "-";
@@ -36,13 +40,22 @@ export default function DetailModal() {
 
   const userId = picked?.userId;
   const isOpen = modalId === "DETAIL_ACCOUNT";
-  const historyKey = isOpen && userId ? `/api/fetchHistory/${userId}` : null;
+  // 거래 내역은 최근 50건씩 불러오고 "더 보기"를 누르면 50건씩 늘린다.
+  const [historyLimit, setHistoryLimit] = useState(HISTORY_PAGE_SIZE);
+  useEffect(() => {
+    setHistoryLimit(HISTORY_PAGE_SIZE); // 다른 학생을 열면 처음부터
+  }, [userId]);
+
+  const historyKey = isOpen && userId ? `/api/fetchHistory/${userId}?limit=${historyLimit}` : null;
 
   const {
     data: historyData,
     isLoading: isHistoryLoading,
+    isValidating: isHistoryValidating,
     isError: isHistoryError,
-  } = useFetchData(historyKey);
+  } = useFetchData(historyKey, { keepPreviousData: true });
+
+  const hasMoreHistory = (historyData?.length ?? 0) >= historyLimit && historyLimit < HISTORY_PAGE_MAX;
 
   const rows = useMemo(() => historyData ?? [], [historyData]);
 
@@ -145,6 +158,19 @@ export default function DetailModal() {
                   ))}
                 </tbody>
               </table>
+            )}
+
+            {hasMoreHistory && (
+              <div className="py-4 text-center">
+                <button
+                  type="button"
+                  onClick={() => setHistoryLimit((n) => Math.min(n + HISTORY_PAGE_SIZE, HISTORY_PAGE_MAX))}
+                  disabled={isHistoryValidating}
+                  className="btn btn-sm bg-orange-300"
+                >
+                  {isHistoryValidating ? "불러오는 중..." : "더 보기"}
+                </button>
+              </div>
             )}
           </div>
         </div>

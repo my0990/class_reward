@@ -1,9 +1,9 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-// import { connectDB } from "@/trash/lib/database";
 import { connectDB } from "@/lib/mongodb";
 import { compare } from "bcryptjs";
 import { ObjectId } from "mongodb";
+import { recheckUser } from "@/lib/auth/sessionCheck";
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -22,7 +22,6 @@ export const authOptions = {
         if (!role || !password) return null;
 
         const db = (await connectDB).db("user");
-        console.log("✅ db connected");
         let user = null;
 
         // 🎓 학생: userId로 조회
@@ -72,7 +71,7 @@ export const authOptions = {
           role: "student",
           userId: user.userId ?? null,
           classId: user.classId ?? null, // 있으면 넣고, 없으면 null
-          teacher_id: user.teacher_id.toString?.() ?? null
+          teacher_id: user.teacher_id?.toString?.() ?? null
         };
       },
     }),
@@ -105,33 +104,22 @@ export const authOptions = {
             userId: user.userId ?? null,
             classId: user.classId ?? null,
             _id: user._id.toString(),
-            teacher_id: user.teacher_id.toString()
+            teacher_id: user.teacher_id?.toString() ?? null
           };
         }
       }
 
-      if (token?.user?._id) {
-
-        try {
+      // 계정이 아직 있는지는 5분에 한 번만 DB로 확인한다 (lib/auth/sessionCheck)
+      await recheckUser(token, {
+        justSignedIn: Boolean(user),
+        findUserById: async (id) => {
           const db = (await connectDB).db("user");
-
-          const dbUser = await db.collection("users").findOne({
-            _id: ObjectId.createFromHexString(token.user._id),
-          });
-
-          if (!dbUser) {
-            token.invalidUser = true;
-            return token;
-          }
-
-          token.invalidUser = false;
-
-          // 선택: DB 값으로 최신화
-
-        } catch (error) {
-          token.invalidUser = true;
-        }
-      }
+          return db.collection("users").findOne(
+            { _id: ObjectId.createFromHexString(id) },
+            { projection: { _id: 1 } }
+          );
+        },
+      });
 
       return token;
     },
