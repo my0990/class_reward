@@ -89,6 +89,29 @@ describe("/api/classes", () => {
   });
 });
 
+describe("/api/classes 학생 수", () => {
+  it("학급별 학생 수를 세서 준다 (저장된 studentsCount는 무시)", async () => {
+    const classA = new ObjectId();
+    const classB = new ObjectId();
+    await mongo.db.collection("classes").insertMany([
+      { _id: classA, teacher_id: scope.teacherObjectId, className: "1반", studentsCount: 0 },
+      { _id: classB, teacher_id: scope.teacherObjectId, className: "2반", studentsCount: 99 },
+    ]);
+    const inA = { ...scope, classObjectId: classA };
+    await seedStudent(mongo.db, inA, { userId: "a1" });
+    await seedStudent(mongo.db, inA, { userId: "a2" });
+    await seedStudent(mongo.db, inA, { userId: "a3" });
+    // 다른 교사의 학생, 교사 본인 데이터는 세지 않는다
+    await seedStudent(mongo.db, { ...other, classObjectId: classA }, { userId: "x1" });
+    await mongo.db.collection("user_data").insertOne({ userId: "t@test.com", role: "teacher", teacher_id: scope.teacherObjectId, classId: classA });
+
+    asTeacher();
+    const { body } = await call(classesRoute);
+    const byName = Object.fromEntries(body.map((c) => [c.className, c.studentsCount]));
+    expect(byName).toEqual({ "1반": 3, "2반": 0 });
+  });
+});
+
 describe("/api/classData/[id]", () => {
   it("교사: 자기 학급 정보를 준다", async () => {
     await seedClassData(mongo.db, scope, { className: "우리반" });

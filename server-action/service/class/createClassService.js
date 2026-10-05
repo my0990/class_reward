@@ -18,7 +18,6 @@ export async function createClassService({ className, teacher_id }) {
     const newClass = {
         className,
         teacher_id: ObjectId.createFromHexString(teacher_id),
-        studentsCount: 0,
         uniqueNickname: null,
     };
 
