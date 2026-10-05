@@ -1,25 +1,68 @@
 'use client';
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
 export default function HeaderNav({ navItems, pathname, classId }) {
   const [openKey, setOpenKey] = useState(null);
   const closeTimer = useRef(null);
+  const navRef = useRef(null);
+  const lastPointerType = useRef("mouse");
+
+  const clearCloseTimer = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = null;
+  };
 
   const openMenu = (key) => {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
+    clearCloseTimer();
     setOpenKey(key);
   };
 
   const closeMenu = () => {
+    clearCloseTimer();
     closeTimer.current = setTimeout(() => {
       setOpenKey(null);
     }, 200);
   };
 
+  const closeNow = () => {
+    clearCloseTimer();
+    setOpenKey(null);
+  };
+
+  // 헤더는 페이지를 옮겨도 그대로 남아 있으므로, 주소가 바뀌면 열린 하위 메뉴를 닫는다.
+  useEffect(() => {
+    closeNow();
+  }, [pathname]);
+
+  // 메뉴 바깥을 클릭·터치하거나 ESC를 누르면 닫는다 (터치 화면에는 "마우스가 나감"이 없다).
+  useEffect(() => {
+    if (!openKey) return;
+    const onPointerDown = (e) => {
+      if (navRef.current && !navRef.current.contains(e.target)) closeNow();
+    };
+    const onKey = (e) => e.key === "Escape" && closeNow();
+    document.addEventListener("pointerdown", onPointerDown, true);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [openKey]);
+
+  useEffect(() => clearCloseTimer, []);
+
+  // 마우스는 올리면 열리고 벗어나면 닫힌다. 터치는 hover가 없으므로 상위 메뉴를 눌러서 열고 닫는다.
+  const onItemPointerEnter = (e, key) => e.pointerType === "mouse" && openMenu(key);
+  const onItemPointerLeave = (e) => e.pointerType === "mouse" && closeMenu();
+  const onParentClick = (key) => {
+    if (lastPointerType.current === "mouse") return; // 마우스는 이미 hover로 열려 있다
+    setOpenKey((k) => (k === key ? null : key));
+  };
+
   // ✅ newTab 지원 링크 렌더러
-  const NavLink = ({ href, newTab, children, className }) => {
+  const NavLink = ({ href, newTab, children, className, onClick }) => {
     if (newTab) {
       return (
         <a
@@ -27,20 +70,25 @@ export default function HeaderNav({ navItems, pathname, classId }) {
           target="_blank"
           rel="noopener noreferrer"
           className={className}
+          onClick={onClick}
         >
           {children}
         </a>
       );
     }
     return (
-      <Link href={href} prefetch={false} className={className}>
+      <Link href={href} prefetch={false} className={className} onClick={onClick}>
         {children}
       </Link>
     );
   };
 
   return (
-    <ul className="flex max-[980px]:hidden relative ">
+    <ul
+      ref={navRef}
+      className="flex max-[980px]:hidden relative "
+      onPointerDown={(e) => { lastPointerType.current = e.pointerType; }}
+    >
       {navItems.map((item) => {
         const hasSubmenu = !!item.submenu?.length;
         const isOpen = openKey === item.key;
@@ -59,8 +107,8 @@ export default function HeaderNav({ navItems, pathname, classId }) {
           <li
             key={item.key}
             className="relative mr-[3vw]"
-            onMouseEnter={() => hasSubmenu && openMenu(item.key)}
-            onMouseLeave={() => hasSubmenu && closeMenu()}
+            onPointerEnter={(e) => hasSubmenu && onItemPointerEnter(e, item.key)}
+            onPointerLeave={(e) => hasSubmenu && onItemPointerLeave(e)}
           >
             {/* 상위 메뉴 */}
             {itemHref ? (
@@ -79,6 +127,9 @@ export default function HeaderNav({ navItems, pathname, classId }) {
               </NavLink>
             ) : (
               <div
+                role={hasSubmenu ? "button" : undefined}
+                aria-expanded={hasSubmenu ? isOpen : undefined}
+                onClick={() => hasSubmenu && onParentClick(item.key)}
                 className={`
                   flex items-center gap-1 cursor-pointer
                   transition-colors duration-200
@@ -131,8 +182,8 @@ export default function HeaderNav({ navItems, pathname, classId }) {
                     ? "opacity-100 translate-y-0 pointer-events-auto"
                     : "opacity-0 -translate-y-2 pointer-events-none"}
                 `}
-                onMouseEnter={() => openMenu(item.key)}
-                onMouseLeave={closeMenu}
+                onPointerEnter={(e) => onItemPointerEnter(e, item.key)}
+                onPointerLeave={onItemPointerLeave}
               >
                 {item.submenu.map((sub) => {
                   const subActive = sub.activeMatch?.(pathname, classId);
@@ -143,6 +194,7 @@ export default function HeaderNav({ navItems, pathname, classId }) {
                       <NavLink
                         href={subHref}
                         newTab={sub.newTab}
+                        onClick={closeNow}
                         className={`
                           block px-4 py-2 whitespace-nowrap
                           transition-colors
