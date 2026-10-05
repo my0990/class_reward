@@ -73,7 +73,7 @@ export default function ModalTemplate({
               damping: 25
             }}
           >
-            {/* 휴대폰에서는 바깥을 누르기 어려워서(창이 화면을 거의 채움) 오른쪽 위에 닫기 버튼을 둔다 */}
+            {/* 모든 화면에서 오른쪽 위에 닫기 버튼 (바깥 클릭·ESC도 그대로 동작) */}
             {!hideCloseButton && (
               <button
                 type="button"
@@ -82,8 +82,7 @@ export default function ModalTemplate({
                 className="
                   absolute right-[8px] top-[8px] z-10 flex h-[36px] w-[36px]
                   items-center justify-center rounded-full bg-white/90 text-gray-500
-                  shadow ring-1 ring-gray-200 active:scale-95
-                  sm:hidden
+                  shadow ring-1 ring-gray-200 hover:bg-gray-50 hover:text-gray-700 active:scale-95
                 "
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-5 w-5" aria-hidden="true">

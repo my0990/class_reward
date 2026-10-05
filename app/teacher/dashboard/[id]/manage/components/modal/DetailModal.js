@@ -65,8 +65,9 @@ export default function DetailModal() {
           </div>
 
           <div className="h-[500px] w-[460px] max-w-full overflow-auto max-[900px]:h-[420px] max-[900px]:w-full">
-            <div className="mb-[16px] flex items-center justify-between">
-              <h1 className="ml-6 text-[1.8rem] font-bold">
+            {/* 새로고침은 제목 바로 옆에 (오른쪽 위는 창 닫기 버튼 자리) */}
+            <div className="mb-[16px] flex items-center gap-[8px] pr-[44px]">
+              <h1 className="ml-[8px] text-[1.5rem] font-bold sm:text-[1.8rem]">
                 화폐 및 아이템 사용 기록
               </h1>
 
@@ -79,11 +80,11 @@ export default function DetailModal() {
                   transform: `rotate(${rotation}deg)`,
                   transition: "transform 0.5s ease-in-out",
                 }}
-                className="mr-[16px] cursor-pointer transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
+                className="shrink-0 cursor-pointer transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <svg
-                  width="32px"
-                  height="32px"
+                  width="26px"
+                  height="26px"
                   viewBox="0 0 21 21"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="#000000"
