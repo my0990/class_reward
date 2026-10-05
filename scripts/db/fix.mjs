@@ -10,6 +10,7 @@ import { connect, isIntString } from "./_common.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const DEFAULT_REQUIRE_CURRENCY = 30; // 온도계 화면이 설정이 없을 때 보여주던 기본값
+const UNPRICED_PROFILE_IMG = 99999; // 새 프로필 이미지를 등록할 때 넣는 "가격 미정" 값
 
 const toInt = (s) => Number(String(s).trim().replace(/,/g, ""));
 const SAFE_KEY = /^[A-Za-z0-9_-]+$/; // DB 필드 경로에 넣어도 안전한 키
@@ -67,16 +68,23 @@ try {
   {
     const col = data.collection("class_data");
     const ops = [];
+    let emptyProfilePrice = 0;
     for await (const c of col.find({ profileImgStorage: { $exists: true } }, { projection: { profileImgStorage: 1 } })) {
       for (const [key, p] of Object.entries(c.profileImgStorage ?? {})) {
         const v = p?.price;
         if (typeof v !== "string") continue;
-        if (!isIntString(v) || !SAFE_KEY.test(key)) { noteBroken("프로필 이미지 가격", v); continue; }
         const path = `profileImgStorage.${key}.price`;
+        // 가격이 빈 문자열이면 "아직 가격 미정"으로 보고, 새 이미지 등록 때와 같은 99999(사실상 판매 안 함)로 채운다.
+        if (v.trim() === "" && SAFE_KEY.test(key)) {
+          emptyProfilePrice++;
+          ops.push({ col, op: { updateOne: { filter: { _id: c._id, [path]: v }, update: { $set: { [path]: UNPRICED_PROFILE_IMG } } } } });
+          continue;
+        }
+        if (!isIntString(v) || !SAFE_KEY.test(key)) { noteBroken("프로필 이미지 가격", v); continue; }
         ops.push({ col, op: { updateOne: { filter: { _id: c._id, [path]: v }, update: { $set: { [path]: toInt(v) } } } } });
       }
     }
-    await run("프로필 이미지 가격 문자열 → 정수", ops);
+    await run(`프로필 이미지 가격 문자열 → 정수 (그중 비어있어서 ${UNPRICED_PROFILE_IMG}으로 채움: ${emptyProfilePrice})`, ops);
   }
 
   // 3) 학생 인벤토리 아이템 가격 (user_data.itemList)
@@ -113,12 +121,16 @@ try {
       if (v === undefined || v === null || v === "") {
         missing++;
         ops.push({ col, op: { updateOne: { filter: { _id: t._id, requireCurrency: v ?? null }, update: { $set: { requireCurrency: DEFAULT_REQUIRE_CURRENCY } } } } });
+      } else if ((typeof v === "string" && isIntString(v) && toInt(v) <= 0) || (typeof v === "number" && v <= 0)) {
+        // 0이면 1도 계산이 0으로 나누기가 되어 기부가 실패한다 → 기본값 30
+        missing++;
+        ops.push({ col, op: { updateOne: { filter: { _id: t._id, requireCurrency: v }, update: { $set: { requireCurrency: DEFAULT_REQUIRE_CURRENCY } } } } });
       } else if (typeof v === "string") {
-        if (!isIntString(v) || toInt(v) <= 0) { noteBroken("온도계 requireCurrency", v); continue; }
+        if (!isIntString(v)) { noteBroken("온도계 requireCurrency", v); continue; }
         ops.push({ col, op: { updateOne: { filter: { _id: t._id, requireCurrency: v }, update: { $set: { requireCurrency: toInt(v) } } } } });
       }
     }
-    await run(`온도계 1도당 쿠키 수 정리 (그중 비어있어서 ${DEFAULT_REQUIRE_CURRENCY}으로 채움: ${missing})`, ops);
+    await run(`온도계 1도당 쿠키 수 정리 (그중 비어있거나 0이라서 ${DEFAULT_REQUIRE_CURRENCY}으로 채움: ${missing})`, ops);
   }
 
   // 5) 거래 기록 (history) — 건수가 많아서 DB 안에서 한 번에 변환한다
