@@ -30,7 +30,8 @@ function Key({ children, onPress, disabled, variant = "number", label }) {
       }}
       className={`
         ${look}
-        flex aspect-[5/4] w-full select-none items-center justify-center
+        flex aspect-[4/3] w-full select-none items-center justify-center
+        [@media(max-height:760px)]:aspect-[2/1]
         rounded-[26px] font-extrabold
         ring-1 ring-orange-100
         transition-[transform,box-shadow] duration-75
@@ -128,7 +129,7 @@ export default function PasswordKeypad({
       ) : (
         <motion.div
           animate={dots}
-          className="my-[22px] flex min-h-[22px] flex-wrap items-center justify-center gap-[12px]"
+          className="my-[20px] flex min-h-[22px] flex-wrap items-center justify-center gap-[12px] [@media(max-height:760px)]:my-[12px]"
           aria-label={`${value.length}자리 입력됨`}
         >
           {Array.from({ length: dotCount }, (_, i) => {
@@ -154,7 +155,7 @@ export default function PasswordKeypad({
       )}
 
       {!textMode && (
-        <div className="grid w-full max-w-[300px] grid-cols-3 gap-[14px]">
+        <div className="grid w-full max-w-[300px] grid-cols-3 gap-[12px] [@media(max-height:760px)]:gap-[10px]">
           {DIGITS.map((d) => (
             <Key key={d} onPress={() => append(d)} disabled={disabled}>
               {d}
@@ -179,7 +180,8 @@ export default function PasswordKeypad({
         onClick={onSubmit}
         disabled={disabled || !value}
         className="
-          mt-[22px] h-[58px] w-full max-w-[300px] rounded-full
+          mt-[20px] h-[56px] w-full max-w-[300px] shrink-0 rounded-full
+          [@media(max-height:760px)]:mt-[14px] [@media(max-height:760px)]:h-[50px]
           bg-gradient-to-r from-orange-400 to-amber-400 text-[1.3rem] font-extrabold text-white
           shadow-[0_5px_0_#ea580c] transition-[transform,box-shadow] duration-75
           active:translate-y-[4px] active:shadow-[0_1px_0_#ea580c]
@@ -196,7 +198,7 @@ export default function PasswordKeypad({
           onToggleTextMode();
         }}
         className="
-          mt-[14px] rounded-full bg-white/70 px-[14px] py-[6px] text-[0.9rem] text-orange-400
+          mt-[14px] shrink-0 rounded-full bg-white/70 px-[14px] py-[6px] text-[0.9rem] text-orange-400
           ring-1 ring-orange-200 hover:bg-white
         "
       >

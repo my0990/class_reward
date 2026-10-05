@@ -59,8 +59,10 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
     <dialog id={KIOSK_PWD_DIALOG_ID} ref={dialogRef} className="modal modal-middle">
       <div
         className="
-          modal-box relative flex max-w-[400px] flex-col items-center overflow-hidden
-          rounded-[36px] bg-gradient-to-b from-orange-50 to-amber-50 px-[24px] pb-[24px] pt-[32px]
+          modal-box relative flex max-w-[400px] flex-col items-center
+          max-h-[calc(100dvh-24px)] overflow-x-hidden overflow-y-auto
+          rounded-[36px] bg-gradient-to-b from-orange-50 to-amber-50 px-[24px] pb-[28px] pt-[28px]
+          [@media(max-height:760px)]:pt-[18px] [@media(max-height:760px)]:pb-[20px]
           shadow-[0_20px_60px_rgba(251,146,60,0.25)]
         "
       >
@@ -73,10 +75,10 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
             <img
               src={userData.profileUrl}
               alt=""
-              className="h-[84px] w-[84px] rounded-full border-4 border-white object-cover shadow-[0_4px_12px_rgba(251,146,60,0.35)]"
+              className="h-[76px] w-[76px] rounded-full border-4 border-white object-cover shadow-[0_4px_12px_rgba(251,146,60,0.35)] [@media(max-height:760px)]:h-[56px] [@media(max-height:760px)]:w-[56px]"
             />
           ) : (
-            <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full border-4 border-white bg-orange-200 text-[2rem] shadow">🍊</div>
+            <div className="flex h-[76px] w-[76px] items-center justify-center rounded-full border-4 border-white bg-orange-200 text-[2rem] shadow [@media(max-height:760px)]:h-[56px] [@media(max-height:760px)]:w-[56px]">🍊</div>
           )}
           <span className="absolute -bottom-1 -right-1 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-[1rem] shadow">🔒</span>
         </div>
@@ -103,7 +105,7 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
           shakeKey={shakeKey}
         />
 
-        <div className="mt-[12px] min-h-[24px] text-center text-[0.95rem] font-semibold text-rose-500" role="alert">
+        <div className="mt-[10px] min-h-[22px] text-center text-[0.95rem] font-semibold text-rose-500" role="alert">
           {error}
         </div>
       </div>
