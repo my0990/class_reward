@@ -66,6 +66,18 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
           shadow-[0_20px_60px_rgba(251,146,60,0.25)]
         "
       >
+        {/* 닫기 버튼 (태블릿·휴대폰에서 바깥을 누르기 어려울 때) */}
+        <form method="dialog" className="absolute right-[12px] top-[12px] z-10">
+          <button
+            aria-label="닫기"
+            className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-white/90 text-orange-300 shadow ring-1 ring-orange-100 active:scale-95"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-5 w-5" aria-hidden="true">
+              <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </form>
+
         {/* 장식용 동그라미 */}
         <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-200/40" />
         <span aria-hidden="true" className="pointer-events-none absolute -left-8 top-24 h-16 w-16 rounded-full bg-orange-200/40" />

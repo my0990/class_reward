@@ -9,7 +9,8 @@ export default function ModalTemplate({
   setModalId,
   children,
   onClose,
-  className=""
+  className="",
+  hideCloseButton = false, // 창 안에 자체 닫기(×) 버튼이 있으면 true
 }) {
 
   const isOpen = modalId === id;
@@ -62,7 +63,7 @@ export default function ModalTemplate({
           <motion.div
             ref={modalRef}
             onClick={(e) => e.stopPropagation()}
-            className={`m-auto bg-white rounded-2xl min-w-[min(320px,100%)] ${hasMaxWidth ? "" : "max-w-[95vw]"} shadow-xl ${className}`}
+            className={`relative m-auto bg-white rounded-2xl min-w-[min(320px,100%)] ${hasMaxWidth ? "" : "max-w-[95vw]"} shadow-xl ${className}`}
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -72,6 +73,24 @@ export default function ModalTemplate({
               damping: 25
             }}
           >
+            {/* 휴대폰에서는 바깥을 누르기 어려워서(창이 화면을 거의 채움) 오른쪽 위에 닫기 버튼을 둔다 */}
+            {!hideCloseButton && (
+              <button
+                type="button"
+                onClick={close}
+                aria-label="닫기"
+                className="
+                  absolute right-[8px] top-[8px] z-10 flex h-[36px] w-[36px]
+                  items-center justify-center rounded-full bg-white/90 text-gray-500
+                  shadow ring-1 ring-gray-200 active:scale-95
+                  sm:hidden
+                "
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-5 w-5" aria-hidden="true">
+                  <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
+            )}
             {children({ close })}
           </motion.div>
         </motion.div>

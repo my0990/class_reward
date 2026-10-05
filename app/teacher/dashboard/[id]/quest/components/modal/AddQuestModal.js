@@ -542,6 +542,7 @@ export default function AddQuestModal({
             modalId={modalId}
             setModalId={setModalId}
             onClose={onClose}
+            hideCloseButton
             className="
                 w-[calc(100%-32px)]
                 max-w-[600px]
