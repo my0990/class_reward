@@ -51,7 +51,9 @@ export default function ModalTemplate({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+          // 창이 화면보다 길면 바깥(배경)이 스크롤된다. items-center로 가운데 정렬하면
+          // 화면보다 긴 창은 위아래가 잘려서 스크롤로도 볼 수 없으므로, m-auto로 가운데 정렬한다.
+          className="fixed inset-0 z-50 flex overflow-y-auto overscroll-contain bg-black/40 p-[12px]"
           onClick={onOutsideClick}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -60,7 +62,7 @@ export default function ModalTemplate({
           <motion.div
             ref={modalRef}
             onClick={(e) => e.stopPropagation()}
-            className={`bg-white rounded-2xl min-w-[320px] ${hasMaxWidth ? "" : "max-w-[95vw]"} shadow-xl ${className}`}
+            className={`m-auto bg-white rounded-2xl min-w-[min(320px,100%)] ${hasMaxWidth ? "" : "max-w-[95vw]"} shadow-xl ${className}`}
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
