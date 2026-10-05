@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { mutate } from "swr";
 import CardTemplate from "../card/CardTemplate";
 import { useFetchData } from "@/hooks/useFetchData";
@@ -41,6 +41,34 @@ export default function DetailModal() {
 
   const rows = useMemo(() => historyData ?? [], [historyData]);
 
+  // 좁은 화면(900px 이하): 프로필 / 사용 기록을 옆으로 넘기는 두 장짜리 화면
+  const sliderRef = useRef(null);
+  const [slide, setSlide] = useState(0);
+  const SLIDES = [
+    { key: "profile", label: "🙂 프로필" },
+    { key: "history", label: "📜 사용 기록" },
+  ];
+
+  const goToSlide = (index, behavior = "smooth") => {
+    const el = sliderRef.current;
+    if (!el) return;
+    el.scrollTo({ left: index * el.clientWidth, behavior });
+    setSlide(index);
+  };
+
+  const onSliderScroll = () => {
+    const el = sliderRef.current;
+    if (!el || !el.clientWidth) return;
+    const index = Math.round(el.scrollLeft / el.clientWidth);
+    if (index !== slide) setSlide(index);
+  };
+
+  // 다른 학생을 열면 항상 프로필부터
+  useEffect(() => {
+    setSlide(0);
+    sliderRef.current?.scrollTo({ left: 0 });
+  }, [userId, isOpen]);
+
   const onRefresh = () => {
     if (!historyKey) return;
 
@@ -53,18 +81,53 @@ export default function DetailModal() {
       id="DETAIL_ACCOUNT"
       modalId={modalId}
       setModalId={setModalId}
+      className="max-[900px]:w-full max-[900px]:max-w-[520px]"
     >
       {() => (
-        <div className="flex max-w-[880px] flex-wrap justify-between gap-y-4 p-6 max-[900px]:max-w-[520px] max-[900px]:justify-center max-[480px]:p-3">
-          <div className="mr-5 flex w-full max-w-[352px] justify-center rounded-xl bg-green-400 p-[8px] max-[900px]:mr-0">
+        <div className="p-6 max-[480px]:p-3">
+          {/* 탭 (좁은 화면에서만) */}
+          <div className="mb-[12px] hidden gap-[6px] rounded-full bg-orange-100 p-[4px] max-[900px]:flex" role="tablist">
+            {SLIDES.map((t, i) => (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={slide === i}
+                onClick={() => goToSlide(i)}
+                className={`flex-1 rounded-full py-[6px] text-[0.95rem] font-bold transition ${
+                  slide === i ? "bg-white text-orange-500 shadow" : "text-orange-300"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* PC: 나란히 / 좁은 화면: 옆으로 넘기기 (scroll-snap) */}
+          <div
+            ref={sliderRef}
+            onScroll={onSliderScroll}
+            className="
+              flex gap-5
+              max-[900px]:snap-x max-[900px]:snap-mandatory max-[900px]:gap-0
+              max-[900px]:overflow-x-auto max-[900px]:overscroll-x-contain
+              max-[900px]:[scrollbar-width:none] max-[900px]:[&::-webkit-scrollbar]:hidden
+            "
+          >
+          <section className="flex shrink-0 justify-center max-[900px]:w-full max-[900px]:snap-start max-[900px]:snap-always" aria-label="프로필">
+          <div className="flex w-full max-w-[352px] justify-center rounded-xl bg-green-400 p-[8px]">
             <CardTemplate
               picked={picked}
               startExp={startExp}
               commonDifference={commonDifference}
             />
           </div>
+          </section>
 
-          <div className="h-[500px] w-[460px] max-w-full overflow-auto max-[900px]:h-[420px] max-[900px]:w-full">
+          <section
+            aria-label="화폐 및 아이템 사용 기록"
+            className="h-[500px] w-[460px] shrink-0 overflow-y-auto max-[900px]:h-[min(500px,70dvh)] max-[900px]:w-full max-[900px]:snap-start max-[900px]:snap-always"
+          >
             {/* 새로고침은 제목 바로 옆에 */}
             <div className="mb-[16px] flex items-center gap-[8px] pr-[12px]">
               <h1 className="ml-[8px] text-[1.5rem] font-bold sm:text-[1.8rem]">
@@ -189,6 +252,20 @@ export default function DetailModal() {
                 </button>
               </div>
             )}
+          </section>
+          </div>
+
+          {/* 몇 번째 장인지 (좁은 화면에서만) */}
+          <div className="mt-[12px] hidden justify-center gap-[8px] max-[900px]:flex">
+            {SLIDES.map((t, i) => (
+              <button
+                key={t.key}
+                type="button"
+                aria-label={`${t.label}로 이동`}
+                onClick={() => goToSlide(i)}
+                className={`h-[8px] rounded-full transition-all ${slide === i ? "w-[22px] bg-orange-400" : "w-[8px] bg-orange-200"}`}
+              />
+            ))}
           </div>
         </div>
       )}
