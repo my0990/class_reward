@@ -55,7 +55,7 @@ export default function DetailModal() {
       setModalId={setModalId}
     >
       {() => (
-        <div className="flex max-w-[850px] flex-wrap justify-between p-6 max-[870px]:max-w-[400px]">
+        <div className="flex max-w-[960px] flex-wrap justify-between p-6 max-[1000px]:max-w-[560px]">
           <div className="mr-5 flex max-w-[352px] justify-center rounded-xl bg-green-400 p-[8px]">
             <CardTemplate
               picked={picked}
@@ -64,7 +64,7 @@ export default function DetailModal() {
             />
           </div>
 
-          <div className="h-[500px] w-[400px] overflow-auto">
+          <div className="h-[500px] w-[520px] max-w-full overflow-auto max-[1000px]:mt-4">
             <div className="mb-[16px] flex items-center justify-between">
               <h1 className="ml-6 text-[1.8rem] font-bold">
                 화폐 및 아이템 사용 기록
@@ -116,7 +116,7 @@ export default function DetailModal() {
                   </span>
                 ))}
               </div>
-              <table className="table">
+              <table className="table table-sm w-full">
                 <thead>
                   <tr className="text-center">
                     <th>종류</th>
@@ -139,7 +139,12 @@ export default function DetailModal() {
                           {kind.icon} {kind.label}
                         </span>
                       </td>
-                      <td>{item?.name}</td>
+                      {/* 긴 내용은 ...으로 줄이고, 마우스를 올리면 전체 내용 */}
+                      <td className="max-w-[220px]">
+                        <div className="truncate" title={item?.name}>
+                          {item?.name}
+                        </div>
+                      </td>
                       <td>
                         <span
                           className={
