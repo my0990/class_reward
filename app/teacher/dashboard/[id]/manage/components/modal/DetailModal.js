@@ -4,6 +4,7 @@ import CardTemplate from "../card/CardTemplate";
 import { useFetchData } from "@/hooks/useFetchData";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import { useManageContext } from "../ManageContext";
+import { HISTORY_KINDS, getHistoryKind, isDepositType } from "../../utils/historyKind";
 
 // app/api/fetchHistory의 기본값/최대값과 맞춘다
 const HISTORY_PAGE_SIZE = 50;
@@ -22,16 +23,6 @@ function formatDate(dateString) {
   const second = String(date.getSeconds()).padStart(2, "0");
 
   return `${date.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`;
-}
-
-// 예전 데이터에는 "deposit"/"withDrawal"이, 지금 데이터에는 "입금"/"출금"이 섞여 있다.
-function isDepositType(type) {
-  return type === "입금" || type === "deposit";
-}
-
-// 아이템 사용 기록인지: 새 기록은 kind로, 예전 기록은 이름("아이템 사용 (...)")으로 구분
-function isItemUse(item) {
-  return item?.kind === "itemUse" || /^아이템 사용/.test(item?.name ?? "");
 }
 
 function getAmountText(type, amount) {
@@ -130,6 +121,15 @@ export default function DetailModal() {
                 사용 기록이 없습니다.
               </div>
             ) : (
+              <>
+              {/* 색 안내 */}
+              <div className="mb-[8px] flex flex-wrap gap-[6px] px-[8px] text-[0.75rem]">
+                {["grant", "quest", "buy", "use", "donate", "take"].map((k) => (
+                  <span key={k} className={`rounded-full px-[8px] py-[2px] ${HISTORY_KINDS[k].badge}`}>
+                    {HISTORY_KINDS[k].icon} {HISTORY_KINDS[k].label}
+                  </span>
+                ))}
+              </div>
               <table className="table">
                 <thead>
                   <tr className="text-center">
@@ -140,18 +140,25 @@ export default function DetailModal() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((item, index) => (
+                  {rows.map((item, index) => {
+                    const kind = HISTORY_KINDS[getHistoryKind(item)];
+                    return (
                     <tr
                       key={item._id ?? `${item.date}-${item.type}-${index}`}
-                      className={`border-none text-center ${isItemUse(item) ? "bg-amber-50" : ""}`}
+                      className={`border-none text-center ${kind.row}`}
                     >
-                      <td>{item?.name}</td>
+                      <td className="text-left">
+                        <span className={`mr-[6px] inline-block whitespace-nowrap rounded-full px-[6px] py-[1px] text-[0.7rem] ${kind.badge}`}>
+                          {kind.icon} {kind.label}
+                        </span>
+                        {item?.name}
+                      </td>
                       <td>
                         <span
                           className={
                             isDepositType(item?.type)
-                              ? "text-green-500"
-                              : "text-red-500"
+                              ? "font-semibold text-emerald-600"
+                              : "font-semibold text-rose-500"
                           }
                         >
                           {getAmountText(item.type, item.amount)}
@@ -160,9 +167,11 @@ export default function DetailModal() {
                       <td>{item.balance}</td>
                       <td>{formatDate(item.date)}</td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
+              </>
             )}
 
             {hasMoreHistory && (
