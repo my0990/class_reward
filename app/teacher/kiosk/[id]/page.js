@@ -106,7 +106,10 @@ export default function KioskHome() {
                     ))}
                 </div>
 
-                <KioskInstallPrompt />
+                {/* 안내를 닫아도 이 자리(맨 아래 칸)는 남겨 둬야 메뉴가 가운데에 있다 (justify-between) */}
+                <div className="flex w-full justify-center">
+                    <KioskInstallPrompt />
+                </div>
             </section>
         </main>
     )
