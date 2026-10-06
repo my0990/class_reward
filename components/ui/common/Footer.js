@@ -10,8 +10,8 @@ export default function Footer({ className = "" }) {
           <Link href="/privacy" prefetch={false} className="font-bold text-gray-700 hover:underline">
             개인정보처리방침
           </Link>
-          <a href={`mailto:${SITE.contactEmail}`} className="hover:underline" title={SITE.contactEmail}>
-            문의하기
+          <a href={`mailto:${SITE.contactEmail}`} className="hover:underline">
+            문의 {SITE.contactEmail}
           </a>
         </nav>
         <p>© {new Date().getFullYear()} {SITE.name}</p>
