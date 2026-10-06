@@ -10,11 +10,13 @@ import PwdSection from "./components/PwdSection";
 import { updateProfile, updatePassword } from "@/server-action/actions/setting/setting.action";
 import { updateCurrencyName } from "@/server-action/actions/class/classSetting.action";
 import ClassSection from "./components/ClassSection";
+import WithdrawModal from "@/components/teacher/WithdrawModal";
 export default function SettingContainer() {
     const params = useParams();
     const classId = params.id;
 
     const [tab, setTab] = useState('profile');
+    const [modalId, setModalId] = useState(null);
     const { runAction, isPending } = usePendingAction();
 
     const [password, setPassword] = useState({ currentPassword: '', nextPassword: '', nextPasswordConfirm: '' })
@@ -162,11 +164,23 @@ export default function SettingContainer() {
                 </div>
                 <div className="max-[600px]:w-[100%] flex justify-center">
                     {tab === "profile" ? <ProfileSection {...{ profileNickname, profileState, profileUrl, setFormData, onSubmit, formData, onChange, isPending }} />
-                        : tab === "pwd" ? <PwdSection {...{ onPwdChange, password, onPwdSubmit, error }} />
+                        : tab === "pwd" ? (
+                            <div>
+                                <PwdSection {...{ onPwdChange, password, onPwdSubmit, error }} />
+                                <div className="mx-[20px] mt-[40px] rounded-xl border border-red-200 p-4 max-w-[400px]">
+                                    <h3 className="font-bold text-red-600">회원 탈퇴</h3>
+                                    <p className="mt-1 text-sm text-gray-500">계정과 모든 학급·학생 정보가 즉시 삭제되며 복구할 수 없습니다.</p>
+                                    <button type="button" onClick={() => setModalId("WITHDRAW")} className="mt-3 rounded-lg border border-red-400 px-3 py-1 text-sm text-red-500 hover:bg-red-50">
+                                        회원 탈퇴
+                                    </button>
+                                </div>
+                            </div>
+                        )
                             : <ClassSection {...{ currencyEmoji, currencyName, currencyData, setCurrencyData, onCurrencyChange, onCurrencySubmit }} />}
                 </div>
             </div>
             {/* <ProfileImgSettingModal /> */}
+            <WithdrawModal modalId={modalId} setModalId={setModalId} />
             <Toaster position="bottom-right" />
         </div>
     )

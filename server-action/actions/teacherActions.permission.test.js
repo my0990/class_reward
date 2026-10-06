@@ -16,6 +16,7 @@ const { createQuest } = await import("./quest/quest.action.js");
 const { createProfileImg, selectProfileImg, selectProfileTitle } = await import("./profile/profile.action.js");
 const { updateCurrencyName } = await import("./class/classSetting.action.js");
 const { createClass } = await import("./class/createClass.js");
+const { withdrawTeacher } = await import("./account/withdraw.action.js");
 
 const mongo = setupTestMongo();
 const scope = makeScope();
@@ -68,6 +69,7 @@ describe("학생 세션으로는 교사용 action이 실행되지 않는다", ()
     expect((await updateCurrencyName({ classId: scope.classId, currencyName: "해킹", currencyEmoji: "💀" })).result).toBe(false);
     expect((await createProfileImg({ classId: scope.classId, createdProfileImgUrl: "https://x.com/a.png" })).result).toBe(false);
     expect((await createClass({ className: "가짜반" })).result).toBe(false);
+    expect((await withdrawTeacher({ password: "x", confirmText: "탈퇴합니다" })).result).toBe(false);
 
     expect(await count("quest")).toBe(0);
     expect(await count("thermometer")).toBe(0);

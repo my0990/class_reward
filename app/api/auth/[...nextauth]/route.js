@@ -54,6 +54,7 @@ export const authOptions = {
           user = await db.collection("users").findOne({
             role: "teacher",
             email,
+            disabled: { $ne: true }, // 탈퇴 처리 중인 계정
           });
         }
 

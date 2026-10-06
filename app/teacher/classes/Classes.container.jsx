@@ -17,6 +17,7 @@ import usePendingAction from "@/hooks/usePendingAction";
 import { Toaster, toast } from "react-hot-toast";
 import { signOut } from "next-auth/react";
 import Footer from "@/components/ui/common/Footer";
+import WithdrawModal from "@/components/teacher/WithdrawModal";
 export default function ClassesContainer() {
     const [modalId, setModalId] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
@@ -110,7 +111,10 @@ export default function ClassesContainer() {
                 <div>
                     <div className="flex justify-between items-center mt-4 mb-8">
                         <h1 className="font-bold text-[1.6rem] flex items-center">학급 선택</h1>
-                        <button onClick={() => signOut({ callbackUrl: `${window.location.origin}/` })} className="bg-orange-500 text-white rounded-lg px-[16px] py-[8px] hover:scale-110 transition-all">로그아웃</button>
+                        <div className="flex items-center gap-3">
+                            <button type="button" onClick={() => setModalId("WITHDRAW")} className="text-sm text-gray-400 hover:text-red-500 hover:underline">회원 탈퇴</button>
+                            <button onClick={() => signOut({ callbackUrl: `${window.location.origin}/` })} className="bg-orange-500 text-white rounded-lg px-[16px] py-[8px] hover:scale-110 transition-all">로그아웃</button>
+                        </div>
                     </div>
                     <div className="
                                         grid gap-4
@@ -150,6 +154,7 @@ export default function ClassesContainer() {
                 target={deleteTarget}
                 onConfirm={onDeleteConfirm}
                 isDeleting={isPending("deleteClass")} />
+            <WithdrawModal modalId={modalId} setModalId={setModalId} />
             <Toaster position="bottom-right" />
         </div>
     )

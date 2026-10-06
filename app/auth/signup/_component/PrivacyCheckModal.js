@@ -31,7 +31,7 @@ export default function PrivacyCheckModal({ setIsPrivacyChecked }) {
 
                         <h3>3. 개인정보의 보유 및 이용 기간</h3>
                         <ul>
-                            <li className="list-disc list-inside ml-[8px]">회원 가입 시부터 회원 탈퇴(삭제 요청) 시까지 보유합니다.</li>
+                            <li className="list-disc list-inside ml-[8px]">회원 가입 시부터 회원 탈퇴 시까지 보유하며, 탈퇴하면 즉시 삭제합니다.</li>
                             <li className="list-disc list-inside ml-[8px]">요청하시면 개인정보를 지체 없이 삭제합니다.</li>
                         </ul>
 

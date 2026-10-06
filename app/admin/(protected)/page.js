@@ -13,6 +13,7 @@ const ACTION_LABEL = {
   notice_unpin: "공지 고정 해제",
   account_create: "관리자 계정 생성",
   account_reset: "관리자 비밀번호 변경",
+  teacher_withdraw: "교사 회원 탈퇴",
 };
 
 function Stat({ label, value, sub }) {
