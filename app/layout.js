@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
+import Analytics from "@/components/common/Analytics";
 
 // import Head from "next/head";
 const inter = Inter({ subsets: ["latin"] });
@@ -54,33 +54,15 @@ export const viewport = {
 };
 export default async function RootLayout({ children }) {
 
-  const GA_MEASUREMENT_ID = "G-1XP2WLNQ01"
-
   return (
     <html lang="en" className="w-full dark:bg-gray-700">
       <head>
-        <Script
-          strategy="afterInteractive"
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${GA_MEASUREMENT_ID}', {
-                page_path: window.location.pathname,
-              });
-            `,
-          }}
-        />
          {/* <meta name="google" content="notranslate" /> */}
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className}>
+        {/* 방문 통계: 선생님 화면에서만 (components/common/Analytics.js) */}
+        <Analytics />
         {/* <RecoilRootProvider> */}
         {/* <Layout fetchedUserData={response} fetchedThermometerData={response2} session={session} /> */}
         {children}
