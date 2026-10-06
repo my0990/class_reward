@@ -1,5 +1,5 @@
 import { toast } from "react-hot-toast";
-export default function homeUtils({setStudentArr, setIsSelectedAll, studentArr, setIsSend}) {
+export default function homeUtils({setStudentArr, setIsSelectedAll, studentArr, setIsSend, openModal}) {
 
 
 
@@ -30,7 +30,7 @@ export default function homeUtils({setStudentArr, setIsSelectedAll, studentArr, 
             return
         }
         setIsSend(true);
-        document.getElementById('modal').showModal();
+        openModal();
     }
     const onTake = () => {
         if (studentArr.filter((a) => a.isactive === true).length === 0) {
@@ -38,7 +38,7 @@ export default function homeUtils({setStudentArr, setIsSelectedAll, studentArr, 
             return
         }
         setIsSend(false);
-        document.getElementById('modal').showModal();
+        openModal();
     }
     return { onClick, selectAll, clearAll, onSend, onTake }
 }

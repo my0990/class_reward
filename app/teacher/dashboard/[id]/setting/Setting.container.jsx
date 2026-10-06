@@ -180,7 +180,6 @@ export default function SettingContainer() {
                             : <ClassSection {...{ currencyEmoji, currencyName, currencyData, setCurrencyData, onCurrencyChange, onCurrencySubmit }} />}
                 </div>
             </div>
-            {/* <ProfileImgSettingModal /> */}
             <WithdrawModal modalId={modalId} setModalId={setModalId} />
         </div>
     )

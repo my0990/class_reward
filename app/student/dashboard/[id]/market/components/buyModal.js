@@ -3,8 +3,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate } from "swr";
 import { buyItem } from "@/server-action/actions/market/market.action";
+import ModalTemplate from "@/components/ui/common/ModalTemplate";
 
-export default function BuyModal({ buyList, money, currencyName, currencyEmoji, classId }) {
+export default function BuyModal({ buyList, money, currencyName, currencyEmoji, classId, modalId, setModalId }) {
     const router = useRouter();
 
 
@@ -17,7 +18,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
 
         if (money < buyList.itemPrice) {
             toast.error('돈이 모자랍니다');
-            document.getElementById('buy').close();
+            setModalId(null);
             return;
         }
 
@@ -52,7 +53,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
             toast.error('구매 처리 중 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
-            document.getElementById('buy').close();
+            setModalId(null);
         }
     }
 
@@ -61,8 +62,9 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
     const currentMoney = money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
     return (
-        <dialog id="buy" className="modal  modal-middle ">
-            <div className="modal-box min-[600px]:p-[48px] dark:bg-orange-200">
+        <ModalTemplate id="BUY" modalId={modalId} setModalId={setModalId} className="w-[calc(100%-32px)] max-w-[520px]">
+            {() => (
+            <div className="p-[24px] min-[600px]:p-[48px] dark:bg-orange-200">
                 <div className="flex justify-end">
                     <div className="w-[20px] h-[20px] mr-[8px]">
                         {/* <Image src={gold} alt="money" /> */}
@@ -95,13 +97,11 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
                     <form onSubmit={onSubmit} className="w-[48%] max-[600px]:w-[100%]">
                         <button disabled={isLoading} className="w-[100%] max-[600px]:w-[100%] bg-orange-400 rounded-[5px] py-[8px] text-white max-[600px]:mb-[8px] outline-none hover:bg-orange-500 disabled:opacity-50">{isLoading ? "처리 중..." : "구입"}</button>
                     </form>
-                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px] hover:bg-gray-300" onClick={() => document.getElementById('buy').close()}>취소</button>
+                    <button className="w-[48%] max-[600px]:w-[100%] bg-gray-200 rounded-[5px] py-[8px] hover:bg-gray-300" type="button" onClick={() => setModalId(null)}>취소</button>
                 </div>
             </div>
-            <form method="dialog" className="modal-backdrop">
-                <button>close</button>
-            </form>
-        </dialog>
+            )}
+        </ModalTemplate>
 
     )
 }

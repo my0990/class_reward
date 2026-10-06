@@ -27,7 +27,8 @@ export default function Random() {
 
 
 
-    const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend });
+    const [modalId, setModalId] = useState(null); // 지급/회수 키패드 창
+    const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend, openModal: () => setModalId("POINT") });
 
     // useEffect(() => {
     //     if (studentData) {
@@ -239,7 +240,7 @@ export default function Random() {
 
             </div>
             {/* currencyName, targetStudent, clearAll */}
-            <Modal setStudentArr={setStudentArr} targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll} classId={id}/>
+            <Modal modalId={modalId} setModalId={setModalId} setStudentArr={setStudentArr} targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll} classId={id}/>
         </div>
     )
 }

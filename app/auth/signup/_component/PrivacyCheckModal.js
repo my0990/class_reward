@@ -1,16 +1,18 @@
 import Link from "next/link";
+import ModalTemplate from "@/components/ui/common/ModalTemplate";
 
-export default function PrivacyCheckModal({ setIsPrivacyChecked }) {
+// 회원가입 개인정보 수집·이용 동의 내용 (확인을 누르면 동의 체크)
+export default function PrivacyCheckModal({ modalId, setModalId, setIsPrivacyChecked }) {
     const onCheck = (e) => {
         e.preventDefault();
         setIsPrivacyChecked(true);
-        document.getElementById('privacyCheckModal').close();
+        setModalId(null);
     }
 
     return (
-        <div>
-            <dialog id="privacyCheckModal" className="modal">
-                <div className="modal-box flex flex-col max-h-[90dvh] bg-white">
+        <ModalTemplate id="PRIVACY" modalId={modalId} setModalId={setModalId} className="w-[calc(100%-32px)] max-w-[520px]">
+            {() => (
+                <div className="flex flex-col max-h-[85dvh] bg-white rounded-2xl p-6">
 
                     <h2 className="text-center text-[1.5rem] font-bold mb-[16px]">개인정보 수집 및 이용 동의</h2>
                     <div className="bg-white outline-none overflow-y-auto">
@@ -53,11 +55,10 @@ export default function PrivacyCheckModal({ setIsPrivacyChecked }) {
                         </p>
                     </div>
                     <div className="h-[40px] text-[1.1rem] text-end mt-[8px] ">
-                        <button onClick={onCheck} className="w-full mt-[8px] outline-none bg-red-500 text-white mr-[8px] h-full rounded-lg px-[16px] hover:bg-red-600" >확인</button>
-                        {/* <button onClick={onClose} className=" bg-red-500 text-white mr-[8px] h-full rounded-lg px-[16px] hover:bg-red-600" >취소</button> */}
+                        <button type="button" onClick={onCheck} className="w-full mt-[8px] outline-none bg-red-500 text-white mr-[8px] h-full rounded-lg px-[16px] hover:bg-red-600" >확인</button>
                     </div>
                 </div>
-            </dialog>
-        </div>
+            )}
+        </ModalTemplate>
     )
 }

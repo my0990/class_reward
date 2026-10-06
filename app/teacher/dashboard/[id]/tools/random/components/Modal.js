@@ -3,7 +3,17 @@ import { useState, useEffect } from "react";
 import DialBtn from "./DialBtn";
 import { mutate } from "swr";
 import { handlePoint } from "@/server-action/actions/class/handlePoint";
-export default function Modal({ studentArr, currencyName, targetStudent, clearAll, isSend, setStudentArr, classId }) {
+import ModalTemplate from "@/components/ui/common/ModalTemplate";
+// 지급/회수 금액 키패드 창 (열려 있을 때만 키보드 숫자를 받는다)
+export default function Modal({ modalId, setModalId, ...props }) {
+    return (
+        <ModalTemplate id="POINT" modalId={modalId} setModalId={setModalId} className="w-[320px] max-w-[95vw] overflow-hidden">
+            {({ close }) => <PointKeypad {...props} close={close} />}
+        </ModalTemplate>
+    );
+}
+
+function PointKeypad({ studentArr, currencyName, targetStudent, clearAll, isSend, setStudentArr, classId, close }) {
     const [point, setPoint] = useState(null);
     const [fontSize, setFontSize] = useState(1.7);
     const [activeKey, setActiveKey] = useState(null);
@@ -91,7 +101,7 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
             );
 
             modalClose();
-            document.getElementById('modal').close();
+            close();
         } catch (error) {
             toast.error(error.message || '처리 중 오류가 발생했습니다.');
         } finally {
@@ -147,8 +157,7 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
         };
     }, [point]);
     return (
-        <dialog id="modal" className="modal " tabIndex="-1">
-            <div className={`modal-box w-[320px] flex justify-center dark:bg-gray-400 ${isSend ? "bg-green-500" : "bg-red-500"}`} >
+            <div className={`w-[320px] max-w-full rounded-2xl p-6 flex justify-center dark:bg-gray-400 ${isSend ? "bg-green-500" : "bg-red-500"}`} >
                 <div className="w-[272px]">
                     <h3 className="font-bold text-lg mb-5 ml-[10px] ">
                         {isSend ? "받는" : "잃는"} 사람: {targetStudent.map((a, i) => <span className="text-[1.4rem] ml-[4px]" key={i}><span className="bg-orange-200">{a.userId}</span><span className="">{i < targetStudent.length - 1 && ', '}</span></span>)}
@@ -181,9 +190,6 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
                     </ul>
                 </div>
             </div>
-            <form method="dialog" className="modal-backdrop" >
-                <button onClick={() => setTimeout(modalClose, 200)}>close</button>
-            </form>
-        </dialog>
+
     )
 }

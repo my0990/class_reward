@@ -18,12 +18,13 @@ export default function MarketContainer() {
     const { data: userData, isLoading: isUserLoading, isError: isUserError } = useFetchData('/api/user', STUDENT_REFRESH);
 
 
+    const [buyList, setBuyList] = useState();
+    const [modalId, setModalId] = useState(null);
     const onBuy = (picked) => {
         setBuyList(picked)
-        document.getElementById('buy').showModal()
+        setModalId("BUY")
     }
 
-    const [buyList, setBuyList] = useState();
     const nodeRef = useRef();
     if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
     if (isClassError || isUserError) return <div>Error loading data</div>;
@@ -50,7 +51,7 @@ export default function MarketContainer() {
                     )
                     )}
                 </div>
-                <BuyModal classId={id} buyList={buyList} money={userData?.money} currencyName={currencyName} currencyEmoji={currencyEmoji} />
+                <BuyModal modalId={modalId} setModalId={setModalId} classId={id} buyList={buyList} money={userData?.money} currencyName={currencyName} currencyEmoji={currencyEmoji} />
             </div>
         </div>
     )

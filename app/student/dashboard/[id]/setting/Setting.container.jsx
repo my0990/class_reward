@@ -4,7 +4,6 @@ import ProfileSection from "./components/ProfileSection";
 import { useState, useEffect } from "react"
 import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
-import ProfileImgSettingModal from "./components/ProfileImgSettingModal";
 import usePendingAction from "@/hooks/usePendingAction";
 import { toast } from "react-hot-toast";
 import PwdSection from "./components/PwdSection";
@@ -144,7 +143,6 @@ export default function SettingContainer() {
                             : null}
                 </div>
             </div>
-            {/* <ProfileImgSettingModal /> */}
         </div>
     )
 }

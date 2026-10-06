@@ -12,6 +12,7 @@ export default function SignUpView() {
     const router = useRouter();
 
     const [isPrivacyChecked, setIsPrivacyChecked] = useState(false);
+    const [modalId, setModalId] = useState(null); // 개인정보 동의 내용 창
 
     // form
     const [form, setForm] = useState({
@@ -270,14 +271,14 @@ export default function SignUpView() {
 
                         <button
                             type="button"
-                            onClick={() => document.getElementById('privacyCheckModal').showModal()}
+                            onClick={() => setModalId("PRIVACY")}
                             className="text-blue-600 underline text-[1.1rem]"
                         >
                             내용 보기
                         </button>
                     </div>
 
-                    <PrivacyCheckModal setIsPrivacyChecked={setIsPrivacyChecked} />
+                    <PrivacyCheckModal modalId={modalId} setModalId={setModalId} setIsPrivacyChecked={setIsPrivacyChecked} />
 
                     <AuthBtn className="text-blue-100 mb-[0px]">
                         {isSubmitting ? "가입중..." : "회원가입"}
