@@ -27,6 +27,9 @@ export async function checkKioskPassword({ userId, userPwd }) {
     return {
       result: true,
       kioskToken: createKioskToken({ teacher_id: session.user._id, classId: res.classId, userId }),
+      classId: res.classId,
+      // true면 결제로 넘어가기 전에 새 비밀번호를 정한다 (changeKioskStudentPassword)
+      mustChangePassword: Boolean(res.mustChangePassword),
     };
   } catch (error) {
     console.error("checkKioskPassword error:", error);

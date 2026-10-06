@@ -20,6 +20,14 @@ export async function proxy(req) {
     return NextResponse.next();
   }
 
+  // 학생: 기본 비밀번호 그대로면 새 비밀번호를 정할 때까지 다른 화면에 못 간다
+  if (pathname.startsWith("/student")) {
+    if (role === "student" && token?.user?.mustChangePassword && pathname !== "/student/change-password") {
+      return NextResponse.redirect(new URL("/student/change-password", req.url));
+    }
+    return NextResponse.next();
+  }
+
   // teacher 전용 페이지: 교사만 (학생·관리자는 차단)
   if (pathname.startsWith("/teacher")) {
     if (!token) {
@@ -34,5 +42,5 @@ export async function proxy(req) {
 }
 
 export const config = {
-  matcher: ["/teacher/:path*", "/admin/:path*"],
+  matcher: ["/teacher/:path*", "/admin/:path*", "/student/:path*"],
 };

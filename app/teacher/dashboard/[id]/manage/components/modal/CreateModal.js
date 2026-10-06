@@ -13,7 +13,7 @@ export default function CreateModal() {
               계정은 1번부터 40번까지 만들 수 있습니다
             </h3>
             <h3 className="mb-[12px] text-[0.9rem] font-bold text-gray-400 sm:mb-[16px] sm:text-[1rem]">
-              초기 비밀번호는 12345678입니다
+              초기 비밀번호는 12345678이고, 학생이 처음 로그인하면(키오스크 포함) 새 비밀번호를 정합니다
             </h3>
           </div>
 

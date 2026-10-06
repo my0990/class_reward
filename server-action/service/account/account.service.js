@@ -3,7 +3,9 @@ import { ObjectId } from "mongodb";
 import { hash } from 'bcryptjs';
 
 export const MAX_CLASS_NUMBER = 40;
-export const DEFAULT_STUDENT_PASSWORD = "12345678";
+// 기본 비밀번호는 lib/auth/studentPassword.js에서 관리한다 (첫 로그인 때 바꾸게 함)
+export { DEFAULT_STUDENT_PASSWORD } from "@/lib/auth/studentPassword";
+import { DEFAULT_STUDENT_PASSWORD } from "@/lib/auth/studentPassword";
 
 /**
  * 학생 계정 생성

@@ -37,7 +37,7 @@ describe("verifyStudentPasswordService (키오스크 학생 비밀번호 확인)
     await reset();
     await seedUser();
     const res = await check("1234");
-    expect(res).toEqual({ ok: true, classId: scope.classId });
+    expect(res).toEqual({ ok: true, classId: scope.classId, mustChangePassword: false });
   });
 
   it("예전 필드(password)에 저장된 해시도 확인한다", async () => {

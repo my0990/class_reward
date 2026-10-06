@@ -118,7 +118,7 @@ export default function ManageContainer() {
             await mutateClassData?.();
             await mutateStudentsData?.();
             setModalId(null)
-            toast.success("비밀번호를 12345678로 초기화하였습니다");
+            toast.success("비밀번호를 12345678로 초기화하였습니다. 학생이 다음에 로그인할 때 새 비밀번호를 정합니다.");
         })
     }
 

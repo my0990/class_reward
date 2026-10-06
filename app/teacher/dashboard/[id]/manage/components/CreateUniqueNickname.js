@@ -62,7 +62,7 @@ export default function CreateUniqueNickname({classId}) {
                         {isClick ? <div className="ml-[8px] text-orange-500">쿠키<span className="text-green-500">3</span></div> : <div onClick={()=>setIsClick(true)} className="cursor-pointer ml-[8px] w-[50px] bg-gray-500"></div>}
                     </li>
                     <li className="mt-[8px]">
-                        2. 학생들은 계정 아이디와 비밀번호를 입력하여 로그인합니다. 초기 비밀번호는 12345678입니다.
+                        2. 학생들은 계정 아이디와 비밀번호를 입력하여 로그인합니다. 초기 비밀번호는 12345678이며, 처음 로그인할 때 새 비밀번호를 정합니다.
                     </li>
 
                     <li className="mt-[8px] bg-red-400">

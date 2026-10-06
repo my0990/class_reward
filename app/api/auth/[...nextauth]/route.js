@@ -5,6 +5,8 @@ import { compare } from "bcryptjs";
 import { ObjectId } from "mongodb";
 import { recheckUser } from "@/lib/auth/sessionCheck";
 import { authorizeAdmin, isAdminEmail, ADMIN_SESSION_MS } from "@/lib/auth/adminAuth";
+import { assertNotLocked, recordLoginFailure, clearLoginFailures } from "@/lib/auth/loginLimit";
+import { isDefaultStudentPassword } from "@/lib/auth/studentPassword";
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -33,11 +35,14 @@ export const authOptions = {
 
         const db = (await connectDB).db("user");
         let user = null;
+        let limitKey = null;
 
         // 🎓 학생: userId로 조회
         if (role === "student") {
           const id = String(credentials?.id ?? "").trim();
           if (!id) return null;
+          limitKey = `student:${id}`;
+          await assertNotLocked(db, limitKey); // 5번 틀리면 10분 잠금 (잠겨 있으면 안내 문구와 함께 실패)
 
           user = await db.collection("users").findOne({
             role: "student",
@@ -50,6 +55,8 @@ export const authOptions = {
         if (role === "teacher") {
           const email = String(credentials?.email ?? "").trim().toLowerCase();
           if (!email) return null;
+          limitKey = `teacher:${email}`;
+          await assertNotLocked(db, limitKey);
 
           user = await db.collection("users").findOne({
             role: "teacher",
@@ -58,13 +65,14 @@ export const authOptions = {
           });
         }
 
-        if (!user) return null;
-
-        const hashed = user.passwordHash ?? user.password;
-        if (!hashed) return null;
-
-        const ok = await compare(password, hashed);
-        if (!ok) return null;
+        const hashed = user?.passwordHash ?? user?.password;
+        const ok = hashed ? await compare(password, hashed) : false;
+        if (!ok) {
+          // 없는 아이디도 같이 센다 (어떤 아이디가 있는지 알려주지 않는다)
+          if (limitKey) await recordLoginFailure(db, limitKey);
+          return null;
+        }
+        if (limitKey) await clearLoginFailures(db, limitKey);
 
         // 관리자 대시보드의 "최근 접속" 통계용
         await db.collection("users").updateOne({ _id: user._id }, { $set: { lastSeenAt: new Date() } }).catch(() => {});
@@ -86,7 +94,9 @@ export const authOptions = {
           role: "student",
           userId: user.userId ?? null,
           classId: user.classId ?? null, // 있으면 넣고, 없으면 null
-          teacher_id: user.teacher_id?.toString?.() ?? null
+          teacher_id: user.teacher_id?.toString?.() ?? null,
+          // 기본 비밀번호 그대로면 먼저 새 비밀번호를 정해야 한다 (proxy가 /student/change-password로 보냄)
+          mustChangePassword: isDefaultStudentPassword(password),
         };
       },
     }),
@@ -121,7 +131,8 @@ export const authOptions = {
             userId: user.userId ?? null,
             classId: user.classId ?? null,
             _id: user._id.toString(),
-            teacher_id: user.teacher_id?.toString() ?? null
+            teacher_id: user.teacher_id?.toString() ?? null,
+            mustChangePassword: Boolean(user.mustChangePassword),
           };
         } else if (user.role === "admin") {
           token.user = {

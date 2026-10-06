@@ -3,8 +3,10 @@
 // 키오스크 학생 비밀번호 확인 창 (구매·아이템 사용·기부 공용)
 // 부모가 document.getElementById(DIALOG_ID).showModal()로 연다.
 // 비밀번호가 맞으면 onSuccess(kioskToken)을 부른다.
+// 기본 비밀번호(처음 비밀번호)로 맞혔으면 새 비밀번호를 두 번 입력받아 바꾼 뒤 넘어간다.
 import { useEffect, useRef, useState } from "react";
 import { checkKioskPassword } from "@/server-action/actions/kiosk/kiosk.action";
+import { changeKioskStudentPassword } from "@/server-action/actions/account/studentPassword.action";
 import PasswordKeypad from "./PasswordKeypad";
 
 export const KIOSK_PWD_DIALOG_ID = "my_modal_3";
@@ -16,12 +18,23 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
   const [isChecking, setIsChecking] = useState(false);
   const [textMode, setTextMode] = useState(false);
   const [shakeKey, setShakeKey] = useState(0);
+  // check: 비밀번호 확인 → (기본 비밀번호였으면) new: 새 비밀번호 → confirm: 한 번 더
+  const [stage, setStage] = useState("check");
+  const [pending, setPending] = useState(null); // { kioskToken, classId, newPwd }
 
   const reset = () => {
     setPwd("");
     setError("");
     setTextMode(false);
     setShakeKey(0);
+    setStage("check");
+    setPending(null);
+  };
+
+  const shake = (message) => {
+    setError(message);
+    setPwd("");
+    setShakeKey((k) => k + 1);
   };
 
   // 다른 학생을 고르면 처음부터
@@ -37,23 +50,65 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
 
   const onSubmit = async () => {
     if (isChecking || !pwd) return;
+
+    // 새 비밀번호 1단계: 기억해 두고 한 번 더 입력받기
+    if (stage === "new") {
+      setPending((p) => ({ ...p, newPwd: pwd }));
+      setPwd("");
+      setError("");
+      setStage("confirm");
+      return;
+    }
+
     setIsChecking(true);
     setError("");
     try {
+      if (stage === "confirm") {
+        if (pwd !== pending.newPwd) {
+          setStage("new");
+          shake("두 번 누른 비밀번호가 달라요. 처음부터 다시 눌러주세요.");
+          return;
+        }
+        const res = await changeKioskStudentPassword({
+          classId: pending.classId,
+          userId: userData?.userId,
+          kioskToken: pending.kioskToken,
+          newPassword: pwd,
+        });
+        if (res?.result) {
+          onSuccess(pending.kioskToken);
+          return;
+        }
+        setStage("new");
+        shake(res?.message || "비밀번호를 바꾸지 못했어요.");
+        return;
+      }
+
       const data = await checkKioskPassword({ userId: userData?.userId, userPwd: pwd });
       if (data?.result === true) {
+        if (data.mustChangePassword) {
+          setPending({ kioskToken: data.kioskToken, classId: data.classId });
+          setPwd("");
+          setStage("new");
+          return;
+        }
         onSuccess(data.kioskToken);
         return;
       }
-      setError(data?.message || "비밀번호를 확인해주세요.");
-      setPwd("");
-      setShakeKey((k) => k + 1);
+      shake(data?.message || "비밀번호를 확인해주세요.");
     } catch {
       setError("비밀번호 확인 중 오류가 발생했습니다.");
     } finally {
       setIsChecking(false);
     }
   };
+
+  const guide =
+    stage === "new"
+      ? "처음 비밀번호예요. 나만 아는 새 비밀번호를 눌러주세요 (4자리 이상)"
+      : stage === "confirm"
+        ? "새 비밀번호를 한 번 더 눌러주세요"
+        : "비밀번호를 눌러주세요";
 
   return (
     <dialog id={KIOSK_PWD_DIALOG_ID} ref={dialogRef} className="modal modal-middle">
@@ -99,7 +154,7 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
             {userData?.classNumber != null && <span className="mr-[6px] text-orange-300">{userData.classNumber}번</span>}
             {userData?.profileNickname}
           </div>
-          <div className="mt-[2px] text-[0.95rem] text-orange-400">비밀번호를 눌러주세요</div>
+          <div className={`mt-[2px] text-[0.95rem] ${stage === "check" ? "text-orange-400" : "font-bold text-rose-500"}`}>{guide}</div>
         </div>
 
         <PasswordKeypad

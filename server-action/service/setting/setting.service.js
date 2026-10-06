@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { compare, hash } from "bcryptjs";
+import { checkNewStudentPassword } from "@/lib/auth/studentPassword";
 
 function toAccountFilter({ _id, email, userId, role }) {
   if (!_id) {
@@ -79,6 +80,10 @@ export async function updatePasswordService({
 
   if (role === "teacher" && String(nextPassword).length < 8) {
     throw new Error("비밀번호는 8자 이상 입력해주세요.");
+  }
+  if (role === "student") {
+    const problem = checkNewStudentPassword(nextPassword, userId);
+    if (problem) throw new Error(problem);
   }
 
   const newPasswordHash = await hash(nextPassword, 12);

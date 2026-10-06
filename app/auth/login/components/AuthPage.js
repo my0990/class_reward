@@ -82,9 +82,9 @@ export default function AuthPage({ role }) {
         redirect: false,
       });
 
-      if (!res?.ok) {
-        // 기본 에러는 CredentialsSignin으로 오는 경우가 많음
-        setError("아이디/이메일 또는 비밀번호가 올바르지 않습니다");
+      if (!res?.ok || res.error) {
+        // 잠금 안내는 서버 문구 그대로, 나머지는 같은 문구 (아이디가 있는지 알려주지 않는다)
+        setError(res?.error && res.error !== "CredentialsSignin" ? res.error : "아이디/이메일 또는 비밀번호가 올바르지 않습니다");
         return;
       }
 
