@@ -241,6 +241,18 @@ describe("/api/fetchHistory/[id]", () => {
     expect((await call(historyRoute, { id: "s1", url: `${base}?limit=abc` })).body).toHaveLength(50);
   });
 
+  it("같은 아이디라도 다른 교사·학급의 기록은 섞이지 않는다", async () => {
+    await seedStudent(mongo.db, scope, { userId: "s1" });
+    await mongo.db.collection("history").insertMany([
+      { userId: "s1", name: "mine", teacher_id: scope.teacherObjectId, classId: scope.classObjectId, date: new Date("2026-02-01") },
+      { userId: "s1", name: "legacy", date: new Date("2026-01-01") },
+      { userId: "s1", name: "theirs", teacher_id: other.teacherObjectId, classId: other.classObjectId, date: new Date("2026-03-01") },
+    ]);
+    asTeacher();
+    const { body } = await call(historyRoute, { id: "s1" });
+    expect(body.map((h) => h.name)).toEqual(["mine", "legacy"]);
+  });
+
   it("다른 교사의 학생 내역은 403", async () => {
     await seedStudent(mongo.db, other, { userId: "outsider" });
     asTeacher();

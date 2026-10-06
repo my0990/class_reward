@@ -7,7 +7,7 @@ beforeAll(() => {
   process.env.EMAIL_CODE_HMAC_KEY = "test-hmac";
 });
 
-const { requestEmailCodeService, EMAIL_LIMITS } = await import("./emailCode.service.js");
+const { requestEmailCodeService, verifyEmailCodeService, EMAIL_LIMITS } = await import("./emailCode.service.js");
 const { hashCode } = await import("@/lib/auth/email");
 
 const mongo = setupTestMongo();
@@ -111,5 +111,44 @@ describe("requestEmailCodeService (인증 메일 발송 제한)", () => {
   it("인증 코드는 항상 6자리 숫자", async () => {
     const { generateCode6 } = await import("@/lib/auth/email");
     for (let i = 0; i < 200; i++) expect(generateCode6()).toMatch(/^\d{6}$/);
+  });
+});
+
+
+describe("verifyEmailCodeService (회원가입 인증 코드 확인)", () => {
+  const E = "new@test.com";
+  let code;
+  beforeEach(async () => {
+    sendMail = vi.fn(async (args) => {
+      code = args.code;
+      return { ok: true };
+    });
+    await requestEmailCodeService({ email: E, ip: "1.1.1.1", now: t0, sendMail });
+  });
+  const verified = async () => (await userDb().collection("email_verifications").findOne({ email: E }))?.verifiedAt;
+
+  it("맞는 코드면 verifiedAt 기록 (대소문자·공백 정리된 이메일로도)", async () => {
+    expect(await verifyEmailCodeService({ email: " NEW@test.com ", code, now: at(MIN) })).toEqual({ success: true });
+    expect(await verified()).toEqual(at(MIN));
+  });
+
+  it("형식이 틀리면 400", async () => {
+    expect((await verifyEmailCodeService({ email: "bad", code, now: at(MIN) })).status).toBe(400);
+    expect((await verifyEmailCodeService({ email: E, code: "12ab", now: at(MIN) })).status).toBe(400);
+  });
+
+  it("요청이 없거나 만료되면 400", async () => {
+    expect((await verifyEmailCodeService({ email: "none@test.com", code: "123456", now: at(MIN) })).status).toBe(400);
+    expect((await verifyEmailCodeService({ email: E, code, now: at(EMAIL_LIMITS.CODE_TTL_MS + 1) })).status).toBe(400);
+    expect(await verified()).toBeUndefined();
+  });
+
+  it("5번 틀리면 맞는 코드도 429", async () => {
+    const wrong = code === "000000" ? "111111" : "000000";
+    for (let i = 0; i < 5; i++) {
+      expect((await verifyEmailCodeService({ email: E, code: wrong, now: at(MIN) })).status).toBe(400);
+    }
+    expect((await verifyEmailCodeService({ email: E, code, now: at(MIN) })).status).toBe(429);
+    expect(await verified()).toBeUndefined();
   });
 });

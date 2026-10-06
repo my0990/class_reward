@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { withApiHandler, requireTeacher, parseIntParam } from "@/lib/api/routeHelpers";
+import { withApiHandler, requireTeacher, parseIntParam, ApiError } from "@/lib/api/routeHelpers";
 
 const HISTORY_PAGE_DEFAULT = 50;
 const HISTORY_PAGE_MAX = 500;
@@ -19,18 +19,25 @@ export const GET = withApiHandler(async (req, { params }) => {
   const db = (await connectDB).db("data");
 
   // ✅ 이 요청을 보낸 교사가 실제로 이 학생의 담임인지 확인한다.
-  const owns = await db.collection("user_data").findOne(
+  const student = await db.collection("user_data").findOne(
     { userId, teacher_id: teacherObjectId, role: "student" },
-    { projection: { _id: 1 } }
+    { projection: { _id: 1, classId: 1 } }
   );
+  if (!student) throw new ApiError(403, "조회 권한이 없습니다.");
 
-  if (!owns) {
-    return NextResponse.json({ error: "조회 권한이 없습니다." }, { status: 403 });
-  }
-
+  // 기록도 이 교사·학급 것만 (teacher_id가 없는 예전 형식 기록은 아이디로)
   const history = await db
     .collection("history")
-    .find({ userId }, { projection: { code: 0 } })
+    .find(
+      {
+        userId,
+        $or: [
+          { teacher_id: teacherObjectId, classId: student.classId },
+          { teacher_id: { $exists: false } },
+        ],
+      },
+      { projection: { code: 0 } }
+    )
     .sort({ date: -1, _id: -1 })
     .limit(limit)
     .toArray();

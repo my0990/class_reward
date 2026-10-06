@@ -118,3 +118,30 @@ export async function requestEmailCodeService({ email, ip = null, now = new Date
 
   return { success: true };
 }
+
+/**
+ * 교사 회원가입 이메일 인증 코드 확인 (POST /api/email/verify-code)
+ * 맞으면 verifiedAt을 기록한다 → 회원가입(signupService)이 이 값을 확인한다.
+ * 틀리면 남은 횟수를 하나 줄인다 (5번).
+ * @returns {{ success: true } | { success: false, status: number, message: string }}
+ */
+export async function verifyEmailCodeService({ email, code, now = new Date() }) {
+  const e = normalizeEmail(email);
+  const c = String(code ?? "").trim();
+  if (!isValidEmailFormat(e)) return fail(400, "이메일 형식이 올바르지 않습니다");
+  if (!/^\d{6}$/.test(c)) return fail(400, "인증 코드는 6자리 숫자입니다");
+
+  const col = (await connectDB).db("user").collection("email_verifications");
+  const doc = await col.findOne({ email: e });
+  if (!doc) return fail(400, "인증 요청이 없습니다. 코드를 다시 받으세요.");
+  if (doc.expiresAt < now) return fail(400, "인증 코드가 만료되었습니다");
+  if ((doc.attemptsLeft ?? 0) <= 0) return fail(429, "시도 횟수를 초과했습니다. 코드를 다시 받으세요.");
+
+  if (hashCode(c) !== doc.codeHash) {
+    await col.updateOne({ _id: doc._id }, { $inc: { attemptsLeft: -1 } });
+    return fail(400, "인증 코드가 올바르지 않습니다");
+  }
+
+  await col.updateOne({ _id: doc._id }, { $set: { verifiedAt: now } });
+  return { success: true };
+}
