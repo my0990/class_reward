@@ -92,7 +92,6 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
           ) : (
             <div className="flex h-[76px] w-[76px] items-center justify-center rounded-full border-4 border-white bg-orange-200 text-[2rem] shadow [@media(max-height:760px)]:h-[56px] [@media(max-height:760px)]:w-[56px]">🍊</div>
           )}
-          <span className="absolute -bottom-1 -right-1 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-[1rem] shadow">🔒</span>
         </div>
 
         <div className="relative mt-[12px] text-center">
