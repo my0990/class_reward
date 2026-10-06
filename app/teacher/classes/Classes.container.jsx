@@ -16,6 +16,7 @@ import { deleteClass, restoreClass } from "@/server-action/actions/class/classDe
 import usePendingAction from "@/hooks/usePendingAction";
 import { Toaster, toast } from "react-hot-toast";
 import { signOut } from "next-auth/react";
+import Footer from "@/components/ui/common/Footer";
 export default function ClassesContainer() {
     const [modalId, setModalId] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
@@ -94,7 +95,8 @@ export default function ClassesContainer() {
     if (isClassesDataError) return <div>Error loading data</div>;
     return (
 
-        <div className="p-4 bg-orange-100 h-dvh flex justify-center ">
+        <div className="bg-orange-100 min-h-dvh flex flex-col">
+          <div className="p-4 flex-1 flex justify-center">
             <div className="w-[1024px]">
                 <div>
                     <div className="flex justify-between items-center mt-4 mb-8">
@@ -121,6 +123,8 @@ export default function ClassesContainer() {
                     />
                 </div>
             </div>
+          </div>
+          <Footer className="border-orange-200" />
             <AddClassModal
                 modalId={modalId}
                 setModalId={setModalId}
