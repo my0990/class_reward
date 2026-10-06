@@ -91,13 +91,22 @@ export default function ClassesContainer() {
     const { data: classesData, isLoading: isClassesDataLoading, isError: isClassesDataError } = useFetchData('/api/classes');
 
 
-    if (isClassesDataLoading) return <div>Loading data...</div>;
-    if (isClassesDataError) return <div>Error loading data</div>;
+    // 불러오는 중에도 같은 주황 배경 + 푸터를 화면 맨 아래에 (흰 공간이 보이지 않게)
+    if (isClassesDataLoading || isClassesDataError) {
+        return (
+            <div className="bg-orange-100 min-h-dvh flex flex-col">
+                <div className="flex-1 flex items-center justify-center text-gray-500">
+                    {isClassesDataError ? "학급 목록을 불러오지 못했습니다." : "불러오는 중..."}
+                </div>
+                <Footer className="border-orange-200" />
+            </div>
+        );
+    }
     return (
 
         <div className="bg-orange-100 min-h-dvh flex flex-col">
           <div className="p-4 flex-1 flex justify-center">
-            <div className="w-[1024px]">
+            <div className="w-full max-w-[1024px]">
                 <div>
                     <div className="flex justify-between items-center mt-4 mb-8">
                         <h1 className="font-bold text-[1.6rem] flex items-center">학급 선택</h1>
