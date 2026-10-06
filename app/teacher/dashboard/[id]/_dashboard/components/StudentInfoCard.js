@@ -23,7 +23,7 @@ export default function StudentInfoCard({
             tabIndex={0}
             onClick={onClick}
             onKeyDown={handleKeyDown}
-            className={`w-[160px] p-[16px] m-[8px] rounded-xl cursor-pointer
+            className={`w-[160px] p-[16px] rounded-xl cursor-pointer
                         ${isActive ? "bg-orange-500" : "bg-orange-200"}
                         ${rest.className ?? ""}`}
         >

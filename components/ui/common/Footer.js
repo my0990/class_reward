@@ -5,8 +5,9 @@ import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
 // 공통 푸터: 개인정보처리방침(굵게) · 카카오톡 문의 · 저작권 (이메일은 개인정보처리방침에만)
 export default function Footer({ className = "" }) {
   return (
-    <footer className={`border-t border-gray-200 px-4 py-5 text-[13px] text-gray-500 ${className}`}>
-      <div className="mx-auto flex max-w-[1024px] flex-col items-center gap-2 sm:flex-row sm:justify-between">
+    <footer className={`border-t border-gray-200 py-5 text-[13px] text-gray-500 ${className}`}>
+      {/* 안쪽 내용은 대시보드 카드와 같은 폭 (globals.css .page-width) */}
+      <div className="page-width flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
         <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
           <Link href="/privacy" prefetch={false} className="font-bold text-gray-700 hover:underline">
             개인정보처리방침

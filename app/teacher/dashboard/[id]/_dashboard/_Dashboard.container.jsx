@@ -131,11 +131,12 @@ export default function DashboardContainer({ classId }) {
   const currencyEmoji = classData?.currencyEmoji ?? "💰"
   return (
 
-    <div className="pt-0 flex justify-center mb-[48px]">
-      <div className="w-[1410px] max-[1410px]:w-[1235px] max-[1235px]:w-[1060px] max-[1060px]:w-[885px] max-[885px]:w-[710px] max-[710px]:w-[535px] max-[535px]:w-[360px]">
-        <div className="flex py-[16px] mr-[8px] justify-between">
+    <div className="mb-[48px]">
+      {/* 헤더·버튼 줄·카드·푸터가 같은 폭(.page-width)이라 좌우 끝이 맞는다 */}
+      <div className="page-width">
+        <div className="flex flex-wrap gap-2 py-[16px] justify-between">
           <button
-            className="btn bg-orange-500 text-white ml-[8px]"
+            className="btn bg-orange-500 text-white"
             onClick={handleToggleAll}
             disabled={studentsData.length === 0}
           >
@@ -144,7 +145,7 @@ export default function DashboardContainer({ classId }) {
 
           <div>
             <button
-              className="btn btn-success text-white mr-[16px]"
+              className="btn btn-success text-white mr-[8px]"
               onClick={onSend}
               disabled={!hasSelectedStudent}
             >
@@ -160,7 +161,7 @@ export default function DashboardContainer({ classId }) {
             </button>
           </div>
         </div>
-        <div className="flex flex-wrap">
+        <div className="grid grid-cols-[repeat(auto-fill,160px)] justify-between gap-4 max-[543px]:justify-center">
           {studentsData.map((student) => {
             const level = levelMap?.[student.userId] ?? 1
             return (

@@ -179,3 +179,21 @@ html,
 body {
   overscroll-behavior-y: none;
 }
+
+/* 공통 내용 폭: 학생 카드(160px, 간격 16px)가 n개 들어가는 폭과 같다.
+   헤더·푸터 안쪽 내용, 대시보드 버튼 줄, 카드 목록이 모두 이 폭을 써서 좌우 끝이 한 줄로 맞는다.
+   카드 n개 폭 = 176n - 16, 화면 양옆에 16px씩 여유가 있을 때 그 단계로 넓어진다.
+   좁은 화면(휴대폰)은 화면 폭에 맞춰 꽉 채운다. */
+@layer components {
+  .page-width {
+    width: calc(100% - 32px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  @media (min-width: 544px) { .page-width { width: 512px; } }   /* 카드 3개 */
+  @media (min-width: 720px) { .page-width { width: 688px; } }   /* 4개 */
+  @media (min-width: 896px) { .page-width { width: 864px; } }   /* 5개 */
+  @media (min-width: 1072px) { .page-width { width: 1040px; } } /* 6개 */
+  @media (min-width: 1248px) { .page-width { width: 1216px; } } /* 7개 */
+  @media (min-width: 1424px) { .page-width { width: 1392px; } } /* 8개 */
+}
