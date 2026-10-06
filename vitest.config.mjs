@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["**/*.test.{js,jsx,ts,tsx}"],
-    exclude: ["**/node_modules/**", "**/.next/**"],
+    exclude: ["**/node_modules/**", "**/.next/**", "**/.next-e2e/**", "e2e/**"],
     hookTimeout: 60000, // mongodb-memory-server 최초 실행 시 mongod 바이너리 다운로드 등으로 느릴 수 있음
     testTimeout: 30000,
   },

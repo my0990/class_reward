@@ -12,6 +12,7 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "node e2e/run.mjs",
     "db:audit": "node scripts/db/audit.mjs",
     "db:fix": "node scripts/db/fix.mjs",
     "db:indexes": "node scripts/db/indexes.mjs",

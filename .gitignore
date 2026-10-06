@@ -43,3 +43,8 @@ next-env.d.ts
 
 # DB 백업 (개인정보 포함, 절대 커밋 금지)
 /backups
+
+# 화면 테스트(Playwright)
+/.next-e2e
+/test-results
+/playwright-report

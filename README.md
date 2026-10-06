@@ -116,3 +116,21 @@ test/helpers/           테스트 공용 헬퍼 (메모리 DB)
   관리자 세션으로는 교사/학생 화면과 API를 쓸 수 없다.
 - 관리자 작업(로그인, 공지 등록/수정/삭제/고정)은 `admins.audit_log`에 남는다.
 - 대시보드는 개수만 보여준다 (교사 목록 없음). "최근 접속"은 로그인과 5분마다의 세션 확인 때 갱신되는 `lastSeenAt` 기준이다.
+
+## 화면 테스트 (Playwright)
+
+키오스크 구매·사용, 학생 첫 로그인, 로그인 잠금, 404 화면을 실제 브라우저로 확인한다.
+메모리 DB에 테스트 데이터를 넣고 포트 3100에 따로 서버를 띄우므로 **진짜 DB와 개발 서버(3000)는 건드리지 않는다.**
+
+```bash
+# 처음 한 번
+npm i -D @playwright/test
+npx playwright install chromium
+
+npm run test:e2e              # 전체
+npm run test:e2e -- --headed  # 브라우저 창을 띄워서 보기
+```
+
+- 테스트 데이터: `e2e/seed.mjs` (교사 1명, 학급 1개, 학생 3명, 아이템 1개)
+- 실패하면 `test-results/`에 화면 기록(trace)이 남는다: `npx playwright show-trace test-results/.../trace.zip`
+
