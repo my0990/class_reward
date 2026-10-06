@@ -1,18 +1,16 @@
-
+"use client";
+// 기부 수량 입력: 숫자 키패드 → 보유/기부/잔액 → 기부하기
 import { useState } from "react";
 import { useFetchData } from "@/hooks/useFetchData";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { donate } from "@/server-action/actions/thermometer/thermometer.action";
 import usePendingAction from "@/hooks/usePendingAction";
-import { Toaster, toast } from "react-hot-toast";
-export default function ConfirmDonate({ requestData, setRequestData, classId }) {
-    const {
-        data: classData,
-        isLoading: isClassDataLoading,
-        isError: isClassDataError,
-        mutate: mutateClassData,
-    } = useFetchData(`/api/classData/${classId}`);
+import { toast } from "react-hot-toast";
+import { kioskHome } from "../../_components/KioskHeader";
+
+export default function DonateAmount({ classId, user, kioskToken }) {
+    const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = useFetchData(`/api/classData/${classId}`);
 
     const {
         data: thermometerData,
@@ -20,12 +18,11 @@ export default function ConfirmDonate({ requestData, setRequestData, classId }) 
         isError: isThermometerDataError,
         mutate: mutateThermometerData,
     } = useFetchData(`/api/thermometer/${classId}`);
-    const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError, mutate: mutateStudentData, } = useFetchData(`/api/students/${classId}`);
+    const { mutate: mutateStudentData } = useFetchData(`/api/students/${classId}`);
     const { runAction, isPending } = usePendingAction();
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
-
-    const { userData } = requestData;
+    const isLoading = isPending("donate");
+    const userData = user;
 
     const [donateCookie, setDonateCookie] = useState("");
 
@@ -34,7 +31,7 @@ export default function ConfirmDonate({ requestData, setRequestData, classId }) 
 
     if (isDataLoading) return <div>불러오는 중...</div>;
     if (isError) return <div>데이터 로드 실패</div>;
-    const { userId, money } = requestData.userData;
+    const { userId, money } = user;
 
     const { currencyName = "호박", currencyEmoji = "🎃" } = classData;
 
@@ -62,10 +59,10 @@ export default function ConfirmDonate({ requestData, setRequestData, classId }) 
         setDonateCookie("");
     };
 
-    const handleDonateConfirm = async ({ userId, amount, money, classId, degree }) => {
-
-        runAction("handleDonateConfirm", async () => {
-            const data = await donate({ userId, amount, classId, kioskToken: requestData.kioskToken });
+    const handleDonateConfirm = ({ userId, amount }) => {
+        if (isLoading || amount <= 0) return;
+        runAction("donate", async () => {
+            const data = await donate({ userId, amount, classId, kioskToken });
 
             if (!data.result) {
                 toast.error(data.message || "수정 실패");
@@ -75,11 +72,8 @@ export default function ConfirmDonate({ requestData, setRequestData, classId }) 
             clearNumber();
             await mutateThermometerData?.();
             await mutateStudentData?.();
-            router.push(`/teacher/kiosk/${classId}`);
-
-
+            router.push(kioskHome(classId));
         })
-
     }
 
 
@@ -95,7 +89,7 @@ export default function ConfirmDonate({ requestData, setRequestData, classId }) 
                         </div>
                     </div>
 
-                    <Link href={`/teacher/kiosk/${classId}`}>
+                    <Link href={kioskHome(classId)}>
                         <div className="cursor-pointer text-[1.2rem] font-bold bg-white px-[12px] py-[5px] rounded-full ">
                             처음으로
                         </div>
@@ -176,15 +170,7 @@ export default function ConfirmDonate({ requestData, setRequestData, classId }) 
                         </div>
 
                         <button
-                            onPointerUp={() =>
-                                handleDonateConfirm({
-                                    userId,
-                                    amount: donateAmount,
-                                    money,
-                                    classId,
-                                    degree: ((donateAmount / thermometerData.requireCurrency)).toFixed(3)
-                                })
-                            }
+                            onPointerUp={() => handleDonateConfirm({ userId, amount: donateAmount })}
                             disabled={isLoading || isEmpty}
                             className={`w-full rounded-full py-[11px] text-[1.2rem] font-extrabold text-white ${isLoading || isEmpty
                                 ? "bg-gray-400 cursor-not-allowed"
