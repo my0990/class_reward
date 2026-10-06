@@ -4,18 +4,14 @@ import { toast } from "react-hot-toast";
 import { useState, useEffect } from "react"
 import FinishQuestModal from "./finishQuestModal"
 import DeleteQuestCardModal from "./deleteQuestCardModal"
-import { fetchData } from "@/hooks/useFetchData"
 import EditQuestModal from "./EditQuestModal"
 import ResetQuestModal from "./ResetQuestModal"
 
 export default function QuestDetailTemplate({ classData, studentData, classId, role, questDetailData, setQuestDetailData, setIsDetail }) {
 
 
-    // const { data: questDetailData, isLoading: isQuestDetailLoading, isError: isQuestDetailError } = fetchData(questId ? `/api/fetchQuestDetail/${questId}` : null);
-    // const { data: studentData, isLoading: isStudentDataLoading, isError: isStudentDataError } = fetchData('/api/fetchStudentData');
-    // const { data: classData, isLoading: isClassDataLoading, isError: isClassDataError } = fetchData('/api/fetchClassData');
-
-
+    // 수정 · 초기화 · 보상 지급 · 삭제 창 중 어느 것이 열려 있는지
+    const [modalId, setModalId] = useState(null);
     const [isSelectedAll, setIsSelectedAll] = useState(false);
     const [studentArr, setStudentArr] = useState([]);
 
@@ -63,7 +59,7 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
             toast.error('학생을 선택해주세요')
 
         } else {
-            document.getElementById('my_modal_2').showModal();
+            setModalId("FINISH_QUEST");
         }
 
     }
@@ -79,7 +75,7 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
                         </svg>
                     </div>
                     {role === 'teacher' ?
-                        <button onClick={() => document.getElementById('editQuestModal').showModal()} className="flex justify-center items-center   bg-white outline-none border-none rounded-full hover:bg-orange-100 transition-all w-[48px] h-[48px] hover:scale-110">
+                        <button onClick={() => setModalId("EDIT_QUEST")} className="flex justify-center items-center   bg-white outline-none border-none rounded-full hover:bg-orange-100 transition-all w-[48px] h-[48px] hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="p-[4px] w-[40px] h-[40px]">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                             </svg>
@@ -112,10 +108,10 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
                 <div className="mt-[32px]">
                     {role === 'teacher'
                         ? <div className="flex justify-end mb-[8px]">
-                            <EditQuestModal classId={classId} currencyEmoji={classData.currencyEmoji} questDetailData={questDetailData} setQuestDetailData={setQuestDetailData} />
+                            <EditQuestModal classId={classId} currency={{ name: classData.currencyName, emoji: classData.currencyEmoji }} questDetailData={questDetailData} setQuestDetailData={setQuestDetailData} modalId={modalId} setModalId={setModalId} />
                             <div>
-                                <button onClick={() => document.getElementById('resetModal').showModal()} className="btn bg-red-500 text-white mr-[8px]" >초기화</button>
-                                <ResetQuestModal classId={classId} questData={questDetailData} setQuestDetailData={setQuestDetailData}/>
+                                <button onClick={() => setModalId("RESET_QUEST")} className="btn bg-red-500 text-white mr-[8px]" >초기화</button>
+                                <ResetQuestModal classId={classId} questData={questDetailData} setQuestDetailData={setQuestDetailData} modalId={modalId} setModalId={setModalId} />
                                 {isSelectedAll
                                     ? <button className="btn bg-orange-500 text-white" onClick={clearAll}>모두 해제</button>
                                     : <button className="btn bg-orange-500 text-white" onClick={selectAll}>모두 선택</button>}
@@ -150,14 +146,14 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
                 {role === "teacher"
                     ? <div>
                         <button className="w-[100%] btn mt-[48px] shadow-none text-white hover:bg-red-600 bg-red-400 border-0  font-bold text-[1.4rem]" onClick={onFinish}>보상 지급</button>
-                        <button className="w-[100%] btn mt-[16px] mb-[16px] shadow-none text-white hover:bg-orange-500 bg-orange-300 border-0  font-bold text-[1.4rem]" onClick={() => document.getElementById('my_modal_3').showModal()}>퀘스트 삭제</button>
+                        <button className="w-[100%] btn mt-[16px] mb-[16px] shadow-none text-white hover:bg-orange-500 bg-orange-300 border-0  font-bold text-[1.4rem]" onClick={() => setModalId("DELETE_QUEST")}>퀘스트 삭제</button>
                     </div>
                     : null
                 }
 
             </div>
-            <FinishQuestModal classId={classId} setQuestDetailData={setQuestDetailData} rewardedUserData={studentArr.filter((a) => a.isactive === true)} questData={questDetailData} currencyName={classData.currencyName} clearAll={clearAll}  />
-            <DeleteQuestCardModal classId={classId} data={questDetailData} setIsDetail={setIsDetail}/>
+            <FinishQuestModal modalId={modalId} setModalId={setModalId} classId={classId} setQuestDetailData={setQuestDetailData} rewardedUserData={studentArr.filter((a) => a.isactive === true)} questData={questDetailData} currencyName={classData.currencyName} clearAll={clearAll}  />
+            <DeleteQuestCardModal modalId={modalId} setModalId={setModalId} classId={classId} data={questDetailData} setIsDetail={setIsDetail}/>
         </div>
 
 

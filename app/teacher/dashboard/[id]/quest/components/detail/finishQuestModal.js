@@ -1,126 +1,55 @@
-'use client';
-
+"use client";
+// 퀘스트 보상 지급 확인
 import { toast } from "react-hot-toast";
 import { mutate } from "swr";
 import usePendingAction from "@/hooks/usePendingAction";
 import { finishQuest } from "@/server-action/actions/quest/quest.action";
+import QuestConfirmModal from "./QuestConfirmModal";
 
-export default function FinishQuestModal({
-  rewardedUserData = [],
-  questData,
-  currencyName,
-  clearAll,
-  classId,
-  setQuestDetailData,
-}) {
+const fmt = (v) => (Number(v) > 0 ? Number(v).toLocaleString() : "");
+
+export default function FinishQuestModal({ modalId, setModalId, rewardedUserData = [], questData, currencyName, clearAll, classId, setQuestDetailData }) {
   const { runAction, isPending } = usePendingAction();
-  const isFinishing = isPending("finishQuest", questData?._id);
+  const questId = questData?._id;
 
-  const closeModal = () => {
-    document.getElementById('my_modal_2')?.close();
-  };
-
-  // 숫자/문자열 둘 다 안전하게 "1,000" 형태로
-  const formatNumber = (v) => {
-    if (v === null || v === undefined) return '';
-    const n = typeof v === 'number' ? v : Number(String(v).replace(/,/g, ''));
-    if (!Number.isFinite(n)) return '';
-    return n.toLocaleString();
-  };
-
-  const rewardText = formatNumber(questData?.questReward);
-  const expText = formatNumber(questData?.questExp);
-  const titleText = questData?.questTitle ? String(questData.questTitle) : '';
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-
-    runAction("finishQuest", questData?._id, async () => {
+  const onConfirm = () =>
+    runAction("finishQuest", questId, async () => {
       const data = await finishQuest({
         classId,
         questData,
-        rewarded: rewardedUserData.map((obj) => ({
-          userId: obj.userId,
-          money: obj.money,
-        })),
+        rewarded: rewardedUserData.map((u) => ({ userId: u.userId, money: u.money })),
       });
-
-      if (data?.result === true) {
-        // ✅ finished에 userId 배열 추가 (중복 방지)
-        setQuestDetailData?.((prev) => {
-          if (!prev) return prev;
-
-          const prevFinished = Array.isArray(prev.finished) ? prev.finished : [];
-          const toAdd = rewardedUserData.map(u => u?.userId).filter(Boolean);
-
-          // 중복 제거
-          const nextFinished = Array.from(new Set([...prevFinished, ...toAdd]));
-
-          return {
-            ...prev,
-            finished: nextFinished,
-          };
-        });
-
-        closeModal();
-        clearAll?.();
-
-        mutate(`/api/fetchQuestList/${classId}`);
-        mutate(`/api/classData/${classId}`);
-        mutate(`/api/students/${classId}`);
-      } else {
-        toast.error(data?.message ?? "처리 실패");
+      if (!data?.result) {
+        toast.error(data?.message ?? "보상 지급에 실패했습니다.");
+        return;
       }
-
-      return data;
-    }, {
-      onError: (error) => {
-        console.error(error);
-        toast.error(error?.message || "네트워크 오류");
-      },
+      const added = rewardedUserData.map((u) => u?.userId).filter(Boolean);
+      setQuestDetailData?.((prev) => (prev ? { ...prev, finished: Array.from(new Set([...(prev.finished ?? []), ...added])) } : prev));
+      setModalId(null);
+      clearAll?.();
+      toast.success("보상을 지급했습니다.");
+      mutate(`/api/fetchQuestList/${classId}`);
+      mutate(`/api/classData/${classId}`);
+      mutate(`/api/students/${classId}`);
+    }).catch((error) => {
+      console.error(error);
+      toast.error("네트워크 오류가 발생했습니다.");
     });
-  };
 
   return (
-    <dialog id="my_modal_2" className="modal w-[100%]">
-      <div className="modal-box max-w-[600px] border-0 p-[32px]">
-        <div className="flex justify-center flex-col text-[1.3rem]">
-          <div className="flex flex-wrap">
-            {rewardedUserData.map((a, i) => (
-              <div key={a?.userId ?? i} className="mr-[4px]">
-                <span className="bg-orange-200">
-                  {a?.classNumber}. {a?.profileNickname}
-                </span>
-                {i < rewardedUserData.length - 1 && ", "}
-              </div>
-            ))}
-            에게 지급합니다
-          </div>
-
-          <div className="mt-[16px]">
-            {rewardText !== '' && <div>- {rewardText}{currencyName}</div>}
-            {expText !== '' && <div>- {expText}경험치</div>}
-            {titleText && <div>- 칭호: {titleText}</div>}
-          </div>
-
-          <form onSubmit={onSubmit} className="mt-[32px]">
-            <button disabled={isFinishing} className="btn mt-[16px] w-[100%] bg-orange-500 border-0 text-white m-auto focus:outline-none text-[1.1rem] disabled:opacity-60">
-              {isFinishing ? "처리 중..." : "확인"}
-            </button>
-          </form>
-
-          <button
-            onClick={closeModal}
-            className="btn mt-[16px] w-[100%] text-[1.1rem] bg-white border-0 shadow-transparent focus:outline-none hover:bg-orange-500 hover:text-white text-orange-500 m-auto"
-          >
-            취소
-          </button>
-        </div>
+    <QuestConfirmModal id="FINISH_QUEST" modalId={modalId} setModalId={setModalId} title="보상을 지급합니다" busy={isPending("finishQuest", questId)} onConfirm={onConfirm}>
+      <div className="flex flex-wrap gap-1">
+        {rewardedUserData.map((u, i) => (
+          <span key={u?.userId ?? i} className="rounded bg-orange-200 px-1">
+            {u?.classNumber}. {u?.profileNickname}
+          </span>
+        ))}
       </div>
-
-      <form method="dialog" className="modal-backdrop" onClick={closeModal}>
-        <button>close</button>
-      </form>
-    </dialog>
+      <div className="mt-[16px]">
+        {fmt(questData?.questReward) && <div>- {fmt(questData.questReward)}{currencyName}</div>}
+        {fmt(questData?.questExp) && <div>- {fmt(questData.questExp)}경험치</div>}
+        {questData?.questTitle && <div>- 칭호: {questData.questTitle}</div>}
+      </div>
+    </QuestConfirmModal>
   );
 }
