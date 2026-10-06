@@ -8,8 +8,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 const APP_NAME = "뀰";
 const APP_DEFAULT_TITLE = "뀰 - 학급 보상 관리";
-// const APP_TITLE_TEMPLATE = "%s - PWA App";
-const APP_TITLE_TEMPLATE = "맛있는 귤은 뀰";
+// 각 화면의 title이 "%s" 자리에 들어간다 (예: "관리자 | 뀰")
+const APP_TITLE_TEMPLATE = "%s | 뀰";
 const APP_DESCRIPTION = "학급 보상을 관리합니다";
 
 

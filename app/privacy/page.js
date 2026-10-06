@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SITE } from "@/config/siteInfo";
 import Footer from "@/components/ui/common/Footer";
 
-export const metadata = { title: `개인정보처리방침 - ${SITE.name}` };
+export const metadata = { title: "개인정보처리방침" };
 
 const mail = <a href={`mailto:${SITE.contactEmail}`} className="text-orange-600 underline">{SITE.contactEmail}</a>;
 

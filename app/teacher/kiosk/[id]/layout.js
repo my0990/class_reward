@@ -2,7 +2,7 @@
 export async function generateMetadata({ params }) {
   const { id } = await params;
   return {
-    title: "뀰 키오스크",
+    title: "키오스크",
     manifest: `/api/kiosk-manifest/${id}`,
     appleWebApp: { capable: true, title: "뀰 키오스크", statusBarStyle: "default" },
   };
