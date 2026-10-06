@@ -77,10 +77,14 @@ export async function updatePasswordService({
     throw new Error("비밀번호가 일치하지 않습니다.");
   }
 
+  if (role === "teacher" && String(nextPassword).length < 8) {
+    throw new Error("비밀번호는 8자 이상 입력해주세요.");
+  }
+
   const newPasswordHash = await hash(nextPassword, 12);
-  await db
-    .collection("users")
-    .updateOne(filter, { $set: { passwordHash: newPasswordHash } });
+  // 교사는 비밀번호를 바꾸면 다른 기기의 로그인도 끝낸다 (passwordChangedAt 이후 세션 무효)
+  const $set = role === "teacher" ? { passwordHash: newPasswordHash, passwordChangedAt: new Date() } : { passwordHash: newPasswordHash };
+  await db.collection("users").updateOne(filter, { $set, $unset: { password: "" } });
 
   return { result: true, message: "비밀번호 변경 성공" };
 }

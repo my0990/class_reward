@@ -4,6 +4,7 @@ import ProfileSection from "./components/ProfileSection";
 import { useState, useEffect } from "react"
 import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
+import { signOut } from "next-auth/react";
 import usePendingAction from "@/hooks/usePendingAction";
 import { toast, Toaster } from "react-hot-toast";
 import PwdSection from "./components/PwdSection";
@@ -97,9 +98,9 @@ export default function SettingContainer() {
             const data = await updatePassword(password);
 
             if (data?.result === true) {
-                alert('비밀번호를 변경하였습니다')
-                setError('')
-                setPassword({ currentPassword: '', nextPassword: '', nextPasswordConfirm: '' })
+                // 비밀번호를 바꾸면 모든 기기에서 로그아웃된다 → 이 기기도 새 비밀번호로 다시 로그인
+                alert('비밀번호를 변경하였습니다. 새 비밀번호로 다시 로그인해주세요.')
+                await signOut({ callbackUrl: `${window.location.origin}/auth/login/teacher` })
             } else {
                 setError(data?.message || '비밀번호가 일치하지 않습니다.')
             }

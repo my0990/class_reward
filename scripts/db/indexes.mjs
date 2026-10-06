@@ -30,6 +30,8 @@ const PLAN = [
   [user, "email_verifications", { email: 1 }, { unique: true, name: "email_unique" }, "인증 요청 이메일당 1개"],
   [user, "kiosk_pwd_attempts", { teacher_id: 1, userId: 1 }, { unique: true, name: "teacher_user_unique" }, "키오스크 비밀번호 시도 기록"],
   [user, "kiosk_pwd_attempts", { updatedAt: 1 }, { expireAfterSeconds: 24 * 60 * 60, name: "updatedAt_ttl_1d" }, "키오스크 시도 기록 하루 뒤 자동 삭제"],
+  [user, "password_resets", { email: 1 }, { unique: true, name: "email_unique" }, "비밀번호 찾기 코드 이메일당 1개"],
+  [user, "password_resets", { expiresAt: 1 }, { expireAfterSeconds: 0, name: "expiresAt_ttl" }, "비밀번호 찾기 코드 만료 시 자동 삭제"],
   [admins, "accounts", { email: 1 }, { unique: true, name: "email_unique" }, "관리자 이메일 중복 금지"],
   [admins, "admin_login_attempts", { email: 1 }, { unique: true, name: "email_unique" }, "관리자 로그인 시도 기록"],
   [admins, "admin_login_attempts", { updatedAt: 1 }, { expireAfterSeconds: 24 * 60 * 60, name: "updatedAt_ttl_1d" }, "관리자 로그인 시도 기록 하루 뒤 자동 삭제"],

@@ -175,13 +175,24 @@ export default function AuthPage({ role }) {
             </AuthBtn>
 
             {isTeacher ? (
-              <div className="text-center mt-[8px]">
-                아이디가 없으세요?{" "}
-                <Link href="/auth/signup">
-                  <span className="text-orange-500 cursor-pointer hover:underline">회원가입</span>
-                </Link>
+              <>
+                <div className="text-center mt-[8px]">
+                  아이디가 없으세요?{" "}
+                  <Link href="/auth/signup">
+                    <span className="text-orange-500 cursor-pointer hover:underline">회원가입</span>
+                  </Link>
+                </div>
+                <div className="text-center mt-[8px]">
+                  <Link href="/auth/reset-password" className="text-sm text-gray-500 hover:underline">
+                    비밀번호를 잊으셨나요?
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <div className="text-center mt-[8px] text-sm text-gray-500">
+                비밀번호를 잊었나요? 담임 선생님께 말씀하세요.
               </div>
-            ) : null}
+            )}
           </div>
         </div>
       </div>

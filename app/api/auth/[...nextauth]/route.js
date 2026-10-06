@@ -105,6 +105,8 @@ export const authOptions = {
     jwt: async ({ token, user }) => {
 
       if (user) {
+        // 로그인한 시각: 이후에 비밀번호가 바뀌면(passwordChangedAt) 이 세션은 로그아웃된다
+        token.authAt = Date.now();
 
         if (user.role === "teacher") {
           token.user = {
@@ -145,11 +147,14 @@ export const authOptions = {
               { _id }, { $set }, { projection: { _id: 1 } }
             );
           }
-          return client.db("user").collection("users").findOneAndUpdate(
+          const found = await client.db("user").collection("users").findOneAndUpdate(
             { _id, disabled: { $ne: true } },
             { $set },
-            { projection: { _id: 1 } }
+            { projection: { _id: 1, passwordChangedAt: 1 } }
           );
+          // 이 세션 로그인 이후에 비밀번호가 바뀌었으면 (비밀번호 찾기·변경) 로그아웃
+          if (found?.passwordChangedAt && found.passwordChangedAt.getTime() > (token.authAt ?? 0)) return null;
+          return found;
         },
       });
 

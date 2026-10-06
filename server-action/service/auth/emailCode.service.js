@@ -34,23 +34,11 @@ function fail(status, message, extra = {}) {
 }
 
 /**
- * 교사 회원가입 이메일 인증 코드 발송
- * @param {{ email: string, ip?: string|null, now?: Date, sendMail: (args:{to:string, code:string}) => Promise<{ok:boolean, message?:string}> }} params
- * @returns {{ success: true } | { success: false, status: number, message: string, retryAfterSec?: number }}
+ * 인증 메일 발송 제한 확인 + 발송 기록 (회원가입 인증, 비밀번호 찾기 공용)
+ * 제한에 걸리면 fail 객체를, 통과하면 기록을 남기고 null을 돌려준다.
+ * @param {{ db: import("mongodb").Db, email: string, ip?: string|null, now: Date }} p  db = "user" DB
  */
-export async function requestEmailCodeService({ email, ip = null, now = new Date(), sendMail }) {
-  const e = normalizeEmail(email);
-  if (!isValidEmailFormat(e) || e.length > 254) {
-    return fail(400, "이메일 형식이 올바르지 않습니다");
-  }
-
-  const db = (await connectDB).db("user");
-
-  const exists = await db.collection("users").findOne({ role: "teacher", email: e }, { projection: { _id: 1 } });
-  if (exists) {
-    return fail(409, "이미 가입된 이메일입니다");
-  }
-
+export async function reserveEmailSend({ db, email: e, ip = null, now }) {
   const logs = db.collection("email_send_log");
   await ensureIndexes(logs);
 
@@ -83,6 +71,29 @@ export async function requestEmailCodeService({ email, ip = null, now = new Date
 
   // 발송 전에 기록한다: 메일 서버가 실패해도 반복 호출을 막기 위해 시도 자체를 센다.
   await logs.insertOne({ email: e, ip, sentAt: now });
+  return null;
+}
+
+/**
+ * 교사 회원가입 이메일 인증 코드 발송
+ * @param {{ email: string, ip?: string|null, now?: Date, sendMail: (args:{to:string, code:string}) => Promise<{ok:boolean, message?:string}> }} params
+ * @returns {{ success: true } | { success: false, status: number, message: string, retryAfterSec?: number }}
+ */
+export async function requestEmailCodeService({ email, ip = null, now = new Date(), sendMail }) {
+  const e = normalizeEmail(email);
+  if (!isValidEmailFormat(e) || e.length > 254) {
+    return fail(400, "이메일 형식이 올바르지 않습니다");
+  }
+
+  const db = (await connectDB).db("user");
+
+  const exists = await db.collection("users").findOne({ role: "teacher", email: e }, { projection: { _id: 1 } });
+  if (exists) {
+    return fail(409, "이미 가입된 이메일입니다");
+  }
+
+  const limited = await reserveEmailSend({ db, email: e, ip, now });
+  if (limited) return limited;
 
   const code = generateCode6();
   await db.collection("email_verifications").updateOne(
