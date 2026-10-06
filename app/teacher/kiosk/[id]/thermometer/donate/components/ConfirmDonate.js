@@ -86,7 +86,7 @@ export default function ConfirmDonate({ requestData, setRequestData, classId }) 
     const keyList = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     return (
-        <div className="min-h-screen   overflow-y-auto p-[8px]">
+        <div className="overflow-y-auto p-[8px]">
             <div className="w-full max-w-[650px] mx-auto">
                 <div className="flex justify-between items-center mb-[6px]">
                     <div>
