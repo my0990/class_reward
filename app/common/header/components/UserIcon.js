@@ -1,4 +1,4 @@
-export default function UserIcon({toggleUserInfo, profileIconRef, profileUrl, toggleHamburger,}) {
+export default function UserIcon({toggleUserInfo, profileIconRef, profileUrl, toggleHamburger, hasBadge = false}) {
     return (
         <div className="flex">
             {/* Profile (desktop only) */}
@@ -14,7 +14,11 @@ export default function UserIcon({toggleUserInfo, profileIconRef, profileUrl, to
 
             {/* Hamburger (mobile only) */}
             <div className="flex items-center min-[981px]:hidden">
-                <div tabIndex={0} role="button" className="btn btn-ghost align-middle p-0">
+                <div tabIndex={0} role="button" className="btn btn-ghost align-middle p-0 relative">
+                    {/* 메뉴 안에 새 공지가 있으면 빨간 점 */}
+                    {hasBadge && (
+                        <span className="absolute right-0 top-1 h-[10px] w-[10px] rounded-full bg-red-500 ring-2 ring-white" aria-label="새 공지" />
+                    )}
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-10 w-10"

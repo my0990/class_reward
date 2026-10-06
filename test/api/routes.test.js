@@ -17,6 +17,7 @@ const thermometerRoute = await import("@/app/api/thermometer/[id]/route.js");
 const userRoute = await import("@/app/api/user/route.js");
 const noticesRoute = await import("@/app/api/notices/route.js");
 const noticeRoute = await import("@/app/api/notices/[id]/route.js");
+const latestNoticeRoute = await import("@/app/api/notices/latest/route.js");
 
 const mongo = setupTestMongo();
 const scope = makeScope();
@@ -344,6 +345,19 @@ describe("/api/notices (로그인 불필요)", () => {
 
     const detail = await call(noticeRoute, { id: pinnedId.toHexString() });
     expect(detail.body.notice).not.toHaveProperty("authorEmail");
+  });
+
+  it("최신 공지 시각: 고정 여부와 상관없이 가장 최근 작성일", async () => {
+    const col = mongo.client.db("admins").collection("notices");
+    await col.deleteMany({});
+    expect((await call(latestNoticeRoute, { url: "http://localhost/api/notices/latest" })).body).toEqual({ latestAt: null });
+
+    await col.insertMany([
+      { title: "고정", createdAt: new Date("2026-01-01T00:00:00Z"), pinned: true, pinnedAt: new Date("2026-09-01T00:00:00Z") },
+      { title: "최신", createdAt: new Date("2026-10-01T00:00:00Z") },
+    ]);
+    const { body } = await call(latestNoticeRoute, { url: "http://localhost/api/notices/latest" });
+    expect(body).toEqual({ latestAt: "2026-10-01T00:00:00.000Z" });
   });
 
   it("공지 상세: 잘못된 id는 400, 없는 id는 404", async () => {

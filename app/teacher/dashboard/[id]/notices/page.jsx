@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { useFetchData } from "@/hooks/useFetchData";
+import { useNoticeBadge } from "@/hooks/useNoticeBadge";
 export default function Notices() {
   const searchParams = useSearchParams();
 
@@ -14,6 +16,12 @@ export default function Notices() {
     isLoading: isNoticesDataLoading,
     isError: isNoticesDataError,
   } = useFetchData(`/api/notices?page=${page}&limit=${limit}`);
+
+  // 공지 목록을 열면 헤더의 "새 공지" 표시를 끈다
+  const { latestAt, markSeen } = useNoticeBadge();
+  useEffect(() => {
+    if (latestAt) markSeen();
+  }, [latestAt, markSeen]);
 
   const NOW = Date.now();
   const NEW_LIMIT = 1000 * 60 * 60 * 48; // 48시간

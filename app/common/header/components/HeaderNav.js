@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
-export default function HeaderNav({ navItems, pathname, classId }) {
+export default function HeaderNav({ navItems, pathname, classId, badges = {} }) {
   const [openKey, setOpenKey] = useState(null);
   const closeTimer = useRef(null);
   const navRef = useRef(null);
@@ -124,6 +124,7 @@ export default function HeaderNav({ navItems, pathname, classId }) {
               >
                 {Icon && <Icon className="w-5 h-5" />}
                 <span className="ml-[4px]">{item.label}</span>
+                {badges[item.key] && <NewBadge />}
               </NavLink>
             ) : (
               <div
@@ -215,5 +216,18 @@ export default function HeaderNav({ navItems, pathname, classId }) {
         );
       })}
     </ul>
+  );
+}
+
+// 새 글 표시 (공지사항 등)
+export function NewBadge() {
+  return (
+    <span
+      className="ml-[4px] inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-[5px] text-[11px] font-bold leading-none text-white"
+      aria-label="새 글"
+      title="새 공지가 있습니다"
+    >
+      N
+    </span>
   );
 }

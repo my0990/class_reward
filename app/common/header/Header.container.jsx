@@ -10,6 +10,7 @@ import HeaderNav from "./components/HeaderNav";
 import UserInfo from "./components/userInfo";
 import DropDown from "./components/dropdown";
 import UserIcon from "./components/UserIcon";
+import { useNoticeBadge } from "@/hooks/useNoticeBadge";
 export default function HeaderContainer({ classId }) {
     const pathname = usePathname();
     // kiosk route면 헤더 숨김 (기존 로직 유지)
@@ -25,6 +26,10 @@ export default function HeaderContainer({ classId }) {
         isLoading: isUserLoading,
         isError: isUserError,
       } = useFetchData(`/api/user`, STUDENT_REFRESH);
+
+    // 새 공지 표시 (교사만)
+    const { hasNew: hasNewNotice } = useNoticeBadge(userData?.role === "teacher");
+    const badges = { notices: hasNewNotice };
 
     // 메뉴 상태
 
@@ -80,16 +85,16 @@ export default function HeaderContainer({ classId }) {
                         : <HomeBtn {...{ homeHref, className }} />}
 
                     {/* Desktop Nav */}
-                    <HeaderNav navItems={navItems} pathname={pathname} classId={classId} />
+                    <HeaderNav navItems={navItems} pathname={pathname} classId={classId} badges={badges} />
 
 
                     {/* Right Icons */}
-                    <UserIcon {...{ toggleUserInfo, profileIconRef, profileUrl, toggleHamburger, }} />
+                    <UserIcon {...{ toggleUserInfo, profileIconRef, profileUrl, toggleHamburger, }} hasBadge={hasNewNotice} />
                 </div>
             </div>
 
             {isHamburgerOpen ? (
-                <DropDown role={role} userId={userId} money={money} navItems={navItems} currencyEmoji={currencyEmoji} settingHref={settingHref}
+                <DropDown badges={badges} role={role} userId={userId} money={money} navItems={navItems} currencyEmoji={currencyEmoji} settingHref={settingHref}
                     currencyName={currencyName} />
             ) : null}
 

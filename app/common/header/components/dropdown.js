@@ -7,6 +7,7 @@ import { usePathname, useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
 import { switchClassPath } from "../utils/classPath";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { NewBadge } from "./HeaderNav";
 
 function splitNavToSections(navItems) {
   const sections = [];
@@ -95,7 +96,8 @@ export default function DropDown({
   navItems,
   userId,
   role,
-  settingHref
+  settingHref,
+  badges = {},
 }) {
   const pathname = usePathname();
   const params = useParams();
@@ -209,6 +211,7 @@ export default function DropDown({
                       <NavLink item={item} href={href} active={active}>
                         {Icon ? <Icon className="w-5 h-5 mr-2" aria-hidden="true" /> : null}
                         {item.label}
+                        {badges?.[item.key] && <NewBadge />}
                       </NavLink>
                     </li>
                   );
