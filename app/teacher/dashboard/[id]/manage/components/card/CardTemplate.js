@@ -16,9 +16,7 @@ export default function CardTemplate({ picked, startExp, commonDifference }) {
             </div>
             <div className="flex justify-center flex-col items-center my-[16px]">
                 <div className="w-[190px] h-[190px] max-[480px]:w-[150px] max-[480px]:h-[150px] border-[6px] border-white overflow-hidden rounded-full bg-white flex justify-center items-center mb-[12px]">
-                    {/* <Image src={male}/> */}
                     <img src={picked?.profileUrl} width="170" height="170" alt="orange" className="rounded-full" />
-                    {/* <img src="https://i.postimg.cc/HLXdVT11/orange.png"></img> */}
                 </div>
                 <div className=" py-[12px] w-full text-center text-[1.2rem] h-[52.8px] bg-green-400 text-white font-bold rounded-xl">{picked?.profileTitle}</div>
             </div>

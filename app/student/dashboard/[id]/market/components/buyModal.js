@@ -67,7 +67,6 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
             <div className="p-[24px] min-[600px]:p-[48px] dark:bg-orange-200">
                 <div className="flex justify-end">
                     <div className="w-[20px] h-[20px] mr-[8px]">
-                        {/* <Image src={gold} alt="money" /> */}
                     </div>
                     <div className="text-[0.9rem]">보유 {currencyName}: {currentMoney} {currencyEmoji} </div>
                 </div>

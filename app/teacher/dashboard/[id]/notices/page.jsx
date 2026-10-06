@@ -40,14 +40,6 @@ export default function Notices() {
   return (
     <div className="">
       <div className="max-w-4xl mx-auto p-6 ">
-        {/* <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold ">공지사항</h1>
-          <Link href="/announcements/write">
-            <div className="bg-black text-white px-4 cursor-pointer py-2 rounded-full">
-              글쓰기
-            </div>
-          </Link>
-        </div> */}
 
         {/* 공지 리스트 */}
         <div className="space-y-4">

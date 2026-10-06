@@ -29,17 +29,6 @@ export default function Random() {
 
     const [modalId, setModalId] = useState(null); // 지급/회수 키패드 창
     const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend, openModal: () => setModalId("POINT") });
-
-    // useEffect(() => {
-    //     if (studentData) {
-    //         console.log(studentData)
-    //         const updatedData = studentData.map(obj => {
-    //             return { ...obj, isactive: false }; // 새로운 키-값 쌍 추가하여 새로운 객체 반환
-    //         });
-    //         // 로컬 캐시 업데이트
-    //         setStudentArr(updatedData)
-    //     }
-    // }, [studentData]);
     
     const audioPool = useRef([]);
     const index = useRef(0);
@@ -106,7 +95,6 @@ export default function Random() {
         setPickedStudentArr([]);
         setOriginalStudentArr(studentData);
         setIsClicked(false);
-        // setIsFirst(true);
     }
 
     useEffect(() => {
@@ -132,15 +120,12 @@ export default function Random() {
     };
     return (
         <div className=" h-[100vh] flex justify-center items-center flex-col">
-            {/* <div>{isClicked && selectedStudent.classNumber}</div> */}
             <div className="flex justify-between w-full text-[1.5rem] px-[16px] mt-[32px]">
                 <div className="flex items-center">
                     나온 번호: {pickedStudentArr.map((a, i) => a.classNumber).sort((a, b) => Number(a) - Number(b)).join(', ')}
                 </div>
                 <div className="">
 
-                    {/* <input type="checkbox" className="mr-[8px] cursor-pointer" id="dup" />
-                    <label htmlFor="dup" className="cursor-pointer">중복</label> */}
                     <button onClick={onRefresh} style={{ transform: `rotate(${rotation}deg)`, transition: "transform 0.5s ease-in-out" }}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 transition-all hover:scale-110">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -171,7 +156,6 @@ export default function Random() {
                                 exit={{ opacity: 0, scale: 0.5 }}
                                 transition={{ delay: i * 0.3, duration: 0.5, ease: "easeOut" }}
                             >
-                                {/* <div key={i} onClick={() => document.getElementById('modal').showModal()}> */}
                                 <div key={i} onClick={(e) => onClick(selectedStudent)}>
                                     <div className={`shadow-[4px_6px_0px_0px_#050071] w-[160px] p-[16px] m-[8px] bg-orange-200 rounded-xl cursor-pointer ${selectedStudent.isactive ? "bg-orange-500" : ""}`}>
                                         <div className="flex justify-between mb-[8px]">
@@ -201,11 +185,6 @@ export default function Random() {
                     </svg>
 
                 </div>
-                {/* <button onClick={pickRandomStudent} className="mx-[16px] inline-flex items-center gap-2 transition duration-300 ease-linear 
-                bg-[#5751E1] text-white text-lg font-semibold font-['Poppins',sans-serif] leading-[1.12] 
-                px-8 py-4 text-center capitalize select-none rounded-full
-                whitespace-nowrap hover:bg-red-500 hover:shadow-none">
-                    {studentNum}명 뽑기</button> */}
 
                 <motion.button
                     whileHover={{
@@ -239,7 +218,6 @@ export default function Random() {
                 </div>
 
             </div>
-            {/* currencyName, targetStudent, clearAll */}
             <Modal modalId={modalId} setModalId={setModalId} setStudentArr={setStudentArr} targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll} classId={id}/>
         </div>
     )

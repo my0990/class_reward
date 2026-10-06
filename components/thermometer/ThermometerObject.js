@@ -20,9 +20,6 @@ export default function ThermometerObject({ reward, currentDegree }) {
 
             </div>
             <div className="absolute w-[48px] bg-red-500 z-30  bottom-[120px] rounded-t-full  " style={{ height: 30 + (3.1 * currentDegree) + 'px' }}></div>
-            {/* <div className="w-[160px] h-[160px] bg-white flex z-10  justify-center items-center border-8 border-red-500  rounded-full ">
-                <div className="w-[112px] h-[112px] bg-red-500   rounded-full  " />
-            </div> */}
             <div className="w-[160px] h-[160px] bg-white flex z-10 justify-center items-center border-8 border-red-500 rounded-full">
 
                 <div className="w-[112px] h-[112px] bg-red-500 rounded-full relative">
@@ -74,7 +71,6 @@ export default function ThermometerObject({ reward, currentDegree }) {
                     ? <Reward degree={a}  key={i}>{tmpReward[i * 10]}</Reward>
                     : null
             )} */}
-            {/* {reward[100]!=='' ? <Reward degree={425}>{reward[100]}</Reward> : null } */}
         </div>
 
 

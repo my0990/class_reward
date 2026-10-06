@@ -1,7 +1,6 @@
 'use client';
 import { toast } from "react-hot-toast";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
-// import { addClass } from "../server-actions/addClass";
 import { useRef } from "react";
 
 export default function AddClassModal({ modalId, setModalId, onCreateClass }) {
@@ -10,9 +9,7 @@ export default function AddClassModal({ modalId, setModalId, onCreateClass }) {
   return (
     <ModalTemplate id="ADD_CLASS" modalId={modalId} setModalId={setModalId}>
       {({ close }) => (
-        // <form onSubmit={(e) => handleSubmit(e, close)}> {/* ⭐️ action 제거 */}
         <div className="p-6">
-          {/* <button onClick={onCreateClass} className="text-xl font-bold mb-4">학급 추가</button > */}
           <h2 className="text-xl font-bold mb-4">학급 추가</h2 >
 
           <input

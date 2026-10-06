@@ -58,7 +58,6 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" className="w-full dark:bg-gray-700">
       <head>
-         {/* <meta name="google" content="notranslate" /> */}
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className}>
@@ -66,10 +65,7 @@ export default async function RootLayout({ children }) {
         <Analytics />
         {/* 알림(토스트)은 여기 하나로: 페이지를 옮겨도 메시지가 남는다 */}
         <Toaster position="top-center" toastOptions={{ style: { fontSize: "1.05rem" } }} />
-        {/* <RecoilRootProvider> */}
-        {/* <Layout fetchedUserData={response} fetchedThermometerData={response2} session={session} /> */}
         {children}
-        {/* </RecoilRootProvider> */}
       </body>
     </html>
 
