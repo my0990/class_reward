@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE } from "@/config/siteInfo";
+import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
 
 // 공통 푸터: 개인정보처리방침(굵게) · 카카오톡 문의 · 저작권 (이메일은 개인정보처리방침에만)
 export default function Footer({ className = "" }) {
@@ -11,7 +12,16 @@ export default function Footer({ className = "" }) {
             개인정보처리방침
           </Link>
           {SITE.kakaoOpenChatUrl && (
-            <a href={SITE.kakaoOpenChatUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
+            <a
+              href={SITE.kakaoOpenChatUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 hover:underline"
+            >
+              {/* 카카오 노란색 배경의 말풍선 아이콘 */}
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-[#FEE500]" aria-hidden="true">
+                <ChatBubbleOvalLeftIcon className="h-3.5 w-3.5 text-[#191919]" />
+              </span>
               카카오톡 문의하기
             </a>
           )}
