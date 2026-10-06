@@ -9,7 +9,8 @@
 import { createWriteStream, mkdirSync } from "node:fs";
 import { createGzip } from "node:zlib";
 import { once } from "node:events";
-import { EJSON } from "mongodb";
+import { BSON } from "mongodb"; // EJSON: ObjectId·날짜를 그대로 보존하는 JSON
+const { EJSON } = BSON;
 import { connect } from "./_common.mjs";
 
 const DBS = ["data", "user", "admins"];

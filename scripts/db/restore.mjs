@@ -7,7 +7,8 @@
 import { readdirSync, existsSync, createReadStream } from "node:fs";
 import { createGunzip } from "node:zlib";
 import { createInterface } from "node:readline";
-import { EJSON } from "mongodb";
+import { BSON } from "mongodb"; // EJSON: ObjectId·날짜를 그대로 보존하는 JSON
+const { EJSON } = BSON;
 import { connect } from "./_common.mjs";
 
 const args = process.argv.slice(2);
