@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Analytics from "@/components/common/Analytics";
+import { Toaster } from "react-hot-toast";
 
 // import Head from "next/head";
 const inter = Inter({ subsets: ["latin"] });
@@ -63,6 +64,8 @@ export default async function RootLayout({ children }) {
       <body className={inter.className}>
         {/* 방문 통계: 선생님 화면에서만 (components/common/Analytics.js) */}
         <Analytics />
+        {/* 알림(토스트)은 여기 하나로: 페이지를 옮겨도 메시지가 남는다 */}
+        <Toaster position="top-center" toastOptions={{ style: { fontSize: "1.05rem" } }} />
         {/* <RecoilRootProvider> */}
         {/* <Layout fetchedUserData={response} fetchedThermometerData={response2} session={session} /> */}
         {children}

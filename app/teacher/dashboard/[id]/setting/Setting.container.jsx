@@ -6,7 +6,7 @@ import { useFetchData } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import usePendingAction from "@/hooks/usePendingAction";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import PwdSection from "./components/PwdSection";
 import { updateProfile, updatePassword } from "@/server-action/actions/setting/setting.action";
 import { updateCurrencyName } from "@/server-action/actions/class/classSetting.action";
@@ -182,7 +182,6 @@ export default function SettingContainer() {
             </div>
             {/* <ProfileImgSettingModal /> */}
             <WithdrawModal modalId={modalId} setModalId={setModalId} />
-            <Toaster position="bottom-right" />
         </div>
     )
 }

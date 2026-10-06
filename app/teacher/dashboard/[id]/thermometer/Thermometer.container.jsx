@@ -5,7 +5,6 @@ import ThermometerObject from "@/components/thermometer/ThermometerObject";
 import TemperatureManageModal from "@/components/thermometer/TemperatureManageModal";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
-import { Toaster } from "react-hot-toast";
 import { useThermometerBoard } from "@/hooks/thermometer/useThermometerBoard";
 
 export default function ThermometerContainer({ }) {
@@ -225,7 +224,6 @@ export default function ThermometerContainer({ }) {
                 modalId={modalId}
                 setModalId={setModalId}
                 onUpdateDegree={onUpdateDegree} />
-            <Toaster position="bottom-right" />
         </div>
 
     )

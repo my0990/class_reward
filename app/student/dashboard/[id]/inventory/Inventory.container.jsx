@@ -1,5 +1,6 @@
 'use client';
 
+import { toast } from "react-hot-toast";
 import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useState, useEffect } from "react";
 import { mutate } from "swr";
@@ -69,14 +70,14 @@ export default function InventoryContainer() {
             if (data?.result === true) {
                 mutate("/api/user");
 
-                alert(`${itemDetail.itemName} 아이템을 사용하였습니다`);
+                toast.success(`${itemDetail.itemName} 아이템을 사용하였습니다`);
                 setItemDetail(EMPTY_DETAIL);
             } else {
-                alert(data?.message || '아이템 사용에 실패했습니다.');
+                toast.error(data?.message || '아이템 사용에 실패했습니다.');
             }
         } catch (error) {
             console.error(error);
-            alert('네트워크 오류가 발생했습니다.');
+            toast.error('네트워크 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
         }

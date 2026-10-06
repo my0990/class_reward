@@ -5,7 +5,7 @@ import ProfileCard from "./components/profileCard";
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import usePendingAction from "@/hooks/usePendingAction";
 import { createProfileImg, updateProfileImg, deleteProfileImg, reorderProfileImgs } from "@/server-action/actions/profile/profile.action";
 import { orderedProfileImgIds } from "@/util/profile/profileImgOrder";
@@ -52,7 +52,7 @@ export default function ProfileContainer() {
 
     const onCreateProfileImg = () => {
         if (url === null) {
-            alert('url을 입력해주세요')
+            toast.error('url을 입력해주세요')
             return
         }
         runAction("createProfileUrl", async () => {
@@ -149,7 +149,6 @@ export default function ProfileContainer() {
 
 
     const onCardClick = (e, urlData, urlId) => {
-        console.log(urlId)
         setModalId('UPDATE_PROFILE')
         setModalData((prev) => ({
             ...prev,
@@ -217,7 +216,6 @@ export default function ProfileContainer() {
             </div>
             <AddProfileImgModal {...{ modalId, setModalId, onChangeProfileImg, onCreateProfileImg, url, onAddModalClose, setUrl }} />
             <UpdateProfileImgModal {...{ setIsEdited, modalData, currencyEmoji, modalId, setModalId, onPriceChange, onUpdateProfileImg, onDeleteProfileImg, onUpdateModalClose, isEdited }} />
-            <Toaster position="bottom-right" />
         </div>
     )
 }

@@ -15,7 +15,7 @@ import useReorder from "@/hooks/useReorder";
 
 const getItemId = (item) => item.itemId;
 import usePendingAction from "@/hooks/usePendingAction";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { MarketProvider } from "./components/MarketContext";
 
 export default function MarketContainer() {
@@ -445,7 +445,6 @@ export default function MarketContainer() {
 
                 <DeleteModal />
 
-                <Toaster position="bottom-right" />
             </div>
         </div>
         </MarketProvider>

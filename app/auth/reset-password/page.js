@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "react-hot-toast";
 // 선생님 비밀번호 찾기: ① 이메일 → ② 인증 코드 → ③ 새 비밀번호
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -71,7 +72,7 @@ export default function ResetPasswordPage() {
         setMsg({ type: "error", text: res.message });
         return;
       }
-      alert(res.message);
+      toast.success(res.message);
       router.push("/auth/login/teacher");
     });
 

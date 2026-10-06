@@ -6,7 +6,7 @@ import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import ProfileImgSettingModal from "./components/ProfileImgSettingModal";
 import usePendingAction from "@/hooks/usePendingAction";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import PwdSection from "./components/PwdSection";
 import { updateProfile, updatePassword } from "@/server-action/actions/setting/setting.action";
 
@@ -99,7 +99,7 @@ export default function SettingContainer() {
             const data = await updatePassword(password);
 
             if (data?.result === true) {
-                alert('비밀번호를 변경하였습니다')
+                toast.success('비밀번호를 변경하였습니다')
                 setError('')
                 setPassword({
                     currentPassword: '',
@@ -145,7 +145,6 @@ export default function SettingContainer() {
                 </div>
             </div>
             {/* <ProfileImgSettingModal /> */}
-            <Toaster position="bottom-right" />
         </div>
     )
 }

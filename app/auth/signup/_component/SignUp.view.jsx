@@ -1,4 +1,5 @@
 'use client'
+import { toast } from "react-hot-toast";
 import AuthBtn from "./authBtn"
 import AuthInput from "./authInput"
 import Link from "next/link"
@@ -101,7 +102,7 @@ export default function SignUpView() {
             setSendCooldown(60);
 
             if (data?.quota) setQuota(data.quota);
-            alert("인증 코드를 전송했습니다");
+            toast.success("인증 코드를 전송했습니다");
         } catch (err) {
             console.error(err);
             setError("네트워크 오류");
@@ -130,7 +131,7 @@ export default function SignUpView() {
             }
 
             setIsEmailVerified(true);
-            alert("이메일 인증 완료");
+            toast.success("이메일 인증 완료");
         } catch (err) {
             console.error(err);
             setError("네트워크 오류");
@@ -170,7 +171,7 @@ export default function SignUpView() {
             });
         
             if (!loginRes?.ok) {
-              alert(loginRes?.error ?? "회원가입은 완료됐지만 로그인 실패");
+              toast.error(loginRes?.error ?? "회원가입은 완료됐지만 로그인 실패");
               router.push("/auth/login/teacher");
               return;
             }

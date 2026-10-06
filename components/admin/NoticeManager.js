@@ -1,7 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import {
   createNoticeAction,
   updateNoticeAction,
@@ -62,7 +62,6 @@ export default function NoticeManager({ notices }) {
 
   return (
     <div className="space-y-6">
-      <Toaster position="bottom-right" />
       <h1 className="text-2xl font-bold">공지사항</h1>
 
       <form onSubmit={onSubmit} className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">

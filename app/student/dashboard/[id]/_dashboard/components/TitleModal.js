@@ -5,7 +5,7 @@ export default function TitleModal({ titles, modalId, setModalId, onUpdateTitle 
 
     return (
 
-        <ModalTemplate id="TITLE_SETTING" modalId={modalId} setModalId={setModalId} onClose={() => console.log('close')}>
+        <ModalTemplate id="TITLE_SETTING" modalId={modalId} setModalId={setModalId}>
             {({ close }) => {
                 return (
                     <div className="p-6 rounded-lg bg-orange-200 max-w-[800px]">

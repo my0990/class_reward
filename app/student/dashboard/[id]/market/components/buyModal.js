@@ -1,3 +1,4 @@
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate } from "swr";
@@ -15,7 +16,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
         if (isLoading) return;
 
         if (money < buyList.itemPrice) {
-            alert('돈이 모자랍니다');
+            toast.error('돈이 모자랍니다');
             document.getElementById('buy').close();
             return;
         }
@@ -27,7 +28,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
             const data = await buyItem({ itemId: buyList?.itemId });
 
             if (data.result === true) {
-                alert('구매완료');
+                toast.success('구매완료');
 
                 mutate(
                     `/api/classData/${classId}`
@@ -36,7 +37,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
                     "/api/user",
                 );
             } else {
-                alert(data.message);
+                toast.error(data.message);
                 if (data.message === '잔액부족') {
                     mutate(
                         "/api/user"
@@ -48,7 +49,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
                 }
             }
         } catch (error) {
-            alert('구매 처리 중 오류가 발생했습니다.');
+            toast.error('구매 처리 중 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
             document.getElementById('buy').close();

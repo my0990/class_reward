@@ -1,5 +1,6 @@
 'use client'
 
+import { toast } from "react-hot-toast";
 import { useState, useEffect } from "react"
 import FinishQuestModal from "./finishQuestModal"
 import DeleteQuestCardModal from "./deleteQuestCardModal"
@@ -59,14 +60,13 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
     }
     const onFinish = () => {
         if (studentArr.filter((a) => a.isactive === true).length === 0) {
-            alert('학생을 선택해주세요')
+            toast.error('학생을 선택해주세요')
 
         } else {
             document.getElementById('my_modal_2').showModal();
         }
 
     }
-    console.log(questDetailData)
     const studentCount = studentData.length;
     return (
         <div className="flex justify-center ">

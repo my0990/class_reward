@@ -6,7 +6,7 @@ import { calculateLevel } from "@/util/level/level.utils";
 import usePointInput from "@/hooks/dashboard/usePointInput";
 import { handlePoint } from "@/server-action/actions/class/handlePoint";
 import PointModal from "./components/point-modal/PointModal";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
 import StudentInfoCard from "./components/StudentInfoCard";
 
@@ -185,7 +185,6 @@ export default function DashboardContainer({ classId }) {
         display={display}
         actions={actions}
       />
-      <Toaster position="bottom-right" />
     </div>
   );
 }

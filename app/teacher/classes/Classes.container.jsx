@@ -14,7 +14,7 @@ import RenameClassModal from "./_component/components/RenameClassModal";
 import { renameClass } from "@/server-action/actions/class/renameClass.action";
 import { deleteClass, restoreClass } from "@/server-action/actions/class/classDelete.action";
 import usePendingAction from "@/hooks/usePendingAction";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { signOut } from "next-auth/react";
 import Footer from "@/components/ui/common/Footer";
 import WithdrawModal from "@/components/teacher/WithdrawModal";
@@ -155,7 +155,6 @@ export default function ClassesContainer() {
                 onConfirm={onDeleteConfirm}
                 isDeleting={isPending("deleteClass")} />
             <WithdrawModal modalId={modalId} setModalId={setModalId} />
-            <Toaster position="bottom-right" />
         </div>
     )
 }

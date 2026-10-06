@@ -1,5 +1,6 @@
 'use client';
 
+import { toast } from "react-hot-toast";
 import { mutate } from "swr";
 import usePendingAction from "@/hooks/usePendingAction";
 import { finishQuest } from "@/server-action/actions/quest/quest.action";
@@ -68,14 +69,14 @@ export default function FinishQuestModal({
         mutate(`/api/classData/${classId}`);
         mutate(`/api/students/${classId}`);
       } else {
-        alert(data?.message ?? "처리 실패");
+        toast.error(data?.message ?? "처리 실패");
       }
 
       return data;
     }, {
       onError: (error) => {
         console.error(error);
-        alert(error?.message || "네트워크 오류");
+        toast.error(error?.message || "네트워크 오류");
       },
     });
   };

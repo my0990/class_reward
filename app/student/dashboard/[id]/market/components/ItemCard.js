@@ -1,7 +1,6 @@
 import soldOut from "@/public/soldOut.png"
 import Image from "next/image";
 export default function ItemCard(props) {
-    // console.log(props.data)
     const { data } = props;
     function getByteB(str) {
         let byte = 0;

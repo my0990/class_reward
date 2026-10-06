@@ -1,4 +1,5 @@
 'use client'
+import { toast } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
 import _ from "lodash";
@@ -57,9 +58,9 @@ export default function Random() {
 
         if (originalStudentArr.length === 0) {
             if (isClicked === false) {
-                alert('학생을 추가해주세요')
+                toast.error('학생을 추가해주세요')
             } else {
-                alert('모두 뽑았습니다')
+                toast.success('모두 뽑았습니다')
                 onRefresh();
             }
             return

@@ -8,7 +8,7 @@ import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import usePendingAction from "@/hooks/usePendingAction";
 import { buyProfileImg } from "@/server-action/actions/profile/profile.action";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 export default function ProfileContainer({ }) {
     const params = useParams();
@@ -46,7 +46,7 @@ export default function ProfileContainer({ }) {
 
     const onBuyProfileImg = (e) => {
         if (pickedData.price > money) {
-            alert('잔액이 부족합니다')
+            toast.error('잔액이 부족합니다')
             return
         }
         runAction("buyProfileImg", async () => {
@@ -86,7 +86,6 @@ export default function ProfileContainer({ }) {
                     <ProfileBuyModal  {...{ pickedData, onBuyModalClose, currencyName, userId, money, modalId, setModalId, onBuyProfileImg }} />
                 </div>
             </div>
-            <Toaster position="bottom-right" />
         </div>
     )
 }

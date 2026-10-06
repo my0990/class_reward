@@ -2,7 +2,6 @@
 // 온도계 기부: 학생 선택(잔액 0이면 막기 + 비밀번호) → 기부 수량 입력
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Toaster } from "react-hot-toast";
 import StudentPicker from "../../_components/StudentPicker";
 import { kioskHome } from "../../_components/KioskHeader";
 import DonateAmount from "./DonateAmount";
@@ -25,7 +24,6 @@ export default function DonatePage() {
           onPicked={setPicked}
         />
       )}
-      <Toaster position="bottom-right" />
     </>
   );
 }

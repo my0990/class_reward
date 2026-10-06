@@ -1,5 +1,6 @@
 'use client';
 
+import { toast } from "react-hot-toast";
 import { mutate } from "swr";
 import usePendingAction from "@/hooks/usePendingAction";
 import { resetQuest } from "@/server-action/actions/quest/quest.action";
@@ -34,14 +35,14 @@ export default function ResetQuestModal({ questData, setQuestDetailData, classId
         mutate(`/api/classData/${classId}`);
         mutate(`/api/students/${classId}`);
       } else {
-        alert(data?.message ?? "초기화 실패");
+        toast.error(data?.message ?? "초기화 실패");
       }
 
       return data;
     }, {
       onError: (error) => {
         console.error(error);
-        alert(error?.message || "네트워크 오류");
+        toast.error(error?.message || "네트워크 오류");
       },
     });
   };

@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "react-hot-toast";
 // 키오스크 학생 선택 (구매·사용·기부 공용)
 // 학생 카드를 누르면 → check(학생)로 막을지 확인 → 비밀번호 키패드 → onPicked({ user, kioskToken })
 import { useEffect, useState } from "react";
@@ -36,7 +37,7 @@ export default function StudentPicker({ classId, title, guide = "계정을 선�
   const onCardClick = (user) => {
     const reason = check?.(user, classData);
     if (reason) {
-      alert(reason);
+      toast.error(reason);
       return;
     }
     setPicked(user);

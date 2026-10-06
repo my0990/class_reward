@@ -1,4 +1,5 @@
 'use client';
+import { toast } from "react-hot-toast";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 // import { addClass } from "../server-actions/addClass";
 import { useRef } from "react";
@@ -41,7 +42,7 @@ export default function AddClassModal({ modalId, setModalId, onCreateClass }) {
                 const className = inputRef.current.value.trim();
 
                 if (!className) {
-                  alert("학급 이름을 입력해주세요!");
+                  toast.error("학급 이름을 입력해주세요!");
                   return;
                 }
 

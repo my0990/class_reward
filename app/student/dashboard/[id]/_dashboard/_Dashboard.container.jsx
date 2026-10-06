@@ -5,7 +5,7 @@ import TitleModal from "./components/TitleModal";
 import { useState } from "react";
 import usePendingAction from "@/hooks/usePendingAction";
 import { selectProfileImg, selectProfileTitle } from "@/server-action/actions/profile/profile.action";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 export default function Page({ classId }) {
 
@@ -130,7 +130,6 @@ export default function Page({ classId }) {
             </div>
             <TitleModal userData={userData} modalId={modalId} setModalId={setModalId} titles={titles} onUpdateTitle={onUpdateTitle} />
             <ProfileImgModal userData={userData} profileImgOrder={classData?.profileImgOrder} modalId={modalId} setModalId={setModalId} onClick={onSelectProfileImg} />
-            <Toaster position="bottom-right" />
         </div>
 
     )

@@ -1,3 +1,4 @@
+import { toast } from "react-hot-toast";
 export default function homeUtils({setStudentArr, setIsSelectedAll, studentArr, setIsSend}) {
 
 
@@ -25,7 +26,7 @@ export default function homeUtils({setStudentArr, setIsSelectedAll, studentArr, 
     }
     const onSend = () => {
         if (studentArr.filter((a) => a.isactive === true).length === 0) {
-            alert('학생을 선택해주세요')
+            toast.error('학생을 선택해주세요')
             return
         }
         setIsSend(true);
@@ -33,7 +34,7 @@ export default function homeUtils({setStudentArr, setIsSelectedAll, studentArr, 
     }
     const onTake = () => {
         if (studentArr.filter((a) => a.isactive === true).length === 0) {
-            alert('학생을 선택해주세요')
+            toast.error('학생을 선택해주세요')
             return
         }
         setIsSend(false);

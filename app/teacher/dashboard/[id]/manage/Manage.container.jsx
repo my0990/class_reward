@@ -10,7 +10,7 @@ import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
 import { useParams } from "next/navigation";
 import StudentGrid from "./components/studentGrid";
 import usePendingAction from "@/hooks/usePendingAction";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { ManageProvider } from "./components/ManageContext";
 
 import { createStudentAccount, deleteStudentAccount, resetPwd } from "@/server-action/actions/account/account.action";
@@ -191,7 +191,6 @@ export default function ManageContainer() {
                 <DeleteModal />
                 <ResetModal />
                 <DetailModal />
-                <Toaster position="bottom-right" />
             </div>
         </ManageProvider>
     )

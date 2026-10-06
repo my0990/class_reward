@@ -9,7 +9,7 @@ export default function ProfileImgModal({ userData, profileImgOrder, modalId, se
     return (
 
 
-        <ModalTemplate id="PROFILE_SETTING" modalId={modalId} setModalId={setModalId} onClose={() => console.log('close')}>
+        <ModalTemplate id="PROFILE_SETTING" modalId={modalId} setModalId={setModalId}>
             {({ close }) => {
                 return (
                     <div className="p-6 rounded-lg bg-orange-200 max-w-[772px] max-[842px]:w-[595px] max-[643px]:w-[420px] ">

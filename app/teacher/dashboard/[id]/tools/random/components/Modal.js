@@ -1,3 +1,4 @@
+import { toast } from "react-hot-toast";
 import { useState, useEffect } from "react";
 import DialBtn from "./DialBtn";
 import { mutate } from "swr";
@@ -29,7 +30,7 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
         e.preventDefault();
 
         if (point === null || point === '') {
-            alert('숫자를 입력해주세요')
+            toast.error('숫자를 입력해주세요')
             return;
         }
         if (isLoading) {
@@ -49,9 +50,9 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
 
             const message = targetStudent.map((a, i) => a.userId)
             if (isSend) {
-                alert(message + '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
+                toast.success(message + '에게 ' + point + currencyName + '를(을) 지급하였습니다.');
             } else {
-                alert(message + '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
+                toast.success(message + '에게서 ' + point + currencyName + '를(을) 회수하였습니다.');
             }
 
             clearAll();
@@ -92,7 +93,7 @@ export default function Modal({ studentArr, currencyName, targetStudent, clearAl
             modalClose();
             document.getElementById('modal').close();
         } catch (error) {
-            alert(error.message || '처리 중 오류가 발생했습니다.');
+            toast.error(error.message || '처리 중 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
         }

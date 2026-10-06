@@ -68,7 +68,7 @@ export default function DonateAmount({ classId, user, kioskToken }) {
                 toast.error(data.message || "수정 실패");
                 return;
             }
-            alert('기부하였습니다')
+            toast.success('기부하였습니다')
             clearNumber();
             await mutateThermometerData?.();
             await mutateStudentData?.();

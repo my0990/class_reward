@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "react-hot-toast";
 // 구매 결제 화면: 고른 아이템 · 보유/결제/잔액 → 결제하기 → "바로 사용 / 다음에"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -28,11 +29,11 @@ export default function ConfirmBuy({ classId, item, user, kioskToken }) {
       if (res?.result) {
         setBoughtItemId(res.itemId);
       } else {
-        alert(res?.message || "구매에 실패했습니다.");
+        toast.error(res?.message || "구매에 실패했습니다.");
         router.push(kioskHome(classId));
       }
     } catch {
-      alert("구매 처리 중 오류가 발생했습니다.");
+      toast.error("구매 처리 중 오류가 발생했습니다.");
     } finally {
       setBuying(false);
     }

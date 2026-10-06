@@ -1,4 +1,5 @@
 'use client'
+import { toast } from "react-hot-toast";
 import { useState, useRef } from "react"
 import { mutate } from "swr";
 import { checkUniqueNickname } from "@/server-action/actions/account/account.action";
@@ -30,7 +31,7 @@ export default function CreateUniqueNickname({classId}) {
             checkUniqueNickname({ uniqueNickname: value, classId: classId }).then((data) => {
 
                 if (data.result === true) {
-                    alert('고유 별명을 등록하였습니다.')
+                    toast.success('고유 별명을 등록하였습니다.')
                     mutate(`/api/classData/${classId}`)
                 } else {
                     setError(data.message || (value + '은(는) 이미 존재하는 별명입니다.'))

@@ -2,7 +2,6 @@
 
 import ThermometerObject from "@/components/thermometer/ThermometerObject";
 import { useParams, useRouter } from "next/navigation";
-import { Toaster } from "react-hot-toast";
 import { useThermometerBoard } from "@/hooks/thermometer/useThermometerBoard";
 
 // 학급 온도계 보기 (기부하기 버튼 → donate)
@@ -204,7 +203,6 @@ export default function ThermometerPage() {
                     </div>
                 </div>
             </div>
-            <Toaster position="bottom-right" />
         </div>
 
     )
