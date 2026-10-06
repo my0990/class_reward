@@ -27,7 +27,6 @@
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@heroicons/react": "^2.2.0",
-    "@vercel/speed-insights": "^1.0.10",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^12.34.3",
     "lodash": "^4.17.21",
@@ -38,13 +37,11 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.6.0",
     "react-lottie-player": "^1.5.6",
-    "react-qr-code": "^2.0.12",
-    "react-to-print": "^3.2.0",
-    "resend": "^6.9.3",
     "swr": "^2.3.0",
     "typewriter-effect": "^2.21.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "20.11.20",
     "@types/react": "18.2.58",
     "autoprefixer": "^10.0.1",
