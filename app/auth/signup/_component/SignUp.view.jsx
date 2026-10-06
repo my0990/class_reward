@@ -171,7 +171,7 @@ export default function SignUpView() {
         
             if (!loginRes?.ok) {
               alert(loginRes?.error ?? "회원가입은 완료됐지만 로그인 실패");
-              router.push("../auth/login/teacher");
+              router.push("/auth/login/teacher");
               return;
             }
         
@@ -286,10 +286,9 @@ export default function SignUpView() {
                         <div className="divider">OR</div>
                     </div>
 
-                    <Link href="../login/teacher">
-                        <button className={`btn btn-block bg-orange-500 dark:hover:bg-orange-300  mb-4 text-lg  border-0 text-white`}>
-                            로그인
-                        </button>
+                    {/* 폼 안의 <button>은 기본이 '제출'이라 회원가입이 같이 실행됐다 → 버튼 대신 링크 자체를 버튼 모양으로 */}
+                    <Link href="/auth/login/teacher" className="btn btn-block bg-orange-500 dark:hover:bg-orange-300 mb-4 text-lg border-0 text-white">
+                        로그인
                     </Link>
 
                 </div>
