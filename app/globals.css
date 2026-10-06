@@ -173,3 +173,9 @@ body {
     text-wrap: balance;
   }
 }
+/* 맨 아래(또는 위)에서 더 스크롤하면 화면이 고무줄처럼 늘어나며
+   페이지 배경 밖의 흰 공간이 보이는 것(맥 트랙패드, 휴대폰)을 막는다. */
+html,
+body {
+  overscroll-behavior-y: none;
+}
