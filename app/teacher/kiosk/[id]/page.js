@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import KioskInstallPrompt from '@/components/kiosk/KioskInstallPrompt'
 
 // 키오스크 첫 화면: 구매 / 사용 / 온도계 메뉴 (뒤로 가기 막음)
 export default function KioskHome() {
@@ -105,7 +106,7 @@ export default function KioskHome() {
                     ))}
                 </div>
 
-                <div />
+                <KioskInstallPrompt />
             </section>
         </main>
     )

@@ -25,13 +25,7 @@ export const metadata = {
 
   description: APP_DESCRIPTION,
 
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: APP_DEFAULT_TITLE,
-    // startUpImage: [],
-  },
+  // manifest(홈 화면에 추가)는 키오스크 화면에서만: app/teacher/kiosk/[id]/layout.js
   formatDetection: {
     telephone: false,
   },
