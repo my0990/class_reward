@@ -54,7 +54,7 @@ export default function LayoutEditor({ layout, setLayout, studentCount, isNew = 
     <div className="flex flex-col items-center gap-4">
       <div className="text-center">
         <h3 className="text-[1.2rem] font-bold">{isNew ? "① 교실 크기를 정해 주세요" : "① 교실 크기"}</h3>
-        <p className="text-sm text-gray-500">한글에서 표 만들 때처럼 왼쪽 위에서부터 드래그하세요. (마우스는 올려 보고 클릭)</p>
+        <p className="text-sm text-gray-500">한글에서 표 만들 때처럼 왼쪽 위 칸을 누른 채로 원하는 크기까지 드래그하세요.</p>
       </div>
       <SizePicker rows={layout.rows} cols={layout.cols} onPick={resize} studentCount={studentCount} />
       <h3 className="mt-4 text-[1.2rem] font-bold">

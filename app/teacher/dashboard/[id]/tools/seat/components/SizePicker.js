@@ -1,6 +1,6 @@
 "use client";
-// 교실 크기 고르기: 한글(HWP)에서 표 만들 때처럼 작은 칸 격자를 드래그(또는 마우스를 올리고 클릭)해서
-// 왼쪽 위부터 "줄 × 칸" 크기를 정한다. 손을 떼거나 클릭하면 그 크기로 확정.
+// 교실 크기 고르기: 한글(HWP)에서 표 만들 때처럼 작은 칸 격자를 누른 채로 드래그해서
+// 왼쪽 위부터 "줄 × 칸" 크기를 정한다. 손을 떼면(한 칸 클릭 포함) 그 크기로 확정.
 import { useRef, useState } from "react";
 import { LAYOUT_LIMITS } from "@/util/seat/seatAlgorithm";
 
@@ -27,12 +27,12 @@ export default function SizePicker({ rows, cols, onPick, studentCount }) {
     setHover(at);
   };
   const onPointerMove = (e) => {
-    // 마우스는 누르지 않아도 올리기만 하면 미리보기 (한글 표 만들기처럼)
-    if (!dragging.current && e.pointerType !== "mouse") return;
+    if (!dragging.current) return; // 누른 채로 움직일 때만 크기가 바뀐다
     const at = cellAt(e);
     if (at) setHover(at);
   };
   const onPointerUp = (e) => {
+    if (!dragging.current) return;
     const at = cellAt(e) ?? hover;
     dragging.current = false;
     if (at) onPick(at[0], at[1]);
