@@ -18,6 +18,7 @@
     "db:indexes": "node scripts/db/indexes.mjs",
     "db:backup": "node scripts/db/backup.mjs",
     "db:restore": "node scripts/db/restore.mjs",
+    "db:drop-legacy-seat": "node scripts/db/drop-legacy-seat.mjs",
     "admin:create": "node scripts/admin/create.mjs"
   },
   "dependencies": {

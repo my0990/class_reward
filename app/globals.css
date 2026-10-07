@@ -197,3 +197,11 @@ body {
   @media (min-width: 1248px) { .page-width { width: 1216px; } } /* 7개 */
   @media (min-width: 1424px) { .page-width { width: 1392px; } } /* 8개 */
 }
+
+/* 자리 바꾸기 인쇄: 자리표만 인쇄한다 */
+@media print {
+  body:has(.seat-print-area) * { visibility: hidden; }
+  body:has(.seat-print-area) .seat-print-area,
+  body:has(.seat-print-area) .seat-print-area * { visibility: visible; }
+  body:has(.seat-print-area) .seat-print-area { position: absolute; left: 0; top: 0; width: 100%; overflow: visible; }
+}

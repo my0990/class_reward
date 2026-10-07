@@ -1,0 +1,62 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { setupTestMongo, makeScope, seedStudent, seedClassData } from "@/test/helpers/testMongo";
+
+vi.mock("@/lib/mongodb", async () => (await import("@/test/helpers/testMongo")).mongodbMock);
+const { saveSeatSetupService, confirmSeatsService, SEAT_HISTORY_MAX } = await import("./seat.service.js");
+const { makeLayout } = await import("@/util/seat/seatAlgorithm.js");
+
+const mongo = setupTestMongo();
+const scope = makeScope();
+const args = { teacher_id: scope.teacher_id, classId: scope.classId };
+const plan = async () => (await mongo.db.collection("class_data").findOne({ classId: scope.classObjectId })).seatPlan;
+
+beforeEach(async () => {
+  await seedClassData(mongo.db, scope);
+  for (const u of ["a", "b", "c"]) await seedStudent(mongo.db, scope, { userId: u });
+});
+
+describe("자리 바꾸기 저장", () => {
+  it("교실 배치 범위를 확인한다", async () => {
+    expect((await saveSeatSetupService({ ...args, layout: { rows: 0, cols: 3 } })).ok).toBe(false);
+    expect((await saveSeatSetupService({ ...args, layout: { rows: 11, cols: 3 } })).ok).toBe(false);
+  });
+
+  it("조건에서 다른 반 학생·책상 없는 자리·중복을 걸러 저장한다", async () => {
+    const layout = makeLayout(2, 2);
+    layout.desks[1][1] = false;
+    const res = await saveSeatSetupService({
+      ...args,
+      layout,
+      rules: {
+        fixed: { a: "0-0", b: "1-1", outsider: "0-1" },
+        front: { userIds: ["c", "c", "outsider"], rows: 9 },
+        apart: [["a", "b"], ["b", "a"], ["a", "a"], ["a", "outsider"]],
+        avoidPrevPartner: 1,
+      },
+    });
+    expect(res.ok).toBe(true);
+    const saved = await plan();
+    expect(saved.rules).toEqual({ fixed: { a: "0-0" }, front: { userIds: ["c"], rows: 2 }, apart: [["a", "b"]], avoidPrevPartner: true });
+    expect(saved.layout.desks[1][1]).toBe(false);
+  });
+
+  it("확정: 모든 학생이 책상에 한 번씩 있어야 하고, 이전 자리는 기록으로 (최대 5번)", async () => {
+    await saveSeatSetupService({ ...args, layout: makeLayout(2, 2), rules: {} });
+    expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a", "0-1": "b" } })).ok).toBe(false); // c 없음
+    expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a", "0-1": "a", "1-0": "c" } })).ok).toBe(false); // 중복
+    expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a", "0-1": "b", "5-5": "c" } })).ok).toBe(false); // 없는 자리
+
+    for (let i = 0; i < SEAT_HISTORY_MAX + 2; i++) {
+      const res = await confirmSeatsService({ ...args, assignment: { "0-0": "a", "0-1": "b", "1-0": "c" }, now: new Date(2026, 0, i + 1) });
+      expect(res.ok).toBe(true);
+    }
+    const saved = await plan();
+    expect(saved.current.confirmedAt).toEqual(new Date(2026, 0, SEAT_HISTORY_MAX + 2));
+    expect(saved.history).toHaveLength(SEAT_HISTORY_MAX);
+    expect(saved.history[0].confirmedAt).toEqual(new Date(2026, 0, SEAT_HISTORY_MAX + 1)); // 최신이 앞
+  });
+
+  it("교실 배치 없이 확정하면 안내", async () => {
+    expect((await confirmSeatsService({ ...args, assignment: {} })).message).toMatch(/교실 배치/);
+  });
+});

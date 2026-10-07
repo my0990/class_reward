@@ -85,12 +85,12 @@ export const teacherNav = [
         href: (id) => `/teacher/dashboard/${id}/tools/random`,
         activeMatch: (pathname, id) => pathname === `/teacher/dashboard/${id}/tools/random`,
       },
-      // {
-      //   key: "tool-market",
-      //   label: "자리 바꾸기",
-      //   href: (id) => `/teacher/dashboard/${id}/tools/seat`,
-      //   activeMatch: (pathname, id) => pathname === `/teacher/dashboard/${id}/tools/seat`,
-      // },
+      {
+        key: "tool-seat",
+        label: "자리 바꾸기",
+        href: (id) => `/teacher/dashboard/${id}/tools/seat`,
+        activeMatch: (pathname, id) => pathname === `/teacher/dashboard/${id}/tools/seat`,
+      },
       {
         key: "tool-quest",
         label: "타이머",
