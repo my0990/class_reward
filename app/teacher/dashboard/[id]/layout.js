@@ -1,5 +1,5 @@
 import HeaderContainer from "../../../common/header/Header.container"
-import Footer from "@/components/ui/common/Footer"
+import DashboardFooter from "@/components/ui/common/DashboardFooter"
 
 export default async function RootLayout({ children, params }) {
     const {id} = await params
@@ -7,7 +7,7 @@ export default async function RootLayout({ children, params }) {
         <div className="flex min-h-dvh flex-col">
             <HeaderContainer classId={id}/>
             <div className="flex-1">{children}</div>
-            <Footer />
+            <DashboardFooter />
         </div>
     )
 }
