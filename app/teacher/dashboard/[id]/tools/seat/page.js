@@ -37,6 +37,7 @@ export default function SeatPage() {
     if (layout || plan === undefined || !studentList) return;
     setLayout(plan?.layout ?? makeLayout(Math.max(1, Math.ceil(students.length / 6)), 6));
     setRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) });
+    if (!plan?.layout) setTab("layout"); // 처음이면 교실 배치부터 (표 만들기처럼 크기 고르기)
   }, [plan, studentList, students.length, layout]);
 
   useEffect(() => () => clearInterval(timer.current), []);
@@ -129,7 +130,7 @@ export default function SeatPage() {
         )}
       </div>
 
-      {tab === "layout" && <LayoutEditor layout={layout} setLayout={(l) => { setLayout(l); setDraft(null); }} studentCount={students.length} />}
+      {tab === "layout" && <LayoutEditor isNew={!plan?.layout} layout={layout} setLayout={(l) => { setLayout(l); setDraft(null); }} studentCount={students.length} />}
       {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} layout={layout} students={students} />}
 
       {tab === "seat" && (
