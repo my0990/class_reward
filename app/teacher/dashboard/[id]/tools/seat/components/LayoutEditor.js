@@ -1,5 +1,7 @@
 "use client";
-// 교실 배치: 줄·칸 수 정하기 + 책상 눌러서 켜기/끄기
+// 교실 배치: 줄·칸 수 정하기 + 책상을 누르거나 드래그해서 켜기/끄기
+// 처음 누른 칸이 책상이면 지나가는 칸을 모두 통로로, 통로면 모두 책상으로 칠한다 (마우스·터치 공용)
+import { useRef } from "react";
 import { LAYOUT_LIMITS, deskSeats } from "@/util/seat/seatAlgorithm";
 import SeatGrid from "./SeatGrid";
 
@@ -10,11 +12,34 @@ export default function LayoutEditor({ layout, setLayout, studentCount }) {
     const desks = Array.from({ length: rows }, (_, r) => Array.from({ length: cols }, (_, c) => layout.desks?.[r]?.[c] ?? true));
     setLayout({ rows, cols, desks });
   };
-  const toggle = (id) => {
+  const paint = useRef(null); // { value: true/false, desks } 드래그 중일 때만
+
+  const seatAt = (e) => document.elementFromPoint(e.clientX, e.clientY)?.closest?.("[data-seat]")?.getAttribute("data-seat");
+
+  const apply = (id) => {
+    const p = paint.current;
+    if (!p || !id) return;
     const [r, c] = id.split("-").map(Number);
-    const desks = layout.desks.map((row) => [...row]);
-    desks[r][c] = !desks[r][c];
-    setLayout({ ...layout, desks });
+    if (p.desks[r][c] === p.value) return;
+    p.desks = p.desks.map((row) => [...row]);
+    p.desks[r][c] = p.value;
+    setLayout({ ...layout, rows: layout.rows, cols: layout.cols, desks: p.desks });
+  };
+
+  const onPointerDown = (e) => {
+    const id = seatAt(e);
+    if (!id) return;
+    e.preventDefault();
+    const [r, c] = id.split("-").map(Number);
+    paint.current = { value: !layout.desks[r][c], desks: layout.desks };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    apply(id);
+  };
+  const onPointerMove = (e) => {
+    if (paint.current) apply(seatAt(e));
+  };
+  const endPaint = () => {
+    paint.current = null;
   };
   const count = deskSeats(layout).length;
 
@@ -37,9 +62,16 @@ export default function LayoutEditor({ layout, setLayout, studentCount }) {
           책상 {count}개 / 학생 {studentCount}명
         </span>
       </div>
-      <p className="text-sm text-gray-500">책상을 누르면 통로(빈칸)로, 다시 누르면 책상으로 바뀝니다. 같은 줄의 1·2칸, 3·4칸…이 짝입니다.</p>
-      <div className="max-w-full overflow-x-auto pb-2">
-        <SeatGrid layout={layout} onSeatClick={toggle} size="sm" />
+      <p className="text-sm text-gray-500">책상을 누르거나 드래그하면 통로(빈칸)로, 통로에서 시작하면 책상으로 바뀝니다. 같은 줄의 1·2칸, 3·4칸…이 짝입니다.</p>
+      <div
+        className="max-w-full touch-none overflow-x-auto pb-2"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endPaint}
+        onPointerCancel={endPaint}
+        onLostPointerCapture={endPaint}
+      >
+        <SeatGrid layout={layout} size="sm" paintable />
       </div>
     </div>
   );
