@@ -113,8 +113,10 @@ export default function SeatPage() {
   const btn = "btn btn-sm border-0";
 
   return (
-    // 최소 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
-    <div className="mx-auto flex min-h-dvh w-full max-w-[1600px] flex-col px-4 py-6 print:block print:min-h-0 sm:px-8">
+    // 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
+    // 자리표 탭은 높이를 화면 높이로 '고정'(h-dvh)해야 자리표가 남은 높이에 맞춰진다.
+    // min-h만 주면 높이가 정해지지 않은 것으로 봐서 칸이 아주 작아졌음. 다른 탭은 내용만큼 늘어나게 min-h.
+    <div className={`mx-auto flex w-full max-w-[1600px] flex-col px-4 py-6 print:block print:h-auto print:min-h-0 sm:px-8 ${tab === "seat" ? "h-dvh" : "min-h-dvh"}`}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div role="tablist" className="tabs tabs-boxed bg-orange-100">
           {tabs.map(([key, label]) => (
