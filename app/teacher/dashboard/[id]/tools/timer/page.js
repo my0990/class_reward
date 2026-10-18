@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
@@ -38,7 +38,6 @@ export default function TimerPage() {
   const [count, setCount] = useState(0);
   const [boardPct, setBoardPct] = useState(0);
   const [isFull, setIsFull] = useState(false);
-  const [height, setHeight] = useState(null);
   const wrapRef = useRef(null);
 
   const timer = useCountdown({
@@ -55,18 +54,6 @@ export default function TimerPage() {
       if (!muteRef.current) playLoud();
     },
   });
-
-  // 헤더 아래 남은 화면을 꽉 채운다
-  useLayoutEffect(() => {
-    const fit = () => {
-      const el = wrapRef.current;
-      if (!el) return;
-      setHeight(window.innerHeight - (el.getBoundingClientRect().top + window.scrollY));
-    };
-    fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
-  }, []);
 
   useEffect(() => {
     const onChange = () => setIsFull(document.fullscreenElement === wrapRef.current);
@@ -137,7 +124,8 @@ export default function TimerPage() {
     <div
       ref={wrapRef}
       className="flex select-none overflow-hidden"
-      style={{ height: isFull ? "100vh" : height ? Math.max(height, 420) : "calc(100dvh - 64px)" }}
+      // 화면 높이 그대로 → 아래로 스크롤하면 헤더가 올라가 타이머만 화면을 채운다
+      style={{ height: isFull ? "100vh" : "max(100dvh, 420px)" }}
     >
       <section
         className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-[4cqh] [container-type:size]"
