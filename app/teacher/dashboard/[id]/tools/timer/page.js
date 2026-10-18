@@ -203,7 +203,7 @@ export default function TimerPage() {
           <button
             type="button"
             onClick={toggleRun}
-            className="flex items-center gap-1 rounded-full bg-black/80 px-[1.2em] py-[0.35em] font-bold text-white transition hover:bg-black"
+            className="flex w-[6.4em] items-center justify-center gap-1 rounded-full bg-black/80 py-[0.35em] font-bold text-white transition hover:bg-black"
           >
             {running ? <PauseIcon className="h-[1.1em] w-[1.1em]" /> : <PlayIcon className="h-[1.1em] w-[1.1em]" />}
             {running ? "일시정지" : timer.status === "paused" ? "계속" : "시작"}
