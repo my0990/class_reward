@@ -76,5 +76,25 @@ export function useCountdown({ initialMs = 5 * 60_000, onSecond, onDone } = {}) 
     [status],
   );
 
-  return { setMs, remainingMs, status, runId, start, pause, reset, setTime };
+  /** 시간 더하기 (돌아가는 중에도 가능). 끝난 뒤에 누르면 그 시간으로 새로 설정 */
+  const addTime = useCallback(
+    (ms) => {
+      if (status === "done") {
+        setSetMs(ms);
+        setRemainingMs(ms);
+        setStatus("idle");
+      } else if (status === "running") {
+        endAtRef.current += ms;
+        setSetMs((t) => t + ms);
+        setRemainingMs(Math.max(0, endAtRef.current - Date.now()));
+      } else {
+        setSetMs(status === "idle" ? remainingMs + ms : (t) => t + ms);
+        setRemainingMs((r) => r + ms);
+      }
+      setRunId((n) => n + 1); // 원형 타이머를 늘어난 전체 시간 기준으로 다시 그림
+    },
+    [status, remainingMs],
+  );
+
+  return { setMs, remainingMs, status, runId, start, pause, reset, setTime, addTime };
 }

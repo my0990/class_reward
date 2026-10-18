@@ -192,11 +192,10 @@ export default function TimerPage() {
             <button
               key={min}
               type="button"
-              disabled={running}
-              onClick={() => timer.setTime(min * 60_000)}
-              className="rounded-full border-2 border-current px-[1em] py-[0.3em] font-semibold opacity-80 transition hover:opacity-100 disabled:opacity-30"
+              onClick={() => timer.addTime(min * 60_000)}
+              className="rounded-full border-2 border-current px-[1em] py-[0.3em] font-semibold opacity-80 transition hover:opacity-100"
             >
-              {min}분
+              +{min}분
             </button>
           ))}
           <span className="mx-1" />
