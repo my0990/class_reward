@@ -141,11 +141,6 @@ export default function SeatPage() {
 
       {tab === "seat" && (
         <div className="flex min-h-0 flex-1 flex-col items-center gap-4">
-          <p className="text-base text-gray-500 print:hidden">
-            {current
-              ? `지금 자리 (${new Date(plan.current.confirmedAt).toLocaleDateString("ko-KR")} 저장)`
-              : "아직 정한 자리가 없습니다. 아래 '시작'을 눌러 보세요."}
-          </p>
           {/* 남은 화면(너비·높이)에 맞춰 자리표 크기를 정한다 (SeatGrid size="fit")
               인쇄할 때는 높이 기준이 없어지므로 inline-size로 바꾼다 (cqh → 인쇄 페이지 높이) */}
           <div className="seat-print-area flex min-h-[240px] w-full flex-1 justify-center pb-2 [container-type:size] print:[container-type:inline-size]">
