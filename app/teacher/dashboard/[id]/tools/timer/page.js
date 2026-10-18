@@ -118,7 +118,7 @@ export default function TimerPage() {
   const fg = level === null ? theme.fg : level >= 3 ? "#ffffff" : "#1f2937";
   const editable = !running;
 
-  const iconBtn = "flex h-10 w-10 items-center justify-center rounded-full transition hover:bg-black/10";
+  const iconBtn = "flex h-[clamp(28px,3.6cqw,40px)] w-[clamp(28px,3.6cqw,40px)] items-center justify-center rounded-full transition hover:bg-black/10";
 
   return (
     <div
@@ -146,7 +146,7 @@ export default function TimerPage() {
                   {count}
                 </button>
                 <button type="button" title="횟수 초기화" onClick={() => setCount(0)} className={iconBtn}>
-                  <ArrowPathIcon className="h-5 w-5" />
+                  <ArrowPathIcon className="h-[55%] w-[55%]" />
                 </button>
               </div>
             )}
@@ -156,13 +156,13 @@ export default function TimerPage() {
         {/* 오른쪽 위: 도구 */}
         <div className="absolute right-3 top-2 flex items-center gap-1">
           <button type="button" title={meter.active ? "소음 측정 끄기" : "소음 측정"} onClick={toggleMeter} className={`${iconBtn} ${meter.active ? "bg-black/15" : ""}`}>
-            <MicrophoneIcon className="h-6 w-6" />
+            <MicrophoneIcon className="h-[60%] w-[60%]" />
           </button>
           <button type="button" title="설정" onClick={() => setModalId("TIMER_SETTINGS")} className={iconBtn}>
-            <Cog6ToothIcon className="h-6 w-6" />
+            <Cog6ToothIcon className="h-[60%] w-[60%]" />
           </button>
           <button type="button" title={isFull ? "전체 화면 끝내기" : "전체 화면"} onClick={toggleFull} className={iconBtn}>
-            {isFull ? <ArrowsPointingInIcon className="h-6 w-6" /> : <ArrowsPointingOutIcon className="h-6 w-6" />}
+            {isFull ? <ArrowsPointingInIcon className="h-[60%] w-[60%]" /> : <ArrowsPointingOutIcon className="h-[60%] w-[60%]" />}
           </button>
           <button
             type="button"
@@ -170,7 +170,7 @@ export default function TimerPage() {
             onClick={() => setBoardPct((p) => (p > 0 ? 0 : BOARD_OPEN_PCT))}
             className={`${iconBtn} ${boardPct > 0 ? "bg-black/15" : ""}`}
           >
-            <PencilSquareIcon className="h-6 w-6" />
+            <PencilSquareIcon className="h-[60%] w-[60%]" />
           </button>
         </div>
 
@@ -187,7 +187,7 @@ export default function TimerPage() {
           />
         )}
 
-        <div className="flex flex-wrap items-center justify-center gap-2 text-[clamp(14px,2.4cqw,22px)]">
+        <div className="flex flex-nowrap items-center justify-center gap-[0.4em] whitespace-nowrap text-[min(2.2cqw,4.5cqh)]">
           {PRESETS.map((min) => (
             <button
               key={min}
