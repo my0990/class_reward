@@ -43,6 +43,8 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
               const userId = assignment[id];
               const s = userId ? students[userId] : null;
               const hidden = hiddenSeats?.has(id);
+              // 통로: 자리만 차지하는 빈 공간 (테두리·글자 없음)
+              if (!isDesk) return <div key={c} aria-hidden="true" style={cellStyle} className={`${cell} shrink-0`} />;
               return (
                 <button
                   type="button"
@@ -52,10 +54,10 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                   onClick={() => onSeatClick?.(id)}
                   style={cellStyle}
                   className={`${cell} flex flex-col items-center justify-center rounded-lg border-2 leading-tight transition
-                    ${!isDesk ? "border-dashed border-gray-200 bg-transparent text-gray-300" : hidden ? "border-orange-300 bg-orange-300 text-white" : s ? "border-orange-300 bg-orange-100 text-gray-800" : "border-orange-200 bg-white text-gray-400"}
+                    ${hidden ? "border-orange-300 bg-orange-300 text-white" : s ? "border-orange-300 bg-orange-100 text-gray-800" : "border-orange-200 bg-white text-gray-400"}
                     ${onSeatClick ? "cursor-pointer hover:scale-105" : "cursor-default"}`}
                 >
-                  {!isDesk ? "통로" : hidden ? <span className="text-[1.6em]">?</span> : s ? (
+                  {hidden ? <span className="text-[1.6em]">?</span> : s ? (
                     <>
                       <span className="text-[0.75em] text-orange-500">{s.classNumber}번</span>
                       <span className="max-w-full truncate px-1 font-bold">{s.profileNickname}</span>
