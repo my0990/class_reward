@@ -26,10 +26,10 @@ export default function TimeDisplay({ ms, editable, onChange, hideZeroHours = fa
                 const next = unit === "h" ? digits : String(Math.min(59, Number(digits || 0)));
                 onChange(replaceUnit(ms, unit, next));
               }}
-              className="w-[1.25em] rounded-lg bg-transparent text-center outline-none transition hover:bg-black/5 focus:bg-black/10"
+              className="w-[calc(2ch+0.3em)] rounded-lg bg-transparent px-0 text-center outline-none transition hover:bg-black/5 focus:bg-black/10"
             />
           ) : (
-            <span className="w-[1.25em] text-center">{pad2(v)}</span>
+            <span className="w-[calc(2ch+0.3em)] text-center">{pad2(v)}</span>
           )}
         </span>
       ))}
