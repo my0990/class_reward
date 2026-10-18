@@ -1,0 +1,80 @@
+"use client";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+/**
+ * 끝나는 시각(endAt)을 기준으로 남은 시간을 계산하는 타이머.
+ * - 초가 바뀔 때만 다시 그린다 (예전: 20ms마다 → 초당 50번)
+ * - 탭이 뒤로 가서 setTimeout이 늦어져도 시간이 밀리지 않는다
+ * status: idle(설정 중) | running | paused | done
+ */
+export function useCountdown({ initialMs = 5 * 60_000, onSecond, onDone } = {}) {
+  const [setMs, setSetMs] = useState(initialMs);
+  const [remainingMs, setRemainingMs] = useState(initialMs);
+  const [status, setStatus] = useState("idle");
+  const [runId, setRunId] = useState(0); // 원형 타이머 애니메이션을 처음부터 다시 그릴 때 바뀜
+
+  const endAtRef = useRef(0);
+  const lastSecRef = useRef(null);
+  const cbRef = useRef({});
+  cbRef.current = { onSecond, onDone };
+
+  useEffect(() => {
+    if (status !== "running") return undefined;
+    let timer;
+    const tick = () => {
+      const left = endAtRef.current - Date.now();
+      if (left <= 0) {
+        setRemainingMs(0);
+        setStatus("done");
+        cbRef.current.onDone?.();
+        return;
+      }
+      setRemainingMs(left);
+      const sec = Math.ceil(left / 1000);
+      if (sec !== lastSecRef.current) {
+        lastSecRef.current = sec;
+        cbRef.current.onSecond?.(sec);
+      }
+      timer = setTimeout(tick, (left % 1000) + 5); // 다음 초가 바뀌는 순간에 맞춰 깨어남
+    };
+    tick();
+    return () => clearTimeout(timer);
+  }, [status]);
+
+  const start = useCallback(() => {
+    if (status === "running") return;
+    const base = status === "done" ? setMs : remainingMs;
+    if (base <= 0) return;
+    endAtRef.current = Date.now() + base;
+    lastSecRef.current = Math.ceil(base / 1000);
+    if (status !== "paused") setRunId((n) => n + 1);
+    if (status === "done") setRemainingMs(base);
+    setStatus("running");
+  }, [status, setMs, remainingMs]);
+
+  const pause = useCallback(() => {
+    if (status !== "running") return;
+    setRemainingMs(Math.max(0, endAtRef.current - Date.now()));
+    setStatus("paused");
+  }, [status]);
+
+  const reset = useCallback(() => {
+    setStatus("idle");
+    setRemainingMs(setMs);
+    setRunId((n) => n + 1);
+  }, [setMs]);
+
+  /** 시간 바꾸기 (돌아가는 중에는 무시) */
+  const setTime = useCallback(
+    (ms) => {
+      if (status === "running") return;
+      setSetMs(ms);
+      setRemainingMs(ms);
+      setStatus("idle");
+      setRunId((n) => n + 1);
+    },
+    [status],
+  );
+
+  return { setMs, remainingMs, status, runId, start, pause, reset, setTime };
+}

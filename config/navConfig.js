@@ -92,11 +92,10 @@ export const teacherNav = [
         activeMatch: (pathname, id) => pathname === `/teacher/dashboard/${id}/tools/seat`,
       },
       {
-        key: "tool-quest",
+        key: "tool-timer",
         label: "타이머",
-        href: () => `https://my0990.github.io/decibel_meter/`,
-        newTab: true,                // ✅ 추가
-        activeMatch: () => false,    // 외부 링크라 active 없음
+        href: (id) => `/teacher/dashboard/${id}/tools/timer`,
+        activeMatch: (pathname, id) => pathname === `/teacher/dashboard/${id}/tools/timer`,
       },
     ],
   },
@@ -164,7 +163,7 @@ export const toolsMenu = [
   {
     key: "timer",
     label: "타이머",
-    href: () => "https://my0990.github.io/decibel_meter/",
+    href: ({ baseUrl }) => `${baseUrl}tools/timer`,
   },
   {
     key: "seat_old",
