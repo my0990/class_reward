@@ -9,7 +9,10 @@ export default function SettingsModal({ modalId, setModalId, settings, update })
     ["muteAlert", "소음 경고음 끄기"],
   ];
   return (
-    <ModalTemplate id="TIMER_SETTINGS" modalId={modalId} setModalId={setModalId} className="max-w-[420px]">
+    <ModalTemplate id="TIMER_SETTINGS" modalId={modalId} setModalId={setModalId} className="w-[420px] max-w-[95vw]">
+      {/* ModalTemplate의 children은 함수({ close }) 형태 */}
+      {() => (
+      <div className="p-6">
       <h2 className="mb-5 text-xl font-bold">타이머 설정</h2>
 
       <label className="mb-1 flex justify-between text-sm font-semibold">
@@ -54,6 +57,8 @@ export default function SettingsModal({ modalId, setModalId, settings, update })
       </div>
 
       <p className="mt-6 text-xs text-gray-400">스페이스바: 시작·일시정지</p>
+      </div>
+      )}
     </ModalTemplate>
   );
 }
