@@ -15,22 +15,23 @@ export default function TimeDisplay({ ms, editable, onChange, hideZeroHours = fa
       {units.map(([unit, v], i) => (
         <span key={unit} className="flex items-center">
           {i > 0 && <span className="-mx-[0.15em] pb-[0.08em]">:</span>}
-          {editable ? (
-            <input
-              aria-label={{ h: "시", m: "분", s: "초" }[unit]}
-              inputMode="numeric"
-              value={pad2(v)}
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => {
-                const digits = e.target.value.replace(/\D/g, "").slice(-2);
-                const next = unit === "h" ? digits : String(Math.min(59, Number(digits || 0)));
-                onChange(replaceUnit(ms, unit, next));
-              }}
-              className="w-[calc(2ch+0.3em)] rounded-lg bg-transparent px-0 text-center outline-none transition hover:bg-black/5 focus:bg-black/10"
-            />
-          ) : (
-            <span className="w-[calc(2ch+0.3em)] text-center">{pad2(v)}</span>
-          )}
+          {/* 멈춤·진행 모두 같은 input을 써서 높이·너비가 똑같다 (span↔input으로 바꾸면 줄 높이가 달라져 아래 버튼이 움직였음) */}
+          <input
+            aria-label={{ h: "시", m: "분", s: "초" }[unit]}
+            inputMode="numeric"
+            value={pad2(v)}
+            readOnly={!editable}
+            tabIndex={editable ? 0 : -1}
+            onFocus={(e) => editable && e.target.select()}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "").slice(-2);
+              const next = unit === "h" ? digits : String(Math.min(59, Number(digits || 0)));
+              onChange(replaceUnit(ms, unit, next));
+            }}
+            className={`w-[calc(2ch+0.3em)] rounded-lg bg-transparent p-0 text-center leading-none outline-none transition ${
+              editable ? "hover:bg-black/5 focus:bg-black/10" : "pointer-events-none"
+            }`}
+          />
         </span>
       ))}
     </div>
