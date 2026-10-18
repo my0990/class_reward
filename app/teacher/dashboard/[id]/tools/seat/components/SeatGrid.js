@@ -10,17 +10,21 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
   const teacher = view === "teacher";
   const rowOrder = teacher ? [...rows].reverse() : rows;
   const colOrder = teacher ? [...cols].reverse() : cols;
-  // fit: 부모(container-type:inline-size) 너비에 맞춰 칸 크기를 키운다 (최대 200px)
+  // fit: 부모(container-type:size)의 너비·높이 둘 다에 맞춰 칸 크기를 정한다 → 한 화면에 다 보임 (최대 200px)
+  // 세로 = 줄 수 × 칸 높이(0.66) + 줄 간격(0.08) + 교탁·간격(약 0.45) (모두 칸 너비 배율)
   const fit = size === "fit";
   const gapPx = (i) => (Math.min(colOrder[i], colOrder[i + 1]) % 2 === 0 ? 2 : 16);
   const gapTotal = cols.slice(0, -1).reduce((sum, i) => sum + gapPx(i), 0);
   const cell = fit ? "" : size === "sm" ? "h-[52px] w-[72px] text-[0.8rem]" : "h-[72px] w-[104px] text-[1rem]";
   const cellStyle = fit ? { width: "var(--cell)", height: "calc(var(--cell) * 0.66)", fontSize: "calc(var(--cell) * 0.16)" } : undefined;
-  const rootStyle = fit ? { "--cell": `min(200px, calc((100cqw - ${gapTotal}px) / ${layout.cols}))` } : undefined;
+  const heightUnits = layout.rows * 0.66 + (layout.rows - 1) * 0.08 + 0.45;
+  const rootStyle = fit
+    ? { "--cell": `min(200px, calc((100cqw - ${gapTotal}px) / ${layout.cols}), calc((100cqh - 8px) / ${heightUnits}))` }
+    : undefined;
 
   const desk = (
     <div
-      className={`mx-auto rounded-lg bg-amber-700 text-center font-bold text-white ${fit ? "" : "w-[220px] py-2"}`}
+      className={`mx-auto rounded-lg bg-amber-700 text-center font-bold text-white ${fit ? "leading-none" : "w-[220px] py-2"}`}
       style={fit ? { width: "calc(var(--cell) * 2)", padding: "calc(var(--cell) * 0.07) 0", fontSize: "calc(var(--cell) * 0.15)" } : undefined}
     >
       교탁

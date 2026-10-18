@@ -114,7 +114,7 @@ export default function SeatPage() {
 
   return (
     // 최소 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
-    <div className="mx-auto min-h-dvh w-full max-w-[1600px] px-4 py-6 print:min-h-0 sm:px-8">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[1600px] flex-col px-4 py-6 print:block print:min-h-0 sm:px-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div role="tablist" className="tabs tabs-boxed bg-orange-100">
           {tabs.map(([key, label]) => (
@@ -138,14 +138,15 @@ export default function SeatPage() {
       {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} layout={layout} students={students} />}
 
       {tab === "seat" && (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex min-h-0 flex-1 flex-col items-center gap-4">
           <p className="text-base text-gray-500 print:hidden">
             {current
               ? `지금 자리 (${new Date(plan.current.confirmedAt).toLocaleDateString("ko-KR")} 저장)`
               : "아직 정한 자리가 없습니다. 아래 '시작'을 눌러 보세요."}
           </p>
-          {/* 화면 너비에 맞춰 자리표를 크게 (SeatGrid size="fit") */}
-          <div className="seat-print-area flex w-full justify-center pb-2 [container-type:inline-size]">
+          {/* 남은 화면(너비·높이)에 맞춰 자리표 크기를 정한다 (SeatGrid size="fit")
+              인쇄할 때는 높이 기준이 없어지므로 inline-size로 바꾼다 (cqh → 인쇄 페이지 높이) */}
+          <div className="seat-print-area flex min-h-[240px] w-full flex-1 justify-center pb-2 [container-type:size] print:[container-type:inline-size]">
             <SeatGrid layout={layout} assignment={shown} students={byId} view={view} hiddenSeats={hiddenSeats} size="fit" />
           </div>
           <div className="print:hidden">
