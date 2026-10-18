@@ -3,8 +3,7 @@
 // view = "student"(교탁이 위, 학생이 칠판을 보는 방향) | "teacher"(교탁이 아래, 교탁에서 본 방향)
 import { seatId } from "@/util/seat/seatAlgorithm";
 
-// paintable: 교실 배치 편집용 (칸을 div로 그리고 data-seat를 달아 부모가 드래그로 칠한다)
-export default function SeatGrid({ layout, assignment = {}, students = {}, view = "student", onSeatClick, hiddenSeats, size = "md", paintable = false }) {
+export default function SeatGrid({ layout, assignment = {}, students = {}, view = "student", onSeatClick, hiddenSeats, size = "md" }) {
   const rows = [...Array(layout.rows).keys()];
   const cols = [...Array(layout.cols).keys()];
   const teacher = view === "teacher";
@@ -45,16 +44,16 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
               const s = userId ? students[userId] : null;
               const hidden = hiddenSeats?.has(id);
               return (
-                <Cell
+                <button
+                  type="button"
                   key={c}
-                  paintable={paintable}
                   data-seat={id}
                   disabled={!onSeatClick}
                   onClick={() => onSeatClick?.(id)}
                   style={cellStyle}
                   className={`${cell} flex flex-col items-center justify-center rounded-lg border-2 leading-tight transition
                     ${!isDesk ? "border-dashed border-gray-200 bg-transparent text-gray-300" : hidden ? "border-orange-300 bg-orange-300 text-white" : s ? "border-orange-300 bg-orange-100 text-gray-800" : "border-orange-200 bg-white text-gray-400"}
-                    ${paintable ? "cursor-pointer select-none" : onSeatClick ? "cursor-pointer hover:scale-105" : "cursor-default"}`}
+                    ${onSeatClick ? "cursor-pointer hover:scale-105" : "cursor-default"}`}
                 >
                   {!isDesk ? "통로" : hidden ? <span className="text-[1.6em]">?</span> : s ? (
                     <>
@@ -64,7 +63,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                   ) : (
                     "책상"
                   )}
-                </Cell>
+                </button>
               );
             })}
           </div>
@@ -80,13 +79,3 @@ export const seatLabel = (id) => {
   const [r, c] = String(id).split("-").map(Number);
   return `${r + 1}줄 ${c + 1}칸`;
 };
-
-// 편집(드래그) 모드는 div, 보통은 button
-function Cell({ paintable, disabled, onClick, children, ...rest }) {
-  if (paintable) return <div {...rest}>{children}</div>;
-  return (
-    <button type="button" disabled={disabled} onClick={onClick} {...rest}>
-      {children}
-    </button>
-  );
-}
