@@ -10,14 +10,27 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
   const teacher = view === "teacher";
   const rowOrder = teacher ? [...rows].reverse() : rows;
   const colOrder = teacher ? [...cols].reverse() : cols;
-  const cell = size === "sm" ? "h-[52px] w-[72px] text-[0.8rem]" : "h-[72px] w-[104px] text-[1rem]";
+  // fit: 부모(container-type:inline-size) 너비에 맞춰 칸 크기를 키운다 (최대 200px)
+  const fit = size === "fit";
+  const gapPx = (i) => (Math.min(colOrder[i], colOrder[i + 1]) % 2 === 0 ? 2 : 16);
+  const gapTotal = cols.slice(0, -1).reduce((sum, i) => sum + gapPx(i), 0);
+  const cell = fit ? "" : size === "sm" ? "h-[52px] w-[72px] text-[0.8rem]" : "h-[72px] w-[104px] text-[1rem]";
+  const cellStyle = fit ? { width: "var(--cell)", height: "calc(var(--cell) * 0.66)", fontSize: "calc(var(--cell) * 0.16)" } : undefined;
+  const rootStyle = fit ? { "--cell": `min(200px, calc((100cqw - ${gapTotal}px) / ${layout.cols}))` } : undefined;
 
-  const desk = <div className="mx-auto w-[220px] rounded-lg bg-amber-700 py-2 text-center font-bold text-white">교탁</div>;
+  const desk = (
+    <div
+      className={`mx-auto rounded-lg bg-amber-700 text-center font-bold text-white ${fit ? "" : "w-[220px] py-2"}`}
+      style={fit ? { width: "calc(var(--cell) * 2)", padding: "calc(var(--cell) * 0.07) 0", fontSize: "calc(var(--cell) * 0.15)" } : undefined}
+    >
+      교탁
+    </div>
+  );
 
   return (
-    <div className="inline-flex flex-col gap-4">
+    <div className={`inline-flex flex-col ${fit ? "gap-[calc(var(--cell)*0.12)]" : "gap-4"}`} style={rootStyle}>
       {!teacher && desk}
-      <div className="flex flex-col gap-2">
+      <div className={`flex flex-col ${fit ? "gap-[calc(var(--cell)*0.08)]" : "gap-2"}`}>
         {rowOrder.map((r) => (
           <div key={r} className="flex">
             {colOrder.map((c, i) => {
@@ -27,7 +40,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
               const s = userId ? students[userId] : null;
               const hidden = hiddenSeats?.has(id);
               // 짝(0-1, 2-3…) 사이는 붙이고, 짝과 짝 사이는 넓게
-              const gap = i < colOrder.length - 1 ? (Math.min(c, colOrder[i + 1]) % 2 === 0 ? "mr-[2px]" : "mr-[16px]") : "";
+              const gap = i < colOrder.length - 1 ? (gapPx(i) === 2 ? "mr-[2px]" : "mr-[16px]") : "";
               return (
                 <Cell
                   key={c}
@@ -35,11 +48,12 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                   data-seat={id}
                   disabled={!onSeatClick}
                   onClick={() => onSeatClick?.(id)}
+                  style={cellStyle}
                   className={`${cell} ${gap} flex flex-col items-center justify-center rounded-lg border-2 leading-tight transition
                     ${!isDesk ? "border-dashed border-gray-200 bg-transparent text-gray-300" : hidden ? "border-orange-300 bg-orange-300 text-white" : s ? "border-orange-300 bg-orange-100 text-gray-800" : "border-orange-200 bg-white text-gray-400"}
                     ${paintable ? "cursor-pointer select-none" : onSeatClick ? "cursor-pointer hover:scale-105" : "cursor-default"}`}
                 >
-                  {!isDesk ? "통로" : hidden ? <span className="text-2xl">?</span> : s ? (
+                  {!isDesk ? "통로" : hidden ? <span className="text-[1.6em]">?</span> : s ? (
                     <>
                       <span className="text-[0.75em] text-orange-500">{s.classNumber}번</span>
                       <span className="max-w-full truncate px-1 font-bold">{s.profileNickname}</span>

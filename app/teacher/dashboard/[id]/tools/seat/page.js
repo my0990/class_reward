@@ -114,7 +114,7 @@ export default function SeatPage() {
 
   return (
     // 최소 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
-    <div className="page-width min-h-dvh py-6 print:min-h-0">
+    <div className="mx-auto min-h-dvh w-full max-w-[1600px] px-4 py-6 print:min-h-0 sm:px-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div role="tablist" className="tabs tabs-boxed bg-orange-100">
           {tabs.map(([key, label]) => (
@@ -123,9 +123,13 @@ export default function SeatPage() {
             </button>
           ))}
         </div>
-        {tab !== "seat" && (
+        {tab !== "seat" ? (
           <button type="button" className={`${btn} bg-orange-500 text-white`} disabled={busy} onClick={onSaveSetup}>
             {busy ? "저장 중..." : "배치·조건 저장"}
+          </button>
+        ) : (
+          <button type="button" className={`${btn} bg-white text-gray-600`} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => window.print()}>
+            🖨 인쇄
           </button>
         )}
       </div>
@@ -135,25 +139,23 @@ export default function SeatPage() {
 
       {tab === "seat" && (
         <div className="flex flex-col items-center gap-4">
-          <p className="text-sm text-gray-500 print:hidden">
+          <p className="text-base text-gray-500 print:hidden">
             {current
               ? `지금 자리 (${new Date(plan.current.confirmedAt).toLocaleDateString("ko-KR")} 저장)`
               : "아직 정한 자리가 없습니다. 아래 '시작'을 눌러 보세요."}
           </p>
-          <div className="seat-print-area max-w-full overflow-x-auto pb-2">
-            <SeatGrid layout={layout} assignment={shown} students={byId} view={view} hiddenSeats={hiddenSeats} />
+          {/* 화면 너비에 맞춰 자리표를 크게 (SeatGrid size="fit") */}
+          <div className="seat-print-area flex w-full justify-center pb-2 [container-type:inline-size]">
+            <SeatGrid layout={layout} assignment={shown} students={byId} view={view} hiddenSeats={hiddenSeats} size="fit" />
           </div>
-          <div className="flex items-center gap-2 print:hidden">
+          <div className="print:hidden">
             <button
               type="button"
-              className="btn border-0 bg-orange-500 px-10 text-lg text-white hover:bg-orange-600"
+              className="btn btn-lg border-0 bg-orange-500 px-16 text-xl text-white hover:bg-orange-600"
               disabled={busy || Boolean(hiddenSeats)}
               onClick={onStart}
             >
               {busy ? "섞는 중..." : "시작"}
-            </button>
-            <button type="button" className={`${btn} bg-white text-gray-600`} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => window.print()}>
-              🖨 인쇄
             </button>
           </div>
         </div>
