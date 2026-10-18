@@ -1,5 +1,7 @@
 "use client";
-// 도구 > 자리 바꾸기: [자리 바꾸기] 섞기·확정·인쇄 / [교실 배치] / [조건]
+// 도구 > 자리 바꾸기: [자리 바꾸기] 시작(섞기+자동 저장)·인쇄 / [교실 배치] / [조건]
+// '시작'을 누르면 바로 저장된다. 이 화면에 들어온 뒤 두 번째부터는 다시 섞기로 보고
+// 기록(history)에 남기지 않으며, '지난 짝 피하기'도 들어오기 전 자리를 기준으로 한다.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { mutate } from "swr";
@@ -23,11 +25,13 @@ export default function SeatPage() {
   const [tab, setTab] = useState("seat");
   const [layout, setLayout] = useState(null);
   const [rules, setRules] = useState(EMPTY_RULES);
-  const [draft, setDraft] = useState(null); // 섞었지만 아직 확정 안 한 자리
+  const [draft, setDraft] = useState(null); // 방금 섞은 자리 (공개 애니메이션용)
   const [revealed, setRevealed] = useState(Infinity);
-  const [view, setView] = useState("student");
+  const view = "student"; // 학생 시점 (교탁이 위)
   const [busy, setBusy] = useState(false);
   const timer = useRef(null);
+  const baseRef = useRef(undefined); // 이 화면에 들어올 때의 자리 (다시 섞어도 이걸 기준으로)
+  const shuffledOnce = useRef(false); // 이 화면에서 이미 한 번 섞었나 (두 번째부터는 기록에 안 남김)
 
   const students = useMemo(() => (studentList ?? []).filter((s) => s.role !== "teacher"), [studentList]);
   const byId = useMemo(() => Object.fromEntries(students.map((s) => [s.userId, s])), [students]);
@@ -38,6 +42,7 @@ export default function SeatPage() {
     setLayout(plan?.layout ?? makeLayout(Math.max(1, Math.ceil(students.length / 6)), 6));
     setRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) });
     if (!plan?.layout) setTab("layout"); // 처음이면 교실 배치부터 (표 만들기처럼 크기 고르기)
+    baseRef.current = plan?.current?.assignment ?? null;
   }, [plan, studentList, students.length, layout]);
 
   useEffect(() => () => clearInterval(timer.current), []);
@@ -50,24 +55,15 @@ export default function SeatPage() {
   const order = deskSeats(layout).filter((s) => shown[s]);
   const hiddenSeats = draft && revealed < order.length ? new Set(order.slice(revealed)) : null;
 
-  const shuffle = (animate) => {
+  const reveal = (assignment) => {
     clearInterval(timer.current);
-    const res = assignSeats(students.map((s) => s.userId), layout, rules, { prevAssignment: current });
-    if (!res.ok) {
-      toast.error(res.reason);
-      return;
-    }
-    setDraft(res.assignment);
-    if (!animate) {
-      setRevealed(Infinity);
-      return;
-    }
+    setDraft(assignment);
     setRevealed(0);
     let n = 0;
     timer.current = setInterval(() => {
       n += 1;
       setRevealed(n);
-      if (n >= Object.keys(res.assignment).length) clearInterval(timer.current);
+      if (n >= Object.keys(assignment).length) clearInterval(timer.current);
     }, REVEAL_MS);
   };
 
@@ -96,14 +92,17 @@ export default function SeatPage() {
       toast.success("저장했습니다.");
     });
 
-  const onConfirm = () =>
+  // 시작: 섞고 → 바로 저장 → 한 자리씩 공개
+  const onStart = () =>
     run(async () => {
-      await saveSetup(); // 확정할 때 쓴 배치·조건도 함께 저장
-      const res = await confirmSeats({ classId, assignment: draft });
-      if (!res?.result) throw new Error(res?.message);
+      const res = assignSeats(students.map((s) => s.userId), layout, rules, { prevAssignment: baseRef.current });
+      if (!res.ok) throw new Error(res.reason);
+      await saveSetup(); // 쓴 배치·조건도 함께 저장
+      const saved = await confirmSeats({ classId, assignment: res.assignment, replace: shuffledOnce.current });
+      if (!saved?.result) throw new Error(saved?.message);
+      shuffledOnce.current = true;
+      reveal(res.assignment);
       await mutate(planKey);
-      setDraft(null);
-      toast.success(res.message);
     });
 
   const tabs = [
@@ -136,26 +135,26 @@ export default function SeatPage() {
 
       {tab === "seat" && (
         <div className="flex flex-col items-center gap-4">
-          <div className="flex flex-wrap items-center justify-center gap-2 print:hidden">
-            <button type="button" className={`${btn} bg-orange-500 text-white`} onClick={() => shuffle(true)}>🎲 섞기</button>
-            <button type="button" className={`${btn} bg-orange-100 text-orange-700`} onClick={() => shuffle(false)}>바로 보기</button>
-            <button type="button" className={`${btn} bg-green-600 text-white`} disabled={!draft || busy || Boolean(hiddenSeats)} onClick={onConfirm}>
-              {busy ? "저장 중..." : "이대로 확정"}
-            </button>
-            <button type="button" className={`${btn} bg-white text-gray-600`} onClick={() => setView((v) => (v === "student" ? "teacher" : "student"))}>
-              {view === "student" ? "학생 시점 (교탁 위)" : "교사 시점 (교탁 아래)"} ↔
-            </button>
-            <button type="button" className={`${btn} bg-white text-gray-600`} disabled={!order.length} onClick={() => window.print()}>🖨 인쇄</button>
-          </div>
           <p className="text-sm text-gray-500 print:hidden">
-            {draft
-              ? "섞은 결과입니다. '이대로 확정'을 눌러야 저장됩니다."
-              : current
-                ? `지금 자리 (${new Date(plan.current.confirmedAt).toLocaleDateString("ko-KR")} 확정)`
-                : "아직 확정한 자리가 없습니다. '섞기'를 눌러 보세요."}
+            {current
+              ? `지금 자리 (${new Date(plan.current.confirmedAt).toLocaleDateString("ko-KR")} 저장)`
+              : "아직 정한 자리가 없습니다. 아래 '시작'을 눌러 보세요."}
           </p>
           <div className="seat-print-area max-w-full overflow-x-auto pb-2">
             <SeatGrid layout={layout} assignment={shown} students={byId} view={view} hiddenSeats={hiddenSeats} />
+          </div>
+          <div className="flex items-center gap-2 print:hidden">
+            <button
+              type="button"
+              className="btn border-0 bg-orange-500 px-10 text-lg text-white hover:bg-orange-600"
+              disabled={busy || Boolean(hiddenSeats)}
+              onClick={onStart}
+            >
+              {busy ? "섞는 중..." : "시작"}
+            </button>
+            <button type="button" className={`${btn} bg-white text-gray-600`} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => window.print()}>
+              🖨 인쇄
+            </button>
           </div>
         </div>
       )}

@@ -56,6 +56,19 @@ describe("자리 바꾸기 저장", () => {
     expect(saved.history[0].confirmedAt).toEqual(new Date(2026, 0, SEAT_HISTORY_MAX + 1)); // 최신이 앞
   });
 
+  it("다시 섞기(replace)는 지금 자리만 바꾸고 기록에 넣지 않음", async () => {
+    await saveSeatSetupService({ ...args, layout: makeLayout(2, 2), rules: {} });
+    const a = { "0-0": "a", "0-1": "b", "1-0": "c" };
+    const b = { "0-0": "b", "0-1": "c", "1-0": "a" };
+    await confirmSeatsService({ ...args, assignment: a, now: new Date(2026, 0, 1) });
+    await confirmSeatsService({ ...args, assignment: b, now: new Date(2026, 0, 2) }); // 새 자리 → a는 기록으로
+    await confirmSeatsService({ ...args, assignment: a, replace: true, now: new Date(2026, 0, 3) }); // 다시 섞기
+    const saved = await plan();
+    expect(saved.current.assignment).toEqual(a);
+    expect(saved.history).toHaveLength(1);
+    expect(saved.history[0].confirmedAt).toEqual(new Date(2026, 0, 1));
+  });
+
   it("교실 배치 없이 확정하면 안내", async () => {
     expect((await confirmSeatsService({ ...args, assignment: {} })).message).toMatch(/교실 배치/);
   });

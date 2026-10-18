@@ -68,7 +68,11 @@ export async function saveSeatSetupService({ teacher_id, classId, layout, rules,
 }
 
 /** 자리 확정: 지금 자리를 기록으로 옮기고 새 자리를 저장 */
-export async function confirmSeatsService({ teacher_id, classId, assignment, now = new Date() }) {
+/**
+ * 자리 저장. replace=true면 지금 자리만 바꾸고 기록(history)에는 넣지 않는다
+ * (같은 시간에 '시작'을 여러 번 눌러 다시 섞을 때 기록이 버린 결과로 채워지지 않게)
+ */
+export async function confirmSeatsService({ teacher_id, classId, assignment, replace = false, now = new Date() }) {
   const db = (await connectDB).db("data");
   const scope = scopeOf(teacher_id, classId);
   const doc = await db.collection("class_data").findOne(scope, { projection: { seatPlan: 1 } });
@@ -90,7 +94,9 @@ export async function confirmSeatsService({ teacher_id, classId, assignment, now
   }
   if (used.size !== ids.size) return { ok: false, message: "자리가 없는 학생이 있어요. 다시 섞어 주세요." };
 
-  const history = doc.seatPlan?.current ? [doc.seatPlan.current, ...(doc.seatPlan.history ?? [])].slice(0, SEAT_HISTORY_MAX) : doc.seatPlan?.history ?? [];
+  const prevHistory = doc.seatPlan?.history ?? [];
+  const history =
+    doc.seatPlan?.current && !replace ? [doc.seatPlan.current, ...prevHistory].slice(0, SEAT_HISTORY_MAX) : prevHistory;
   await db.collection("class_data").updateOne(scope, {
     $set: { "seatPlan.current": { assignment: clean, confirmedAt: now }, "seatPlan.history": history, "seatPlan.updatedAt": now },
   });
