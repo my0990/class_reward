@@ -8,7 +8,7 @@ export default function TimeDisplay({ ms, editable, onChange, hideZeroHours = fa
     ["h", h],
     ["m", m],
     ["s", s],
-  ].filter(([u, v]) => u !== "h" || v > 0 || (editable && !hideZeroHours)); // 0시간은 고칠 때만 보임
+  ].filter(([u, v]) => !hideZeroHours || u !== "h" || v > 0); // 시작·정지와 상관없이 같은 자리 유지
 
   return (
     <div className={`flex items-center justify-center font-bold tabular-nums leading-none ${className}`}>
