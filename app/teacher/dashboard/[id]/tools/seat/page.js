@@ -114,7 +114,8 @@ export default function SeatPage() {
   const btn = "btn btn-sm border-0";
 
   return (
-    <div className="page-width py-6">
+    // 최소 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
+    <div className="page-width min-h-dvh py-6 print:min-h-0">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div role="tablist" className="tabs tabs-boxed bg-orange-100">
           {tabs.map(([key, label]) => (
