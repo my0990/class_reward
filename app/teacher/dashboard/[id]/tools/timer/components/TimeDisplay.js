@@ -14,7 +14,7 @@ export default function TimeDisplay({ ms, editable, onChange, hideZeroHours = fa
     <div className={`flex items-center justify-center font-bold tabular-nums leading-none ${className}`}>
       {units.map(([unit, v], i) => (
         <span key={unit} className="flex items-center">
-          {i > 0 && <span className="px-[0.05em] pb-[0.08em]">:</span>}
+          {i > 0 && <span className="-mx-[0.15em] pb-[0.08em]">:</span>}
           {editable ? (
             <input
               aria-label={{ h: "시", m: "분", s: "초" }[unit]}
