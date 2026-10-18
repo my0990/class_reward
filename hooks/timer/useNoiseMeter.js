@@ -1,12 +1,13 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { rawNoise, smoothNoise } from "@/util/timer/timerMath";
+import { VOICE_BAND, rawNoise, smoothNoise, voiceWeights } from "@/util/timer/timerMath";
 
 /**
  * 마이크 소음 측정.
  * - 측정은 requestAnimationFrame + ref로 하고, 화면 값은 0.1초에 한 번·값이 바뀔 때만 갱신
  * - 끄거나 페이지를 나가면 마이크(트랙)와 AudioContext를 반드시 닫는다
  *   (예전: 닫지 않아 마이크 표시등이 계속 켜져 있었음)
+ * - 목소리 구간(300~4000Hz)만, 사람 귀 감도(A 가중치)로 센다 → 바람·에어컨 소리에 덜 반응
  * - 100을 넘으면 onLoud (5초에 한 번까지)
  */
 export function useNoiseMeter({ sensitivity = 50, onLoud } = {}) {
@@ -47,9 +48,17 @@ export function useNoiseMeter({ sensitivity = 50, onLoud } = {}) {
       return;
     }
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // 마이크 → 낮은 소리 거르기 → 높은 소리 거르기 → 분석
+    const highpass = ctx.createBiquadFilter();
+    highpass.type = "highpass";
+    highpass.frequency.value = VOICE_BAND.low;
+    const lowpass = ctx.createBiquadFilter();
+    lowpass.type = "lowpass";
+    lowpass.frequency.value = VOICE_BAND.high;
     const analyser = ctx.createAnalyser();
-    ctx.createMediaStreamSource(stream).connect(analyser);
+    ctx.createMediaStreamSource(stream).connect(highpass).connect(lowpass).connect(analyser);
     const buf = new Uint8Array(analyser.frequencyBinCount);
+    const weights = voiceWeights(analyser.frequencyBinCount, ctx.sampleRate);
 
     const s = { stream, ctx, smooth: 0, last: performance.now(), shown: -1, shownAt: 0, loudAt: 0, raf: 0 };
     stateRef.current = s;
@@ -58,7 +67,7 @@ export function useNoiseMeter({ sensitivity = 50, onLoud } = {}) {
       analyser.getByteFrequencyData(buf);
       const dt = Math.min(now - s.last, 200);
       s.last = now;
-      s.smooth = smoothNoise(s.smooth, rawNoise(buf, sensRef.current), dt);
+      s.smooth = smoothNoise(s.smooth, rawNoise(buf, sensRef.current, weights), dt);
       const v = Math.round(s.smooth);
       if (v !== s.shown && now - s.shownAt >= 100) {
         s.shown = v;

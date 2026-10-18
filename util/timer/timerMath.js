@@ -26,11 +26,45 @@ export function noiseLevel(value) {
   return 0;
 }
 
-/** 소음 측정값: 주파수 막대(0~255) 합 / 10000 × 민감도 (예전 계산식 그대로) */
-export function rawNoise(freqBytes, sensitivity) {
+/** 목소리 구간: 이 밖(바람·에어컨 웅웅거림, 아주 높은 소리)은 세지 않는다 */
+export const VOICE_BAND = { low: 300, high: 4000 };
+
+/** A 가중치(사람 귀 감도) 배율. 1kHz = 1, 낮은 소리일수록 작아진다 */
+export function aWeight(f) {
+  const f2 = f * f;
+  const ra =
+    (12194 ** 2 * f2 * f2) /
+    ((f2 + 20.6 ** 2) * Math.sqrt((f2 + 107.7 ** 2) * (f2 + 737.9 ** 2)) * (f2 + 12194 ** 2));
+  return Math.pow(10, (20 * Math.log10(ra) + 2.0) / 20);
+}
+
+/** 주파수 막대마다의 비중 (목소리 구간 밖은 0) — 측정 시작할 때 한 번만 계산 */
+export function voiceWeights(binCount, sampleRate) {
+  const binHz = sampleRate / 2 / binCount;
+  const w = new Float32Array(binCount);
+  for (let i = 0; i < binCount; i++) {
+    const f = (i + 0.5) * binHz;
+    w[i] = f >= VOICE_BAND.low && f <= VOICE_BAND.high ? aWeight(f) : 0;
+  }
+  return w;
+}
+
+/**
+ * 소음 측정값 = 목소리 구간 막대(0~255)의 가중 평균 × 0.1024 × 민감도
+ * 0.1024는 예전 계산식(전체 1024개 막대 합 / 10000 × 민감도)과
+ * 고르게 퍼진 소리에서 같은 숫자가 나오게 맞춘 값.
+ * 비중을 안 주면 예전처럼 모든 막대를 똑같이 센다.
+ */
+export function rawNoise(freqBytes, sensitivity, weights) {
   let sum = 0;
-  for (let i = 0; i < freqBytes.length; i++) sum += freqBytes[i];
-  return (sum / 10000) * sensitivity;
+  let wsum = 0;
+  for (let i = 0; i < freqBytes.length; i++) {
+    const w = weights ? weights[i] : 1;
+    sum += freqBytes[i] * w;
+    wsum += w;
+  }
+  if (!wsum) return 0;
+  return (sum / wsum) * 0.1024 * sensitivity;
 }
 
 /**
