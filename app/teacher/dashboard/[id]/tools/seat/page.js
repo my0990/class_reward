@@ -50,8 +50,8 @@ export default function SeatPage() {
   if (l1 || l2 || !layout) return <div className="p-8">불러오는 중...</div>;
   if (e1 || e2) return <div className="p-8">데이터를 불러오지 못했습니다.</div>;
 
-  const current = plan?.current?.assignment ?? null;
-  const shown = draft ?? current ?? {};
+  // 처음 들어오면 이름 없이 빈 책상만 → '시작'을 눌러야 이름이 나온다 (지난 자리는 저장만 되어 있음)
+  const shown = draft ?? {};
   const order = deskSeats(layout).filter((s) => shown[s]);
   const hiddenSeats = draft && revealed < order.length ? new Set(order.slice(revealed)) : null;
 
