@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { setupTestMongo, makeScope, seedStudent, seedClassData } from "@/test/helpers/testMongo";
 
 vi.mock("@/lib/mongodb", async () => (await import("@/test/helpers/testMongo")).mongodbMock);
-const { saveSeatSetupService, confirmSeatsService, SEAT_HISTORY_MAX } = await import("./seat.service.js");
+const { saveSeatSetupService, confirmSeatsService, deleteSeatRecordService, SEAT_HISTORY_MAX } = await import("./seat.service.js");
 const { makeLayout } = await import("@/util/seat/seatAlgorithm.js");
 
 const mongo = setupTestMongo();
@@ -103,6 +103,26 @@ describe("자리 바꾸기 저장", () => {
     expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a", "0-1": "b" } })).ok).toBe(true);
     expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a", "0-1": "b", "1-0": "c" } })).ok).toBe(false); // 뺀 학생이 들어 있음
     expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a" } })).ok).toBe(false); // b 빠짐
+  });
+
+  it("기록 지우기: 지난 자리는 빠지고, 지금 자리를 지우면 가장 최근 지난 자리가 지금 자리로", async () => {
+    await saveSeatSetupService({ ...args, layout: makeLayout(2, 2), rules: {} });
+    const a = { "0-0": "a", "0-1": "b", "1-0": "c" };
+    const d = (n) => new Date(2026, 0, n);
+    for (const n of [1, 2, 3]) await confirmSeatsService({ ...args, assignment: a, now: d(n) });
+    expect((await plan()).current.layout).toEqual(makeLayout(2, 2)); // 저장할 때 배치도 같이
+
+    expect((await deleteSeatRecordService({ ...args, at: d(1).toISOString() })).ok).toBe(true);
+    let p = await plan();
+    expect(p.history.map((r) => r.confirmedAt)).toEqual([d(2)]);
+
+    await deleteSeatRecordService({ ...args, at: d(3).toISOString() }); // 지금 자리
+    p = await plan();
+    expect(p.current.confirmedAt).toEqual(d(2));
+    expect(p.history).toEqual([]);
+
+    expect((await deleteSeatRecordService({ ...args, at: d(9).toISOString() })).ok).toBe(false);
+    expect((await deleteSeatRecordService({ ...args, at: "이상한 값" })).ok).toBe(false);
   });
 
   it("교실 배치 없이 확정하면 안내", async () => {

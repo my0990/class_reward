@@ -3,8 +3,8 @@
 // seatPlan = {
 //   layout: { rows, cols, desks },          교실 배치
 //   rules: { fixed, groups, apart, avoidPrevPartner, excluded },   excluded: 자리 바꾸기에서 뺀 학생 userId   (예전 front는 저장할 때 '앞자리' 그룹으로 바뀜)
-//   current: { assignment, confirmedAt } | null,   지금 자리
-//   history: [{ assignment, confirmedAt }],        지난 자리 (최근 5번, 최신이 앞)
+//   current: { assignment, layout, confirmedAt } | null,   지금 자리 (layout: 저장할 때의 책상 배치, 예전 기록엔 없음)
+//   history: [{ assignment, layout, confirmedAt }],        지난 자리 (최근 5번, 최신이 앞)
 //   updatedAt
 // }
 // 권한 확인(authorizeTeacherClass)은 action에서 한다.
@@ -118,7 +118,33 @@ export async function confirmSeatsService({ teacher_id, classId, assignment, rep
   const history =
     doc.seatPlan?.current && !replace ? [doc.seatPlan.current, ...prevHistory].slice(0, SEAT_HISTORY_MAX) : prevHistory;
   await db.collection("class_data").updateOne(scope, {
-    $set: { "seatPlan.current": { assignment: clean, confirmedAt: now }, "seatPlan.history": history, "seatPlan.updatedAt": now },
+    $set: { "seatPlan.current": { assignment: clean, layout, confirmedAt: now }, "seatPlan.history": history, "seatPlan.updatedAt": now },
+  });
+  return { ok: true };
+}
+
+/**
+ * 저장한 자리 기록 하나 지우기 (at = confirmedAt ISO 문자열)
+ * 지금 자리를 지우면 가장 최근 지난 자리가 지금 자리가 된다 ('지난 옆자리 피하기' 기준도 그걸로)
+ */
+export async function deleteSeatRecordService({ teacher_id, classId, at, now = new Date() }) {
+  const time = new Date(at);
+  if (!at || Number.isNaN(time.getTime())) return { ok: false, message: "잘못된 요청입니다." };
+  const db = (await connectDB).db("data");
+  const scope = scopeOf(teacher_id, classId);
+  const doc = await db.collection("class_data").findOne(scope, { projection: { seatPlan: 1 } });
+  if (!doc) return { ok: false, message: "학급 정보를 찾을 수 없습니다." };
+
+  const same = (r) => r?.confirmedAt && new Date(r.confirmedAt).getTime() === time.getTime();
+  const current = doc.seatPlan?.current ?? null;
+  const history = doc.seatPlan?.history ?? [];
+  let next;
+  if (same(current)) next = { current: history[0] ?? null, history: history.slice(1) };
+  else if (history.some(same)) next = { current, history: history.filter((r) => !same(r)) };
+  else return { ok: false, message: "이미 지워진 기록이에요." };
+
+  await db.collection("class_data").updateOne(scope, {
+    $set: { "seatPlan.current": next.current, "seatPlan.history": next.history, "seatPlan.updatedAt": now },
   });
   return { ok: true };
 }

@@ -11,7 +11,7 @@ import { toast } from "react-hot-toast";
 import { Cog6ToothIcon, PrinterIcon } from "@heroicons/react/24/outline";
 import { useFetchData } from "@/hooks/useFetchData";
 import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
-import { saveSeatSetup, confirmSeats } from "@/server-action/actions/seat/seat.action";
+import { saveSeatSetup, confirmSeats, deleteSeatRecord } from "@/server-action/actions/seat/seat.action";
 import SeatGrid from "./components/SeatGrid";
 import PrintPreviewModal, { PRINT_PREVIEW_ID } from "./components/PrintPreviewModal";
 import SeatSettingsModal, { SEAT_SETTINGS_ID } from "./components/SeatSettingsModal";
@@ -167,6 +167,15 @@ export default function SeatPage() {
       toast.success("이 자리로 저장했어요.");
     });
 
+  // 기록 지우기 (설정 창 > 기록)
+  const onDeleteRecord = (at) =>
+    run(async () => {
+      const res = await deleteSeatRecord({ classId, at });
+      if (!res?.result) throw new Error(res?.message);
+      await mutate(planKey);
+      toast.success(res.message);
+    });
+
   // 화면 자리표를 고른 방향으로 바꾼 뒤 인쇄하고, 끝나면 되돌린다
   const onPrint = () => {
     setPrinting(true);
@@ -242,6 +251,9 @@ export default function SeatPage() {
         rules={rules}
         setRules={editRules}
         students={students}
+        plan={plan}
+        onDeleteRecord={onDeleteRecord}
+        busy={busy}
       />
     </div>
   );

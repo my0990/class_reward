@@ -1,7 +1,7 @@
 "use server";
 
 import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
-import { saveSeatSetupService, confirmSeatsService } from "@/server-action/service/seat/seat.service";
+import { saveSeatSetupService, confirmSeatsService, deleteSeatRecordService } from "@/server-action/service/seat/seat.service";
 
 /** 교실 배치·조건 저장 */
 export async function saveSeatSetup({ classId, layout, rules }) {
@@ -26,5 +26,18 @@ export async function confirmSeats({ classId, assignment, replace = false }) {
   } catch (error) {
     console.error("confirmSeats error:", error);
     return { result: false, message: "자리를 저장하지 못했습니다." };
+  }
+}
+
+/** 저장한 자리 기록 지우기 */
+export async function deleteSeatRecord({ classId, at }) {
+  try {
+    const auth = await authorizeTeacherClass(classId);
+    if (!auth.ok) return { result: false, message: auth.message };
+    const res = await deleteSeatRecordService({ teacher_id: auth.teacher_id, classId, at });
+    return res.ok ? { result: true, message: "기록을 지웠어요." } : { result: false, message: res.message };
+  } catch (error) {
+    console.error("deleteSeatRecord error:", error);
+    return { result: false, message: "기록을 지우지 못했습니다." };
   }
 }

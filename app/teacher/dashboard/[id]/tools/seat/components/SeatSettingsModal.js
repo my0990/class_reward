@@ -1,11 +1,12 @@
 "use client";
-// 설정 창: [책상 배치] · [학생] · [조건] · [그룹] 탭. 바꾼 내용은 페이지가 자동 저장한다.
+// 설정 창: [책상 배치] · [학생] · [조건] · [그룹] · [기록] 탭. 바꾼 내용은 페이지가 자동 저장한다.
 import { useState } from "react";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import LayoutEditor from "./LayoutEditor";
 import RulesEditor from "./RulesEditor";
 import GroupEditor from "./GroupEditor";
 import StudentsEditor from "./StudentsEditor";
+import HistoryEditor from "./HistoryEditor";
 
 export const SEAT_SETTINGS_ID = "SEAT_SETTINGS";
 
@@ -14,9 +15,10 @@ const tabs = [
   ["students", "학생"],
   ["rules", "조건"],
   ["groups", "그룹"],
+  ["history", "기록"],
 ];
 
-export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, setLayout, rules, setRules, students }) {
+export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, setLayout, rules, setRules, students, plan, onDeleteRecord, busy }) {
   const [tab, setTab] = useState("layout"); // 창을 닫았다 열어도 마지막 탭 유지
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
   const name = (u) => (byId[u] ? `${byId[u].classNumber}. ${byId[u].profileNickname}` : u);
@@ -47,6 +49,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
               <GroupEditor groups={rules.groups ?? []} setGroups={(groups) => setRules({ ...rules, groups })} layout={layout} students={students} name={name} />
             </div>
           )}
+          {tab === "history" && <HistoryEditor plan={plan} layout={layout} studentsById={byId} onDelete={onDeleteRecord} busy={busy} />}
           </div>
           <p className="mt-5 text-center text-xs text-gray-400">바꾼 내용은 자동으로 저장됩니다.</p>
         </div>
