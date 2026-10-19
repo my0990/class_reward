@@ -95,7 +95,7 @@ export default function Board({ storageKey }) {
         onInput={() => save()}
         onPaste={onPaste}
         data-placeholder="여기에 쓰세요"
-        className="flex-1 overflow-auto whitespace-pre-wrap break-words p-6 font-semibold leading-snug text-white outline-none empty:before:text-white/30 empty:before:content-[attr(data-placeholder)]"
+        className="board-cursor flex-1 overflow-auto whitespace-pre-wrap break-words p-6 font-semibold leading-snug text-white outline-none empty:before:text-white/30 empty:before:content-[attr(data-placeholder)]"
         style={{ fontSize: SIZES[sizeIdx] }}
       />
     </div>

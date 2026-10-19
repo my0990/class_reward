@@ -21,6 +21,7 @@ import { playCountdown, playDone, playLoud, unlockSound } from "@/util/timer/sou
 import TimeDisplay from "./components/TimeDisplay";
 import CircleTimer from "./components/CircleTimer";
 import SettingsModal from "./components/SettingsModal";
+import { BIG_CURSOR_CSS, useBigCursor } from "./components/useBigCursor";
 
 // 판서판은 열 때만 내려받는다
 const Board = dynamic(() => import("./components/Board"), {
@@ -39,6 +40,7 @@ export default function TimerPage() {
   const [boardPct, setBoardPct] = useState(0);
   const [isFull, setIsFull] = useState(false);
   const wrapRef = useRef(null);
+  const cursor = useBigCursor({ highlight: settings.pointerHighlight });
 
   const timer = useCountdown({
     onSecond: (sec) => sec <= 3 && playCountdown(),
@@ -123,7 +125,8 @@ export default function TimerPage() {
   return (
     <div
       ref={wrapRef}
-      className="flex select-none overflow-hidden"
+      className={`flex select-none overflow-hidden ${cursor.className}`}
+      {...cursor.handlers}
       // 화면 높이 그대로 → 아래로 스크롤하면 헤더가 올라가 타이머만 화면을 채운다
       style={{ height: isFull ? "100vh" : "max(100dvh, 420px)" }}
     >
@@ -221,7 +224,7 @@ export default function TimerPage() {
       <div
         onPointerDown={onDividerDown}
         title="끌어서 판서판 열기"
-        className="flex w-3 shrink-0 cursor-col-resize items-center justify-center bg-gray-200 hover:bg-gray-300"
+        className="resize-cursor flex w-3 shrink-0 cursor-col-resize items-center justify-center bg-gray-200 hover:bg-gray-300"
       >
         <span className="h-10 w-1 rounded-full bg-gray-400" />
       </div>
@@ -231,6 +234,8 @@ export default function TimerPage() {
         </div>
       )}
 
+      <style>{BIG_CURSOR_CSS}</style>
+      {cursor.dot}
       <SettingsModal modalId={modalId} setModalId={setModalId} settings={settings} update={update} />
     </div>
   );

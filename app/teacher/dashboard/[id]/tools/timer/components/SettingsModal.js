@@ -7,6 +7,7 @@ export default function SettingsModal({ modalId, setModalId, settings, update })
     ["circle", "원형 타이머로 보기"],
     ["hideCount", "소음 횟수 숨기기"],
     ["muteAlert", "소음 경고음 끄기"],
+    ["pointerHighlight", "마우스 강조 원 (가리킬 때)"],
   ];
   return (
     <ModalTemplate id="TIMER_SETTINGS" modalId={modalId} setModalId={setModalId} className="w-[420px] max-w-[95vw]">

@@ -8,6 +8,7 @@ export const TIMER_DEFAULTS = {
   hideCount: false, // 소음 횟수 숨기기
   muteAlert: false, // 소음 경고음 끄기
   circle: false, // 원형 타이머
+  pointerHighlight: false, // 커서를 따라다니는 노란 원
 };
 
 /** 설정은 처음 한 번만 읽고, 바뀔 때만 저장 (예전: 그릴 때마다 localStorage 읽음) */
