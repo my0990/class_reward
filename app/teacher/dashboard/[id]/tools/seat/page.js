@@ -1,5 +1,6 @@
 "use client";
-// 도구 > 자리 바꾸기: 자리표 + 시작(섞기) / 오른쪽 위 아이콘: 저장(확정)·인쇄·180도 회전·설정
+// 도구 > 자리 바꾸기: 자리표 + 시작(섞기) / 오른쪽 위 아이콘: 저장(확정)·인쇄·설정
+// 인쇄를 누르면 미리보기 창 → 거기서 180도 회전(칠판 아래) 고르고 인쇄
 // 설정(톱니)을 누르면 [책상 배치]·[조건]을 창(모달)으로 연다 (배치·조건은 자동 저장)
 // '시작'은 섞어서 보여 주기만 하고, 오른쪽 위 저장 버튼을 눌러야 지금 자리로 확정된다(지난 자리는 기록으로).
 // '지난 옆자리 피하기'는 마지막으로 저장한 자리를 기준으로 한다.
@@ -41,7 +42,8 @@ export default function SeatPage() {
   const [rules, setRules] = useState(EMPTY_RULES);
   const [draft, setDraft] = useState(null); // 방금 섞은 자리 (공개 애니메이션용)
   const [revealed, setRevealed] = useState(Infinity);
-  const [view, setView] = useState("student"); // student: 칠판이 위 / teacher: 180도 돌려 칠판이 아래
+  const [printView, setPrintView] = useState("student"); // 인쇄 방향: student 칠판이 위 / teacher 180도 돌려 칠판이 아래
+  const [printing, setPrinting] = useState(false); // 인쇄하는 동안만 화면 자리표를 printView로
   const [savedDraft, setSavedDraft] = useState(null); // 마지막으로 저장한 draft (같은 결과를 두 번 저장하지 않게)
   const [busy, setBusy] = useState(false);
   const timer = useRef(null);
@@ -189,17 +191,8 @@ export default function SeatPage() {
               {/* 저장 안 한 새 자리가 있으면 작은 주황 점 */}
               {unsaved && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-orange-500" />}
             </button>
-            <button type="button" title="인쇄" aria-label="인쇄" className={iconBtn} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => window.print()}>
+            <button type="button" title="인쇄 (미리보기)" aria-label="인쇄" className={iconBtn} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => setModalId("PRINT_PREVIEW")}>
               <PrinterIcon className="h-6 w-6" />
-            </button>
-            <button
-              type="button"
-              title={view === "student" ? "180도 회전 (칠판이 아래로)" : "180도 회전 (칠판이 위로)"}
-              aria-label="180도 회전"
-              className={iconBtn}
-              onClick={() => setView((v) => (v === "student" ? "teacher" : "student"))}
-            >
-              <ArrowPathIcon className="h-6 w-6" />
             </button>
             <button type="button" title="책상 배치·조건 설정" aria-label="설정" className={iconBtn} onClick={() => setModalId("SEAT_SETTINGS")}>
               <Cog6ToothIcon className="h-6 w-6" />
@@ -211,7 +204,7 @@ export default function SeatPage() {
           {/* 남은 화면(너비·높이)에 맞춰 자리표 크기를 정한다 (SeatGrid size="fit")
               인쇄할 때는 높이 기준이 없어지므로 inline-size로 바꾼다 (cqh → 인쇄 페이지 높이) */}
           <div className="seat-print-area flex min-h-[240px] w-full flex-1 justify-center pb-2 [container-type:size] print:[container-type:inline-size]">
-            <SeatGrid layout={layout} assignment={shown} students={byId} view={view} hiddenSeats={hiddenSeats} size="fit" />
+            <SeatGrid layout={layout} assignment={shown} students={byId} view={printing ? printView : "student"} hiddenSeats={hiddenSeats} size="fit" />
           </div>
           <div className="print:hidden">
             <button
@@ -224,6 +217,44 @@ export default function SeatPage() {
             </button>
           </div>
         </div>
+
+      {/* 인쇄 미리보기: 방향(180도 회전)을 고르고 인쇄 */}
+      <ModalTemplate id="PRINT_PREVIEW" modalId={modalId} setModalId={setModalId} className="w-[960px] max-w-[95vw] print:hidden">
+        {({ close }) => (
+          <div className="p-5 sm:p-6">
+            <h2 className="mb-4 text-lg font-bold">인쇄 미리보기</h2>
+            <div className="flex h-[60vh] w-full justify-center rounded-xl border border-gray-200 bg-white p-4 [container-type:size]">
+              <SeatGrid layout={layout} assignment={shown} students={byId} view={printView} size="fit" />
+            </div>
+            <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                className={`btn btn-sm border-0 ${printView === "teacher" ? "bg-orange-100 text-orange-700" : "bg-gray-100 text-gray-700"}`}
+                onClick={() => setPrintView((v) => (v === "student" ? "teacher" : "student"))}
+              >
+                <ArrowPathIcon className="h-5 w-5" />
+                180도 회전 {printView === "teacher" ? "(칠판 아래)" : "(칠판 위)"}
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm border-0 bg-orange-500 text-white hover:bg-orange-600"
+                onClick={() => {
+                  close();
+                  // 화면 자리표를 고른 방향으로 바꾼 뒤 인쇄하고, 끝나면 되돌린다
+                  setPrinting(true);
+                  setTimeout(() => {
+                    window.print();
+                    setPrinting(false);
+                  }, 100);
+                }}
+              >
+                <PrinterIcon className="h-5 w-5" />
+                인쇄
+              </button>
+            </div>
+          </div>
+        )}
+      </ModalTemplate>
 
       {/* 설정 창: 책상 배치 · 조건 (바꾸면 자동 저장) */}
       <ModalTemplate id="SEAT_SETTINGS" modalId={modalId} setModalId={setModalId} className="w-[960px] max-w-[95vw] print:hidden">
