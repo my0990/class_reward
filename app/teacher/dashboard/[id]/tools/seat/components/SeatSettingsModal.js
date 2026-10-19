@@ -30,6 +30,8 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
               </button>
             ))}
           </div>
+          {/* 탭 내용 높이 고정 (탭을 바꿔도 창 크기가 그대로, 넘치면 이 안에서 스크롤) */}
+          <div className="h-[min(640px,65vh)] overflow-y-auto overscroll-contain pr-1">
           {tab === "layout" && <LayoutEditor isNew={isNew} layout={layout} setLayout={setLayout} studentCount={students.length} />}
           {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} layout={layout} students={students} />}
           {tab === "groups" && (
@@ -40,6 +42,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
               <GroupEditor groups={rules.groups ?? []} setGroups={(groups) => setRules({ ...rules, groups })} layout={layout} students={students} name={name} />
             </div>
           )}
+          </div>
           <p className="mt-5 text-center text-xs text-gray-400">바꾼 내용은 자동으로 저장됩니다.</p>
         </div>
       )}
