@@ -60,7 +60,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                   onClick={() => onSeatClick?.(id)}
                   style={cellStyle}
                   className={`${cell} flex flex-col items-center justify-center rounded-lg border-2 leading-tight transition
-                    ${hidden ? "border-orange-300 bg-orange-300 text-white" : s ? "border-orange-300 bg-orange-100 text-gray-800" : "border-orange-200 bg-white text-gray-400"}
+                    ${hidden ? "border-orange-300 bg-orange-300 text-white" : s ? "border-orange-300 bg-orange-100 text-gray-800" : "border-orange-300 bg-orange-100"}
                     ${onSeatClick ? "cursor-pointer hover:scale-105" : "cursor-default"}`}
                 >
                   {hidden ? <span className="text-[1.6em]">?</span> : s ? (
@@ -68,9 +68,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                       <span className="text-[0.75em] text-orange-500">{s.classNumber}번</span>
                       <span className="max-w-full truncate px-1 font-bold">{s.profileNickname}</span>
                     </>
-                  ) : (
-                    "책상"
-                  )}
+                  ) : null}
                 </button>
               );
             })}
