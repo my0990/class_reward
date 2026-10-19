@@ -1,17 +1,28 @@
 "use client";
-// 도구 > 자리 바꾸기: [자리 바꾸기] 시작(섞기+자동 저장)·인쇄 / [교실 배치] / [조건] (배치·조건은 자동 저장)
-// '시작'을 누르면 바로 저장된다. 이 화면에 들어온 뒤 두 번째부터는 다시 섞기로 보고
-// 기록(history)에 남기지 않으며, '지난 짝 피하기'도 들어오기 전 자리를 기준으로 한다.
+// 도구 > 자리 바꾸기: [자리 바꾸기] 시작(섞기)·저장(확정)·인쇄·180도 회전 / [책상 배치] / [조건] (배치·조건은 자동 저장)
+// '시작'은 섞어서 보여 주기만 하고, 오른쪽 위 저장 버튼을 눌러야 지금 자리로 확정된다(지난 자리는 기록으로).
+// '지난 옆자리 피하기'는 마지막으로 저장한 자리를 기준으로 한다.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { mutate } from "swr";
 import { toast } from "react-hot-toast";
+import { ArrowPathIcon, PrinterIcon } from "@heroicons/react/24/outline";
 import { useFetchData } from "@/hooks/useFetchData";
 import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
 import { saveSeatSetup, confirmSeats } from "@/server-action/actions/seat/seat.action";
 import SeatGrid from "./components/SeatGrid";
 import LayoutEditor from "./components/LayoutEditor";
 import RulesEditor from "./components/RulesEditor";
+
+// 저장(디스크) 아이콘
+function SaveIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinejoin="round" aria-hidden="true" {...props}>
+      <path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
+      <path d="M7 3v5h8V3M7 21v-7h10v7" />
+    </svg>
+  );
+}
 
 const EMPTY_RULES = { fixed: {}, groups: [], apart: [], avoidPrevPartner: true };
 const REVEAL_MS = 90; // 섞을 때 한 자리씩 공개하는 간격
@@ -27,11 +38,10 @@ export default function SeatPage() {
   const [rules, setRules] = useState(EMPTY_RULES);
   const [draft, setDraft] = useState(null); // 방금 섞은 자리 (공개 애니메이션용)
   const [revealed, setRevealed] = useState(Infinity);
-  const view = "student"; // 학생 시점 (칠판이 위)
+  const [view, setView] = useState("student"); // student: 칠판이 위 / teacher: 180도 돌려 칠판이 아래
+  const [savedDraft, setSavedDraft] = useState(null); // 마지막으로 저장한 draft (같은 결과를 두 번 저장하지 않게)
   const [busy, setBusy] = useState(false);
   const timer = useRef(null);
-  const baseRef = useRef(undefined); // 이 화면에 들어올 때의 자리 (다시 섞어도 이걸 기준으로)
-  const shuffledOnce = useRef(false); // 이 화면에서 이미 한 번 섞었나 (두 번째부터는 기록에 안 남김)
 
   const students = useMemo(() => (studentList ?? []).filter((s) => s.role !== "teacher"), [studentList]);
   const byId = useMemo(() => Object.fromEntries(students.map((s) => [s.userId, s])), [students]);
@@ -43,7 +53,6 @@ export default function SeatPage() {
     setLayout(initial);
     setRules(normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial)); // 예전 '앞자리' → 그룹
     if (!plan?.layout) setTab("layout"); // 처음이면 교실 배치부터 (표 만들기처럼 크기 고르기)
-    baseRef.current = plan?.current?.assignment ?? null;
   }, [plan, studentList, students.length, layout]);
 
   useEffect(() => () => clearInterval(timer.current), []);
@@ -70,6 +79,17 @@ export default function SeatPage() {
     return () => clearTimeout(t);
   }, [layout, rules]);
   useEffect(() => () => void autoSave.current(), []);
+
+  // 섞고 저장하지 않은 채 새로고침·창 닫기를 하면 한 번 물어본다
+  useEffect(() => {
+    if (!draft || draft === savedDraft) return undefined;
+    const warn = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [draft, savedDraft]);
   const editLayout = (l) => {
     dirty.current = true;
     setLayout(l);
@@ -119,28 +139,34 @@ export default function SeatPage() {
     }
   };
 
-  // 시작: 섞고 → 바로 저장 → 한 자리씩 공개
-  const onStart = () =>
+  // 시작: 섞어서 한 자리씩 공개 (저장은 아직 안 함)
+  const onStart = () => {
+    const res = assignSeats(students.map((s) => s.userId), layout, rules, {
+      prevAssignment: plan?.current?.assignment ?? null, // 마지막으로 저장한 자리
+      nameOf: (u) => (byId[u] ? `${byId[u].classNumber}번 ${byId[u].profileNickname}` : u),
+    });
+    if (!res.ok) return toast.error(res.reason);
+    reveal(res.assignment);
+  };
+
+  // 저장: 지금 보이는 자리를 확정 (이전 자리는 기록으로)
+  const unsaved = Boolean(draft) && draft !== savedDraft;
+  const onSave = () =>
     run(async () => {
-      const res = assignSeats(students.map((s) => s.userId), layout, rules, {
-        prevAssignment: baseRef.current,
-        nameOf: (u) => (byId[u] ? `${byId[u].classNumber}번 ${byId[u].profileNickname}` : u),
-      });
-      if (!res.ok) throw new Error(res.reason);
       await saveSetup(); // 쓴 배치·조건도 함께 저장
-      const saved = await confirmSeats({ classId, assignment: res.assignment, replace: shuffledOnce.current });
+      const saved = await confirmSeats({ classId, assignment: draft });
       if (!saved?.result) throw new Error(saved?.message);
-      shuffledOnce.current = true;
-      reveal(res.assignment);
+      setSavedDraft(draft);
       await mutate(planKey);
+      toast.success("이 자리로 저장했어요.");
     });
 
   const tabs = [
     ["seat", "자리 바꾸기"],
-    ["layout", "교실 배치"],
+    ["layout", "책상 배치"],
     ["rules", "조건"],
   ];
-  const btn = "btn btn-sm border-0";
+  const iconBtn = "btn btn-square btn-sm h-10 w-10 border-0 bg-white text-gray-600 hover:bg-orange-50";
 
   return (
     // 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
@@ -156,9 +182,30 @@ export default function SeatPage() {
           ))}
         </div>
         {tab === "seat" && (
-          <button type="button" className={`${btn} bg-white text-gray-600`} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => window.print()}>
-            🖨 인쇄
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              title={unsaved ? "이 자리로 저장" : "저장할 새 자리가 없어요 ('시작'을 눌러 섞어 주세요)"}
+              aria-label="자리 저장"
+              className={`${iconBtn} ${unsaved ? "bg-orange-500 text-white hover:bg-orange-600" : ""}`}
+              disabled={!unsaved || busy || Boolean(hiddenSeats)}
+              onClick={onSave}
+            >
+              <SaveIcon className="h-6 w-6" />
+            </button>
+            <button type="button" title="인쇄" aria-label="인쇄" className={iconBtn} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => window.print()}>
+              <PrinterIcon className="h-6 w-6" />
+            </button>
+            <button
+              type="button"
+              title={view === "student" ? "180도 회전 (칠판이 아래로)" : "180도 회전 (칠판이 위로)"}
+              aria-label="180도 회전"
+              className={`${iconBtn} ${view === "teacher" ? "bg-orange-100 text-orange-700" : ""}`}
+              onClick={() => setView((v) => (v === "student" ? "teacher" : "student"))}
+            >
+              <ArrowPathIcon className="h-6 w-6" />
+            </button>
+          </div>
         )}
       </div>
 
@@ -179,7 +226,7 @@ export default function SeatPage() {
               disabled={busy || Boolean(hiddenSeats)}
               onClick={onStart}
             >
-              {busy ? "섞는 중..." : "시작"}
+              시작
             </button>
           </div>
         </div>
