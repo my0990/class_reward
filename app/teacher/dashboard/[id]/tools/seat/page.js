@@ -1,12 +1,14 @@
 "use client";
-// 도구 > 자리 바꾸기: [자리 바꾸기] 시작(섞기)·저장(확정)·인쇄·180도 회전 / [책상 배치] / [조건] (배치·조건은 자동 저장)
+// 도구 > 자리 바꾸기: 자리표 + 시작(섞기) / 오른쪽 위 아이콘: 저장(확정)·인쇄·180도 회전·설정
+// 설정(톱니)을 누르면 [책상 배치]·[조건]을 창(모달)으로 연다 (배치·조건은 자동 저장)
 // '시작'은 섞어서 보여 주기만 하고, 오른쪽 위 저장 버튼을 눌러야 지금 자리로 확정된다(지난 자리는 기록으로).
 // '지난 옆자리 피하기'는 마지막으로 저장한 자리를 기준으로 한다.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { mutate } from "swr";
 import { toast } from "react-hot-toast";
-import { ArrowPathIcon, PrinterIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, Cog6ToothIcon, PrinterIcon } from "@heroicons/react/24/outline";
+import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import { useFetchData } from "@/hooks/useFetchData";
 import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
 import { saveSeatSetup, confirmSeats } from "@/server-action/actions/seat/seat.action";
@@ -33,7 +35,8 @@ export default function SeatPage() {
   const { data: plan, isLoading: l1, isError: e1 } = useFetchData(planKey);
   const { data: studentList, isLoading: l2, isError: e2 } = useFetchData(`/api/students/${classId}`);
 
-  const [tab, setTab] = useState("seat");
+  const [modalId, setModalId] = useState(null); // "SEAT_SETTINGS" 이면 설정 창
+  const [tab, setTab] = useState("layout"); // 설정 창 안의 탭: layout | rules
   const [layout, setLayout] = useState(null);
   const [rules, setRules] = useState(EMPTY_RULES);
   const [draft, setDraft] = useState(null); // 방금 섞은 자리 (공개 애니메이션용)
@@ -52,7 +55,7 @@ export default function SeatPage() {
     const initial = plan?.layout ?? makeLayout(Math.max(1, Math.ceil(students.length / 6)), 6);
     setLayout(initial);
     setRules(normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial)); // 예전 '앞자리' → 그룹
-    if (!plan?.layout) setTab("layout"); // 처음이면 교실 배치부터 (표 만들기처럼 크기 고르기)
+    if (!plan?.layout) setModalId("SEAT_SETTINGS"); // 처음이면 설정 창(책상 배치)부터
   }, [plan, studentList, students.length, layout]);
 
   useEffect(() => () => clearInterval(timer.current), []);
@@ -162,7 +165,6 @@ export default function SeatPage() {
     });
 
   const tabs = [
-    ["seat", "자리 바꾸기"],
     ["layout", "책상 배치"],
     ["rules", "조건"],
   ];
@@ -171,18 +173,9 @@ export default function SeatPage() {
 
   return (
     // 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
-    // 자리표 탭은 높이를 화면 높이로 '고정'(h-dvh)해야 자리표가 남은 높이에 맞춰진다.
-    // min-h만 주면 높이가 정해지지 않은 것으로 봐서 칸이 아주 작아졌음. 다른 탭은 내용만큼 늘어나게 min-h.
-    <div className={`mx-auto flex w-full max-w-[1600px] flex-col px-4 py-6 print:block print:h-auto print:min-h-0 sm:px-8 ${tab === "seat" ? "h-dvh" : "min-h-dvh"}`}>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <div role="tablist" className="tabs tabs-boxed bg-orange-100">
-          {tabs.map(([key, label]) => (
-            <button key={key} type="button" role="tab" className={`tab ${tab === key ? "tab-active !bg-orange-500 !text-white" : ""}`} onClick={() => setTab(key)}>
-              {label}
-            </button>
-          ))}
-        </div>
-        {tab === "seat" && (
+    // 높이를 화면 높이로 '고정'(h-dvh)해야 자리표가 남은 높이에 맞춰진다 (min-h만 주면 칸이 아주 작아졌음)
+    <div className="mx-auto flex h-dvh w-full max-w-[1600px] flex-col px-4 py-6 print:block print:h-auto sm:px-8">
+      <div className="mb-4 flex items-center justify-end gap-3 print:hidden">
           <div className="flex items-center gap-1">
             <button
               type="button"
@@ -208,14 +201,12 @@ export default function SeatPage() {
             >
               <ArrowPathIcon className="h-6 w-6" />
             </button>
+            <button type="button" title="책상 배치·조건 설정" aria-label="설정" className={iconBtn} onClick={() => setModalId("SEAT_SETTINGS")}>
+              <Cog6ToothIcon className="h-6 w-6" />
+            </button>
           </div>
-        )}
       </div>
 
-      {tab === "layout" && <LayoutEditor isNew={!plan?.layout} layout={layout} setLayout={editLayout} studentCount={students.length} />}
-      {tab === "rules" && <RulesEditor rules={rules} setRules={editRules} layout={layout} students={students} />}
-
-      {tab === "seat" && (
         <div className="flex min-h-0 flex-1 flex-col items-center gap-4">
           {/* 남은 화면(너비·높이)에 맞춰 자리표 크기를 정한다 (SeatGrid size="fit")
               인쇄할 때는 높이 기준이 없어지므로 inline-size로 바꾼다 (cqh → 인쇄 페이지 높이) */}
@@ -233,7 +224,27 @@ export default function SeatPage() {
             </button>
           </div>
         </div>
-      )}
+
+      {/* 설정 창: 책상 배치 · 조건 (바꾸면 자동 저장) */}
+      <ModalTemplate id="SEAT_SETTINGS" modalId={modalId} setModalId={setModalId} className="w-[960px] max-w-[95vw] print:hidden">
+        {() => (
+          <div className="p-5 sm:p-6">
+            <div role="tablist" className="tabs tabs-boxed mb-5 inline-flex bg-orange-100">
+              {tabs.map(([key, label]) => (
+                <button key={key} type="button" role="tab" className={`tab ${tab === key ? "tab-active !bg-orange-500 !text-white" : ""}`} onClick={() => setTab(key)}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            {tab === "layout" ? (
+              <LayoutEditor isNew={!plan?.layout} layout={layout} setLayout={editLayout} studentCount={students.length} />
+            ) : (
+              <RulesEditor rules={rules} setRules={editRules} layout={layout} students={students} />
+            )}
+            <p className="mt-5 text-center text-xs text-gray-400">바꾼 내용은 자동으로 저장됩니다.</p>
+          </div>
+        )}
+      </ModalTemplate>
     </div>
   );
 }
