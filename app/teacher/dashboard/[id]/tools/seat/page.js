@@ -63,7 +63,6 @@ export default function SeatPage() {
     setLayout(initial);
     // 예전 '앞자리' → 그룹. 고정 자리는 옵션을 없앴으므로 비운다 (다음 저장 때 DB에서도 지워짐)
     setRules({ ...normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial), fixed: {} });
-    if (!plan?.layout) setModalId(SEAT_SETTINGS_ID); // 처음이면 설정 창(책상 배치)부터
   }, [plan, studentList, students.length, layout]);
 
   useEffect(() => () => clearInterval(timer.current), []);
