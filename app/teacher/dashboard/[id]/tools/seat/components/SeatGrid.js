@@ -17,7 +17,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
   const cell = fit ? "" : size === "sm" ? "h-[52px] w-[72px] text-[0.8rem]" : "h-[72px] w-[104px] text-[1rem]";
   const cellStyle = fit ? { width: "var(--cell)", height: "calc(var(--cell) * 0.66)", fontSize: "calc(var(--cell) * 0.16)" } : undefined;
   const widthUnits = layout.cols + (layout.cols - 1) * GAP;
-  const heightUnits = layout.rows * 0.66 + (layout.rows - 1) * GAP + 0.45;
+  const heightUnits = layout.rows * 0.66 + (layout.rows - 1) * GAP + 0.73; // 교탁(약 0.33) + 교탁~책상 간격(0.4)
   const rootStyle = fit
     ? { "--cell": `min(200px, calc(100cqw / ${widthUnits}), calc((100cqh - 8px) / ${heightUnits}))` }
     : undefined;
@@ -32,7 +32,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
   );
 
   return (
-    <div className={`inline-flex flex-col ${fit ? "gap-[calc(var(--cell)*0.12)]" : "gap-4"}`} style={rootStyle}>
+    <div className={`inline-flex flex-col ${fit ? "gap-[calc(var(--cell)*0.4)]" : "gap-10"}`} style={rootStyle}>
       {!teacher && desk}
       <div className={`flex flex-col ${gapCls}`}>
         {rowOrder.map((r) => (
