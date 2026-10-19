@@ -1,5 +1,5 @@
 "use client";
-// 도구 > 자리 바꾸기: [자리 바꾸기] 시작(섞기+자동 저장)·인쇄 / [교실 배치] / [조건]
+// 도구 > 자리 바꾸기: [자리 바꾸기] 시작(섞기+자동 저장)·인쇄 / [교실 배치] / [조건] (배치·조건은 자동 저장)
 // '시작'을 누르면 바로 저장된다. 이 화면에 들어온 뒤 두 번째부터는 다시 섞기로 보고
 // 기록(history)에 남기지 않으며, '지난 짝 피하기'도 들어오기 전 자리를 기준으로 한다.
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -47,6 +47,38 @@ export default function SeatPage() {
 
   useEffect(() => () => clearInterval(timer.current), []);
 
+  // 교실 배치·조건은 바꾸면 0.8초 뒤 자동 저장 (저장 버튼 없음). 화면을 나갈 때 남은 것도 저장
+  const dirty = useRef(false);
+  const latest = useRef({ layout, rules });
+  latest.current = { layout, rules };
+  const autoSave = useRef(null);
+  autoSave.current = async () => {
+    if (!dirty.current || !latest.current.layout) return;
+    dirty.current = false;
+    const res = await saveSeatSetup({ classId, ...latest.current }).catch(() => null);
+    if (!res?.result) {
+      dirty.current = true;
+      toast.error(res?.message || "배치·조건을 저장하지 못했습니다.");
+      return;
+    }
+    mutate(planKey);
+  };
+  useEffect(() => {
+    if (!dirty.current) return undefined;
+    const t = setTimeout(() => autoSave.current(), 800);
+    return () => clearTimeout(t);
+  }, [layout, rules]);
+  useEffect(() => () => void autoSave.current(), []);
+  const editLayout = (l) => {
+    dirty.current = true;
+    setLayout(l);
+    setDraft(null);
+  };
+  const editRules = (next) => {
+    dirty.current = true;
+    setRules(next);
+  };
+
   if (l1 || l2 || !layout) return <div className="p-8">불러오는 중...</div>;
   if (e1 || e2) return <div className="p-8">데이터를 불러오지 못했습니다.</div>;
 
@@ -68,6 +100,7 @@ export default function SeatPage() {
   };
 
   const saveSetup = async () => {
+    dirty.current = false; // 자동 저장할 것도 같이 저장됨
     const res = await saveSeatSetup({ classId, layout, rules });
     if (!res?.result) throw new Error(res?.message || "저장하지 못했습니다.");
     setRules(res.data.rules);
@@ -84,13 +117,6 @@ export default function SeatPage() {
       setBusy(false);
     }
   };
-
-  const onSaveSetup = () =>
-    run(async () => {
-      await saveSetup();
-      await mutate(planKey);
-      toast.success("저장했습니다.");
-    });
 
   // 시작: 섞고 → 바로 저장 → 한 자리씩 공개
   const onStart = () =>
@@ -125,19 +151,15 @@ export default function SeatPage() {
             </button>
           ))}
         </div>
-        {tab !== "seat" ? (
-          <button type="button" className={`${btn} bg-orange-500 text-white`} disabled={busy} onClick={onSaveSetup}>
-            {busy ? "저장 중..." : "배치·조건 저장"}
-          </button>
-        ) : (
+        {tab === "seat" && (
           <button type="button" className={`${btn} bg-white text-gray-600`} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => window.print()}>
             🖨 인쇄
           </button>
         )}
       </div>
 
-      {tab === "layout" && <LayoutEditor isNew={!plan?.layout} layout={layout} setLayout={(l) => { setLayout(l); setDraft(null); }} studentCount={students.length} />}
-      {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} layout={layout} students={students} />}
+      {tab === "layout" && <LayoutEditor isNew={!plan?.layout} layout={layout} setLayout={editLayout} studentCount={students.length} />}
+      {tab === "rules" && <RulesEditor rules={rules} setRules={editRules} layout={layout} students={students} />}
 
       {tab === "seat" && (
         <div className="flex min-h-0 flex-1 flex-col items-center gap-4">
