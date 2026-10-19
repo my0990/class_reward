@@ -1,19 +1,20 @@
 "use client";
 // 교실 화면(칠판·TV)에서 마우스가 잘 보이게
-// 1) 큰 커서: 흰 테두리 검은 화살표(48px) — 소음 배경색(초록~빨강)이 바뀌어도 잘 보임
-//    판서판·경계 막대 등 화면 어디서나 같은 화살표 (판서판 입력 막대만 노란색)
+// 1) 큰 커서: 검은 테두리 흰 손가락(48px) — 소음 배경색(초록~빨강)이 바뀌어도 잘 보임
+//    판서판·경계 막대 등 화면 어디서나 같은 손가락 (판서판 입력 막대만 노란색)
 // 2) 2.5초 동안 움직이지 않으면 커서를 숨긴다 (숫자를 가리지 않게)
 // 3) (설정에서 켜면) 커서를 따라다니는 노란 원 — 위치는 ref로 직접 옮겨서 화면을 다시 그리지 않는다
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const svg = (s) => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
-const ARROW = svg(
-  `<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'><path d='M4 2L4 19L8.5 14.8L11.5 21.5L14.3 20.3L11.4 13.8L17.5 13.8Z' fill='black' stroke='white' stroke-width='1.6' stroke-linejoin='round'/></svg>`,
+// 손가락(포인터) 모양: 흰 손 + 검은 테두리, 끝점(손가락 끝) = (21, 2)
+const HAND = svg(
+  `<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'><path d='M9 2.6a1.5 1.5 0 0 1 3 0V10.2a1.4 1.4 0 0 1 2.7.4a1.4 1.4 0 0 1 2.7.5a1.4 1.4 0 0 1 2.7.6V16.2c0 3.3-2.3 5.8-5.6 5.8h-1.6c-1.8 0-3.2-.8-4.3-2.2L4.9 15.2a1.5 1.5 0 0 1 2.3-1.9L9 15.1V2.6zM12 10.2v4.3M14.7 10.6v3.9M17.4 11.1v3.4' fill='white' stroke='black' stroke-width='1.3' stroke-linejoin='round' stroke-linecap='round'/></svg>`,
 );
 
-// .timer-cursor 안에서만 적용 (버튼·판서판·경계 막대 어디서나 같은 큰 화살표)
+// .timer-cursor 안에서만 적용 (버튼·판서판·경계 막대 어디서나 같은 큰 손가락)
 export const BIG_CURSOR_CSS = `
-.timer-cursor, .timer-cursor * { cursor: ${ARROW} 8 4, auto !important; }
+.timer-cursor, .timer-cursor * { cursor: ${HAND} 21 2, pointer !important; }
 .timer-cursor .board-cursor { caret-color: #ffe066; }
 .timer-cursor.cursor-idle, .timer-cursor.cursor-idle * { cursor: none !important; }
 `;
