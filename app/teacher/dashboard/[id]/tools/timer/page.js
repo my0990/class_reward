@@ -121,6 +121,8 @@ export default function TimerPage() {
   const editable = !running;
 
   const iconBtn = "flex h-[clamp(28px,3.6cqw,40px)] w-[clamp(28px,3.6cqw,40px)] items-center justify-center rounded-full transition hover:bg-black/10";
+  // 오른쪽 위 도구 아이콘은 1.5배
+  const topBtn = "flex h-[clamp(42px,5.4cqw,60px)] w-[clamp(42px,5.4cqw,60px)] items-center justify-center rounded-full transition hover:bg-black/10";
 
   return (
     <div
@@ -158,20 +160,20 @@ export default function TimerPage() {
 
         {/* 오른쪽 위: 도구 */}
         <div className="absolute right-3 top-2 flex items-center gap-1">
-          <button type="button" title={meter.active ? "소음 측정 끄기" : "소음 측정"} onClick={toggleMeter} className={`${iconBtn} ${meter.active ? "bg-black/15" : ""}`}>
+          <button type="button" title={meter.active ? "소음 측정 끄기" : "소음 측정"} onClick={toggleMeter} className={`${topBtn} ${meter.active ? "bg-black/15" : ""}`}>
             <MicrophoneIcon className="h-[60%] w-[60%]" />
           </button>
-          <button type="button" title="설정" onClick={() => setModalId("TIMER_SETTINGS")} className={iconBtn}>
+          <button type="button" title="설정" onClick={() => setModalId("TIMER_SETTINGS")} className={topBtn}>
             <Cog6ToothIcon className="h-[60%] w-[60%]" />
           </button>
-          <button type="button" title={isFull ? "전체 화면 끝내기" : "전체 화면"} onClick={toggleFull} className={iconBtn}>
+          <button type="button" title={isFull ? "전체 화면 끝내기" : "전체 화면"} onClick={toggleFull} className={topBtn}>
             {isFull ? <ArrowsPointingInIcon className="h-[60%] w-[60%]" /> : <ArrowsPointingOutIcon className="h-[60%] w-[60%]" />}
           </button>
           <button
             type="button"
             title="판서판"
             onClick={() => setBoardPct((p) => (p > 0 ? 0 : BOARD_OPEN_PCT))}
-            className={`${iconBtn} ${boardPct > 0 ? "bg-black/15" : ""}`}
+            className={`${topBtn} ${boardPct > 0 ? "bg-black/15" : ""}`}
           >
             <PencilSquareIcon className="h-[60%] w-[60%]" />
           </button>
@@ -215,7 +217,7 @@ export default function TimerPage() {
             onClick={timer.reset}
             className="rounded-full px-[0.8em] py-[0.35em] font-semibold opacity-70 transition hover:bg-black/10 hover:opacity-100"
           >
-            처음으로
+            리셋
           </button>
         </div>
       </section>

@@ -58,7 +58,7 @@ export function useCountdown({ initialMs = 10 * 60_000, onSecond, onDone } = {})
     setStatus("paused");
   }, [status]);
 
-  /** 처음으로: 00:00:00으로 비운다 (처음 들어왔을 때만 10분) */
+  /** 리셋: 00:00:00으로 비운다 (처음 들어왔을 때만 10분) */
   const reset = useCallback(() => {
     setStatus("idle");
     setSetMs(0);
