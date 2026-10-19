@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/mongodb";
 import { compare } from "bcryptjs";
 import { ObjectId } from "mongodb";
 import { recheckUser } from "@/lib/auth/sessionCheck";
+import { touchLastSeen } from "@/lib/stats/dailyUsage";
 import { authorizeAdmin, isAdminEmail, ADMIN_SESSION_MS } from "@/lib/auth/adminAuth";
 import { assertNotLocked, recordLoginFailure, clearLoginFailures } from "@/lib/auth/loginLimit";
 import { isDefaultStudentPassword } from "@/lib/auth/studentPassword";
@@ -74,8 +75,8 @@ export const authOptions = {
         }
         if (limitKey) await clearLoginFailures(db, limitKey);
 
-        // 관리자 대시보드의 "최근 접속" 통계용
-        await db.collection("users").updateOne({ _id: user._id }, { $set: { lastSeenAt: new Date() } }).catch(() => {});
+        // 관리자 대시보드의 "최근 접속"·일별 접속 수 통계용 (실패해도 로그인은 계속)
+        await touchLastSeen(db.collection("users"), { _id: user._id }, { role }).catch(() => {});
 
         // ✅ role별로 필요한 최소 필드만 반환 (jwt/session에서 사용)
         if (role === "teacher") {
@@ -158,10 +159,11 @@ export const authOptions = {
               { _id }, { $set }, { projection: { _id: 1 } }
             );
           }
-          const found = await client.db("user").collection("users").findOneAndUpdate(
+          // 오늘 첫 접속이면 일별 접속 수 +1 (lib/stats/dailyUsage)
+          const found = await touchLastSeen(
+            client.db("user").collection("users"),
             { _id, disabled: { $ne: true } },
-            { $set },
-            { projection: { _id: 1, passwordChangedAt: 1 } }
+            { role: token.user.role, projection: { _id: 1, passwordChangedAt: 1 } }
           );
           // 이 세션 로그인 이후에 비밀번호가 바뀌었으면 (비밀번호 찾기·변경) 로그아웃
           if (found?.passwordChangedAt && found.passwordChangedAt.getTime() > (token.authAt ?? 0)) return null;

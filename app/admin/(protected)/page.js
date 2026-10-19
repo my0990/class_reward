@@ -55,6 +55,19 @@ export default async function AdminDashboard() {
         ※ 최근 접속 수는 접속 기록 기능을 넣은 뒤부터 쌓입니다. 처음 며칠은 실제보다 적게 보입니다.
       </p>
 
+      <section className="space-y-2">
+        <h2 className="font-semibold">일별 이용</h2>
+        <p className="text-xs text-slate-500">
+          Google Analytics는 선생님 화면만 세기 때문에, 학생·키오스크 이용은 여기서 봅니다. 개인 정보 없이 날짜별 숫자만 저장하며,
+          이 기능을 넣은 날부터 쌓입니다.
+        </p>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <DailyBarChart title="접속한 교사" unit="명" data={s.teachersByDay} />
+          <DailyBarChart title="접속한 학생" unit="명" data={s.studentsByDay} />
+          <DailyBarChart title="키오스크 사용" unit="번" data={s.kioskByDay} />
+        </div>
+      </section>
+
       <div className="grid gap-4 lg:grid-cols-2">
         <DailyBarChart title="일별 교사 가입" unit="명" data={s.signupsByDay} />
         <DailyBarChart title="일별 화폐·아이템 기록" unit="건" data={s.historyByDay} />

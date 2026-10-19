@@ -49,6 +49,7 @@ export async function getDashboardStatsService({ now = new Date() } = {}) {
     signupsByDay,
     historyByDay,
     recentAudit,
+    usageDocs,
   ] = await Promise.all([
     users.countDocuments({ role: "teacher" }),
     users.countDocuments({ role: "student", disabled: { $ne: true } }),
@@ -62,7 +63,12 @@ export async function getDashboardStatsService({ now = new Date() } = {}) {
     countByDay(users, "createdAt", keys, { role: "teacher" }),
     countByDay(data.collection("history"), "expiresAfter", keys),
     admins.collection("audit_log").find().sort({ at: -1 }).limit(10).toArray(),
+    admins.collection("daily_usage").find({ _id: { $gte: keys[0] } }).toArray(),
   ]);
+
+  // 일별 접속·키오스크 사용 (lib/stats/dailyUsage가 쌓는 숫자)
+  const usage = new Map(usageDocs.map((d) => [d._id, d]));
+  const usageSeries = (field) => keys.map((date) => ({ date, count: usage.get(date)?.[field] ?? 0 }));
 
   return {
     generatedAt: now.toISOString(),
@@ -71,6 +77,9 @@ export async function getDashboardStatsService({ now = new Date() } = {}) {
     email: { last24h: emailsLast24h, dailyLimit: EMAIL_LIMITS.GLOBAL_PER_DAY },
     signupsByDay,
     historyByDay,
+    teachersByDay: usageSeries("teachers"),
+    studentsByDay: usageSeries("students"),
+    kioskByDay: usageSeries("kioskUses"),
     recentAudit: recentAudit.map((a) => ({
       _id: a._id.toString(),
       at: new Date(a.at).toISOString(),

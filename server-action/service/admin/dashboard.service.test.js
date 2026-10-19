@@ -54,4 +54,18 @@ describe("대시보드 통계", () => {
     expect(s.historyByDay.at(-1).count).toBe(1);
     expect(s.historyByDay.at(-2)).toEqual({ date: "2026-10-04", count: 2 });
   });
+
+  it("일별 접속·키오스크 사용", async () => {
+    await mongo.client.db("admins").collection("daily_usage").insertMany([
+      { _id: "2026-10-05", teachers: 2, students: 30, kioskUses: 7 },
+      { _id: "2026-10-03", students: 5 },
+      { _id: "2026-08-01", students: 99 }, // 30일 밖
+    ]);
+    const s = await getDashboardStatsService({ now: NOW });
+    expect(s.teachersByDay.at(-1)).toEqual({ date: "2026-10-05", count: 2 });
+    expect(s.studentsByDay.at(-3)).toEqual({ date: "2026-10-03", count: 5 });
+    expect(s.studentsByDay.reduce((a, d) => a + d.count, 0)).toBe(35);
+    expect(s.kioskByDay.at(-1).count).toBe(7);
+    expect(s.kioskByDay.at(-3).count).toBe(0);
+  });
 });
