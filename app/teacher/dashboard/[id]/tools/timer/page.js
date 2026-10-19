@@ -99,14 +99,17 @@ export default function TimerPage() {
   };
 
   // 가운데 막대를 끌어 판서판 너비 조절 (끝까지 밀면 닫힘)
+  const [dragging, setDragging] = useState(false);
   const onDividerDown = (e) => {
     e.preventDefault();
+    setDragging(true);
     const rect = wrapRef.current.getBoundingClientRect();
     const move = (ev) => {
       const pct = ((rect.right - ev.clientX) / rect.width) * 100;
       setBoardPct(pct < 8 ? 0 : Math.min(75, pct));
     };
     const up = () => {
+      setDragging(false);
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
     };
@@ -222,13 +225,18 @@ export default function TimerPage() {
         </div>
       </section>
 
-      {/* 판서판 경계 (끌어서 열기·크기 조절) */}
+      {/* 판서판 경계: 끌어서 열기·크기 조절, 두 번 누르면 열기/닫기 (24px, 손가락으로도 잡기 쉽게) */}
       <div
         onPointerDown={onDividerDown}
-        title="끌어서 판서판 열기"
-        className="resize-cursor flex w-3 shrink-0 cursor-col-resize items-center justify-center bg-gray-200 hover:bg-gray-300"
+        onDoubleClick={() => setBoardPct((p) => (p > 0 ? 0 : BOARD_OPEN_PCT))}
+        title="끌어서 판서판 열기 · 두 번 누르면 열기/닫기"
+        className={`resize-cursor flex w-6 shrink-0 touch-none cursor-col-resize items-center justify-center gap-[3px] transition-colors ${
+          dragging ? "bg-orange-300" : "bg-gray-200 hover:bg-orange-200"
+        }`}
       >
-        <span className="h-10 w-1 rounded-full bg-gray-400" />
+        {[0, 1, 2].map((i) => (
+          <span key={i} className={`h-14 w-[3px] rounded-full ${dragging ? "bg-orange-600" : "bg-gray-400"}`} />
+        ))}
       </div>
       {boardPct > 0 && (
         <div className="shrink-0" style={{ width: `${boardPct}%` }}>
