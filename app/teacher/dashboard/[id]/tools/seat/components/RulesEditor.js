@@ -1,9 +1,8 @@
 "use client";
-// 조건: 지난 옆자리 피하기 · 그룹(앉을 수 있는 자리) · 떨어뜨리기 · 고정 자리
+// 조건: 지난 옆자리 피하기 · 떨어뜨리기 · 고정 자리 (그룹은 설정 창의 [그룹] 탭 → GroupEditor)
 import { useState } from "react";
 import { deskSeats } from "@/util/seat/seatAlgorithm";
 import { seatLabel } from "./SeatGrid";
-import GroupEditor from "./GroupEditor";
 
 export default function RulesEditor({ rules, setRules, layout, students }) {
   const [apartA, setApartA] = useState("");
@@ -89,13 +88,6 @@ export default function RulesEditor({ rules, setRules, layout, students }) {
         </ul>
       </section>
 
-      <section className={`${box} md:col-span-2`}>
-        <h3 className="font-bold">그룹</h3>
-        <p className="mb-3 text-sm text-gray-500">
-          그룹을 만들고 학생을 넣은 뒤, 그 그룹 학생이 앉을 수 있는 자리를 고르세요. 한 학생이 여러 그룹에 들어가면 모든 그룹 자리가 겹치는 곳에만 앉습니다.
-        </p>
-        <GroupEditor groups={rules.groups ?? []} setGroups={(groups) => setRules({ ...rules, groups })} layout={layout} students={students} name={name} />
-      </section>
     </div>
   );
 }
