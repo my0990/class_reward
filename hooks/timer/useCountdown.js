@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * - 탭이 뒤로 가서 setTimeout이 늦어져도 시간이 밀리지 않는다
  * status: idle(설정 중) | running | paused | done
  */
-export function useCountdown({ initialMs = 5 * 60_000, onSecond, onDone } = {}) {
+export function useCountdown({ initialMs = 10 * 60_000, onSecond, onDone } = {}) {
   const [setMs, setSetMs] = useState(initialMs);
   const [remainingMs, setRemainingMs] = useState(initialMs);
   const [status, setStatus] = useState("idle");
@@ -58,11 +58,13 @@ export function useCountdown({ initialMs = 5 * 60_000, onSecond, onDone } = {}) 
     setStatus("paused");
   }, [status]);
 
+  /** 처음으로: 00:00:00으로 비운다 (처음 들어왔을 때만 10분) */
   const reset = useCallback(() => {
     setStatus("idle");
-    setRemainingMs(setMs);
+    setSetMs(0);
+    setRemainingMs(0);
     setRunId((n) => n + 1);
-  }, [setMs]);
+  }, []);
 
   /** 시간 바꾸기 (돌아가는 중에는 무시) */
   const setTime = useCallback(
