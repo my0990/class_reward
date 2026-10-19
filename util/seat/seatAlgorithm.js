@@ -7,7 +7,10 @@
 //
 // 조건(rules)
 //   fixed:  { [userId]: seatId }           고정 자리
-//   front:  { userIds: [], rows: n }        앞쪽 n줄 안
+//   groups: [{ id, name, color, userIds: [], seats: [seatId] }]
+//           그룹 학생은 그룹 자리 중 하나에만 앉는다. 여러 그룹이면 모든 그룹 자리가 겹치는 곳에만.
+//           자리를 하나도 고르지 않은 그룹은 아직 조건이 아닌 것으로 본다. 그룹 자리에 다른 학생이 앉는 건 막지 않는다.
+//   (예전) front: { userIds, rows } 앞쪽 n줄 → normalizeRules가 '앞자리' 그룹으로 바꾼다
 //   apart:  [[userIdA, userIdB], ...]      짝·앞뒤·옆자리 금지
 //   avoidPrevPartner: boolean               바로 전 배치의 짝과 다시 짝 금지
 //
@@ -57,6 +60,35 @@ export function partnersOf(layout, assignment = {}) {
   return map;
 }
 
+export const GROUP_COLORS = ["#f97316", "#3b82f6", "#22c55e", "#a855f7", "#ec4899", "#14b8a6", "#eab308", "#ef4444"];
+
+/** 예전 '앞자리 학생'(front)을 '앞자리' 그룹으로 바꾼다. groups가 없으면 []로 */
+export function normalizeRules(rules = {}, layout) {
+  const { front, ...rest } = rules ?? {};
+  const groups = Array.isArray(rest.groups) ? rest.groups : [];
+  if (!front?.userIds?.length || !layout) return { ...rest, groups };
+  const rows = Math.max(1, Number(front.rows) || 1);
+  const seats = deskSeats(layout).filter((sid) => parseSeatId(sid).r < rows);
+  const frontGroup = { id: "front", name: "앞자리", color: 0, userIds: [...front.userIds], seats };
+  return { ...rest, groups: [frontGroup, ...groups.filter((g) => g.id !== "front")] };
+}
+
+/** 그룹 조건이 있는 학생: userId → { seats: Set(겹치는 자리), groups: [그룹 이름] } */
+export function groupLimits(groups = [], ids) {
+  const out = {};
+  for (const g of groups) {
+    if (!g?.seats?.length) continue; // 자리를 안 고른 그룹은 조건 아님
+    const gs = new Set(g.seats);
+    for (const u of g.userIds ?? []) {
+      if (ids && !ids.has(u)) continue;
+      const cur = out[u];
+      if (!cur) out[u] = { seats: gs, groups: [g.name] };
+      else out[u] = { seats: new Set([...cur.seats].filter((sid) => gs.has(sid))), groups: [...cur.groups, g.name] };
+    }
+  }
+  return out;
+}
+
 function shuffle(arr, rng) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -67,8 +99,10 @@ function shuffle(arr, rng) {
 }
 
 /** 섞기 전에 바로 알 수 있는 문제 (없으면 null) */
-export function precheck(studentIds, layout, rules = {}) {
+export function precheck(studentIds, layout, rules = {}, { nameOf = (u) => u } = {}) {
+  rules = normalizeRules(rules, layout);
   const seats = deskSeats(layout);
+  const seatSet = new Set(seats);
   if (studentIds.length === 0) return "학생이 없습니다.";
   if (seats.length < studentIds.length) return `책상이 ${seats.length}개라 학생 ${studentIds.length}명이 모두 앉을 수 없어요. 책상을 더 켜 주세요.`;
 
@@ -82,11 +116,25 @@ export function precheck(studentIds, layout, rules = {}) {
     used.add(sid);
   }
 
-  const front = (rules.front?.userIds ?? []).filter((u) => ids.has(u) && !rules.fixed?.[u]);
-  if (front.length) {
-    const n = Math.max(1, Number(rules.front.rows) || 1);
-    const frontSeats = seats.filter((s) => parseSeatId(s).r < n && !used.has(s));
-    if (frontSeats.length < front.length) return `앞쪽 ${n}줄에 남은 책상(${frontSeats.length}개)보다 앞자리 학생(${front.length}명)이 많아요.`;
+  const limits = groupLimits(rules.groups, ids);
+  for (const [u, lim] of Object.entries(limits)) {
+    const fixedSeat = rules.fixed?.[u];
+    if (fixedSeat) {
+      if (!lim.seats.has(fixedSeat)) return `${nameOf(u)} 학생의 고정 자리가 그룹(${lim.groups.join(", ")}) 자리 밖이에요.`;
+      continue;
+    }
+    const free = [...lim.seats].filter((sid) => seatSet.has(sid) && !used.has(sid));
+    if (free.length === 0) {
+      return lim.groups.length > 1
+        ? `${nameOf(u)} 학생이 속한 그룹(${lim.groups.join(", ")})의 자리가 겹치는 곳이 없어요.`
+        : `'${lim.groups[0]}' 그룹에 앉을 자리가 남아 있지 않아요.`;
+    }
+  }
+  for (const g of rules.groups ?? []) {
+    if (!g?.seats?.length) continue;
+    const members = (g.userIds ?? []).filter((u) => ids.has(u) && !rules.fixed?.[u]);
+    const free = g.seats.filter((sid) => seatSet.has(sid) && !used.has(sid));
+    if (members.length > free.length) return `'${g.name}' 그룹 학생은 ${members.length}명인데 앉을 자리는 ${free.length}개예요.`;
   }
   return null;
 }
@@ -96,15 +144,15 @@ export function precheck(studentIds, layout, rules = {}) {
  * @param {string[]} studentIds
  * @param {{ rng?: () => number, prevAssignment?: object, attempts?: number }} opts
  */
-export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random, prevAssignment = null, attempts = 30 } = {}) {
-  const problem = precheck(studentIds, layout, rules);
+export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random, prevAssignment = null, attempts = 30, nameOf } = {}) {
+  rules = normalizeRules(rules, layout);
+  const problem = precheck(studentIds, layout, rules, { nameOf });
   if (problem) return { ok: false, reason: problem };
 
   const ids = new Set(studentIds);
   const seats = deskSeats(layout);
   const fixed = Object.fromEntries(Object.entries(rules.fixed ?? {}).filter(([u]) => ids.has(u)));
-  const frontRows = Math.max(1, Number(rules.front?.rows) || 1);
-  const frontSet = new Set((rules.front?.userIds ?? []).filter((u) => ids.has(u)));
+  const limits = groupLimits(rules.groups, ids);
 
   // 서로 떨어져야 하는 짝: userId → Set
   const apart = {};
@@ -116,11 +164,13 @@ export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random,
 
   const prevPartner = rules.avoidPrevPartner && prevAssignment ? partnersOf(layout, prevAssignment) : {};
 
+  const fixedSeats = new Set(Object.values(fixed));
   const allowedSeats = (userId) => {
     if (fixed[userId]) return [fixed[userId]];
-    const fixedSeats = new Set(Object.values(fixed));
-    return seats.filter((s) => !fixedSeats.has(s) && (!frontSet.has(userId) || parseSeatId(s).r < frontRows));
+    const lim = limits[userId]?.seats;
+    return seats.filter((s) => !fixedSeats.has(s) && (!lim || lim.has(s)));
   };
+  const allowedCount = Object.fromEntries(studentIds.map((u) => [u, allowedSeats(u).length]));
 
   const fits = (userId, sid, at) => {
     const partner = partnerSeat(layout, sid);
@@ -134,10 +184,11 @@ export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random,
   };
 
   for (let attempt = 0; attempt < attempts; attempt++) {
-    // 조건이 많은 학생부터 (고정 → 앞자리 → 떨어뜨리기 → 나머지는 무작위)
+    // 조건이 많은 학생부터 (고정 → 앉을 자리가 적은 그룹 학생 → 떨어뜨리기 → 나머지는 무작위)
     const order = shuffle(studentIds, rng).sort((a, b) => weight(b) - weight(a));
     function weight(u) {
-      return (fixed[u] ? 100 : 0) + (frontSet.has(u) ? 10 : 0) + (apart[u]?.size ?? 0);
+      if (fixed[u]) return 100000;
+      return (limits[u] ? 10000 - allowedCount[u] * 10 : 0) + (apart[u]?.size ?? 0);
     }
 
     const at = {}; // seatId → userId
@@ -156,16 +207,16 @@ export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random,
     };
     if (place(0)) return { ok: true, assignment: at };
   }
-  return { ok: false, reason: "조건을 모두 지키는 자리를 찾지 못했어요. 떨어뜨리기나 앞자리 조건을 조금 줄여 보세요." };
+  return { ok: false, reason: "조건을 모두 지키는 자리를 찾지 못했어요. 떨어뜨리기나 그룹 조건을 조금 줄여 보세요." };
 }
 
 /** 저장된 배치가 조건을 지키는지 확인 (테스트·확정 전 검사용). 어긴 조건 설명 목록을 돌려준다 */
 export function violations(assignment, layout, rules = {}, prevAssignment = null) {
+  rules = normalizeRules(rules, layout);
   const out = [];
   const seatOf = Object.fromEntries(Object.entries(assignment).map(([s, u]) => [u, s]));
   for (const [u, s] of Object.entries(rules.fixed ?? {})) if (seatOf[u] && seatOf[u] !== s) out.push(`고정 자리: ${u}`);
-  const n = Math.max(1, Number(rules.front?.rows) || 1);
-  for (const u of rules.front?.userIds ?? []) if (seatOf[u] && parseSeatId(seatOf[u]).r >= n && !rules.fixed?.[u]) out.push(`앞자리: ${u}`);
+  for (const [u, lim] of Object.entries(groupLimits(rules.groups))) if (seatOf[u] && !lim.seats.has(seatOf[u])) out.push(`그룹: ${u}`);
   for (const [a, b] of rules.apart ?? []) {
     if (!seatOf[a] || !seatOf[b]) continue;
     const near = [partnerSeat(layout, seatOf[a]), ...neighborSeats(layout, seatOf[a])];

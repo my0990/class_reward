@@ -7,13 +7,13 @@ import { useParams } from "next/navigation";
 import { mutate } from "swr";
 import { toast } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
-import { assignSeats, makeLayout, deskSeats } from "@/util/seat/seatAlgorithm";
+import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
 import { saveSeatSetup, confirmSeats } from "@/server-action/actions/seat/seat.action";
 import SeatGrid from "./components/SeatGrid";
 import LayoutEditor from "./components/LayoutEditor";
 import RulesEditor from "./components/RulesEditor";
 
-const EMPTY_RULES = { fixed: {}, front: { userIds: [], rows: 1 }, apart: [], avoidPrevPartner: true };
+const EMPTY_RULES = { fixed: {}, groups: [], apart: [], avoidPrevPartner: true };
 const REVEAL_MS = 90; // 섞을 때 한 자리씩 공개하는 간격
 
 export default function SeatPage() {
@@ -39,8 +39,9 @@ export default function SeatPage() {
   // 처음 불러올 때: 저장된 배치가 없으면 학생 수에 맞춘 6칸 배치
   useEffect(() => {
     if (layout || plan === undefined || !studentList) return;
-    setLayout(plan?.layout ?? makeLayout(Math.max(1, Math.ceil(students.length / 6)), 6));
-    setRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) });
+    const initial = plan?.layout ?? makeLayout(Math.max(1, Math.ceil(students.length / 6)), 6);
+    setLayout(initial);
+    setRules(normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial)); // 예전 '앞자리' → 그룹
     if (!plan?.layout) setTab("layout"); // 처음이면 교실 배치부터 (표 만들기처럼 크기 고르기)
     baseRef.current = plan?.current?.assignment ?? null;
   }, [plan, studentList, students.length, layout]);
@@ -121,7 +122,10 @@ export default function SeatPage() {
   // 시작: 섞고 → 바로 저장 → 한 자리씩 공개
   const onStart = () =>
     run(async () => {
-      const res = assignSeats(students.map((s) => s.userId), layout, rules, { prevAssignment: baseRef.current });
+      const res = assignSeats(students.map((s) => s.userId), layout, rules, {
+        prevAssignment: baseRef.current,
+        nameOf: (u) => (byId[u] ? `${byId[u].classNumber}번 ${byId[u].profileNickname}` : u),
+      });
       if (!res.ok) throw new Error(res.reason);
       await saveSetup(); // 쓴 배치·조건도 함께 저장
       const saved = await confirmSeats({ classId, assignment: res.assignment, replace: shuffledOnce.current });

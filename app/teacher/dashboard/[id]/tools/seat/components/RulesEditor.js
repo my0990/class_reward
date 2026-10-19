@@ -1,8 +1,9 @@
 "use client";
-// 조건: 지난 짝 피하기 · 앞자리 · 떨어뜨리기 · 고정 자리
+// 조건: 지난 짝 피하기 · 그룹(앉을 수 있는 자리) · 떨어뜨리기 · 고정 자리
 import { useState } from "react";
 import { deskSeats } from "@/util/seat/seatAlgorithm";
 import { seatLabel } from "./SeatGrid";
+import GroupEditor from "./GroupEditor";
 
 export default function RulesEditor({ rules, setRules, layout, students }) {
   const [apartA, setApartA] = useState("");
@@ -12,7 +13,6 @@ export default function RulesEditor({ rules, setRules, layout, students }) {
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
   const name = (u) => (byId[u] ? `${byId[u].classNumber}. ${byId[u].profileNickname}` : u);
   const seats = deskSeats(layout);
-  const front = rules.front ?? { userIds: [], rows: 1 };
 
   const box = "rounded-2xl border border-orange-200 bg-white p-4";
   const select = "select select-bordered select-sm max-w-[180px]";
@@ -26,60 +26,6 @@ export default function RulesEditor({ rules, setRules, layout, students }) {
           지난 짝과 다시 짝 되지 않기
         </label>
         <p className="mt-1 text-sm text-gray-500">바로 전에 확정한 자리의 짝을 피합니다.</p>
-      </section>
-
-      <section className={box}>
-        <h3 className="font-bold">앞자리 학생</h3>
-        <p className="mb-2 text-sm text-gray-500">
-          앞쪽
-          <select className="select select-bordered select-xs mx-1" value={front.rows} onChange={(e) => setRules({ ...rules, front: { ...front, rows: Number(e.target.value) } })}>
-            {[...Array(layout.rows).keys()].map((i) => <option key={i} value={i + 1}>{i + 1}</option>)}
-          </select>
-          줄 안에 앉힙니다. 이름을 눌러 고르세요.
-        </p>
-        <div className="flex flex-wrap gap-1">
-          {students.map((s) => {
-            const on = front.userIds.includes(s.userId);
-            return (
-              <button
-                key={s.userId}
-                type="button"
-                onClick={() => setRules({ ...rules, front: { ...front, userIds: on ? front.userIds.filter((u) => u !== s.userId) : [...front.userIds, s.userId] } })}
-                className={`rounded-full px-2 py-1 text-sm ${on ? "bg-orange-500 text-white" : "bg-orange-50 text-gray-600"}`}
-              >
-                {name(s.userId)}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className={box}>
-        <h3 className="font-bold">떨어뜨리기</h3>
-        <p className="mb-2 text-sm text-gray-500">두 학생이 짝이 되거나 앞뒤·옆에 앉지 않게 합니다.</p>
-        <div className="flex flex-wrap items-center gap-2">
-          <select className={select} value={apartA} onChange={(e) => setApartA(e.target.value)}><option value="">학생 선택</option>{studentOptions}</select>
-          <select className={select} value={apartB} onChange={(e) => setApartB(e.target.value)}><option value="">학생 선택</option>{studentOptions}</select>
-          <button
-            type="button"
-            className="btn btn-sm bg-orange-500 text-white"
-            disabled={!apartA || !apartB || apartA === apartB}
-            onClick={() => {
-              setRules({ ...rules, apart: [...(rules.apart ?? []), [apartA, apartB]] });
-              setApartB("");
-            }}
-          >
-            추가
-          </button>
-        </div>
-        <ul className="mt-2 space-y-1">
-          {(rules.apart ?? []).map(([a, b], i) => (
-            <li key={`${a}-${b}-${i}`} className="flex items-center justify-between rounded bg-orange-50 px-2 py-1 text-sm">
-              {name(a)} ↔ {name(b)}
-              <button type="button" className="text-gray-400 hover:text-red-500" onClick={() => setRules({ ...rules, apart: rules.apart.filter((_, j) => j !== i) })}>삭제</button>
-            </li>
-          ))}
-        </ul>
       </section>
 
       <section className={box}>
@@ -113,6 +59,42 @@ export default function RulesEditor({ rules, setRules, layout, students }) {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className={box}>
+        <h3 className="font-bold">떨어뜨리기</h3>
+        <p className="mb-2 text-sm text-gray-500">두 학생이 짝이 되거나 앞뒤·옆에 앉지 않게 합니다.</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <select className={select} value={apartA} onChange={(e) => setApartA(e.target.value)}><option value="">학생 선택</option>{studentOptions}</select>
+          <select className={select} value={apartB} onChange={(e) => setApartB(e.target.value)}><option value="">학생 선택</option>{studentOptions}</select>
+          <button
+            type="button"
+            className="btn btn-sm bg-orange-500 text-white"
+            disabled={!apartA || !apartB || apartA === apartB}
+            onClick={() => {
+              setRules({ ...rules, apart: [...(rules.apart ?? []), [apartA, apartB]] });
+              setApartB("");
+            }}
+          >
+            추가
+          </button>
+        </div>
+        <ul className="mt-2 space-y-1">
+          {(rules.apart ?? []).map(([a, b], i) => (
+            <li key={`${a}-${b}-${i}`} className="flex items-center justify-between rounded bg-orange-50 px-2 py-1 text-sm">
+              {name(a)} ↔ {name(b)}
+              <button type="button" className="text-gray-400 hover:text-red-500" onClick={() => setRules({ ...rules, apart: rules.apart.filter((_, j) => j !== i) })}>삭제</button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className={`${box} md:col-span-2`}>
+        <h3 className="font-bold">그룹</h3>
+        <p className="mb-3 text-sm text-gray-500">
+          그룹을 만들고 학생을 넣은 뒤, 그 그룹 학생이 앉을 수 있는 자리를 고르세요. 한 학생이 여러 그룹에 들어가면 모든 그룹 자리가 겹치는 곳에만 앉습니다.
+        </p>
+        <GroupEditor groups={rules.groups ?? []} setGroups={(groups) => setRules({ ...rules, groups })} layout={layout} students={students} name={name} />
       </section>
     </div>
   );

@@ -36,7 +36,13 @@ describe("자리 바꾸기 저장", () => {
     });
     expect(res.ok).toBe(true);
     const saved = await plan();
-    expect(saved.rules).toEqual({ fixed: { a: "0-0" }, front: { userIds: ["c"], rows: 2 }, apart: [["a", "b"]], avoidPrevPartner: true });
+    // 예전 앞자리(front)는 '앞자리' 그룹으로 (책상 있는 앞 2줄 자리)
+    expect(saved.rules).toEqual({
+      fixed: { a: "0-0" },
+      groups: [{ id: "front", name: "앞자리", color: 0, userIds: ["c"], seats: ["0-0", "0-1", "1-0"] }],
+      apart: [["a", "b"]],
+      avoidPrevPartner: true,
+    });
     expect(saved.layout.desks[1][1]).toBe(false);
   });
 
@@ -54,6 +60,27 @@ describe("자리 바꾸기 저장", () => {
     expect(saved.current.confirmedAt).toEqual(new Date(2026, 0, SEAT_HISTORY_MAX + 2));
     expect(saved.history).toHaveLength(SEAT_HISTORY_MAX);
     expect(saved.history[0].confirmedAt).toEqual(new Date(2026, 0, SEAT_HISTORY_MAX + 1)); // 최신이 앞
+  });
+
+  it("그룹: 이름·색·학생·자리를 정리해 저장 (한 학생이 여러 그룹 가능)", async () => {
+    const layout = makeLayout(2, 2);
+    layout.desks[1][1] = false;
+    await saveSeatSetupService({
+      ...args,
+      layout,
+      rules: {
+        groups: [
+          { id: "x", name: "  창가  ", color: 3, userIds: ["a", "a", "outsider"], seats: ["0-1", "1-1", "9-9", "0-1"] },
+          { id: "x", name: "", color: 99, userIds: ["a", "b"], seats: [] },
+          "이상한 값",
+        ],
+      },
+    });
+    const { groups } = (await plan()).rules;
+    expect(groups).toEqual([
+      { id: "x", name: "창가", color: 3, userIds: ["a"], seats: ["0-1"] },
+      { id: "x_", name: "그룹 2", color: 1, userIds: ["a", "b"], seats: [] },
+    ]);
   });
 
   it("다시 섞기(replace)는 지금 자리만 바꾸고 기록에 넣지 않음", async () => {

@@ -2,7 +2,7 @@
 //
 // seatPlan = {
 //   layout: { rows, cols, desks },          교실 배치
-//   rules: { fixed, front, apart, avoidPrevPartner },
+//   rules: { fixed, groups, apart, avoidPrevPartner },   (예전 front는 저장할 때 '앞자리' 그룹으로 바뀜)
 //   current: { assignment, confirmedAt } | null,   지금 자리
 //   history: [{ assignment, confirmedAt }],        지난 자리 (최근 5번, 최신이 앞)
 //   updatedAt
@@ -10,7 +10,10 @@
 // 권한 확인(authorizeTeacherClass)은 action에서 한다.
 import { ObjectId } from "mongodb";
 import { connectDB } from "@/lib/mongodb";
-import { LAYOUT_LIMITS, deskSeats, parseSeatId } from "@/util/seat/seatAlgorithm";
+import { LAYOUT_LIMITS, GROUP_COLORS, deskSeats, normalizeRules, parseSeatId } from "@/util/seat/seatAlgorithm";
+
+export const GROUP_MAX = 20;
+const GROUP_NAME_MAX = 20;
 
 export const SEAT_HISTORY_MAX = 5;
 
@@ -38,8 +41,23 @@ export function cleanRules(rules, layout, studentIds) {
   const seats = new Set(deskSeats(layout));
   const fixed = {};
   for (const [u, s] of Object.entries(rules?.fixed ?? {})) if (studentIds.has(u) && seats.has(s)) fixed[u] = s;
-  const frontRows = Math.min(layout.rows, Math.max(1, Number(rules?.front?.rows) || 1));
-  const frontIds = [...new Set((rules?.front?.userIds ?? []).filter((u) => studentIds.has(u)))];
+  // 그룹: 이 학급 학생만, 책상이 있는 자리만, 중복 없이 (예전 front → '앞자리' 그룹)
+  const groups = [];
+  const groupIds = new Set();
+  for (const [i, g] of normalizeRules(rules ?? {}, layout).groups.entries()) {
+    if (groups.length >= GROUP_MAX || !g || typeof g !== "object") continue;
+    let id = String(g.id ?? "").slice(0, 40) || `g${i}`;
+    while (groupIds.has(id)) id += "_";
+    groupIds.add(id);
+    const color = Number.isInteger(g.color) && g.color >= 0 && g.color < GROUP_COLORS.length ? g.color : i % GROUP_COLORS.length;
+    groups.push({
+      id,
+      name: String(g.name ?? "").trim().slice(0, GROUP_NAME_MAX) || `그룹 ${groups.length + 1}`,
+      color,
+      userIds: [...new Set((g.userIds ?? []).filter((u) => studentIds.has(u)))],
+      seats: [...new Set((g.seats ?? []).filter((sid) => seats.has(sid)))],
+    });
+  }
   const apart = [];
   const seen = new Set();
   for (const pair of rules?.apart ?? []) {
@@ -50,7 +68,7 @@ export function cleanRules(rules, layout, studentIds) {
     seen.add(key);
     apart.push([a, b]);
   }
-  return { fixed, front: { userIds: frontIds, rows: frontRows }, apart, avoidPrevPartner: Boolean(rules?.avoidPrevPartner) };
+  return { fixed, groups, apart, avoidPrevPartner: Boolean(rules?.avoidPrevPartner) };
 }
 
 /** 교실 배치·조건 저장 */
