@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { makeLayout, deskSeats, partnerSeat, neighborSeats, assignSeats, violations, precheck, seatId, normalizeRules, groupLimits } from "./seatAlgorithm.js";
+import { makeLayout, deskSeats, partnerSeat, neighborSeats, sideSeats, sideMatesOf, assignSeats, violations, precheck, seatId, normalizeRules, groupLimits } from "./seatAlgorithm.js";
 
 // 재현 가능한 난수
 function seeded(seed = 1) {
@@ -16,6 +16,18 @@ describe("교실 배치", () => {
     layout.desks[1][1] = false;
     expect(partnerSeat(layout, "1-0")).toBeNull();
     expect(deskSeats(layout)).toHaveLength(7);
+  });
+
+  it("옆자리: 같은 줄 바로 왼쪽·오른쪽 책상 (통로 건너편은 아님)", () => {
+    const layout = makeLayout(1, 7); // A B C | D E F  (3칸이 통로)
+    layout.desks[0][3] = false;
+    expect(sideSeats(layout, "0-1").sort()).toEqual(["0-0", "0-2"]);
+    expect(sideSeats(layout, "0-2")).toEqual(["0-1"]);
+    expect(sideSeats(layout, "0-4")).toEqual(["0-5"]);
+    const mates = sideMatesOf(layout, { "0-0": "A", "0-1": "B", "0-2": "C", "0-4": "D", "0-5": "E", "0-6": "F" });
+    expect([...mates.B].sort()).toEqual(["A", "C"]);
+    expect([...mates.C]).toEqual(["B"]);
+    expect([...mates.D]).toEqual(["E"]);
   });
 
   it("앞뒤·옆 자리", () => {
@@ -76,6 +88,19 @@ describe("자리 배치", () => {
     expect([...lim.u.seats]).toEqual(["0-1"]);
     expect(lim.u.groups).toEqual(["A", "B"]);
     expect(lim.v).toBeUndefined();
+  });
+
+  it("3칸씩 붙은 책상: 지난번 옆자리와 다시 옆자리가 되지 않는다", () => {
+    const layout = makeLayout(4, 7);
+    for (let r = 0; r < 4; r++) layout.desks[r][3] = false; // 3칸 | 통로 | 3칸
+    const ids = students(24);
+    const prev = assignSeats(ids, layout, {}, { rng: seeded(5) }).assignment;
+    const rules = { avoidPrevPartner: true };
+    for (let seed = 1; seed <= 20; seed++) {
+      const res = assignSeats(ids, layout, rules, { rng: seeded(seed), prevAssignment: prev });
+      expect(res.ok).toBe(true);
+      expect(violations(res.assignment, layout, rules, prev)).toEqual([]);
+    }
   });
 
   it("미리 알 수 있는 불가능한 조건은 이유를 알려준다", () => {

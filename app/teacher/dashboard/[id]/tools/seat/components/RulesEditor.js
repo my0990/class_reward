@@ -1,5 +1,5 @@
 "use client";
-// 조건: 지난 짝 피하기 · 그룹(앉을 수 있는 자리) · 떨어뜨리기 · 고정 자리
+// 조건: 지난 옆자리 피하기 · 그룹(앉을 수 있는 자리) · 떨어뜨리기 · 고정 자리
 import { useState } from "react";
 import { deskSeats } from "@/util/seat/seatAlgorithm";
 import { seatLabel } from "./SeatGrid";
@@ -23,9 +23,9 @@ export default function RulesEditor({ rules, setRules, layout, students }) {
       <section className={box}>
         <label className="flex cursor-pointer items-center gap-3 text-[1.1rem] font-bold">
           <input type="checkbox" className="checkbox checkbox-warning" checked={Boolean(rules.avoidPrevPartner)} onChange={(e) => setRules({ ...rules, avoidPrevPartner: e.target.checked })} />
-          지난 짝과 다시 짝 되지 않기
+          지난번 옆자리였던 친구와 다시 옆자리 되지 않기
         </label>
-        <p className="mt-1 text-sm text-gray-500">바로 전에 확정한 자리의 짝을 피합니다.</p>
+        <p className="mt-1 text-sm text-gray-500">바로 전 자리에서 왼쪽·오른쪽에 붙어 앉았던 학생끼리는 다시 옆에 앉지 않습니다. (통로 건너편은 옆자리가 아니에요)</p>
       </section>
 
       <section className={box}>
@@ -63,7 +63,7 @@ export default function RulesEditor({ rules, setRules, layout, students }) {
 
       <section className={box}>
         <h3 className="font-bold">떨어뜨리기</h3>
-        <p className="mb-2 text-sm text-gray-500">두 학생이 짝이 되거나 앞뒤·옆에 앉지 않게 합니다.</p>
+        <p className="mb-2 text-sm text-gray-500">두 학생이 앞뒤나 옆에 붙어 앉지 않게 합니다.</p>
         <div className="flex flex-wrap items-center gap-2">
           <select className={select} value={apartA} onChange={(e) => setApartA(e.target.value)}><option value="">학생 선택</option>{studentOptions}</select>
           <select className={select} value={apartB} onChange={(e) => setApartB(e.target.value)}><option value="">학생 선택</option>{studentOptions}</select>

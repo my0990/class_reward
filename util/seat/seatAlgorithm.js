@@ -3,7 +3,7 @@
 // 교실 배치(layout)
 //   { rows, cols, desks: boolean[rows][cols] }   true = 책상 있음 / false = 통로·빈칸
 //   자리 id = "줄-칸" (0부터, 0줄이 칠판 바로 앞)
-//   짝 = 같은 줄에서 (0,1) (2,3) (4,5)… 칸끼리 (둘 다 책상일 때)
+//   옆자리 = 같은 줄에서 바로 왼쪽·오른쪽 책상 (통로를 사이에 두면 옆자리 아님)
 //
 // 조건(rules)
 //   fixed:  { [userId]: seatId }           고정 자리
@@ -11,8 +11,9 @@
 //           그룹 학생은 그룹 자리 중 하나에만 앉는다. 여러 그룹이면 모든 그룹 자리가 겹치는 곳에만.
 //           자리를 하나도 고르지 않은 그룹은 아직 조건이 아닌 것으로 본다. 그룹 자리에 다른 학생이 앉는 건 막지 않는다.
 //   (예전) front: { userIds, rows } 앞쪽 n줄 → normalizeRules가 '앞자리' 그룹으로 바꾼다
-//   apart:  [[userIdA, userIdB], ...]      짝·앞뒤·옆자리 금지
-//   avoidPrevPartner: boolean               바로 전 배치의 짝과 다시 짝 금지
+//   apart:  [[userIdA, userIdB], ...]      앞뒤·옆자리 금지
+//   avoidPrevPartner: boolean               바로 전 배치에서 옆자리였던 학생과 다시 옆자리 금지
+//                                           (이름은 예전 '지난 짝 피하기' 그대로. 2칸·3칸씩 붙은 책상 모두에 맞음)
 //
 // 결과: { ok: true, assignment: { [seatId]: userId } } 또는 { ok: false, reason }
 
@@ -50,7 +51,22 @@ export function neighborSeats(layout, id) {
   return [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].filter(([rr, cc]) => isDesk(layout, rr, cc)).map(([rr, cc]) => seatId(rr, cc));
 }
 
-/** 배치 결과에서 짝 관계: userId → 짝 userId */
+/** 옆자리(같은 줄 바로 왼쪽·오른쪽 책상) id 목록 */
+export function sideSeats(layout, id) {
+  const { r, c } = parseSeatId(id);
+  return [c - 1, c + 1].filter((cc) => isDesk(layout, r, cc)).map((cc) => seatId(r, cc));
+}
+
+/** 배치 결과에서 옆자리 관계: userId → Set(옆자리 userId) */
+export function sideMatesOf(layout, assignment = {}) {
+  const map = {};
+  for (const [id, userId] of Object.entries(assignment)) {
+    for (const n of sideSeats(layout, id)) if (assignment[n]) (map[userId] ??= new Set()).add(assignment[n]);
+  }
+  return map;
+}
+
+/** (예전) 짝 관계: userId → 짝 userId */
 export function partnersOf(layout, assignment = {}) {
   const map = {};
   for (const [id, userId] of Object.entries(assignment)) {
@@ -162,7 +178,7 @@ export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random,
   };
   for (const [a, b] of rules.apart ?? []) if (ids.has(a) && ids.has(b) && a !== b) addApart(a, b);
 
-  const prevPartner = rules.avoidPrevPartner && prevAssignment ? partnersOf(layout, prevAssignment) : {};
+  const prevSide = rules.avoidPrevPartner && prevAssignment ? sideMatesOf(layout, prevAssignment) : {};
 
   const fixedSeats = new Set(Object.values(fixed));
   const allowedSeats = (userId) => {
@@ -173,13 +189,10 @@ export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random,
   const allowedCount = Object.fromEntries(studentIds.map((u) => [u, allowedSeats(u).length]));
 
   const fits = (userId, sid, at) => {
-    const partner = partnerSeat(layout, sid);
-    const partnerUser = partner ? at[partner] : null;
-    if (partnerUser && prevPartner[userId] === partnerUser) return false;
-    if (apart[userId]) {
-      if (partnerUser && apart[userId].has(partnerUser)) return false;
-      for (const n of neighborSeats(layout, sid)) if (at[n] && apart[userId].has(at[n])) return false;
-    }
+    // 지난번 옆자리였던 학생과 다시 옆자리 X (양쪽 다 확인: 나중에 앉는 학생 쪽에서 걸러진다)
+    if (prevSide[userId]) for (const n of sideSeats(layout, sid)) if (at[n] && prevSide[userId].has(at[n])) return false;
+    // 떨어뜨리기: 앞뒤·옆자리 X
+    if (apart[userId]) for (const n of neighborSeats(layout, sid)) if (at[n] && apart[userId].has(at[n])) return false;
     return true;
   };
 
@@ -219,13 +232,12 @@ export function violations(assignment, layout, rules = {}, prevAssignment = null
   for (const [u, lim] of Object.entries(groupLimits(rules.groups))) if (seatOf[u] && !lim.seats.has(seatOf[u])) out.push(`그룹: ${u}`);
   for (const [a, b] of rules.apart ?? []) {
     if (!seatOf[a] || !seatOf[b]) continue;
-    const near = [partnerSeat(layout, seatOf[a]), ...neighborSeats(layout, seatOf[a])];
-    if (near.includes(seatOf[b])) out.push(`떨어뜨리기: ${a}·${b}`);
+    if (neighborSeats(layout, seatOf[a]).includes(seatOf[b])) out.push(`떨어뜨리기: ${a}·${b}`);
   }
   if (rules.avoidPrevPartner && prevAssignment) {
-    const before = partnersOf(layout, prevAssignment);
-    const now = partnersOf(layout, assignment);
-    for (const [u, p] of Object.entries(now)) if (before[u] === p && u < p) out.push(`지난 짝: ${u}·${p}`);
+    const before = sideMatesOf(layout, prevAssignment);
+    const now = sideMatesOf(layout, assignment);
+    for (const [u, mates] of Object.entries(now)) for (const m of mates) if (before[u]?.has(m) && u < m) out.push(`지난 옆자리: ${u}·${m}`);
   }
   return out;
 }
