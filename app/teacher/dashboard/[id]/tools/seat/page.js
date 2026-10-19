@@ -26,6 +26,13 @@ function SaveIcon(props) {
   );
 }
 
+// 처음(저장된 배치 없음) 기본 배치: 4줄 × 8칸, 3번째·6번째 칸은 통로 → 책상 둘 | 통로 | 둘 | 통로 | 둘
+function defaultLayout() {
+  const layout = makeLayout(4, 8);
+  for (const row of layout.desks) row[2] = row[5] = false;
+  return layout;
+}
+
 const EMPTY_RULES = { fixed: {}, groups: [], apart: [], avoidPrevPartner: true, excluded: [] };
 const REVEAL_MS = 90; // 섞을 때 한 자리씩 공개하는 간격
 
@@ -49,10 +56,10 @@ export default function SeatPage() {
   const students = useMemo(() => (studentList ?? []).filter((s) => s.role !== "teacher"), [studentList]);
   const byId = useMemo(() => Object.fromEntries(students.map((s) => [s.userId, s])), [students]);
 
-  // 처음 불러올 때: 저장된 배치가 없으면 학생 수에 맞춘 6칸 배치
+  // 처음 불러올 때: 저장된 배치가 없으면 기본 배치(4×8, 통로 2줄)
   useEffect(() => {
     if (layout || plan === undefined || !studentList) return;
-    const initial = plan?.layout ?? makeLayout(Math.max(1, Math.ceil(students.length / 6)), 6);
+    const initial = plan?.layout ?? defaultLayout();
     setLayout(initial);
     // 예전 '앞자리' → 그룹. 고정 자리는 옵션을 없앴으므로 비운다 (다음 저장 때 DB에서도 지워짐)
     setRules({ ...normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial), fixed: {} });
