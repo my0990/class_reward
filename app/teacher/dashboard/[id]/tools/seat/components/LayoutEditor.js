@@ -10,7 +10,7 @@ export default function LayoutEditor({ layout, setLayout, studentCount, isNew = 
         <p className="text-sm text-gray-500">
           칸을 누르거나 누른 채로 드래그해서 책상을 놓으세요. 이미 놓인 책상에서 드래그하면 그 부분이 지워집니다.
           <br />
-          위쪽이 교탁 쪽입니다.
+          위쪽이 칠판 쪽입니다.
         </p>
       </div>
       <SizePicker layout={layout} onChange={setLayout} studentCount={studentCount} />

@@ -1,6 +1,6 @@
 "use client";
-// 교실 자리 그림: 교탁 + 책상 격자 (책상 사이 간격은 가로·세로 모두 같게)
-// view = "student"(교탁이 위, 학생이 칠판을 보는 방향) | "teacher"(교탁이 아래, 교탁에서 본 방향)
+// 교실 자리 그림: 칠판 + 책상 격자 (책상 사이 간격은 가로·세로 모두 같게)
+// view = "student"(칠판이 위, 학생이 칠판을 보는 방향) | "teacher"(칠판이 아래, 앞에서 본 방향)
 import { seatId } from "@/util/seat/seatAlgorithm";
 
 export default function SeatGrid({ layout, assignment = {}, students = {}, view = "student", onSeatClick, hiddenSeats, size = "md" }) {
@@ -10,31 +10,38 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
   const rowOrder = teacher ? [...rows].reverse() : rows;
   const colOrder = teacher ? [...cols].reverse() : cols;
   // fit: 부모(container-type:size)의 너비·높이 둘 다에 맞춰 칸 크기를 정한다 → 한 화면에 다 보임 (최대 200px)
-  // 세로 = 줄 수 × 칸 높이(0.66) + 줄 간격(0.08) + 교탁(0.56)·교탁~책상 간격(0.4) (모두 칸 너비 배율)
+  // 세로 = 줄 수 × 칸 높이(0.66) + 줄 간격(0.08) + 칠판(0.56)·칠판~책상 간격(0.4) (모두 칸 너비 배율)
   const fit = size === "fit";
   const GAP = 0.08; // 책상 사이 간격 (칸 너비 배율, fit일 때)
   const gapCls = fit ? "gap-[calc(var(--cell)*0.08)]" : "gap-2";
   const cell = fit ? "" : size === "sm" ? "h-[52px] w-[72px] text-[0.8rem]" : "h-[72px] w-[104px] text-[1rem]";
   const cellStyle = fit ? { width: "var(--cell)", height: "calc(var(--cell) * 0.66)", fontSize: "calc(var(--cell) * 0.16)" } : undefined;
   const widthUnits = layout.cols + (layout.cols - 1) * GAP;
-  const heightUnits = layout.rows * 0.66 + (layout.rows - 1) * GAP + 0.96; // 교탁(0.56) + 교탁~책상 간격(0.4)
+  const heightUnits = layout.rows * 0.66 + (layout.rows - 1) * GAP + 0.96; // 칠판(0.56) + 칠판~책상 간격(0.4)
   const rootStyle = fit
     ? { "--cell": `min(200px, calc(100cqw / ${widthUnits}), calc((100cqh - 8px) / ${heightUnits}))` }
     : undefined;
 
-  // 교탁: 책상 3칸 너비, 높이 0.56칸 (줄이 좁으면 화면 너비까지만)
-  const desk = (
+  // 칠판: 글자 없이 색으로 (짙은 초록 판 + 나무 테두리 + 아래 분필 받침). 책상 5칸 너비(화면 너비까지만), 높이 0.56칸
+  const board = (
     <div
-      className={`mx-auto rounded-lg bg-amber-700 text-center font-bold text-white ${fit ? "leading-none" : "w-[320px] py-4 text-xl"}`}
-      style={fit ? { width: "calc(var(--cell) * 3)", maxWidth: "100cqw", padding: "calc(var(--cell) * 0.16) 0", fontSize: "calc(var(--cell) * 0.24)" } : undefined}
-    >
-      교탁
-    </div>
+      role="img"
+      aria-label="칠판"
+      className={`mx-auto rounded-md [print-color-adjust:exact] ${fit ? "" : "h-[48px] w-[360px]"}`}
+      style={{
+        ...(fit ? { width: "calc(var(--cell) * 5)", maxWidth: "100cqw", height: "calc(var(--cell) * 0.56)" } : {}),
+        background: "linear-gradient(180deg, #2f5d4f 0%, #264941 60%, #213f38 100%)",
+        border: fit ? "calc(var(--cell) * 0.05) solid #8b5a2b" : "5px solid #8b5a2b",
+        borderBottomWidth: fit ? "calc(var(--cell) * 0.1)" : "9px",
+        borderBottomColor: "#a87440",
+        boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.06), 0 2px 4px rgba(0,0,0,0.15)",
+      }}
+    />
   );
 
   return (
     <div className={`inline-flex flex-col ${fit ? "gap-[calc(var(--cell)*0.4)]" : "gap-10"}`} style={rootStyle}>
-      {!teacher && desk}
+      {!teacher && board}
       <div className={`flex flex-col ${gapCls}`}>
         {rowOrder.map((r) => (
           <div key={r} className={`flex ${gapCls}`}>
@@ -72,7 +79,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
           </div>
         ))}
       </div>
-      {teacher && desk}
+      {teacher && board}
     </div>
   );
 }

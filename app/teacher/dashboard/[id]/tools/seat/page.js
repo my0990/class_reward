@@ -27,7 +27,7 @@ export default function SeatPage() {
   const [rules, setRules] = useState(EMPTY_RULES);
   const [draft, setDraft] = useState(null); // 방금 섞은 자리 (공개 애니메이션용)
   const [revealed, setRevealed] = useState(Infinity);
-  const view = "student"; // 학생 시점 (교탁이 위)
+  const view = "student"; // 학생 시점 (칠판이 위)
   const [busy, setBusy] = useState(false);
   const timer = useRef(null);
   const baseRef = useRef(undefined); // 이 화면에 들어올 때의 자리 (다시 섞어도 이걸 기준으로)
