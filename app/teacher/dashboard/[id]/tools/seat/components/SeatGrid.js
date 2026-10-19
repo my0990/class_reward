@@ -10,22 +10,23 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
   const rowOrder = teacher ? [...rows].reverse() : rows;
   const colOrder = teacher ? [...cols].reverse() : cols;
   // fit: 부모(container-type:size)의 너비·높이 둘 다에 맞춰 칸 크기를 정한다 → 한 화면에 다 보임 (최대 200px)
-  // 세로 = 줄 수 × 칸 높이(0.66) + 줄 간격(0.08) + 교탁·간격(약 0.45) (모두 칸 너비 배율)
+  // 세로 = 줄 수 × 칸 높이(0.66) + 줄 간격(0.08) + 교탁(0.56)·교탁~책상 간격(0.4) (모두 칸 너비 배율)
   const fit = size === "fit";
   const GAP = 0.08; // 책상 사이 간격 (칸 너비 배율, fit일 때)
   const gapCls = fit ? "gap-[calc(var(--cell)*0.08)]" : "gap-2";
   const cell = fit ? "" : size === "sm" ? "h-[52px] w-[72px] text-[0.8rem]" : "h-[72px] w-[104px] text-[1rem]";
   const cellStyle = fit ? { width: "var(--cell)", height: "calc(var(--cell) * 0.66)", fontSize: "calc(var(--cell) * 0.16)" } : undefined;
   const widthUnits = layout.cols + (layout.cols - 1) * GAP;
-  const heightUnits = layout.rows * 0.66 + (layout.rows - 1) * GAP + 0.73; // 교탁(약 0.33) + 교탁~책상 간격(0.4)
+  const heightUnits = layout.rows * 0.66 + (layout.rows - 1) * GAP + 0.96; // 교탁(0.56) + 교탁~책상 간격(0.4)
   const rootStyle = fit
     ? { "--cell": `min(200px, calc(100cqw / ${widthUnits}), calc((100cqh - 8px) / ${heightUnits}))` }
     : undefined;
 
+  // 교탁: 책상 3칸 너비, 높이 0.56칸 (줄이 좁으면 화면 너비까지만)
   const desk = (
     <div
-      className={`mx-auto rounded-lg bg-amber-700 text-center font-bold text-white ${fit ? "leading-none" : "w-[220px] py-2"}`}
-      style={fit ? { width: "calc(var(--cell) * 2)", padding: "calc(var(--cell) * 0.07) 0", fontSize: "calc(var(--cell) * 0.15)" } : undefined}
+      className={`mx-auto rounded-lg bg-amber-700 text-center font-bold text-white ${fit ? "leading-none" : "w-[320px] py-4 text-xl"}`}
+      style={fit ? { width: "calc(var(--cell) * 3)", maxWidth: "100cqw", padding: "calc(var(--cell) * 0.16) 0", fontSize: "calc(var(--cell) * 0.24)" } : undefined}
     >
       교탁
     </div>
