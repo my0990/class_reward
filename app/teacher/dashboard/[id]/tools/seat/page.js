@@ -202,8 +202,8 @@ export default function SeatPage() {
 
         <div className="flex min-h-0 flex-1 flex-col items-center gap-4">
           {/* 남은 화면(너비·높이)에 맞춰 자리표 크기를 정한다 (SeatGrid size="fit")
-              인쇄할 때는 높이 기준이 없어지므로 inline-size로 바꾼다 (cqh → 인쇄 페이지 높이) */}
-          <div className="seat-print-area flex min-h-[240px] w-full flex-1 justify-center pb-2 [container-type:size] print:[container-type:inline-size]">
+              인쇄할 때는 globals.css가 종이 한 장 크기로 바꿔 가로·세로 가운데에 놓는다 */}
+          <div className="seat-print-area flex min-h-[240px] w-full flex-1 justify-center pb-2 [container-type:size]">
             <SeatGrid layout={layout} assignment={shown} students={byId} view={printing ? printView : "student"} hiddenSeats={hiddenSeats} size="fit" />
           </div>
           <div className="print:hidden">

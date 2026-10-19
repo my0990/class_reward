@@ -198,10 +198,24 @@ body {
   @media (min-width: 1424px) { .page-width { width: 1392px; } } /* 8개 */
 }
 
-/* 자리 바꾸기 인쇄: 자리표만 인쇄한다 */
+/* 자리 바꾸기 인쇄: 자리표만, 종이 한 장의 가로·세로 가운데에 (종이 크기에 맞춰 크기도 조절) */
 @media print {
+  @page { margin: 12mm; }
+  html:has(.seat-print-area), body:has(.seat-print-area) { height: 100%; overflow: hidden; } /* 빈 두 번째 장 방지 */
   body:has(.seat-print-area) * { visibility: hidden; }
   body:has(.seat-print-area) .seat-print-area,
-  body:has(.seat-print-area) .seat-print-area * { visibility: visible; }
-  body:has(.seat-print-area) .seat-print-area { position: absolute; left: 0; top: 0; width: 100%; overflow: visible; }
+  body:has(.seat-print-area) .seat-print-area * { visibility: visible; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body:has(.seat-print-area) .seat-print-area {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;      /* 위아래 가운데 */
+    justify-content: center;  /* 좌우 가운데 */
+    container-type: size;     /* 종이 너비·높이에 맞춰 자리표 크기 (SeatGrid size="fit") */
+    overflow: visible;
+  }
 }
