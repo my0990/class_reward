@@ -83,7 +83,8 @@ export default function GroupEditor({ groups, setGroups, layout, students, name 
               <div>
                 <p className="mb-1 text-sm text-gray-500">② 앉을 수 있는 자리 (누르거나 드래그, 위쪽이 칠판)</p>
                 <GroupSeatPicker layout={layout} seats={g.seats} color={color} onChange={(seats) => update(i, { seats })} />
-                {g.seats.length === 0 && <p className="mt-1 text-xs text-gray-400">자리를 고르기 전에는 조건으로 쓰지 않아요.</p>}
+                {/* 자리를 고르면 글자만 숨긴다 (자리는 그대로 차지 → 아래 내용이 움직이지 않음) */}
+                <p className={`mt-1 text-xs text-gray-400 ${g.seats.length ? "invisible" : ""}`}>자리를 고르기 전에는 조건으로 쓰지 않아요.</p>
               </div>
             </div>
           </div>
