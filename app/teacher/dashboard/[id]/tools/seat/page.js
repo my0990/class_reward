@@ -54,7 +54,8 @@ export default function SeatPage() {
     if (layout || plan === undefined || !studentList) return;
     const initial = plan?.layout ?? makeLayout(Math.max(1, Math.ceil(students.length / 6)), 6);
     setLayout(initial);
-    setRules(normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial)); // 예전 '앞자리' → 그룹
+    // 예전 '앞자리' → 그룹. 고정 자리는 옵션을 없앴으므로 비운다 (다음 저장 때 DB에서도 지워짐)
+    setRules({ ...normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial), fixed: {} });
     if (!plan?.layout) setModalId(SEAT_SETTINGS_ID); // 처음이면 설정 창(책상 배치)부터
   }, [plan, studentList, students.length, layout]);
 

@@ -33,7 +33,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
           {/* 탭 내용 높이 고정 (탭을 바꿔도 창 크기가 그대로, 넘치면 이 안에서 스크롤) */}
           <div className="h-[min(640px,65vh)] overflow-y-auto overscroll-contain pr-1">
           {tab === "layout" && <LayoutEditor isNew={isNew} layout={layout} setLayout={setLayout} studentCount={students.length} />}
-          {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} layout={layout} students={students} />}
+          {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} students={students} />}
           {tab === "groups" && (
             <div>
               <p className="mb-3 text-sm text-gray-500">
