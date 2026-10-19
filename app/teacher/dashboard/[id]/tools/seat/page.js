@@ -166,7 +166,9 @@ export default function SeatPage() {
     ["layout", "책상 배치"],
     ["rules", "조건"],
   ];
-  const iconBtn = "btn btn-square btn-sm h-10 w-10 border-0 bg-white text-gray-600 hover:bg-orange-50";
+  // 배경·글자색은 한 가지만 붙인다 (bg-white와 bg-orange-500을 같이 붙이면 CSS 순서로 흰색이 이겨 아이콘이 안 보였음)
+  const iconBase = "btn btn-square btn-sm h-10 w-10 border-0";
+  const iconBtn = `${iconBase} bg-white text-gray-600 hover:bg-orange-50`;
 
   return (
     // 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
@@ -187,7 +189,7 @@ export default function SeatPage() {
               type="button"
               title={unsaved ? "이 자리로 저장" : "저장할 새 자리가 없어요 ('시작'을 눌러 섞어 주세요)"}
               aria-label="자리 저장"
-              className={`${iconBtn} ${unsaved ? "bg-orange-500 text-white hover:bg-orange-600" : ""}`}
+              className={unsaved ? `${iconBase} bg-orange-500 text-white hover:bg-orange-600 disabled:bg-orange-300 disabled:text-white` : iconBtn}
               disabled={!unsaved || busy || Boolean(hiddenSeats)}
               onClick={onSave}
             >
@@ -200,7 +202,7 @@ export default function SeatPage() {
               type="button"
               title={view === "student" ? "180도 회전 (칠판이 아래로)" : "180도 회전 (칠판이 위로)"}
               aria-label="180도 회전"
-              className={`${iconBtn} ${view === "teacher" ? "bg-orange-100 text-orange-700" : ""}`}
+              className={view === "teacher" ? `${iconBase} bg-orange-100 text-orange-700 hover:bg-orange-200` : iconBtn}
               onClick={() => setView((v) => (v === "student" ? "teacher" : "student"))}
             >
               <ArrowPathIcon className="h-6 w-6" />
