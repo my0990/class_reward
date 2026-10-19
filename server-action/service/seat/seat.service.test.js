@@ -42,6 +42,7 @@ describe("자리 바꾸기 저장", () => {
       groups: [{ id: "front", name: "앞자리", color: 0, userIds: ["c"], seats: ["0-0", "0-1", "1-0"] }],
       apart: [["a", "b"]],
       avoidPrevPartner: true,
+      excluded: [],
     });
     expect(saved.layout.desks[1][1]).toBe(false);
   });
@@ -94,6 +95,14 @@ describe("자리 바꾸기 저장", () => {
     expect(saved.current.assignment).toEqual(a);
     expect(saved.history).toHaveLength(1);
     expect(saved.history[0].confirmedAt).toEqual(new Date(2026, 0, 1));
+  });
+
+  it("뺀 학생(excluded)은 자리 없이 저장할 수 있다", async () => {
+    await saveSeatSetupService({ ...args, layout: makeLayout(2, 2), rules: { excluded: ["c", "c", "outsider"] } });
+    expect((await plan()).rules.excluded).toEqual(["c"]);
+    expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a", "0-1": "b" } })).ok).toBe(true);
+    expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a", "0-1": "b", "1-0": "c" } })).ok).toBe(false); // 뺀 학생이 들어 있음
+    expect((await confirmSeatsService({ ...args, assignment: { "0-0": "a" } })).ok).toBe(false); // b 빠짐
   });
 
   it("교실 배치 없이 확정하면 안내", async () => {

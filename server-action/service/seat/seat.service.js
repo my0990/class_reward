@@ -2,7 +2,7 @@
 //
 // seatPlan = {
 //   layout: { rows, cols, desks },          교실 배치
-//   rules: { fixed, groups, apart, avoidPrevPartner },   (예전 front는 저장할 때 '앞자리' 그룹으로 바뀜)
+//   rules: { fixed, groups, apart, avoidPrevPartner, excluded },   excluded: 자리 바꾸기에서 뺀 학생 userId   (예전 front는 저장할 때 '앞자리' 그룹으로 바뀜)
 //   current: { assignment, confirmedAt } | null,   지금 자리
 //   history: [{ assignment, confirmedAt }],        지난 자리 (최근 5번, 최신이 앞)
 //   updatedAt
@@ -68,7 +68,8 @@ export function cleanRules(rules, layout, studentIds) {
     seen.add(key);
     apart.push([a, b]);
   }
-  return { fixed, groups, apart, avoidPrevPartner: Boolean(rules?.avoidPrevPartner) };
+  const excluded = [...new Set((rules?.excluded ?? []).filter((u) => studentIds.has(u)))];
+  return { fixed, groups, apart, avoidPrevPartner: Boolean(rules?.avoidPrevPartner), excluded };
 }
 
 /** 교실 배치·조건 저장 */
@@ -98,9 +99,10 @@ export async function confirmSeatsService({ teacher_id, classId, assignment, rep
   const layout = doc.seatPlan?.layout;
   if (!layout) return { ok: false, message: "교실 배치를 먼저 저장해 주세요." };
 
-  // 책상이 있는 자리에, 이 학급 학생이, 한 번씩만
+  // 책상이 있는 자리에, 이 학급 학생이(뺀 학생 제외), 한 번씩만
   const seats = new Set(deskSeats(layout));
-  const ids = await studentIdsOf(db, scope);
+  const excluded = new Set(doc.seatPlan?.rules?.excluded ?? []);
+  const ids = new Set([...(await studentIdsOf(db, scope))].filter((u) => !excluded.has(u)));
   const used = new Set();
   const clean = {};
   for (const [sid, u] of Object.entries(assignment ?? {})) {

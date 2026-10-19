@@ -26,7 +26,7 @@ function SaveIcon(props) {
   );
 }
 
-const EMPTY_RULES = { fixed: {}, groups: [], apart: [], avoidPrevPartner: true };
+const EMPTY_RULES = { fixed: {}, groups: [], apart: [], avoidPrevPartner: true, excluded: [] };
 const REVEAL_MS = 90; // 섞을 때 한 자리씩 공개하는 간격
 
 export default function SeatPage() {
@@ -101,6 +101,7 @@ export default function SeatPage() {
   };
   const editRules = (next) => {
     dirty.current = true;
+    if (next.excluded !== rules.excluded) setDraft(null); // 참여 학생이 바뀌면 섞은 결과는 다시
     setRules(next);
   };
 
@@ -145,7 +146,8 @@ export default function SeatPage() {
 
   // 시작: 섞어서 한 자리씩 공개 (저장은 아직 안 함)
   const onStart = () => {
-    const res = assignSeats(students.map((s) => s.userId), layout, rules, {
+    const excluded = new Set(rules.excluded ?? []);
+    const res = assignSeats(students.map((s) => s.userId).filter((u) => !excluded.has(u)), layout, rules, {
       prevAssignment: plan?.current?.assignment ?? null, // 마지막으로 저장한 자리
       nameOf: (u) => (byId[u] ? `${byId[u].classNumber}번 ${byId[u].profileNickname}` : u),
     });

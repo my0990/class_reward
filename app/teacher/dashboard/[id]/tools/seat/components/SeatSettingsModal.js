@@ -1,15 +1,17 @@
 "use client";
-// 설정 창: [책상 배치] · [조건] · [그룹] 탭. 바꾼 내용은 페이지가 자동 저장한다.
+// 설정 창: [책상 배치] · [학생] · [조건] · [그룹] 탭. 바꾼 내용은 페이지가 자동 저장한다.
 import { useState } from "react";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import LayoutEditor from "./LayoutEditor";
 import RulesEditor from "./RulesEditor";
 import GroupEditor from "./GroupEditor";
+import StudentsEditor from "./StudentsEditor";
 
 export const SEAT_SETTINGS_ID = "SEAT_SETTINGS";
 
 const tabs = [
   ["layout", "책상 배치"],
+  ["students", "학생"],
   ["rules", "조건"],
   ["groups", "그룹"],
 ];
@@ -32,7 +34,10 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
           </div>
           {/* 탭 내용 높이 고정 (탭을 바꿔도 창 크기가 그대로, 넘치면 이 안에서 스크롤) */}
           <div className="h-[min(640px,65vh)] overflow-y-auto overscroll-contain pr-1">
-          {tab === "layout" && <LayoutEditor isNew={isNew} layout={layout} setLayout={setLayout} studentCount={students.length} />}
+          {tab === "layout" && <LayoutEditor isNew={isNew} layout={layout} setLayout={setLayout} studentCount={students.length - (rules.excluded?.length ?? 0)} />}
+          {tab === "students" && (
+            <StudentsEditor students={students} excluded={rules.excluded ?? []} setExcluded={(excluded) => setRules({ ...rules, excluded })} />
+          )}
           {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} students={students} />}
           {tab === "groups" && (
             <div>
