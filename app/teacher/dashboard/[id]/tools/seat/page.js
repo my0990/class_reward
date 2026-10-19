@@ -8,14 +8,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { mutate } from "swr";
 import { toast } from "react-hot-toast";
-import { ArrowPathIcon, Cog6ToothIcon, PrinterIcon } from "@heroicons/react/24/outline";
-import ModalTemplate from "@/components/ui/common/ModalTemplate";
+import { Cog6ToothIcon, PrinterIcon } from "@heroicons/react/24/outline";
 import { useFetchData } from "@/hooks/useFetchData";
 import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
 import { saveSeatSetup, confirmSeats } from "@/server-action/actions/seat/seat.action";
 import SeatGrid from "./components/SeatGrid";
-import LayoutEditor from "./components/LayoutEditor";
-import RulesEditor from "./components/RulesEditor";
+import PrintPreviewModal, { PRINT_PREVIEW_ID } from "./components/PrintPreviewModal";
+import SeatSettingsModal, { SEAT_SETTINGS_ID } from "./components/SeatSettingsModal";
 
 // 저장(디스크) 아이콘
 function SaveIcon(props) {
@@ -36,8 +35,7 @@ export default function SeatPage() {
   const { data: plan, isLoading: l1, isError: e1 } = useFetchData(planKey);
   const { data: studentList, isLoading: l2, isError: e2 } = useFetchData(`/api/students/${classId}`);
 
-  const [modalId, setModalId] = useState(null); // "SEAT_SETTINGS" 이면 설정 창
-  const [tab, setTab] = useState("layout"); // 설정 창 안의 탭: layout | rules
+  const [modalId, setModalId] = useState(null); // 인쇄 미리보기 / 설정 창
   const [layout, setLayout] = useState(null);
   const [rules, setRules] = useState(EMPTY_RULES);
   const [draft, setDraft] = useState(null); // 방금 섞은 자리 (공개 애니메이션용)
@@ -57,7 +55,7 @@ export default function SeatPage() {
     const initial = plan?.layout ?? makeLayout(Math.max(1, Math.ceil(students.length / 6)), 6);
     setLayout(initial);
     setRules(normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial)); // 예전 '앞자리' → 그룹
-    if (!plan?.layout) setModalId("SEAT_SETTINGS"); // 처음이면 설정 창(책상 배치)부터
+    if (!plan?.layout) setModalId(SEAT_SETTINGS_ID); // 처음이면 설정 창(책상 배치)부터
   }, [plan, studentList, students.length, layout]);
 
   useEffect(() => () => clearInterval(timer.current), []);
@@ -166,10 +164,14 @@ export default function SeatPage() {
       toast.success("이 자리로 저장했어요.");
     });
 
-  const tabs = [
-    ["layout", "책상 배치"],
-    ["rules", "조건"],
-  ];
+  // 화면 자리표를 고른 방향으로 바꾼 뒤 인쇄하고, 끝나면 되돌린다
+  const onPrint = () => {
+    setPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setPrinting(false);
+    }, 100);
+  };
   // 오른쪽 위 아이콘 버튼은 모두 같은 모양 (흰 배경 + 회색 선)
   const iconBtn = "btn btn-square btn-sm h-10 w-10 border-0 bg-white text-gray-600 hover:bg-orange-50";
 
@@ -191,10 +193,10 @@ export default function SeatPage() {
               {/* 저장 안 한 새 자리가 있으면 작은 주황 점 */}
               {unsaved && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-orange-500" />}
             </button>
-            <button type="button" title="인쇄 (미리보기)" aria-label="인쇄" className={iconBtn} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => setModalId("PRINT_PREVIEW")}>
+            <button type="button" title="인쇄 (미리보기)" aria-label="인쇄" className={iconBtn} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => setModalId(PRINT_PREVIEW_ID)}>
               <PrinterIcon className="h-6 w-6" />
             </button>
-            <button type="button" title="책상 배치·조건 설정" aria-label="설정" className={iconBtn} onClick={() => setModalId("SEAT_SETTINGS")}>
+            <button type="button" title="책상 배치·조건 설정" aria-label="설정" className={iconBtn} onClick={() => setModalId(SEAT_SETTINGS_ID)}>
               <Cog6ToothIcon className="h-6 w-6" />
             </button>
           </div>
@@ -218,64 +220,26 @@ export default function SeatPage() {
           </div>
         </div>
 
-      {/* 인쇄 미리보기: 방향(180도 회전)을 고르고 인쇄 */}
-      <ModalTemplate id="PRINT_PREVIEW" modalId={modalId} setModalId={setModalId} className="w-[960px] max-w-[95vw] print:hidden">
-        {({ close }) => (
-          <div className="p-5 sm:p-6">
-            <h2 className="mb-4 text-lg font-bold">인쇄 미리보기</h2>
-            <div className="flex h-[60vh] w-full justify-center rounded-xl border border-gray-200 bg-white p-4 [container-type:size]">
-              <SeatGrid layout={layout} assignment={shown} students={byId} view={printView} size="fit" />
-            </div>
-            <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
-              <button
-                type="button"
-                className={`btn btn-sm border-0 ${printView === "teacher" ? "bg-orange-100 text-orange-700" : "bg-gray-100 text-gray-700"}`}
-                onClick={() => setPrintView((v) => (v === "student" ? "teacher" : "student"))}
-              >
-                <ArrowPathIcon className="h-5 w-5" />
-                180도 회전 {printView === "teacher" ? "(칠판 아래)" : "(칠판 위)"}
-              </button>
-              <button
-                type="button"
-                className="btn btn-sm border-0 bg-orange-500 text-white hover:bg-orange-600"
-                onClick={() => {
-                  close();
-                  // 화면 자리표를 고른 방향으로 바꾼 뒤 인쇄하고, 끝나면 되돌린다
-                  setPrinting(true);
-                  setTimeout(() => {
-                    window.print();
-                    setPrinting(false);
-                  }, 100);
-                }}
-              >
-                <PrinterIcon className="h-5 w-5" />
-                인쇄
-              </button>
-            </div>
-          </div>
-        )}
-      </ModalTemplate>
-
-      {/* 설정 창: 책상 배치 · 조건 (바꾸면 자동 저장) */}
-      <ModalTemplate id="SEAT_SETTINGS" modalId={modalId} setModalId={setModalId} className="w-[960px] max-w-[95vw] print:hidden">
-        {() => (
-          <div className="p-5 sm:p-6">
-            <div role="tablist" className="tabs tabs-boxed mb-5 inline-flex bg-orange-100">
-              {tabs.map(([key, label]) => (
-                <button key={key} type="button" role="tab" className={`tab ${tab === key ? "tab-active !bg-orange-500 !text-white" : ""}`} onClick={() => setTab(key)}>
-                  {label}
-                </button>
-              ))}
-            </div>
-            {tab === "layout" ? (
-              <LayoutEditor isNew={!plan?.layout} layout={layout} setLayout={editLayout} studentCount={students.length} />
-            ) : (
-              <RulesEditor rules={rules} setRules={editRules} layout={layout} students={students} />
-            )}
-            <p className="mt-5 text-center text-xs text-gray-400">바꾼 내용은 자동으로 저장됩니다.</p>
-          </div>
-        )}
-      </ModalTemplate>
+      <PrintPreviewModal
+        modalId={modalId}
+        setModalId={setModalId}
+        layout={layout}
+        assignment={shown}
+        students={byId}
+        printView={printView}
+        setPrintView={setPrintView}
+        onPrint={onPrint}
+      />
+      <SeatSettingsModal
+        modalId={modalId}
+        setModalId={setModalId}
+        isNew={!plan?.layout}
+        layout={layout}
+        setLayout={editLayout}
+        rules={rules}
+        setRules={editRules}
+        students={students}
+      />
     </div>
   );
 }
