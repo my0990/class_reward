@@ -28,6 +28,14 @@ try {
     }
   }
 
+  // 학생 목록 API(/api/students)가 빼고 보내는 칸이 얼마나 되는지
+  const [sz] = await client.db("data").collection("user_data").aggregate([
+    { $match: { role: "student" } },
+    { $project: { full: { $bsonSize: "$$ROOT" }, list: { $bsonSize: { $unsetField: { field: "profileImgStorage", input: { $unsetField: { field: "titles", input: { $unsetField: { field: "inventory", input: "$$ROOT" } } } } } } } } },
+    { $group: { _id: null, full: { $avg: "$full" }, list: { $avg: "$list" } } },
+  ]).toArray().catch(() => [null]);
+  if (sz) console.log(`\n## 학생 문서 평균 크기: 전체 ${(sz.full / 1024).toFixed(2)}KB → 학생 목록용 ${(sz.list / 1024).toFixed(2)}KB (${Math.round((1 - sz.list / sz.full) * 100)}% 감소)`);
+
   const users = client.db("user").collection("users");
   console.log("\n## 사용자");
   const c = (q) => users.countDocuments(q);
