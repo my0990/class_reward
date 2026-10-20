@@ -4,7 +4,8 @@ import { toast } from "react-hot-toast";
 // 학생 카드를 누르면 → check(학생)로 막을지 확인 → 비밀번호 키패드 → onPicked({ user, kioskToken })
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
-import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useLiveStudents } from "@/hooks/useLiveStudents";
 import KioskPasswordDialog, { KIOSK_PWD_DIALOG_ID } from "@/components/kiosk/KioskPasswordDialog";
 import KioskHeader from "./KioskHeader";
 import StudentCard from "./StudentCard";
@@ -21,7 +22,7 @@ export { notEnoughMessage } from "./kioskUtils";
 export default function StudentPicker({ classId, title, guide = "계정을 선택하세요", onBack, check, onPicked, children }) {
   const studentsKey = `/api/students/${classId}`;
   const { data: classData, isLoading: l1, isError: e1 } = useFetchData(`/api/classData/${classId}`);
-  const { data: students, isLoading: l2, isError: e2 } = useFetchData(studentsKey, LIVE_REFRESH);
+  const { data: students, isLoading: l2, isError: e2 } = useLiveStudents(classId); // 바뀌었을 때만 다시 불러옴
   const [picked, setPicked] = useState(null);
 
   // 키오스크는 오래 켜 두므로, 이 화면에 들어올 때마다 최신 잔액을 다시 가져온다.

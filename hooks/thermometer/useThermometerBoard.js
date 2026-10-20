@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
+import { useLiveInterval } from "@/hooks/useLiveInterval";
 import { toast } from "react-hot-toast";
 import usePendingAction from "@/hooks/usePendingAction";
 import { updateManualDegree, updateThermometerSetting } from "@/server-action/actions/thermometer/thermometer.action";
@@ -24,13 +25,14 @@ const DEFAULT_REWARD_OBJ = {
 // 하나로 모은 공용 훅.
 export function useThermometerBoard(classId) {
   const { runAction, isPending } = usePendingAction();
+  const liveInterval = useLiveInterval(); // 15초, 10분 동안 안 쓰면 1분
 
   const {
     data: thermometerData,
     isLoading,
     isError,
     mutate: mutateThermometerData,
-  } = useFetchData(classId ? `/api/thermometer/${classId}` : null, LIVE_REFRESH);
+  } = useFetchData(classId ? `/api/thermometer/${classId}` : null, { ...LIVE_REFRESH, refreshInterval: liveInterval });
 
   const [modalId, setModalId] = useState(null);
   const [rewardObj, setRewardObj] = useState({});

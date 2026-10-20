@@ -22,6 +22,7 @@ const PLAN = [
   [data, "user_data", { userId: 1 }, { unique: true, partialFilterExpression: nonEmpty("userId"), name: "userId_unique" }, "학생 아이디 중복 금지"],
   [data, "user_data", { teacher_id: 1, classId: 1, userId: 1 }, {}, "학급별 학생 조회"],
   [data, "history", { userId: 1, date: -1 }, {}, "학생 거래 내역 조회 (최신순)"],
+  [data, "history", { teacher_id: 1, classId: 1, date: -1 }, {}, "학급 마지막 거래 시각 (키오스크 새로고침 확인)"],
   [data, "class_data", { teacher_id: 1, classId: 1 }, {}, "학급 정보 조회"],
   [data, "class_data", { uniqueNickname: 1 }, { unique: true, partialFilterExpression: nonEmpty("uniqueNickname"), name: "uniqueNickname_unique" }, "학급 고유 별명 중복 금지"],
   [data, "thermometer", { teacher_id: 1, classId: 1 }, {}, "학급 온도계 조회"],
