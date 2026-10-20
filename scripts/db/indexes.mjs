@@ -95,10 +95,21 @@ try {
     lines.push(`- ✅ ${label}: 만들었음${dropNote} (${where})`);
   }
 
-  const ttl = (await data.collection("history").indexes()).find((i) => i.expireAfterSeconds !== undefined);
-  lines.push(
-    `\n거래 기록 자동 삭제: ${ttl ? `유지 (${Math.round(ttl.expireAfterSeconds / 86400)}일)` : "없음"} — 이 스크립트는 건드리지 않습니다.`
-  );
+  // 거래 기록(history) 자동 삭제: 이미 있으면 그 기간을 그대로 두고, 없을 때만 1년으로 만든다
+  // (기록이 끝없이 쌓여 Atlas 무료 용량 0.5GB를 채우지 않게. expiresAfter = 기록한 시각)
+  const HISTORY_TTL_DAYS = 365;
+  const historyIdx = await data.collection("history").indexes();
+  const ttl = historyIdx.find((i) => i.expireAfterSeconds !== undefined);
+  if (ttl) {
+    lines.push(`\n- ✅ 거래 기록 자동 삭제: 이미 있음 (${Math.round(ttl.expireAfterSeconds / 86400)}일, ${Object.keys(ttl.key).join(",")}) — 기간은 그대로 둡니다.`);
+  } else if (!APPLY) {
+    lines.push(`\n- ➕ 거래 기록 자동 삭제: 없음 → ${HISTORY_TTL_DAYS}일 지난 기록 자동 삭제를 만들 예정 (data.history {expiresAfter:1})`);
+  } else {
+    const plain = historyIdx.filter((i) => sameKey(i.key, { expiresAfter: 1 }));
+    for (const i of plain) await data.collection("history").dropIndex(i.name);
+    await data.collection("history").createIndex({ expiresAfter: 1 }, { expireAfterSeconds: HISTORY_TTL_DAYS * 86400, name: "expiresAfter_ttl_1y" });
+    lines.push(`\n- ✅ 거래 기록 자동 삭제: ${HISTORY_TTL_DAYS}일 지난 기록 자동 삭제를 만들었음 (data.history {expiresAfter:1})`);
+  }
 
   console.log(
     `# DB 인덱스 ${APPLY ? "적용 결과" : "연습 실행(dry-run) — 아무것도 바뀌지 않았습니다"}\n` +
