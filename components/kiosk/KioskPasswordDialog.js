@@ -1,5 +1,6 @@
 "use client";
 
+import { profileImgProps } from "@/util/image/profileImage";
 // 키오스크 학생 비밀번호 확인 창 (구매·아이템 사용·기부 공용)
 // 부모가 document.getElementById(DIALOG_ID).showModal()로 연다.
 // 비밀번호가 맞으면 onSuccess(kioskToken)을 부른다.
@@ -140,7 +141,7 @@ export default function KioskPasswordDialog({ userData, onSuccess }) {
         <div className="relative">
           {userData?.profileUrl ? (
             <img
-              src={userData.profileUrl}
+              {...profileImgProps(userData.profileUrl, 76)}
               alt=""
               className="h-[76px] w-[76px] rounded-full border-4 border-white object-cover shadow-[0_4px_12px_rgba(251,146,60,0.35)] [@media(max-height:760px)]:h-[56px] [@media(max-height:760px)]:w-[56px]"
             />

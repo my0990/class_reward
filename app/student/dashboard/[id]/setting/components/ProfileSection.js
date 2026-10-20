@@ -1,4 +1,5 @@
 'use client';
+import { profileImgProps } from "@/util/image/profileImage";
 import { useEffect } from "react";
 
 export default function ProfileSection({ profileNickname, profileState, profileUrl, setFormData, onSubmit, formData, onChange, isPending }) {
@@ -22,7 +23,7 @@ export default function ProfileSection({ profileNickname, profileState, profileU
           <div className="w-24 rounded-full border-[6px] border-orange-200 ring-offset-2 ring-offset-base-100 transition-all">
             {formData.profileUrl ? (
               <img
-                src={formData.profileUrl}
+                {...profileImgProps(formData.profileUrl, 96)}
                 width="100"
                 height="100"
                 alt="profile"

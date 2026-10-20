@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Typewriter from "typewriter-effect";
 import Link from "next/link";
@@ -9,7 +9,6 @@ import { signIn } from "next-auth/react";
 
 import AuthInput from "../../components/authInput";
 import AuthBtn from "../../components/authBtn";
-import lottieJson from "@/public/tangerine.json";
 
 export default function AuthPage({ role }) {
   const router = useRouter();
@@ -17,6 +16,19 @@ export default function AuthPage({ role }) {
     () => dynamic(() => import("react-lottie-player"), { ssr: false }),
     []
   );
+
+  // 귤 애니메이션(116KB)은 화면 코드에 넣지 않고, 화면이 뜬 뒤에 따로 불러온다
+  const [lottieJson, setLottieJson] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetch("/tangerine.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => alive && json && setLottieJson(json))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const isTeacher = role === "teacher";
 
@@ -129,7 +141,7 @@ export default function AuthPage({ role }) {
 
           <div className="relative w-[80vw] h-[80vw] min-[400px]:w-[300px] min-[400px]:h-[300px] overflow-hidden border-orange-400 mx-auto rounded-full flex items-center justify-center">
             <div className="absolute min-[500px]:w-[500px] min-[500px]:h-[500px] w-[400px]">
-              <Lottie loop animationData={lottieJson} play />
+              {lottieJson && <Lottie loop animationData={lottieJson} play />}
             </div>
           </div>
 

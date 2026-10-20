@@ -1,5 +1,7 @@
 'use client'
-import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
+import { profileImgProps } from "@/util/image/profileImage";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useStudentRefresh } from "@/hooks/useLiveInterval";
 import ProfileImgModal from "./components/ProfileImgModal";
 import TitleModal from "./components/TitleModal";
 import { useState } from "react";
@@ -24,7 +26,7 @@ export default function Page({ classId }) {
         isError: isUserError,
         error: userError,
         mutate: mutateUserData,
-    } = useFetchData(`/api/user`, STUDENT_REFRESH);
+    } = useFetchData(`/api/user`, useStudentRefresh());
     const [modalId, setModalId] = useState(null);
     const isLoading =
         isClassLoading ||
@@ -118,7 +120,7 @@ export default function Page({ classId }) {
                     </div>
                     <div className="flex justify-center flex-col items-center my-[16px]">
                         <div onClick={() => setModalId('PROFILE_SETTING')} className="border-[6px] border-white bg-white cursor-pointer transition-all hover:scale-105 w-[165px] h-[165px] mb-[16px] rounded-full bg-green-400 flex justify-center items-center overflow-hidden">
-                            <img src={profileUrl} width="165" height="165" alt="orange" />
+                            <img {...profileImgProps(profileUrl, 165)} width="165" height="165" alt="orange" />
                         </div>
 
                         <div className="text-[1.6rem] ">{classNumber}. {profileNickname}</div>

@@ -1,12 +1,22 @@
 'use client'
+import { profileImgProps } from "@/util/image/profileImage";
 import { toast } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
-import _ from "lodash";
 import { motion } from "framer-motion";
 import Modal from "./components/Modal";
 import util from "./util";
 import { useParams } from 'next/navigation';
+// 섞기 (lodash 전체를 불러오지 않게 직접 구현)
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
 export default function Random() {
     const params = useParams();
     const id = params.id;
@@ -83,7 +93,7 @@ export default function Random() {
     }
     useEffect(() => {
         if (studentData && isFirst) {
-            setOriginalStudentArr(_.shuffle(studentData))
+            setOriginalStudentArr(shuffle(studentData))
             setIsFirst(false)
         }
     }, [studentData])
@@ -163,7 +173,7 @@ export default function Random() {
                                             <div className="w-[80px] text-right overflow-hidden whitespace-nowrap"> </div>
                                         </div>
                                         <div className="flex overflow-hidden border-4 border-white justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
-                                            <img src={selectedStudent.profileUrl} width="100" height="100" alt="characther" className="rounded-full" />
+                                            <img {...profileImgProps(selectedStudent.profileUrl, 100)} width="100" height="100" alt="characther" className="rounded-full" />
                                         </div>
                                         <h1 className="text-[1rem] font-bold text-center overflow-hidden">{selectedStudent.classNumber}. {selectedStudent.profileNickname}</h1>
                                         <div className="bg-white rounded-lg flex items-center justify-center">

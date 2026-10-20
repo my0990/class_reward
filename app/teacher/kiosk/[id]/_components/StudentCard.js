@@ -1,3 +1,4 @@
+import { profileImgProps } from "@/util/image/profileImage";
 // 키오스크 학생 카드: 레벨 · 잔액 · 프로필 · 번호/별명 · 칭호
 import { getLevel } from "./kioskUtils";
 
@@ -15,7 +16,7 @@ export default function StudentCard({ user, currencyEmoji, startExp, commonDiffe
         </div>
       </div>
       <div className="mx-auto mb-[8px] flex h-[110px] w-[110px] items-center justify-center overflow-hidden rounded-full border-4 border-white bg-white">
-        <img src={user.profileUrl} width="100" height="100" alt="" className="rounded-full" />
+        <img {...profileImgProps(user.profileUrl, 100)} width="100" height="100" alt="" className="rounded-full" />
       </div>
       <div className="overflow-hidden text-center text-[1rem] font-bold">
         {user.classNumber}. {user.profileNickname}

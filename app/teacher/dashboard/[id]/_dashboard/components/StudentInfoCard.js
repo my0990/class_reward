@@ -1,5 +1,6 @@
 'use client'
 
+import { profileImgProps } from "@/util/image/profileImage";
 export default function StudentInfoCard({
     data,
     level,
@@ -37,7 +38,7 @@ export default function StudentInfoCard({
             <div className="flex overflow-hidden border-4 border-white justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
                 {data.profileUrl && (
                     <img
-                        src={data.profileUrl}
+                        {...profileImgProps(data.profileUrl, 100)}
                         width="100"
                         height="100"
                         alt="characther"

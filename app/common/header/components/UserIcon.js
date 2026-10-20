@@ -1,3 +1,4 @@
+import { profileImgProps } from "@/util/image/profileImage";
 export default function UserIcon({toggleUserInfo, profileIconRef, profileUrl, toggleHamburger, hasBadge = false}) {
     return (
         <div className="flex">
@@ -8,7 +9,7 @@ export default function UserIcon({toggleUserInfo, profileIconRef, profileUrl, to
                 ref={profileIconRef}
             >
                 <div className="w-12 h-12 rounded-full ring ring-gray ring-offset-base-100 ring-offset-2">
-                    <img src={profileUrl} width="90" height="90" alt="characther" />
+                    <img {...profileImgProps(profileUrl, 48)} width="90" height="90" alt="characther" />
                 </div>
             </div>
 
