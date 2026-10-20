@@ -3,13 +3,13 @@
 import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
 import { softDeleteClassService, restoreClassService } from "@/server-action/service/class/deleteClass.service";
 
-/** 학급을 휴지통으로 (30일 뒤 영구 삭제). confirmName = 사용자가 입력한 학급 이름 */
-export async function deleteClass({ classId, confirmName }) {
+/** 학급을 휴지통으로 (30일 뒤 영구 삭제). password = 교사 비밀번호 확인 */
+export async function deleteClass({ classId, password }) {
   try {
     const auth = await authorizeTeacherClass(classId);
     if (!auth.ok) return { result: false, message: auth.message };
 
-    const res = await softDeleteClassService({ teacher_id: auth.teacher_id, classId, confirmName });
+    const res = await softDeleteClassService({ teacher_id: auth.teacher_id, classId, password });
     return { result: true, message: "학급을 삭제했습니다. 30일 안에는 '삭제된 학급'에서 복구할 수 있어요.", data: res };
   } catch (error) {
     console.error("deleteClass error:", error);

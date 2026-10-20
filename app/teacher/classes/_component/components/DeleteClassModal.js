@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 
-// 학급 삭제 확인: 학급 이름을 똑같이 입력해야 삭제 버튼이 켜진다.
+// 학급 삭제 확인: 교사 비밀번호를 입력해야 삭제된다.
+// (교실에 켜 둔 키오스크 기기에서 학생이 학급 이름을 보고 따라 쳐서 지우는 일을 막는다)
 export default function DeleteClassModal({ modalId, setModalId, target, onConfirm, isDeleting }) {
-  const [typed, setTyped] = useState("");
-  useEffect(() => setTyped(""), [target?._id]);
+  const [password, setPassword] = useState("");
+  useEffect(() => setPassword(""), [target?._id, modalId]);
 
   const name = target?.className ?? "";
-  const matches = typed.trim() !== "" && typed.trim() === name.trim();
+  const ready = password !== "";
 
   return (
     <ModalTemplate id="DELETE_CLASS" modalId={modalId} setModalId={setModalId} className="w-[calc(100%-32px)] max-w-[460px]">
@@ -18,7 +19,7 @@ export default function DeleteClassModal({ modalId, setModalId, target, onConfir
           className="p-6"
           onSubmit={(e) => {
             e.preventDefault();
-            if (matches && !isDeleting) onConfirm(typed);
+            if (ready && !isDeleting) onConfirm(password);
           }}
         >
           <h2 className="mb-4 text-xl font-bold">&quot;{name}&quot;을(를) 삭제할까요?</h2>
@@ -31,17 +32,18 @@ export default function DeleteClassModal({ modalId, setModalId, target, onConfir
             삭제하는 동안 이 학급 학생들은 로그인할 수 없습니다.
           </div>
 
-          <label htmlFor="confirmClassName" className="mb-1 block text-sm text-gray-600">
-            확인을 위해 학급 이름 <b>{name}</b>을(를) 입력하세요
+          <label htmlFor="confirmClassPassword" className="mb-1 block text-sm text-gray-600">
+            확인을 위해 <b>선생님 비밀번호</b>를 입력하세요
           </label>
           <input
-            id="confirmClassName"
-            value={typed}
-            onChange={(e) => setTyped(e.target.value)}
-            autoComplete="off"
+            id="confirmClassPassword"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
             autoFocus
             className="mb-4 w-full border p-2"
-            placeholder={name}
+            placeholder="비밀번호"
           />
 
           <div className="flex justify-end gap-2">
@@ -50,7 +52,7 @@ export default function DeleteClassModal({ modalId, setModalId, target, onConfir
             </button>
             <button
               type="submit"
-              disabled={!matches || isDeleting}
+              disabled={!ready || isDeleting}
               className="rounded bg-red-500 px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isDeleting ? "삭제 중..." : "삭제"}

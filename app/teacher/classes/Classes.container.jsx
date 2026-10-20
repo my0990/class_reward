@@ -33,9 +33,9 @@ export default function ClassesContainer() {
         setModalId("DELETE_CLASS");
     };
 
-    const onDeleteConfirm = (confirmName) => {
+    const onDeleteConfirm = (password) => {
         runAction("deleteClass", async () => {
-            const res = await deleteClass({ classId: String(deleteTarget._id), confirmName });
+            const res = await deleteClass({ classId: String(deleteTarget._id), password });
             if (!res.result) {
                 toast.error(res.message);
                 return;

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ObjectId } from "mongodb";
+import { hashSync } from "bcryptjs";
 import { setupTestMongo, makeScope, seedStudent, seedClassData } from "@/test/helpers/testMongo";
 
 vi.mock("@/lib/mongodb", async () => (await import("@/test/helpers/testMongo")).mongodbMock);
@@ -25,7 +26,14 @@ const users = () => mongo.client.db("user").collection("users");
 const kiosk = () => mongo.client.db("user").collection("kiosk_pwd_attempts");
 const count = (col, f = {}) => mongo.db.collection(col).countDocuments(f);
 
+const PW = "teacher-pw";
+async function seedTeacher(s) {
+  if (await users().countDocuments({ _id: s.teacherObjectId })) return;
+  await users().insertOne({ _id: s.teacherObjectId, role: "teacher", email: `${s.teacher_id}@t.test`, passwordHash: hashSync(PW, 4) });
+}
+
 async function seedFullClass(s, name, prefix) {
+  await seedTeacher(s);
   await mongo.db.collection("classes").insertOne({ _id: s.classObjectId, teacher_id: s.teacherObjectId, className: name });
   await seedClassData(mongo.db, s, { className: name });
   for (const n of [1, 2]) {
@@ -42,14 +50,15 @@ async function seedFullClass(s, name, prefix) {
 
 beforeEach(async () => {
   await users().deleteMany({});
+  await mongo.client.db("user").collection("login_attempts").deleteMany({});
   await kiosk().deleteMany({});
   await seedFullClass(scope, "6학년 1반", "일반");
   await seedFullClass(sibling, "6학년 2반", "이반");
   await seedFullClass(other, "남의반", "남반");
 });
 
-const del = (confirmName = "6학년 1반", now = t0) =>
-  softDeleteClassService({ teacher_id: scope.teacher_id, classId: scope.classId, confirmName, now });
+const del = (password = PW, now = t0) =>
+  softDeleteClassService({ teacher_id: scope.teacher_id, classId: scope.classId, password, now });
 
 describe("softDeleteClassService (학급 휴지통으로)", () => {
   it("학급에 삭제 표시를 하고, 그 학급 학생 로그인을 막는다 (데이터는 아직 그대로)", async () => {
@@ -65,17 +74,20 @@ describe("softDeleteClassService (학급 휴지통으로)", () => {
     expect(await users().countDocuments({ disabled: true })).toBe(2);
   });
 
-  it("학급 이름이 다르면 거부 (앞뒤 공백은 무시)", async () => {
-    await expect(del("6학년 2반")).rejects.toThrow("학급 이름이 일치하지 않습니다.");
-    await expect(del("")).rejects.toThrow("학급 이름이 일치하지 않습니다.");
-    expect((await del("  6학년 1반  ")).result).toBe(true);
+  it("교사 비밀번호가 틀리면 거부, 5번 틀리면 10분 잠금", async () => {
+    await expect(del("")).rejects.toThrow("비밀번호를 입력해주세요.");
+    await expect(del("wrong")).rejects.toThrow("비밀번호가 일치하지 않습니다.");
+    for (let i = 0; i < 3; i++) await del("wrong").catch(() => {});
+    await expect(del("wrong")).rejects.toThrow("잠겼습니다");
+    await expect(del(PW)).rejects.toThrow("잠겼습니다"); // 잠긴 동안은 맞아도 거부
+    expect((await del(PW, new Date(t0.getTime() + 11 * 60 * 1000))).studentCount).toBe(2); // 10분 뒤
   });
 
   it("이미 삭제된 학급, 다른 교사의 학급은 거부", async () => {
     await del();
     await expect(del()).rejects.toThrow("이미 삭제된 학급입니다.");
     await expect(
-      softDeleteClassService({ teacher_id: scope.teacher_id, classId: other.classId, confirmName: "남의반" })
+      softDeleteClassService({ teacher_id: scope.teacher_id, classId: other.classId, password: PW })
     ).rejects.toThrow("학급 정보를 찾을 수 없습니다.");
   });
 });

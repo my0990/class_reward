@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { forgetActiveClass } from "@/lib/api/activeClassCache";
+import { verifyTeacherPassword } from "@/lib/auth/teacherPassword";
 
 // 학급 삭제 = 휴지통 방식
 // 1) 삭제하면 바로 지우지 않고 classes 문서에 deletedAt/purgeAt을 표시한다.
@@ -23,8 +24,8 @@ function toScope({ teacher_id, classId }) {
   }
 }
 
-/** 학급을 휴지통으로 (확인용 학급 이름이 정확히 같아야 한다) */
-export async function softDeleteClassService({ teacher_id, classId, confirmName, now = new Date() }) {
+/** 학급을 휴지통으로 (교사 비밀번호를 한 번 더 확인한다) */
+export async function softDeleteClassService({ teacher_id, classId, password, now = new Date() }) {
   const { teacherObjectId, classObjectId } = toScope({ teacher_id, classId });
 
   const client = await connectDB;
@@ -34,9 +35,9 @@ export async function softDeleteClassService({ teacher_id, classId, confirmName,
   const cls = await data.collection("classes").findOne({ _id: classObjectId, teacher_id: teacherObjectId });
   if (!cls) throw new Error("학급 정보를 찾을 수 없습니다.");
   if (cls.deletedAt) throw new Error("이미 삭제된 학급입니다.");
-  if (String(confirmName ?? "").trim() !== String(cls.className ?? "").trim()) {
-    throw new Error("학급 이름이 일치하지 않습니다.");
-  }
+  // 교실에 켜 둔 키오스크(교사 로그인 기기)에서 학생이 지우지 못하게 비밀번호 확인
+  const pw = await verifyTeacherPassword(userDb, teacherObjectId, password, now);
+  if (!pw.ok) throw new Error(pw.message);
 
   const purgeAt = new Date(now.getTime() + CLASS_TRASH_DAYS * DAY);
   const session = client.startSession();
