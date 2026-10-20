@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { forgetActiveClass } from "@/lib/api/activeClassCache";
 
 // 학급 삭제 = 휴지통 방식
 // 1) 삭제하면 바로 지우지 않고 classes 문서에 deletedAt/purgeAt을 표시한다.
@@ -56,6 +57,7 @@ export async function softDeleteClassService({ teacher_id, classId, confirmName,
       );
       studentCount = u.matchedCount;
     });
+    forgetActiveClass(classObjectId); // 이 서버가 기억하던 '있는 학급'을 바로 잊는다
   } finally {
     await session.endSession();
   }
