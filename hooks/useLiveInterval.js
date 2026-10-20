@@ -29,3 +29,9 @@ export function useLiveInterval(fast = 15_000, slow = 60_000) {
 
   return idle ? slow : fast;
 }
+
+/** 학생 화면 새로고침: 1분마다, 10분 동안 안 쓰면 5분마다 (+ 창으로 돌아올 때) */
+export function useStudentRefresh() {
+  const refreshInterval = useLiveInterval(60_000, 5 * 60_000);
+  return { refreshInterval, revalidateOnFocus: true, revalidateOnReconnect: true };
+}

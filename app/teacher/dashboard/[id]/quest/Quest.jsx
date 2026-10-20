@@ -8,7 +8,8 @@ import { reorderQuests } from "@/server-action/actions/quest/quest.action";
 
 const getQuestId = (quest) => String(quest.questId ?? quest._id);
 import { useParams } from "next/navigation";
-import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useLiveStudents } from "@/hooks/useLiveStudents";
 import QuestCard from "./components/QuestCard";
 import AddQuestModal from "./components/modal/AddQuestModal";
 import QuestDetailTemplate from "./components/detail/QuestDetailTemplate";
@@ -44,12 +45,7 @@ export default function Quest() {
         data: studentData,
         isLoading: isStudentDataLoading,
         isError: isStudentDataError,
-    } = useFetchData(
-        classId
-            ? `/api/students/${classId}`
-            : null,
-        LIVE_REFRESH
-    );
+    } = useLiveStudents(classId) /* 바뀌었을 때만 다시 불러옴 */;
 
     const isLoading =
         isQuestListLoading ||

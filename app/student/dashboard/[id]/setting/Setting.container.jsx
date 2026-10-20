@@ -2,7 +2,8 @@
 
 import ProfileSection from "./components/ProfileSection";
 import { useState, useEffect } from "react"
-import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useStudentRefresh } from "@/hooks/useLiveInterval";
 import { useParams } from "next/navigation";
 import usePendingAction from "@/hooks/usePendingAction";
 import { toast } from "react-hot-toast";
@@ -34,7 +35,7 @@ export default function SettingContainer() {
         isError: isUserError,
         error: userError,
         mutate: mutateUserData,
-    } = useFetchData(`/api/user`, STUDENT_REFRESH);
+    } = useFetchData(`/api/user`, useStudentRefresh());
 
     const [formData, setFormData] = useState({
         profileNickname: "",

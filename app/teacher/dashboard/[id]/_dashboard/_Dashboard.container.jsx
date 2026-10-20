@@ -7,7 +7,8 @@ import usePointInput from "@/hooks/dashboard/usePointInput";
 import { handlePoint } from "@/server-action/actions/class/handlePoint";
 import PointModal from "./components/point-modal/PointModal";
 import { toast } from "react-hot-toast";
-import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useLiveStudents } from "@/hooks/useLiveStudents";
 import StudentInfoCard from "./components/StudentInfoCard";
 
 
@@ -19,13 +20,13 @@ export default function DashboardContainer({ classId }) {
     isError: isClassError,
   } = useFetchData(classId ? `/api/classData/${classId}` : null);
 
-  // ✅ 키오스크에서 구매·기부해도 교사 화면 잔액이 따라오도록 15초마다 + 포커스 복귀 시 새로고침
+  // ✅ 키오스크에서 구매·기부해도 교사 화면 잔액이 따라오도록: 15초마다 작은 버전 값만 확인하고, 바뀌면 다시 불러옴
   const {
     data: studentsData = [],
     isLoading: isStudentsLoading,
     isError: isStudentsError,
     mutate: mutateStudentsData,
-  } = useFetchData(classId ? `/api/students/${classId}` : null, LIVE_REFRESH);
+  } = useLiveStudents(classId) /* 바뀌었을 때만 다시 불러옴 */;
 
 
   const {

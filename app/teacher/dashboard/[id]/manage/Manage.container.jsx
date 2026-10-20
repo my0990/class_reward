@@ -5,7 +5,8 @@ import CreateModal from "./components/modal/CreateModal";
 import ResetModal from "./components/modal/ResetModal";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import CreateUniqueNickname from "./components/CreateUniqueNickname";
-import { useFetchData, LIVE_REFRESH } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useLiveStudents } from "@/hooks/useLiveStudents";
 
 import { useParams } from "next/navigation";
 import StudentGrid from "./components/studentGrid";
@@ -40,7 +41,7 @@ export default function ManageContainer() {
         isLoading: isStudentsLoading,
         isError: isStudentsError,
         mutate: mutateStudentsData,
-    } = useFetchData(classId ? `/api/students/${classId}` : null, LIVE_REFRESH);
+    } = useLiveStudents(classId) /* 바뀌었을 때만 다시 불러옴 */;
 
 
     useEffect(() => {

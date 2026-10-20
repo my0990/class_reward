@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useFetchData, STUDENT_REFRESH } from "@/hooks/useFetchData";
+import { useFetchData } from "@/hooks/useFetchData";
+import { useStudentRefresh } from "@/hooks/useLiveInterval";
 import { teacherNav, studentNav } from "@/config/navConfig";
 import HomeBtn from "./components/HomeBtn";
 import ClassSwitcher from "./components/ClassSwitcher";
@@ -25,7 +26,7 @@ export default function HeaderContainer({ classId }) {
         data: userData,
         isLoading: isUserLoading,
         isError: isUserError,
-      } = useFetchData(`/api/user`, STUDENT_REFRESH);
+      } = useFetchData(`/api/user`, useStudentRefresh());
 
     // 새 공지 표시 (교사만)
     const { hasNew: hasNewNotice } = useNoticeBadge(userData?.role === "teacher");
