@@ -157,6 +157,7 @@ describe("purgeExpiredClassesService (30일 뒤 영구 삭제)", () => {
     expect(await count("user_data", { classId: sibling.classObjectId })).toBe(2);
     expect(await count("history", { userId: "이반1" })).toBe(2);
     expect(await count("user_data", { classId: other.classObjectId })).toBe(2);
-    expect(await users().countDocuments()).toBe(4);
+    expect(await users().countDocuments({ role: "student" })).toBe(4); // 학생 계정 (교사 계정은 그대로)
+    expect(await users().countDocuments({ role: "teacher" })).toBe(2);
   });
 });

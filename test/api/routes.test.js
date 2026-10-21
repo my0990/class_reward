@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ObjectId } from "mongodb";
 import { setupTestMongo, makeScope, seedStudent, seedClassData } from "@/test/helpers/testMongo";
+import { clearActiveClassCache } from "@/lib/api/activeClassCache";
 
 vi.mock("next-auth", () => ({ getServerSession: vi.fn() }));
 vi.mock("@/app/api/auth/[...nextauth]/route", () => ({ authOptions: {} }));
@@ -45,6 +46,7 @@ async function seedClassDocs(...scopes) {
 }
 
 beforeEach(() => {
+  clearActiveClassCache(); // 앞 테스트에서 '있는 학급'으로 기억한 결과가 남지 않게
   getServerSession.mockReset();
 });
 
