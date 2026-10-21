@@ -5,7 +5,6 @@ import { lastDayKeys } from "@/server-action/service/admin/dashboard.service";
 
 export const DB_LIMIT_BYTES = 512 * 1024 * 1024; // Atlas 무료(M0) 저장 한도
 export const DB_NAMES = ["user", "data", "admins"];
-const TOP_COLLECTIONS = 8;
 
 /**
  * DB 용량: DB별·컬렉션별 크기, 한도 대비 %, 최근 30일 추이.
@@ -69,7 +68,7 @@ export async function getDbUsageService({ now = new Date() } = {}) {
     totalBytes,
     percent: Math.round((totalBytes / DB_LIMIT_BYTES) * 1000) / 10,
     dbs,
-    collections: collections.slice(0, TOP_COLLECTIONS),
+    collections, // 큰 순서, 전부 (화면에서 상위 몇 개 + 기타로 묶음)
     trend: keys.map((key) => ({ key, bytes: byDay.get(key) ?? null })),
   };
 }

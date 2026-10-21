@@ -1,8 +1,6 @@
 // 관리자 대시보드: DB 용량 + 배포 상태 (서버 컴포넌트, 그래프만 클라이언트)
 import { LineChart } from "@/components/admin/UsageTrends";
 
-const MB = (b) => (b / 1024 / 1024).toFixed(1);
-
 const fmtTime = (iso) =>
   new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(
     new Date(iso)
@@ -17,6 +15,38 @@ const STATE = {
   CANCELED: { label: "취소", cls: "bg-slate-100 text-slate-700" },
 };
 
+// 컬렉션 → 화면에 보일 이름
+const COLLECTION_LABEL = {
+  "data.history": "거래 기록",
+  "data.user_data": "학생 데이터",
+  "data.class_data": "학급 정보",
+  "data.classes": "학급 목록",
+  "data.quest": "퀘스트",
+  "data.thermometer": "학급 온도계",
+  "user.users": "로그인 계정",
+  "user.email_verifications": "이메일 인증",
+  "user.email_send_log": "메일 발송 기록",
+  "user.kiosk_pwd_attempts": "키오스크 비밀번호 시도",
+  "user.kiosk_devices": "키오스크 기기",
+  "user.login_attempts": "로그인 실패 기록",
+  "user.password_resets": "비밀번호 찾기",
+  "admins.notices": "공지",
+  "admins.audit_log": "관리자 작업 기록",
+  "admins.accounts": "관리자 계정",
+  "admins.admin_login_attempts": "관리자 로그인 시도",
+  "admins.daily_usage": "일별 이용 통계",
+  "admins.period_usage": "주·월별 이용 통계",
+  "admins.db_size": "DB 용량 기록",
+};
+const DB_LABEL = { user: "계정", data: "학급·학생", admins: "관리자" };
+const SHOW_TOP = 6;
+
+/** 크기를 읽기 쉽게: 1MB 미만은 KB */
+function size(bytes) {
+  if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))}KB`;
+}
+
 function Gauge({ percent }) {
   const color = percent >= 80 ? "bg-red-600" : percent >= 50 ? "bg-amber-500" : "bg-orange-600";
   return (
@@ -26,45 +56,92 @@ function Gauge({ percent }) {
   );
 }
 
+function UsageRow({ label, bytes, total, count }) {
+  const share = total > 0 ? (bytes / total) * 100 : 0;
+  return (
+    <li className="grid grid-cols-[minmax(0,7.5rem)_minmax(3rem,1fr)_3.75rem_2.25rem_4.5rem] items-center gap-2 py-1 text-sm">
+      <span className="truncate text-slate-800">{label}</span>
+      <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+        <div className="h-full rounded-full bg-orange-400" style={{ width: `${Math.max(share, 1)}%` }} />
+      </div>
+      <span className="text-right font-medium tabular-nums text-slate-800">{size(bytes)}</span>
+      <span className="text-right text-xs tabular-nums text-slate-500">{Math.round(share)}%</span>
+      <span className="text-right text-xs tabular-nums text-slate-500">{count.toLocaleString()}개</span>
+    </li>
+  );
+}
+
 function DbCard({ db }) {
+  const used = db.totalBytes;
+  const left = Math.max(0, db.limitBytes - used);
+  const top = db.collections.slice(0, SHOW_TOP);
+  const rest = db.collections.slice(SHOW_TOP);
+  const restBytes = rest.reduce((a, c) => a + c.bytes, 0);
+  const restCount = rest.reduce((a, c) => a + c.count, 0);
+  // 컬렉션 합계 기준 비율 (DB 전체 크기와 약간 다를 수 있음)
+  const listTotal = db.collections.reduce((a, c) => a + c.bytes, 0);
+
   return (
     <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4">
-      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="font-semibold">DB 용량</h3>
-        <span className="text-sm text-slate-500">무료 한도 512MB</span>
-      </div>
-      <div className="mb-1 flex items-baseline gap-2">
-        <span className="text-2xl font-bold tabular-nums">{MB(db.totalBytes)}MB</span>
-        <span className="text-sm text-slate-500">
-          {db.percent}%{db.percent >= 80 ? " ⚠️ 한도 가까움" : ""}
-        </span>
-      </div>
-      <Gauge percent={db.percent} />
-      <ul className="mt-3 space-y-1 text-sm">
-        {db.dbs.map((d) => (
-          <li key={d.name} className="flex justify-between gap-2">
-            <span className="text-slate-600">{d.name}</span>
-            <span className="tabular-nums text-slate-500">
-              저장 {MB(d.storageSize)} · 인덱스 {MB(d.indexSize)}MB · 문서 {d.objects.toLocaleString()}개
+      <h3 className="mb-3 font-semibold">DB 용량</h3>
+      <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        {/* 왼쪽: 전체 사용량 + DB별 */}
+        <div className="min-w-0">
+          <div className="flex items-baseline justify-between gap-2">
+            <div className="tabular-nums">
+              <span className="text-2xl font-bold">{size(used)}</span>
+              <span className="ml-1 text-sm text-slate-500">/ 512MB</span>
+            </div>
+            <span className={`text-sm font-medium ${db.percent >= 80 ? "text-red-700" : "text-slate-600"}`}>
+              {db.percent}% 사용{db.percent >= 80 ? " ⚠️" : ""}
             </span>
-          </li>
-        ))}
-      </ul>
-      {db.collections.length > 0 && (
-        <>
-          <div className="mt-3 text-xs font-medium text-slate-500">큰 컬렉션</div>
-          <ul className="mt-1 space-y-1 text-sm">
-            {db.collections.map((c) => (
-              <li key={c.name} className="flex justify-between gap-2">
-                <span className="min-w-0 truncate text-slate-600">{c.name}</span>
-                <span className="shrink-0 tabular-nums text-slate-500">
-                  {MB(c.bytes)}MB · {c.count.toLocaleString()}개
-                </span>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+          </div>
+          <div className="mt-1.5">
+            <Gauge percent={db.percent} />
+          </div>
+          <div className="mt-1 text-xs text-slate-500">남은 용량 {size(left)}</div>
+
+          <table className="mt-4 w-full text-xs tabular-nums">
+            <thead className="text-left text-slate-500">
+              <tr>
+                <th className="py-1 font-normal">DB별</th>
+                <th className="py-1 text-right font-normal">데이터</th>
+                <th className="py-1 text-right font-normal">인덱스</th>
+                <th className="py-1 text-right font-normal">문서</th>
+              </tr>
+            </thead>
+            <tbody>
+              {db.dbs.map((d) => (
+                <tr key={d.name} className="border-t border-slate-100">
+                  <td className="py-1 text-slate-700">{DB_LABEL[d.name] ?? d.name}</td>
+                  <td className="py-1 text-right">{size(d.storageSize)}</td>
+                  <td className="py-1 text-right">{size(d.indexSize)}</td>
+                  <td className="py-1 text-right">{d.objects.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* 오른쪽: 어디에 쓰이나 */}
+        {top.length > 0 && (
+          <div className="min-w-0">
+            <div className="grid grid-cols-[minmax(0,7.5rem)_minmax(3rem,1fr)_3.75rem_2.25rem_4.5rem] gap-2 text-xs text-slate-500">
+              <span>어디에 쓰이나</span>
+              <span />
+              <span className="text-right">크기</span>
+              <span className="text-right">비율</span>
+              <span className="text-right">문서</span>
+            </div>
+            <ul className="mt-1 divide-y divide-slate-50">
+              {top.map((c) => (
+                <UsageRow key={c.name} label={COLLECTION_LABEL[c.name] ?? c.name} bytes={c.bytes} total={listTotal} count={c.count} />
+              ))}
+              {rest.length > 0 && <UsageRow label={`기타 ${rest.length}개`} bytes={restBytes} total={listTotal} count={restCount} />}
+            </ul>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -130,7 +207,7 @@ function DeployCard({ deploy }) {
 export default function SystemStatus({ db, deploy }) {
   const trend = db.trend.map((t) => ({ key: t.key, value: t.bytes == null ? null : Math.round((t.bytes / 1024 / 1024) * 10) / 10 }));
   return (
-    <section className="space-y-2">
+    <section className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="font-semibold">서버 상태</h2>
         <div className="flex gap-3 text-sm">
@@ -145,8 +222,8 @@ export default function SystemStatus({ db, deploy }) {
       <p className="text-xs text-slate-500">
         DB 작업량·연결 수·네트워크와 Vercel 함수 실행량은 각 사이트에서 확인하세요. DB 용량 추이는 대시보드를 연 날의 값이 쌓입니다.
       </p>
-      <div className="grid gap-4 lg:grid-cols-3">
-        <DbCard db={db} />
+      <DbCard db={db} />
+      <div className="grid gap-4 lg:grid-cols-2">
         <LineChart title="DB 용량 추이" unit="MB" period="day" points={trend} />
         <DeployCard deploy={deploy} />
       </div>
