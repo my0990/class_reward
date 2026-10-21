@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/mongodb", async () => (await import("@/test/helpers/testMongo")).mongodbMock);
 const { setupTestMongo } = await import("@/test/helpers/testMongo");
-const { getDashboardStatsService, lastDayKeys } = await import("@/server-action/service/admin/dashboard.service");
+const { getDashboardStatsService, lastDayKeys, lastWeekKeys, lastMonthKeys } = await import("@/server-action/service/admin/dashboard.service");
 
 const mongo = setupTestMongo();
 const NOW = new Date("2026-10-05T03:00:00Z"); // 한국 10/5 12시
@@ -55,17 +55,44 @@ describe("대시보드 통계", () => {
     expect(s.historyByDay.at(-2)).toEqual({ date: "2026-10-04", count: 2 });
   });
 
-  it("일별 접속·키오스크 사용", async () => {
-    await mongo.client.db("admins").collection("daily_usage").insertMany([
-      { _id: "2026-10-05", teachers: 2, students: 30, kioskUses: 7 },
-      { _id: "2026-10-03", students: 5 },
-      { _id: "2026-08-01", students: 99 }, // 30일 밖
+  it("최근 주·달 키 (월요일 시작, 한국 시간)", () => {
+    const now = new Date("2026-10-04T16:00:00Z"); // 한국 10/5(월) 01시
+    const weeks = lastWeekKeys(now);
+    expect(weeks).toHaveLength(12);
+    expect(weeks.at(-1)).toBe("2026-10-05");
+    expect(weeks.at(-2)).toBe("2026-09-28");
+    const months = lastMonthKeys(now);
+    expect(months).toHaveLength(12);
+    expect(months.at(-1)).toBe("2026-10");
+    expect(months[0]).toBe("2025-11");
+  });
+
+  it("일·주·월별 이용 (기록 전 기간은 null)", async () => {
+    const admins = mongo.client.db("admins");
+    await admins.collection("daily_usage").insertMany([
+      { _id: "2026-09-28", students: 4, kioskUses: 1 }, // 9/28(월) 주, 9월 — 첫 기록
+      { _id: "2026-10-03", students: 5, kioskUses: 2 }, // 9/28 주, 10월
+      { _id: "2026-10-05", teachers: 2, students: 30, kioskUses: 7 }, // 10/5 주
     ]);
-    const s = await getDashboardStatsService({ now: NOW });
-    expect(s.teachersByDay.at(-1)).toEqual({ date: "2026-10-05", count: 2 });
-    expect(s.studentsByDay.at(-3)).toEqual({ date: "2026-10-03", count: 5 });
-    expect(s.studentsByDay.reduce((a, d) => a + d.count, 0)).toBe(35);
-    expect(s.kioskByDay.at(-1).count).toBe(7);
-    expect(s.kioskByDay.at(-3).count).toBe(0);
+    await admins.collection("period_usage").insertMany([
+      { _id: "w:2026-10-05", teachers: 2, students: 30 },
+      { _id: "m:2026-10", teachers: 3, students: 31 },
+    ]);
+    const { usage } = await getDashboardStatsService({ now: NOW });
+
+    expect(usage.day).toHaveLength(30);
+    expect(usage.day.at(-1)).toEqual({ key: "2026-10-05", teachers: 2, students: 30, kioskUses: 7 });
+    expect(usage.day.at(-2)).toEqual({ key: "2026-10-04", teachers: 0, students: 0, kioskUses: 0 });
+    expect(usage.day.find((d) => d.key === "2026-09-27")).toEqual({ key: "2026-09-27", teachers: null, students: null, kioskUses: null });
+
+    expect(usage.week).toHaveLength(12);
+    expect(usage.week.at(-1)).toEqual({ key: "2026-10-05", teachers: 2, students: 30, kioskUses: 7 });
+    // 주별 사람 수 기록이 없는 주는 null, 키오스크는 일별 합
+    expect(usage.week.at(-2)).toEqual({ key: "2026-09-28", teachers: null, students: null, kioskUses: 3 });
+    expect(usage.week.at(-3).kioskUses).toBeNull();
+
+    expect(usage.month.at(-1)).toEqual({ key: "2026-10", teachers: 3, students: 31, kioskUses: 9 });
+    expect(usage.month.at(-2)).toEqual({ key: "2026-09", teachers: null, students: null, kioskUses: 1 });
+    expect(usage.month.at(-3).kioskUses).toBeNull();
   });
 });
