@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getDashboardStatsService } from "@/server-action/service/admin/dashboard.service";
 import DailyBarChart from "@/components/admin/DailyBarChart";
 import UsageTrends from "@/components/admin/UsageTrends";
+import SystemStatus from "@/components/admin/SystemStatus";
+import { getDbUsageService, getDeployStatusService } from "@/server-action/service/admin/systemStatus.service";
 import { requireAdminPage } from "@/lib/auth/actionAuth";
 
 const ACTION_LABEL = {
@@ -32,7 +34,7 @@ const fmtTime = (iso) =>
 
 export default async function AdminDashboard() {
   await requireAdminPage();
-  const s = await getDashboardStatsService();
+  const [s, db, deploy] = await Promise.all([getDashboardStatsService(), getDbUsageService(), getDeployStatusService()]);
   const emailPct = Math.round((s.email.last24h / s.email.dailyLimit) * 100);
 
   return (
@@ -60,6 +62,8 @@ export default async function AdminDashboard() {
       <p className="text-xs text-slate-500">
         Google Analytics는 선생님 화면만 세기 때문에, 학생·키오스크 이용은 여기서 봅니다.
       </p>
+
+      <SystemStatus db={db} deploy={deploy} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <DailyBarChart title="일별 교사 가입" unit="명" data={s.signupsByDay} />

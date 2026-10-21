@@ -42,7 +42,7 @@ const longLabel = (period, key) => {
   return `${num(key.slice(5, 7))}/${num(key.slice(8, 10))}`;
 };
 
-function LineChart({ title, unit, period, points }) {
+export function LineChart({ title, unit, period, points }) {
   const [hover, setHover] = useState(null);
   const [showTable, setShowTable] = useState(false);
   const current = PERIODS.find((p) => p.id === period).current;
@@ -73,7 +73,7 @@ function LineChart({ title, unit, period, points }) {
   const h = hover != null ? points[hover] : null;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4">
+    <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4">
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="font-semibold">{title}</h3>
         <div className="flex items-center gap-3 text-sm text-slate-500">
