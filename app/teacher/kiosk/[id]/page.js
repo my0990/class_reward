@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import KioskInstallPrompt from '@/components/kiosk/KioskInstallPrompt'
+import KioskSettings from '@/components/kiosk/KioskSettings'
 
 // 키오스크 첫 화면: 구매 / 사용 / 온도계 메뉴 (뒤로 가기 막음)
 export default function KioskHome() {
@@ -82,8 +83,12 @@ export default function KioskHome() {
                         </div>
                     </div>
 
-                    <div className="rounded-full bg-white/80 px-4 py-2 text-base font-black text-orange-700 shadow-md sm:px-5 sm:text-xl">
-                        {time}
+                    <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-white/80 px-4 py-2 text-base font-black text-orange-700 shadow-md sm:px-5 sm:text-xl">
+                            {time}
+                        </div>
+                        {/* 설정: 선생님 비밀번호로 열기 (기기 연결·연결 끊기) */}
+                        <KioskSettings classId={classId} />
                     </div>
                 </header>
 

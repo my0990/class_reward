@@ -12,6 +12,8 @@ export default async function Home() {
     redirect(`/student/dashboard/${session.user.classId}`)
   } else if (session && session.user.role === "admin") {
     redirect("/admin")
+  } else if (session && session.user.role === "kiosk") {
+    redirect(`/teacher/kiosk/${session.user.classId}`) // 키오스크로 연결된 기기
   }
     
 

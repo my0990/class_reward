@@ -11,6 +11,7 @@ import PwdSection from "./components/PwdSection";
 import { updateProfile, updatePassword } from "@/server-action/actions/setting/setting.action";
 import { updateCurrencyName } from "@/server-action/actions/class/classSetting.action";
 import ClassSection from "./components/ClassSection";
+import KioskDevicesSection from "./components/KioskDevicesSection";
 import WithdrawModal from "@/components/teacher/WithdrawModal";
 export default function SettingContainer() {
     const params = useParams();
@@ -162,6 +163,7 @@ export default function SettingContainer() {
                     <h2 onClick={() => setTab("profile")} id="profile" className={`cursor-pointer text-[1.1rem] mt-[32px]`}><span className={`${tab === "profile" ? "border-b-4 border-orange-500" : null}`}>프로필 관리</span></h2>
                     <h2 onClick={() => setTab("pwd")} id="pwd" className={`cursor-pointer text-[1.1rem] mt-[16px] max-[600px]:mb-[40px] `}><span className={`${tab === "pwd" ? "border-b-4 border-orange-500" : null}`}>계정 관리</span></h2>
                     <h2 onClick={() => setTab("class")} id="class" className={`cursor-pointer text-[1.1rem] mt-[16px] max-[600px]:mb-[40px] `}><span className={`${tab === "class" ? "border-b-4 border-orange-500" : null}`}>학급 관리</span></h2>
+                    <h2 onClick={() => setTab("kiosk")} id="kiosk" className={`cursor-pointer text-[1.1rem] mt-[16px] max-[600px]:mb-[40px] `}><span className={`${tab === "kiosk" ? "border-b-4 border-orange-500" : null}`}>키오스크 기기</span></h2>
                 </div>
                 <div className="max-[600px]:w-[100%] flex justify-center">
                     {tab === "profile" ? <ProfileSection {...{ profileNickname, profileState, profileUrl, setFormData, onSubmit, formData, onChange, isPending }} />
@@ -177,6 +179,7 @@ export default function SettingContainer() {
                                 </div>
                             </div>
                         )
+                            : tab === "kiosk" ? <KioskDevicesSection classId={classId} />
                             : <ClassSection {...{ currencyEmoji, currencyName, currencyData, setCurrencyData, onCurrencyChange, onCurrencySubmit }} />}
                 </div>
             </div>

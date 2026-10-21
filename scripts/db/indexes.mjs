@@ -30,6 +30,7 @@ const PLAN = [
   [user, "users", { email: 1 }, { unique: true, partialFilterExpression: nonEmpty("email"), name: "email_unique" }, "교사 이메일 중복 금지"],
   [user, "email_verifications", { email: 1 }, { unique: true, name: "email_unique" }, "인증 요청 이메일당 1개"],
   [user, "kiosk_pwd_attempts", { teacher_id: 1, userId: 1 }, { unique: true, name: "teacher_user_unique" }, "키오스크 비밀번호 시도 기록"],
+  [user, "kiosk_devices", { teacher_id: 1, classId: 1 }, {}, "학급별 연결된 키오스크 기기"],
   [user, "kiosk_pwd_attempts", { updatedAt: 1 }, { expireAfterSeconds: 24 * 60 * 60, name: "updatedAt_ttl_1d" }, "키오스크 시도 기록 하루 뒤 자동 삭제"],
   [user, "login_attempts", { key: 1 }, { unique: true, name: "key_unique" }, "로그인 실패 기록 (학생·교사)"],
   [user, "login_attempts", { updatedAt: 1 }, { expireAfterSeconds: 24 * 60 * 60, name: "updatedAt_ttl_1d" }, "로그인 실패 기록 하루 뒤 자동 삭제"],

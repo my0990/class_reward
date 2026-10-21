@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { withApiHandler, requireTeacher, parseObjectId, requireActiveClass } from "@/lib/api/routeHelpers";
+import { withApiHandler, requireTeacherOrKiosk, parseObjectId, requireActiveClass } from "@/lib/api/routeHelpers";
 
 // 학급 학생 목록이 바뀌었는지 알려 주는 아주 작은 값 (키오스크가 15초마다 확인)
 // - 잔액·아이템이 바뀌면 거래 기록(history)이 생기므로 → 그 학급의 마지막 기록 시각
@@ -9,7 +9,7 @@ import { withApiHandler, requireTeacher, parseObjectId, requireActiveClass } fro
 export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
   const classObjectId = parseObjectId(id, "학급 id");
-  const { teacherObjectId } = await requireTeacher();
+  const { teacherObjectId } = await requireTeacherOrKiosk({ classId: id }); // 교사 또는 이 반 키오스크
   await requireActiveClass(teacherObjectId, classObjectId);
 
   const db = (await connectDB).db("data");

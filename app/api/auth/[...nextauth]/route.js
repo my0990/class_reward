@@ -8,12 +8,16 @@ import { touchLastSeen } from "@/lib/stats/dailyUsage";
 import { authorizeAdmin, isAdminEmail, ADMIN_SESSION_MS } from "@/lib/auth/adminAuth";
 import { assertNotLocked, recordLoginFailure, clearLoginFailures } from "@/lib/auth/loginLimit";
 import { isDefaultStudentPassword } from "@/lib/auth/studentPassword";
+import { readSignedToken } from "@/lib/auth/signedToken";
+import { KIOSK_PAIR_PURPOSE } from "@/lib/auth/kioskSession";
+import { findActiveKioskDeviceService } from "@/server-action/service/kiosk/kioskDevice.service";
 export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        role: { label: "Role", type: "text" }, // "student" | "teacher" | "admin"
+        role: { label: "Role", type: "text" }, // "student" | "teacher" | "admin" | "kiosk"
+        token: { label: "Kiosk pair token", type: "text" }, // kiosk 전용: 기기 연결 직후 받은 토큰
         id: { label: "Student ID", type: "text" }, // student 전용
         email: { label: "Email", type: "text" }, // teacher 전용
         password: { label: "Password", type: "password" },
@@ -22,6 +26,21 @@ export const authOptions = {
       async authorize(credentials) {
         
         const role = String(credentials?.role ?? "");
+
+        // 🖥️ 키오스크 기기: 선생님이 「이 기기를 키오스크로 연결」을 눌러 받은 연결 토큰(2분)으로만 로그인
+        if (role === "kiosk") {
+          const pair = readSignedToken(KIOSK_PAIR_PURPOSE, credentials?.token);
+          if (!pair?.d) return null;
+          const device = await findActiveKioskDeviceService(pair.d);
+          if (!device) return null;
+          return {
+            _id: device._id.toHexString(),
+            role: "kiosk",
+            teacher_id: device.teacher_id.toHexString(),
+            classId: device.classId.toHexString(),
+          };
+        }
+
         const password = String(credentials?.password ?? "");
         if (!role || !password) return null;
 
@@ -135,6 +154,14 @@ export const authOptions = {
             teacher_id: user.teacher_id?.toString() ?? null,
             mustChangePassword: Boolean(user.mustChangePassword),
           };
+        } else if (user.role === "kiosk") {
+          // _id = 연결 기록(kiosk_devices) id. 선생님 권한은 없고 이 반 키오스크 기능만 (lib/auth/kioskSession)
+          token.user = {
+            role: "kiosk",
+            _id: user._id,
+            teacher_id: user.teacher_id,
+            classId: user.classId,
+          };
         } else if (user.role === "admin") {
           token.user = {
             role: "admin",
@@ -153,6 +180,10 @@ export const authOptions = {
           const client = await connectDB;
           const _id = ObjectId.createFromHexString(id);
           const $set = { lastSeenAt: new Date() };
+          if (token.user.role === "kiosk") {
+            // 끊겼거나 오래 안 쓴 기기면 로그아웃 (쓰고 있으면 마지막 사용 시각 갱신)
+            return findActiveKioskDeviceService(id, { touch: true });
+          }
           if (token.user.role === "admin") {
             if (!isAdminEmail(token.user.email)) return null; // ADMIN_EMAILS에서 빠짐
             return client.db("admins").collection("accounts").findOneAndUpdate(

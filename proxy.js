@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { isKioskUser, isKioskAllowedPath, kioskHomePath } from "@/lib/auth/kioskSession";
 
 export async function proxy(req) {
   const token = await getToken({
@@ -9,6 +10,13 @@ export async function proxy(req) {
 
   const { pathname } = req.nextUrl;
   const role = token?.user?.role;
+
+  // 키오스크 기기: 자기 반 키오스크 화면만 (선생님·학생·관리자 화면으로 가면 키오스크로 되돌림)
+  if (role === "kiosk") {
+    const ok = isKioskUser(token.user) && !token.invalidUser; // invalidUser: 연결이 끊긴 기기
+    if (ok && isKioskAllowedPath(token.user, pathname)) return NextResponse.next();
+    return NextResponse.redirect(new URL(ok ? kioskHomePath(token.user) : "/", req.url));
+  }
 
   // 관리자 페이지: 로그인 화면 말고는 관리자만
   // (최종 확인은 페이지/액션에서 ADMIN_EMAILS까지 다시 본다)

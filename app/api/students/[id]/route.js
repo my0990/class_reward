@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { withApiHandler, requireTeacher, parseObjectId, requireActiveClass } from "@/lib/api/routeHelpers";
+import { withApiHandler, requireTeacherOrKiosk, parseObjectId, requireActiveClass } from "@/lib/api/routeHelpers";
 
 // 학급 학생 목록 (교사 대시보드, 키오스크, 학생 관리, 퀘스트, 번호 뽑기, 자리 바꾸기)
 //
@@ -12,7 +12,7 @@ const LIST_PROJECTION = { profileImgStorage: 0, titles: 0, inventory: 0 };
 export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
   const classObjectId = parseObjectId(id, "학급 id");
-  const { teacherObjectId } = await requireTeacher();
+  const { teacherObjectId } = await requireTeacherOrKiosk({ classId: id }); // 교사 또는 이 반 키오스크
   await requireActiveClass(teacherObjectId, classObjectId);
 
   const db = (await connectDB).db("data");

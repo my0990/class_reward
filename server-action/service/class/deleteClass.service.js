@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { forgetActiveClass } from "@/lib/api/activeClassCache";
 import { verifyTeacherPassword } from "@/lib/auth/teacherPassword";
+import { revokeClassKioskDevicesService } from "@/server-action/service/kiosk/kioskDevice.service";
 
 // 학급 삭제 = 휴지통 방식
 // 1) 삭제하면 바로 지우지 않고 classes 문서에 deletedAt/purgeAt을 표시한다.
@@ -57,6 +58,9 @@ export async function softDeleteClassService({ teacher_id, classId, password, no
         { session }
       );
       studentCount = u.matchedCount;
+
+      // 이 반에 연결된 키오스크 기기도 모두 끊는다 (복구하면 기기는 다시 연결)
+      await revokeClassKioskDevicesService({ teacherObjectId, classObjectId, now }, { session });
     });
     forgetActiveClass(classObjectId); // 이 서버가 기억하던 '있는 학급'을 바로 잊는다
   } finally {
@@ -158,6 +162,7 @@ export async function purgeClassService({ teacherObjectId, classObjectId }) {
       ).deletedCount;
       removed.quests = (await data.collection("quest").deleteMany(scope, { session })).deletedCount;
       removed.thermometer = (await data.collection("thermometer").deleteMany(scope, { session })).deletedCount;
+      removed.kioskDevices = (await userDb.collection("kiosk_devices").deleteMany(scope, { session })).deletedCount;
       removed.kiosk = (
         await userDb.collection("kiosk_pwd_attempts").deleteMany({ teacher_id: teacherObjectId, userId: { $in: userIds } }, { session })
       ).deletedCount;

@@ -75,6 +75,7 @@ export async function withdrawTeacherService({ teacher_id, password, confirmText
   }
   leftovers.studentUsers = (await userDb.collection("users").deleteMany({ ...byTeacher, role: "student" })).deletedCount;
   leftovers.kiosk = (await userDb.collection("kiosk_pwd_attempts").deleteMany(byTeacher)).deletedCount;
+  leftovers.kioskDevices = (await userDb.collection("kiosk_devices").deleteMany(byTeacher)).deletedCount;
 
   // 5) 교사 본인 데이터 (교사 user_data는 userId = 이메일로 저장되어 있다)
   const email = teacher.email;

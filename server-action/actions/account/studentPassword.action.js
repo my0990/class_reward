@@ -3,6 +3,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { verifyKioskToken } from "@/lib/auth/kioskToken";
+import { isKioskOfClass } from "@/lib/auth/kioskSession";
 import { changeDefaultStudentPasswordService } from "@/server-action/service/account/studentPassword.service";
 
 const fail = (message) => ({ result: false, message });
@@ -24,11 +25,15 @@ export async function changeMyDefaultPassword({ newPassword }) {
 export async function changeKioskStudentPassword({ classId, userId, kioskToken, newPassword }) {
   try {
     const user = (await getServerSession(authOptions))?.user;
-    if (user?.role !== "teacher" || !user._id) return fail("로그인이 필요합니다.");
-    if (!verifyKioskToken(kioskToken, { teacher_id: user._id, classId, userId })) {
+    // 교사 로그인 기기, 또는 이 반에 연결된 키오스크 기기
+    let teacher_id = null;
+    if (user?.role === "teacher" && user._id) teacher_id = user._id;
+    else if (isKioskOfClass(user, classId)) teacher_id = user.teacher_id;
+    if (!teacher_id) return fail("로그인이 필요합니다.");
+    if (!verifyKioskToken(kioskToken, { teacher_id, classId, userId })) {
       return fail("시간이 지났어요. 처음부터 다시 해주세요.");
     }
-    const res = await changeDefaultStudentPasswordService({ teacher_id: user._id, userId, newPassword });
+    const res = await changeDefaultStudentPasswordService({ teacher_id, userId, newPassword });
     return res.ok ? { result: true, message: "비밀번호를 바꿨어요." } : fail(res.message);
   } catch (error) {
     console.error("changeKioskStudentPassword error:", error);

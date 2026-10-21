@@ -16,7 +16,7 @@ const DEFAULT_THERMOMETER = {
 export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
   const classObjectId = parseObjectId(id, "학급 id");
-  const { teacherObjectId } = await requireMember({ classId: id });
+  const { teacherObjectId } = await requireMember({ classId: id, allowKiosk: true }); // 교사·그 반 학생·그 반 키오스크
   await requireActiveClass(teacherObjectId, classObjectId);
 
   const db = (await connectDB).db("data");

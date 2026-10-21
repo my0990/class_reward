@@ -19,7 +19,7 @@ const STUDENT_FIELDS = {
 export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
   const classObjectId = parseObjectId(id, "학급 id");
-  const { teacherObjectId, role } = await requireMember({ classId: id });
+  const { teacherObjectId, role } = await requireMember({ classId: id, allowKiosk: true }); // 교사·그 반 학생·그 반 키오스크
   await requireActiveClass(teacherObjectId, classObjectId);
 
   const db = (await connectDB).db("data");
@@ -28,7 +28,7 @@ export const GET = withApiHandler(async (req, { params }) => {
       classId: classObjectId,
       teacher_id: teacherObjectId, // 소유권 체크
     },
-    role === "student" ? { projection: STUDENT_FIELDS } : undefined
+    role === "student" || role === "kiosk" ? { projection: STUDENT_FIELDS } : undefined // 키오스크도 학생과 같은 칸만
   );
 
   if (!classData) {
