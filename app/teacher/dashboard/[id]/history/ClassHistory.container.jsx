@@ -42,7 +42,7 @@ export default function ClassHistoryContainer() {
   const [period, setPeriod] = useState("all");
   const [rows, setRows] = useState([]);
   const [cursor, setCursor] = useState(null);
-  const [totals, setTotals] = useState(null); // 기간 합계: 지급·회수 총액과 하루 평균
+  const [totals, setTotals] = useState(null); // 기간 합계: 수입·지출
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [openKey, setOpenKey] = useState(null); // 명단을 띄운 묶음 (한 번에 하나)
@@ -134,7 +134,6 @@ export default function ClassHistoryContainer() {
       tone: diff > 0 ? "text-emerald-700" : diff < 0 ? "text-rose-600" : "text-gray-600",
     };
     const subs = [];
-    if (period !== "today") subs.push(`하루 평균 수입 ${m(totals.in.perDay)}, 지출 ${m(totals.out.perDay)}`);
     if (perPerson(inc) != null) subs.push(`1인당 수입 ${m(perPerson(inc))}, 지출 ${m(perPerson(out))}`);
     return { main, net, sub: subs.join(" · ") || null };
   })();
@@ -150,7 +149,7 @@ export default function ClassHistoryContainer() {
             </p>
           )}
           {summary.sub && (
-            <p className="text-[0.85rem] text-gray-600" title={period !== "today" ? `하루 평균은 ${totals.days}일로 나눈 값이에요` : undefined}>
+            <p className="text-[0.85rem] text-gray-600">
               {summary.sub}
             </p>
           )}
