@@ -30,7 +30,12 @@ export default function StudentInfoCard({
         >
             <div className="flex justify-between mb-[8px]">
                 <div className="font-semibold">LV. {level}</div>
-                <div className="w-[80px] text-right overflow-hidden whitespace-nowrap">
+                {/* 잔액이 마이너스면 빨간색 (선택된 진한 주황 바탕에서는 더 진한 빨강) */}
+                <div
+                    className={`w-[80px] text-right overflow-hidden whitespace-nowrap ${
+                        Number(data.money) < 0 ? `font-bold ${isActive ? "text-red-800" : "text-red-600"}` : ""
+                    }`}
+                >
                     {currencyemoji} {data.money}
                 </div>
             </div>
