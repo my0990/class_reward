@@ -75,8 +75,6 @@ function Recipients({ isSend, activeStudentLabels, totalCount }) {
 
 export function PointModalBody({ isSend, currencyName, activeStudentLabels, totalCount }) {
   const { display } = usePointInputContext();
-  const count = activeStudentLabels.length;
-  const amount = Number(display.value || 0);
 
   return (
     <div
@@ -87,9 +85,9 @@ export function PointModalBody({ isSend, currencyName, activeStudentLabels, tota
       <div className="w-[272px]">
         <Recipients isSend={isSend} activeStudentLabels={activeStudentLabels} totalCount={totalCount} />
 
-        <div className={`h-[64px] bg-gray-200 rounded-2xl flex justify-between items-center px-[16px] ${count >= 2 ? "mb-1" : "mb-5"}`}>
+        <div className="h-[64px] bg-gray-200 mb-5 rounded-2xl flex justify-between items-center px-[16px]">
           <div className="text-gray-500">
-            {count >= 2 ? "1인당" : `${isSend ? "받는" : "잃는"} 금액`}
+            {isSend ? "받는" : "잃는"} 금액
           </div>
           <div
             style={{ fontSize: display.fontSize + "rem" }}
@@ -98,13 +96,6 @@ export function PointModalBody({ isSend, currencyName, activeStudentLabels, tota
             {display.value ? display.value : 0} {currencyName}
           </div>
         </div>
-        {count >= 2 && (
-          // 여러 명이면 총액을 같이 보여줘서 큰 금액 실수를 막는다 (높이 고정 → 키패드 위치 그대로)
-          <div className="mb-4 h-[20px] pr-[16px] text-right text-sm font-medium">
-            {count}명 · 총 {(amount * count).toLocaleString()} {currencyName}
-          </div>
-        )}
-
         <DialPad />
       </div>
     </div>
