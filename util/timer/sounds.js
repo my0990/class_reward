@@ -68,10 +68,10 @@ export const unlockSound = () => void audio();
 /** 끝나기 3·2·1초 전 */
 export const playCountdown = () => tone(1047, 0, 0.18, { gain: 0.7 });
 
-/** 끝: 올라가는 4음을 3번 */
+/** 끝: 올라가는 4음을 천천히, 3번 (음 사이 0.3초, 한 번에 약 1.9초, 전체 약 6초) */
 export const playDone = () => {
   for (let r = 0; r < 3; r++) {
-    [523, 659, 784, 1047].forEach((f, i) => tone(f, r * 1.0 + i * 0.14, 0.45, { gain: 0.7 }));
+    [523, 659, 784, 1047].forEach((f, i) => tone(f, r * 2.0 + i * 0.3, i === 3 ? 0.9 : 0.6, { gain: 0.7 }));
   }
 };
 
