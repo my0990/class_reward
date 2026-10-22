@@ -43,7 +43,7 @@ export default function ClassHistoryContainer() {
   const [cursor, setCursor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [open, setOpen] = useState(() => new Set());
+  const [openKey, setOpenKey] = useState(null); // 명단을 띄운 묶음 (한 번에 하나)
   const reqId = useRef(0);
 
   const load = useCallback(
@@ -62,7 +62,7 @@ export default function ClassHistoryContainer() {
         if (my !== reqId.current) return;
         setRows((prev) => (fromCursor ? [...prev, ...body.rows] : body.rows));
         setCursor(body.nextCursor);
-        if (!fromCursor) setOpen(new Set());
+        if (!fromCursor) setOpenKey(null);
       } catch (e) {
         if (my === reqId.current) setError(e.message);
       } finally {
@@ -77,12 +77,22 @@ export default function ClassHistoryContainer() {
   }, [load]);
 
   const days = useMemo(() => splitByDay(groupHistory(rows)), [rows]);
-  const toggle = (key) =>
-    setOpen((prev) => {
-      const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
-      return next;
-    });
+  const toggle = (key) => setOpenKey((prev) => (prev === key ? null : key));
+
+  // 명단 바깥을 누르거나 ESC면 닫기
+  useEffect(() => {
+    if (!openKey) return;
+    const onDown = (e) => {
+      if (!e.target.closest?.(`[data-popover="${openKey}"]`)) setOpenKey(null);
+    };
+    const onKey = (e) => e.key === "Escape" && setOpenKey(null);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [openKey]);
 
   const chip = (active) =>
     `whitespace-nowrap rounded-full px-[12px] py-[4px] text-[0.85rem] font-medium transition ${
@@ -151,8 +161,8 @@ export default function ClassHistoryContainer() {
       ) : (
         <div className="space-y-[12px]">
           {days.map(({ day, groups }) => (
-            <section key={day} className="overflow-hidden rounded-xl bg-white">
-              <h2 className="border-b border-gray-100 bg-gray-50 px-[12px] py-[6px] text-[0.85rem] font-semibold text-gray-600">
+            <section key={day} className="rounded-xl bg-white">
+              <h2 className="rounded-t-xl border-b border-gray-100 bg-gray-50 px-[12px] py-[6px] text-[0.85rem] font-semibold text-gray-600">
                 {formatHistoryDateParts(groups[0].date).day}
               </h2>
               <ul className="divide-y divide-gray-100">
@@ -160,11 +170,11 @@ export default function ClassHistoryContainer() {
                   const k = HISTORY_KINDS[getHistoryKind(g)];
                   const items = [...g.items].sort((a, b) => byNumber(studentMap.get(String(a.userId)) ?? {}, studentMap.get(String(b.userId)) ?? {}));
                   const many = items.length > 1;
-                  const isOpen = open.has(g.key);
+                  const isOpen = openKey === g.key;
                   const who = many ? `${labelOf(items[0].userId)} 외 ${items.length - 1}명` : labelOf(items[0].userId);
                   const sentence = historySentence({ kind: getHistoryKind(g), who, many, name: g.name, amount: g.amount, currency });
                   return (
-                    <li key={g.key} className={k.row}>
+                    <li key={g.key} className={`relative last:rounded-b-xl ${k.row}`} data-popover={many ? g.key : undefined}>
                       <div className="flex items-start gap-[8px] px-[12px] py-[8px] text-[0.95rem]">
                         <span className="w-[44px] shrink-0 pt-[2px] tabular-nums text-[0.8rem] text-gray-500" title={formatFullDate(g.date)}>
                           {formatHistoryDateParts(g.date).time}
@@ -183,7 +193,7 @@ export default function ClassHistoryContainer() {
                                   aria-expanded={isOpen}
                                   className="rounded bg-orange-100 px-[3px] font-semibold hover:bg-orange-200"
                                 >
-                                  {seg.v} {isOpen ? "▴" : "▾"}
+                                  {seg.v}
                                 </button>
                               ) : (
                                 <b key={i} className="font-semibold">
@@ -213,19 +223,35 @@ export default function ClassHistoryContainer() {
                         )}
                       </div>
                       {many && isOpen && (
-                        <ul className="grid grid-cols-1 gap-x-[16px] gap-y-[2px] border-t border-black/5 bg-white/70 px-[12px] py-[8px] text-[0.85rem] sm:grid-cols-2">
-                          {items.map((it) => (
-                            <li key={it._id} className="flex justify-between gap-[8px]">
-                              <span className="truncate">{labelOf(it.userId)}</span>
-                              {it.balance != null && (
-                                <span className="shrink-0 tabular-nums text-gray-500">
-                                  잔액 {Number(it.balance).toLocaleString()}
-                                  {currency}
-                                </span>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
+                        // 아래 줄 위에 덮어서 보여준다 → 목록 위치는 그대로
+                        <div className="absolute left-[12px] right-[12px] top-full z-20 -mt-[4px] rounded-xl bg-white text-gray-800 shadow-xl ring-1 ring-black/10 sm:left-[60px] sm:right-auto sm:w-[420px]">
+                          <div className="flex items-center justify-between border-b border-gray-100 px-[12px] py-[6px] text-[0.85rem]">
+                            <span className="font-semibold">{items.length}명</span>
+                            <button
+                              type="button"
+                              onClick={() => setOpenKey(null)}
+                              aria-label="명단 닫기"
+                              className="rounded-full p-[4px] text-gray-500 hover:bg-gray-100"
+                            >
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-4 w-4" aria-hidden="true">
+                                <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+                              </svg>
+                            </button>
+                          </div>
+                          <ul className="grid max-h-[280px] grid-cols-1 gap-x-[16px] gap-y-[2px] overflow-y-auto px-[12px] py-[8px] text-[0.85rem] sm:grid-cols-2">
+                            {items.map((it) => (
+                              <li key={it._id} className="flex justify-between gap-[8px]">
+                                <span className="truncate">{labelOf(it.userId)}</span>
+                                {it.balance != null && (
+                                  <span className="shrink-0 tabular-nums text-gray-500">
+                                    잔액 {Number(it.balance).toLocaleString()}
+                                    {currency}
+                                  </span>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       )}
                     </li>
                   );
