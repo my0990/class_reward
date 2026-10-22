@@ -98,30 +98,34 @@ const MARIMBA = [[1, 1], [4.0, 0.25], [9.9, 0.06]];
 export const DONE_SOUNDS = {
   chime: {
     label: "기본 (띵띵띵띵)",
-    // 올라가는 4음을 천천히 한 번 (약 2.8초)
-    play: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.5, i === 3 ? 1.3 : 0.8, { gain: 0.7 })),
+    sec: 2.8,
+    // 올라가는 4음을 천천히 한 번
+    play: (o) => [523, 659, 784, 1047].forEach((f, i) => tone(f, o + i * 0.5, i === 3 ? 1.3 : 0.8, { gain: 0.7 })),
   },
   school: {
     label: "학교종 (딩동댕동)",
+    sec: 5.7,
     // 미-도-레-솔 … 솔-레-미-도 (학교 종소리 가락)
-    play: () =>
+    play: (o) =>
       [659, 523, 587, 392, 392, 587, 659, 523].forEach((f, i) =>
-        strike(f, i * 0.55 + (i >= 4 ? 0.35 : 0), i === 7 ? 2.0 : 1.4, { gain: 0.85, partials: BELL }),
+        strike(f, o + i * 0.55 + (i >= 4 ? 0.35 : 0), i === 7 ? 2.0 : 1.4, { gain: 0.85, partials: BELL }),
       ),
   },
   alarm: {
     label: "알람시계 (따르릉)",
+    sec: 2.4,
     // 아주 빠르게 두드리는 높은 종소리를 1초씩 두 번
-    play: () => {
+    play: (o) => {
       for (let burst = 0; burst < 2; burst++) {
-        for (let i = 0; i < 22; i++) strike(2093, burst * 1.4 + i * 0.045, 0.09, { gain: 0.7, partials: [[1, 1], [1.5, 0.5]], type: "square" });
+        for (let i = 0; i < 22; i++) strike(2093, o + burst * 1.4 + i * 0.045, 0.09, { gain: 0.7, partials: [[1, 1], [1.5, 0.5]], type: "square" });
       }
     },
   },
   marimba: {
     label: "마림바",
+    sec: 2.3,
     // 도-미-솔-도 / 솔-도 (밝게 끝나는 짧은 가락)
-    play: () =>
+    play: (o) =>
       [
         [523, 0],
         [659, 0.25],
@@ -129,18 +133,19 @@ export const DONE_SOUNDS = {
         [1047, 0.75],
         [784, 1.15],
         [1047, 1.4],
-      ].forEach(([f, t], i) => strike(f, t, i === 5 ? 1.2 : 0.6, { gain: 1.2, partials: MARIMBA })),
+      ].forEach(([f, t], i) => strike(f, o + t, i === 5 ? 1.2 : 0.6, { gain: 1.2, partials: MARIMBA })),
   },
   whistle: {
     label: "호루라기 (삑— 삑—)",
-    play: () => {
+    sec: 1.45,
+    play: (o) => {
       const c = audio();
       if (!c) return;
       [
         [0, 0.35],
         [0.55, 0.9],
       ].forEach(([at, dur]) => {
-        const t0 = c.currentTime + at;
+        const t0 = c.currentTime + o + at;
         const osc = c.createOscillator();
         const lfo = c.createOscillator(); // 호루라기 안 구슬이 떠는 소리
         const lfoGain = c.createGain();
@@ -164,8 +169,16 @@ export const DONE_SOUNDS = {
   },
 };
 
-/** 끝 (kind: DONE_SOUNDS의 키, 모르는 값이면 기본) */
-export const playDone = (kind = "chime") => (DONE_SOUNDS[kind] ?? DONE_SOUNDS.chime).play();
+export const DONE_REPEAT_MAX = 5;
+const REPEAT_GAP = 0.6; // 반복 사이 쉬는 시간(초)
+
+/** 끝 (kind: DONE_SOUNDS의 키, 모르는 값이면 기본 / times: 1~5번 반복) */
+export const playDone = (kind = "chime", times = 1) => {
+  const sound = DONE_SOUNDS[kind] ?? DONE_SOUNDS.chime;
+  const n = Math.min(DONE_REPEAT_MAX, Math.max(1, Math.round(Number(times)) || 1));
+  // 소리 시계(AudioContext) 기준으로 미리 예약해서, 탭이 뒤에 있어도 간격이 밀리지 않는다
+  for (let r = 0; r < n; r++) sound.play(r * (sound.sec + REPEAT_GAP));
+};
 
 /** 너무 시끄러울 때 */
 export const playLoud = () => {

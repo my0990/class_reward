@@ -11,6 +11,7 @@ export const TIMER_DEFAULTS = {
   pointerHighlight: false, // 커서를 따라다니는 노란 원
   volume: 150, // 알림음 크기 (%) 50~200
   doneSound: "chime", // 끝 알림음 (util/timer/sounds의 DONE_SOUNDS)
+  doneRepeat: 1, // 끝 알림음 횟수 1~5
 };
 
 /** 설정은 처음 한 번만 읽고, 바뀔 때만 저장 (예전: 그릴 때마다 localStorage 읽음) */

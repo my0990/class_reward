@@ -1,5 +1,5 @@
 "use client";
-import { playCountdown, playDone, unlockSound, DONE_SOUNDS } from "@/util/timer/sounds";
+import { playCountdown, playDone, unlockSound, DONE_SOUNDS, DONE_REPEAT_MAX } from "@/util/timer/sounds";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import { TIMER_THEMES } from "@/util/timer/timerMath";
 
@@ -59,6 +59,22 @@ export default function SettingsModal({ modalId, setModalId, settings, update })
         >
           ▶ 듣기
         </button>
+      </div>
+
+      <label className="mb-1 block text-sm font-semibold">끝 알림음 횟수</label>
+      <div className="mb-5 flex gap-1" role="radiogroup" aria-label="끝 알림음 횟수">
+        {Array.from({ length: DONE_REPEAT_MAX }, (_, i) => i + 1).map((n) => (
+          <button
+            key={n}
+            type="button"
+            role="radio"
+            aria-checked={settings.doneRepeat === n}
+            onClick={() => update({ doneRepeat: n })}
+            className={`btn btn-sm flex-1 ${settings.doneRepeat === n ? "btn-warning" : "btn-ghost bg-gray-100"}`}
+          >
+            {n}번
+          </button>
+        ))}
       </div>
 
       <label className="mb-1 flex justify-between text-sm font-semibold">
