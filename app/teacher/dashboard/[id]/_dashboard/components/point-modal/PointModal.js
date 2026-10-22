@@ -2,66 +2,53 @@
 
 import { useState } from "react";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
-import { summarizeSelection } from "@/util/student/selectionSummary";
 import DialPad from "./DialPad";
 import { PointInputProvider, usePointInputContext } from "./PointInputContext";
 
-function Recipients({ isSend, activeStudentLabels, totalCount }) {
-  const [showNames, setShowNames] = useState(false);
-  const who = isSend ? "받는" : "잃는";
-  const sum = summarizeSelection(activeStudentLabels, totalCount);
+// 번호순으로 (번호 없는 학생은 뒤로)
+const byNumber = (a, b) => (Number(a.classNumber) || Infinity) - (Number(b.classNumber) || Infinity);
 
-  if (sum.mode === "names") {
-    return (
-      <h3 className="font-bold text-lg mb-5 ml-[10px]">
-        {who} 사람:{" "}
-        {activeStudentLabels.map((s, i) => (
-          <span className="text-[1.4rem] ml-[4px]" key={s.userId}>
-            <span className="bg-orange-200">{s.label}</span>
-            {i < activeStudentLabels.length - 1 && ", "}
-          </span>
-        ))}
-      </h3>
-    );
-  }
+// 받는/잃는 사람: 1명이면 "3번 홍길동", 여러 명이면 "3번 홍길동 외 3명" → '외 3명'을 누르면 나머지 명단
+function Recipients({ isSend, activeStudentLabels }) {
+  const [showRest, setShowRest] = useState(false);
+  const who = isSend ? "받는" : "잃는";
+  const [first, ...rest] = [...activeStudentLabels].sort(byNumber);
 
   return (
     <div className="relative mb-5 ml-[10px]">
-      <div className="flex items-baseline justify-between gap-2">
-        <h3 className="font-bold text-lg">
-          {who} 사람:{" "}
-          <span className="text-[1.4rem] bg-orange-200 px-1">
-            {sum.mode === "all" ? `전체 ${sum.count}명` : `${sum.count}명`}
-          </span>
-        </h3>
-        <button
-          type="button"
-          onClick={() => setShowNames((v) => !v)}
-          className="shrink-0 text-sm font-medium underline underline-offset-2"
-        >
-          {showNames ? "접기" : "이름 보기"}
-        </button>
-      </div>
-      {sum.mode === "numbers" && (sum.numbers || sum.others.length > 0) && (
-        <p className="mt-1 line-clamp-2 text-[1.05rem] font-semibold">
-          {sum.numbers && `${sum.numbers}번`}
-          {sum.numbers && sum.others.length > 0 && ", "}
-          {sum.others.join(", ")}
-        </p>
-      )}
-      {showNames && (
+      <h3 className="font-bold text-lg">
+        {who} 사람:{" "}
+        {first && <span className="text-[1.4rem] ml-[4px] bg-orange-200">{first.label}</span>}
+        {rest.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowRest((v) => !v)}
+            aria-expanded={showRest}
+            className="ml-1.5 text-[1.2rem] underline underline-offset-4 decoration-2"
+          >
+            외 {rest.length}명
+          </button>
+        )}
+      </h3>
+
+      {showRest && rest.length > 0 && (
         // 창 위에 덮어서 보여준다 → 창 높이·키패드 위치는 그대로
         <div className="absolute inset-x-0 top-full z-20 mt-1 rounded-xl bg-white text-gray-800 shadow-xl ring-1 ring-black/10">
           <div className="flex items-center justify-between border-b border-gray-100 px-3 py-2 text-sm">
-            <span className="font-semibold">선택한 학생 {sum.count}명</span>
-            <button type="button" onClick={() => setShowNames(false)} aria-label="이름 목록 닫기" className="rounded-full p-1 text-gray-500 hover:bg-gray-100">
+            <span className="font-semibold">나머지 {rest.length}명</span>
+            <button
+              type="button"
+              onClick={() => setShowRest(false)}
+              aria-label="명단 닫기"
+              className="rounded-full p-1 text-gray-500 hover:bg-gray-100"
+            >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-4 w-4" aria-hidden="true">
                 <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
               </svg>
             </button>
           </div>
           <ul className="grid max-h-[260px] grid-cols-2 gap-x-3 gap-y-1 overflow-y-auto px-3 py-2 text-sm">
-            {activeStudentLabels.map((s) => (
+            {rest.map((s) => (
               <li key={s.userId} className="truncate">
                 {s.label}
               </li>
@@ -73,7 +60,7 @@ function Recipients({ isSend, activeStudentLabels, totalCount }) {
   );
 }
 
-export function PointModalBody({ isSend, currencyName, activeStudentLabels, totalCount }) {
+export function PointModalBody({ isSend, currencyName, activeStudentLabels }) {
   const { display } = usePointInputContext();
 
   return (
@@ -83,7 +70,7 @@ export function PointModalBody({ isSend, currencyName, activeStudentLabels, tota
       } rounded-2xl p-4`}
     >
       <div className="w-[272px]">
-        <Recipients isSend={isSend} activeStudentLabels={activeStudentLabels} totalCount={totalCount} />
+        <Recipients isSend={isSend} activeStudentLabels={activeStudentLabels} />
 
         <div className="h-[64px] bg-gray-200 mb-5 rounded-2xl flex justify-between items-center px-[16px]">
           <div className="text-gray-500">
@@ -110,7 +97,6 @@ export default function PointModal({
   display,
   actions,
   activeStudentLabels,
-  totalCount,
 }) {
   return (
     <ModalTemplate
@@ -125,7 +111,6 @@ export default function PointModal({
             isSend={isSend}
             currencyName={currencyName}
             activeStudentLabels={activeStudentLabels}
-            totalCount={totalCount}
           />
         </PointInputProvider>
       )}

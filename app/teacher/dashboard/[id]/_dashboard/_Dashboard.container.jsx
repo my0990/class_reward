@@ -182,7 +182,6 @@ export default function DashboardContainer({ classId }) {
         isSend={isSend}
         currencyName={currencyName}
         activeStudentLabels={activeStudentLabels}
-        totalCount={studentsData?.length ?? 0}
         modalId={modalId}
         setModalId={setModalId}
         display={display}

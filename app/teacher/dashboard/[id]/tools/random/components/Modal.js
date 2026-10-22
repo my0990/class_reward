@@ -21,7 +21,7 @@ export default function Modal({ modalId, setModalId, ...props }) {
     );
 }
 
-function PointKeypad({ studentArr, totalCount, currencyName, targetStudent, clearAll, isSend, setStudentArr, classId, close }) {
+function PointKeypad({ studentArr, currencyName, targetStudent, clearAll, isSend, setStudentArr, classId, close }) {
     const labels = useMemo(
         () =>
             targetStudent.map((s) => {
@@ -69,7 +69,7 @@ function PointKeypad({ studentArr, totalCount, currencyName, targetStudent, clea
 
     return (
         <PointInputProvider display={display} actions={actions}>
-            <PointModalBody isSend={isSend} currencyName={currencyName} activeStudentLabels={labels} totalCount={totalCount} />
+            <PointModalBody isSend={isSend} currencyName={currencyName} activeStudentLabels={labels} />
         </PointInputProvider>
     );
 }
