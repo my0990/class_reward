@@ -43,7 +43,8 @@ export default function ApprovalsContainer() {
   const [pendingCount, setPendingCount] = useState(null);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [rejecting, setRejecting] = useState(null); // { ids, reason }
+  const [selected, setSelected] = useState(() => new Set()); // 고른 요청 _id
+  const [rejecting, setRejecting] = useState(null); // 반려 사유 입력 중이면 문자열
 
   const load = useCallback(async () => {
     setError(null);
@@ -54,6 +55,8 @@ export default function ApprovalsContainer() {
       return;
     }
     setRows(res.rows);
+    setSelected(new Set());
+    setRejecting(null);
     if (tab === "pending") setPendingCount(res.rows.length);
   }, [classId, tab]);
 
@@ -116,25 +119,33 @@ export default function ApprovalsContainer() {
     return `${day} ${time}`;
   };
 
-  const rejectBox = (ids) =>
-    rejecting && rejecting.ids.join() === ids.join() ? (
-      <div className="flex flex-wrap items-center gap-[6px]">
-        <input
-          autoFocus
-          value={rejecting.reason}
-          onChange={(e) => setRejecting({ ...rejecting, reason: e.target.value })}
-          maxLength={100}
-          placeholder="반려 사유 (선택)"
-          className="input input-sm input-bordered w-[180px] bg-white"
-        />
-        <button type="button" disabled={busy} onClick={() => decide(ids, "reject", rejecting.reason)} className="btn btn-sm bg-rose-500 text-white hover:bg-rose-600">
-          반려 확정
-        </button>
-        <button type="button" onClick={() => setRejecting(null)} className="btn btn-sm btn-ghost">
-          취소
-        </button>
-      </div>
-    ) : null;
+  // ---- 고르기 ----
+  const allIds = tab === "pending" && rows ? rows.map((r) => r._id) : [];
+  const toggleIds = (ids, on) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => (on ? next.add(id) : next.delete(id)));
+      return next;
+    });
+  const stateOf = (ids) => {
+    const n = ids.filter((id) => selected.has(id)).length;
+    return { checked: ids.length > 0 && n === ids.length, partial: n > 0 && n < ids.length };
+  };
+  // 일부만 골랐을 때 '-' 표시
+  const check = (ids, label) => {
+    const { checked, partial } = stateOf(ids);
+    return (
+      <input
+        type="checkbox"
+        aria-label={label}
+        className="checkbox checkbox-sm checkbox-warning bg-white"
+        checked={checked}
+        ref={(el) => el && (el.indeterminate = partial)}
+        onChange={(e) => toggleIds(ids, e.target.checked)}
+      />
+    );
+  };
+  const selectedIds = allIds.filter((id) => selected.has(id));
 
   return (
     <div className="space-y-[12px]">
@@ -162,52 +173,81 @@ export default function ApprovalsContainer() {
         </div>
       ) : tab === "pending" ? (
         <div className="space-y-[12px]">
+          {/* 전체 선택 + 고른 것 승인·반려 (한 곳에서만) */}
+          <div className="sticky top-0 z-10 flex flex-wrap items-center gap-[8px] rounded-xl bg-white px-[14px] py-[10px] shadow-sm">
+            <label className="flex cursor-pointer items-center gap-[8px] font-semibold">
+              {check(allIds, "전체 선택")}
+              전체 선택
+            </label>
+            <span className="text-[0.85rem] text-gray-500">{selectedIds.length > 0 ? `${selectedIds.length}명 선택` : `${allIds.length}건`}</span>
+            <div className="ml-auto flex flex-wrap items-center gap-[6px]">
+              {rejecting !== null ? (
+                <>
+                  <input
+                    autoFocus
+                    value={rejecting}
+                    onChange={(e) => setRejecting(e.target.value)}
+                    maxLength={100}
+                    placeholder="반려 사유 (선택)"
+                    className="input input-sm input-bordered w-[180px] bg-white"
+                  />
+                  <button type="button" disabled={busy} onClick={() => decide(selectedIds, "reject", rejecting)} className="btn btn-sm bg-rose-500 text-white hover:bg-rose-600">
+                    {selectedIds.length}명 반려
+                  </button>
+                  <button type="button" onClick={() => setRejecting(null)} className="btn btn-sm btn-ghost">
+                    취소
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    disabled={busy || selectedIds.length === 0}
+                    onClick={() => setRejecting("")}
+                    className="btn btn-sm btn-ghost text-rose-600 disabled:bg-transparent"
+                  >
+                    반려
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy || selectedIds.length === 0}
+                    onClick={() => decide(selectedIds, "approve")}
+                    className="btn btn-sm bg-emerald-500 text-white hover:bg-emerald-600"
+                  >
+                    {busy ? "처리 중..." : "승인"}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
           {groups.map((g) => {
             const ids = g.items.map((r) => r._id);
             return (
               <section key={g.targetId} className="rounded-xl bg-white">
                 <header className="flex flex-wrap items-center gap-[8px] rounded-t-xl border-b border-gray-100 bg-gray-50 px-[14px] py-[10px]">
-                  <h2 className="font-bold">{g.target ? `🏆 ${g.target.name}` : "삭제된 퀘스트"}</h2>
+                  <label className="flex cursor-pointer items-center gap-[8px]">
+                    {check(ids, `${g.target?.name ?? "삭제된 퀘스트"} 모두 선택`)}
+                    <h2 className="font-bold">{g.target ? `🏆 ${g.target.name}` : "삭제된 퀘스트"}</h2>
+                  </label>
                   {reward(g.target)}
                   <span className="text-[0.85rem] text-gray-500">신청 {g.items.length}명</span>
-                  <div className="ml-auto flex gap-[6px]">
-                    {g.target && (
-                      <button type="button" disabled={busy} onClick={() => decide(ids, "approve")} className="btn btn-sm bg-emerald-500 text-white hover:bg-emerald-600">
-                        모두 승인
-                      </button>
-                    )}
-                    <button type="button" disabled={busy} onClick={() => setRejecting({ ids, reason: "" })} className="btn btn-sm btn-ghost text-rose-600">
-                      모두 반려
-                    </button>
-                  </div>
-                  {g.items.length > 1 && <div className="w-full">{rejectBox(ids)}</div>}
                 </header>
                 <ul className="divide-y divide-gray-100">
                   {g.items.map((r) => (
-                    <li key={r._id} className="flex flex-wrap items-center gap-[8px] px-[14px] py-[10px]">
-                      <span className="font-semibold">{labelOf(r.userId)}</span>
-                      <span className="text-[0.8rem] text-gray-500" title={formatFullDate(r.createdAt)}>
-                        {timeOf(r.createdAt)}
-                      </span>
-                      {r.target?.alreadyDone && (
-                        <span className="rounded bg-gray-100 px-[6px] py-[1px] text-[0.75rem] text-gray-600" title="승인하면 보상 없이 닫혀요">
-                          이미 완료됨
+                    <li key={r._id}>
+                      <label className="flex cursor-pointer flex-wrap items-center gap-[8px] px-[14px] py-[10px] hover:bg-orange-50">
+                        {check([r._id], `${labelOf(r.userId)} 선택`)}
+                        <span className="font-semibold">{labelOf(r.userId)}</span>
+                        <span className="text-[0.8rem] text-gray-500" title={formatFullDate(r.createdAt)}>
+                          {timeOf(r.createdAt)}
                         </span>
-                      )}
-                      <div className="ml-auto flex gap-[6px]">
-                        {rejectBox([r._id]) ?? (
-                          <>
-                            {g.target && (
-                              <button type="button" disabled={busy} onClick={() => decide([r._id], "approve")} className="btn btn-sm bg-emerald-500 text-white hover:bg-emerald-600">
-                                승인
-                              </button>
-                            )}
-                            <button type="button" disabled={busy} onClick={() => setRejecting({ ids: [r._id], reason: "" })} className="btn btn-sm btn-ghost text-rose-600">
-                              반려
-                            </button>
-                          </>
+                        {r.target?.alreadyDone && (
+                          <span className="rounded bg-gray-100 px-[6px] py-[1px] text-[0.75rem] text-gray-600" title="승인하면 보상 없이 닫혀요">
+                            이미 완료됨
+                          </span>
                         )}
-                      </div>
+                      </label>
                     </li>
                   ))}
                 </ul>
