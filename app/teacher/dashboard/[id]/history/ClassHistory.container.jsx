@@ -109,29 +109,34 @@ export default function ClassHistoryContainer() {
     };
   }, [openKey]);
 
-  // 제목 아래 요약 문장: "최근 7일 동안 학생들에게 1,500쿠키가 들어오고 800쿠키가 나갔어요."
-  // 들어온 돈 = 지급·퀘스트 보상 등 모든 입금, 나간 돈 = 회수·구입·기부 등 모든 출금
+  // 제목 아래 요약: "최근 7일 동안 학생들의 수입은 1,500쿠키, 지출은 800쿠키였어요." + "반 전체 쿠키 보유량 +700"
+  // 수입 = 지급·퀘스트 보상 등 모든 입금, 지출 = 회수·구입·기부 등 모든 출금
   const summary = (() => {
     if (!totals) return null;
     const when = { today: "오늘", "7d": "최근 7일 동안", all: "최근 30일 동안" }[period];
     const who = userId ? labelOf(userId) : "학생들";
+    const unit = currency || "화폐";
     const m = (n) => `${n.toLocaleString()}${currency}`;
     const inc = totals.in.total;
     const out = totals.out.total;
-    if (!inc && !out) {
-      const unit = currency || "돈";
-      return { main: `${when} ${who}에게 들어오거나 나간 ${unit}${josa(unit, "이", "가")} 없어요.`, sub: null };
-    }
-    const I = <b key="i" className="text-emerald-700">{m(inc)}</b>;
-    const O = <b key="o" className="text-rose-600">{m(out)}</b>;
-    const main = [`${when} ${who}${inc ? "에게" : "에게서"} `]; // 나가기만 했으면 '~에게서'
-    if (inc && out) main.push(I, `${josa(m(inc), "이", "가")} 들어오고 `, O, `${josa(m(out), "이", "가")} 나갔어요.`);
-    else if (inc) main.push(I, `${josa(m(inc), "이", "가")} 들어왔어요.`);
-    else main.push(O, `${josa(m(out), "이", "가")} 나갔어요.`);
+    if (!inc && !out) return { main: `${when} ${who}의 수입과 지출이 없어요.`, net: null, sub: null };
+    const main = [
+      `${when} ${who}의 수입은 `,
+      <b key="i" className="text-emerald-700">{m(inc)}</b>,
+      ", 지출은 ",
+      <b key="o" className="text-rose-600">{m(out)}</b>,
+      `${josa(m(out), "이었", "였")}어요.`,
+    ];
+    const diff = inc - out;
+    const net = {
+      label: `${userId ? labelOf(userId) : "반 전체"} ${unit} 보유량`,
+      value: `${diff > 0 ? "+" : diff < 0 ? "−" : "±"}${Math.abs(diff).toLocaleString()}`,
+      tone: diff > 0 ? "text-emerald-700" : diff < 0 ? "text-rose-600" : "text-gray-600",
+    };
     const subs = [];
-    if (period !== "today") subs.push(`하루 평균 들어옴 ${m(totals.in.perDay)}, 나감 ${m(totals.out.perDay)}`);
-    if (perPerson(inc) != null) subs.push(`1인당 들어옴 ${m(perPerson(inc))}, 나감 ${m(perPerson(out))}`);
-    return { main, sub: subs.join(" · ") || null };
+    if (period !== "today") subs.push(`하루 평균 수입 ${m(totals.in.perDay)}, 지출 ${m(totals.out.perDay)}`);
+    if (perPerson(inc) != null) subs.push(`1인당 수입 ${m(perPerson(inc))}, 지출 ${m(perPerson(out))}`);
+    return { main, net, sub: subs.join(" · ") || null };
   })();
 
   return (
@@ -139,6 +144,11 @@ export default function ClassHistoryContainer() {
       {summary && (
         <div className="leading-relaxed">
           <p className="text-[1rem] sm:text-[1.1rem]">{summary.main}</p>
+          {summary.net && (
+            <p className="text-[1rem] sm:text-[1.1rem]">
+              {summary.net.label} <b className={`tabular-nums ${summary.net.tone}`}>{summary.net.value}</b>
+            </p>
+          )}
           {summary.sub && (
             <p className="text-[0.85rem] text-gray-600" title={period !== "today" ? `하루 평균은 ${totals.days}일로 나눈 값이에요` : undefined}>
               {summary.sub}
