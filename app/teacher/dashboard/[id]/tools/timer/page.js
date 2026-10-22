@@ -43,6 +43,7 @@ export default function TimerPage() {
   const cursor = useBigCursor({ highlight: settings.pointerHighlight });
 
   const timer = useCountdown({
+    initialMs: 0, // 처음엔 0분
     onSecond: (sec) => sec <= 3 && playCountdown(),
     onDone: playDone,
   });
@@ -98,7 +99,8 @@ export default function TimerPage() {
     else wrapRef.current?.requestFullscreen?.();
   };
 
-  // 가운데 막대를 끌어 판서판 너비 조절 (끝까지 밀면 닫힘)
+  // 가운데 막대를 끌어 판서판 너비 조절
+  // 오른쪽 끝까지 밀면 판서판 닫힘, 왼쪽 끝까지 밀면 판서판만 보임(시계 숨김)
   const [dragging, setDragging] = useState(false);
   const onDividerDown = (e) => {
     e.preventDefault();
@@ -106,7 +108,7 @@ export default function TimerPage() {
     const rect = wrapRef.current.getBoundingClientRect();
     const move = (ev) => {
       const pct = ((rect.right - ev.clientX) / rect.width) * 100;
-      setBoardPct(pct < 8 ? 0 : Math.min(75, pct));
+      setBoardPct(pct < 8 ? 0 : pct > 88 ? 100 : pct);
     };
     const up = () => {
       setDragging(false);
@@ -135,8 +137,9 @@ export default function TimerPage() {
       // 화면 높이 그대로 → 아래로 스크롤하면 헤더가 올라가 타이머만 화면을 채운다
       style={{ height: isFull ? "100vh" : "max(100dvh, 420px)" }}
     >
+      {/* 판서판만 보일 때는 시계를 숨긴다 (시간은 계속 흐르고 알림도 그대로) */}
       <section
-        className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-[4cqh] [container-type:size]"
+        className={`relative min-w-0 flex-1 flex-col items-center justify-center gap-[4cqh] [container-type:size] ${boardPct === 100 ? "hidden" : "flex"}`}
         style={{ background: bg, color: fg, transition: "background-color 0.4s" }}
       >
         {/* 왼쪽 위: 소음 */}
@@ -228,8 +231,9 @@ export default function TimerPage() {
       {/* 판서판 경계: 끌어서 열기·크기 조절, 두 번 누르면 열기/닫기 (24px, 손가락으로도 잡기 쉽게) */}
       <div
         onPointerDown={onDividerDown}
-        onDoubleClick={() => setBoardPct((p) => (p > 0 ? 0 : BOARD_OPEN_PCT))}
-        title="끌어서 판서판 열기 · 두 번 누르면 열기/닫기"
+        // 판서판만 보일 때 두 번 누르면 반반으로, 아니면 열기/닫기
+        onDoubleClick={() => setBoardPct((p) => (p === 100 ? BOARD_OPEN_PCT : p > 0 ? 0 : BOARD_OPEN_PCT))}
+        title="끌어서 판서판 크기 조절 (왼쪽 끝까지 밀면 판서판만) · 두 번 누르면 열기/닫기"
         className={`resize-cursor flex w-6 shrink-0 touch-none cursor-col-resize items-center justify-center gap-[3px] transition-colors ${
           dragging ? "bg-orange-300" : "bg-gray-200 hover:bg-orange-200"
         }`}
@@ -239,7 +243,7 @@ export default function TimerPage() {
         ))}
       </div>
       {boardPct > 0 && (
-        <div className="shrink-0" style={{ width: `${boardPct}%` }}>
+        <div className={boardPct === 100 ? "min-w-0 flex-1" : "shrink-0"} style={boardPct === 100 ? undefined : { width: `${boardPct}%` }}>
           <Board storageKey={`kkyul:timer-board:${id}`} />
         </div>
       )}
