@@ -267,7 +267,11 @@ export default function ApprovalsContainer() {
         </div>
       ) : (
         <ul className="divide-y divide-gray-100 rounded-xl bg-white">
-          {rows.map((r) => (
+          {rows.map((r) => ({
+            ...r,
+            // 예전 기록(보상 기록 없음)은 지금 퀘스트 보상으로 보여줌. '이미 완료'는 보상을 안 줬음
+            paid: r.paid ?? (r.status === "approved" && r.note !== "이미 완료" && r.target ? { money: r.target.reward, exp: r.target.exp } : null),
+          })).map((r) => (
             <li key={r._id} className="flex flex-wrap items-center gap-[8px] px-[14px] py-[10px] text-[0.95rem]">
               <span className="w-[110px] shrink-0 text-[0.8rem] text-gray-500" title={formatFullDate(r.decidedAt)}>
                 {timeOf(r.decidedAt)}
@@ -280,10 +284,24 @@ export default function ApprovalsContainer() {
                 {r.status === "approved" ? "승인" : "반려"}
               </span>
               <span className="font-semibold">{labelOf(r.userId)}</span>
-              <span className="min-w-0 truncate text-gray-700">{r.target ? r.target.name : "삭제된 퀘스트"}</span>
+              <span className="min-w-0 truncate text-gray-700">
+                {r.status === "approved" ? "퀘스트 완료: " : "퀘스트: "}
+                {r.target ? r.target.name : "삭제된 퀘스트"}
+              </span>
               {r.note && <span className="text-[0.8rem] text-gray-500">({r.note})</span>}
               {r.reason && <span className="text-[0.8rem] text-rose-600">사유: {r.reason}</span>}
-              <span className="ml-auto text-[0.8rem] text-gray-500">처리: {r.decidedBy?.label ?? "-"}</span>
+              {/* 처리한 사람 대신 실제로 준 보상 */}
+              <span className="ml-auto flex shrink-0 gap-[6px] text-[0.85rem] font-semibold tabular-nums">
+                {r.status === "approved" && r.paid ? (
+                  <>
+                    {r.paid.money > 0 && <span className="text-emerald-700">{currency || "화폐"} +{r.paid.money.toLocaleString()}</span>}
+                    {r.paid.exp > 0 && <span className="text-sky-700">경험치 +{r.paid.exp.toLocaleString()}</span>}
+                    {!r.paid.money && !r.paid.exp && <span className="text-gray-400">보상 없음</span>}
+                  </>
+                ) : (
+                  <span className="text-gray-400">{r.status === "approved" ? "보상 없음" : "-"}</span>
+                )}
+              </span>
             </li>
           ))}
         </ul>

@@ -73,7 +73,7 @@ describe("승인·반려", () => {
     expect(await mongo.db.collection("history").countDocuments({ name: "퀘스트 완료" })).toBe(2);
     const done = await svc.listRequestsService({ ...ctx, status: "done" });
     expect(done).toHaveLength(2);
-    expect(done[0]).toMatchObject({ status: "approved", decidedBy: { role: "teacher", label: "선생님" } });
+    expect(done[0]).toMatchObject({ status: "approved", decidedBy: { role: "teacher", label: "선생님" }, paid: { money: 10, exp: 5 } });
     expect((await svc.listKioskQuestsService(ctx))[0]).toMatchObject({ pending: [], finished: expect.arrayContaining(["a", "b"]) });
   });
 
@@ -91,6 +91,7 @@ describe("승인·반려", () => {
     expect(r).toMatchObject({ approved: 0, alreadyDone: 1 });
     expect((await getStudent(mongo.db, "b")).money).toBe(0);
     expect((await getStudent(mongo.db, "a")).money).toBe(10);
+    expect((await requests().findOne({ _id: new ObjectId(ids[1]) })).paid).toBeUndefined(); // 이미 완료: 보상 기록 없음
   });
 
   it("반려하면 보상 없음, 사유 저장, 다시 신청 가능", async () => {

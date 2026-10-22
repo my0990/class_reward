@@ -1,7 +1,7 @@
 // 승인 요청 (승인 센터)
-// data.requests: { teacher_id, classId, type: "quest", targetId(퀘스트 _id), userId(신청 학생),
+// data.requests: { teacher_id, classId, type: "quest", targetId(퀘스트 _id), userId(신청 학생), cycleKey,
 //                  status: "pending" | "approved" | "rejected", createdAt,
-//                  decidedAt?, decidedBy?: { role, id, label }, reason?, note? }
+//                  decidedAt?, decidedBy?: { role, id, label }, reason?, note?, paid?: { money, exp } }
 // - 키오스크에서 학생이 "다 했어요!"를 누르면 pending 요청이 생긴다 (보상은 아직 없음)
 // - 선생님(나중엔 학생 관리자)이 승인하면 퀘스트 완료 처리(finishQuestService)로 보상을 준다
 // - 누가 처리했는지(decidedBy)를 남긴다
@@ -177,6 +177,7 @@ export async function listRequestsService({ teacherObjectId, classObjectId, stat
       decidedBy: r.decidedBy ?? null,
       reason: r.reason ?? "",
       note: r.note ?? "",
+      paid: r.paid ?? null, // 승인 때 실제로 준 보상 { money, exp } (이미 완료라 안 줬으면 null)
       target: q
         ? {
             name: q.questName,
@@ -244,17 +245,19 @@ export async function decideRequestsService({ actor, teacherObjectId, classObjec
       continue;
     }
     const repeating = normalizeRepeat(quest.repeat) !== "none";
+    // 실제로 준 보상을 요청에 남긴다 (나중에 퀘스트 보상을 바꿔도 처리 완료 목록은 그때 값으로)
+    const paid = { money: Number(quest.questReward) || 0, exp: Number(quest.questExp) || 0 };
     const finished = new Set(quest.finished ?? []);
     const toPay = []; // 이번 회차: 보상 + 완료 명단
     const latePay = []; // 지난 회차: 보상만
     for (const r of list) {
       const stale = repeating && (r.cycleKey ?? null) !== (quest.cycleKey ?? null);
       if (stale) {
-        if (await claim(r, { status: "approved", note: "지난 회차" })) latePay.push(r);
+        if (await claim(r, { status: "approved", note: "지난 회차", paid })) latePay.push(r);
         else summary.skipped++;
       } else if (finished.has(r.userId)) {
         if (await claim(r, { status: "approved", note: "이미 완료" })) summary.alreadyDone++;
-      } else if (await claim(r, { status: "approved" })) {
+      } else if (await claim(r, { status: "approved", paid })) {
         toPay.push(r);
       } else summary.skipped++;
     }
@@ -275,7 +278,7 @@ export async function decideRequestsService({ actor, teacherObjectId, classObjec
         else summary.lateCycle += batch.length;
       } catch (e) {
         // 보상 지급이 실패하면 다시 '대기'로 되돌린다
-        await col.updateMany({ _id: { $in: batch.map((r) => r._id) } }, { $set: { status: "pending" }, $unset: { decidedAt: "", decidedBy: "", note: "" } });
+        await col.updateMany({ _id: { $in: batch.map((r) => r._id) } }, { $set: { status: "pending" }, $unset: { decidedAt: "", decidedBy: "", note: "", paid: "" } });
         throw e;
       }
     }
