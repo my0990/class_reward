@@ -5,11 +5,14 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import KioskInstallPrompt from '@/components/kiosk/KioskInstallPrompt'
 import KioskSettings from '@/components/kiosk/KioskSettings'
+import { useFetchData } from '@/hooks/useFetchData'
+import { isKioskMenuOn } from '@/util/kiosk/kioskMenus'
 
 // 키오스크 첫 화면: 구매 / 사용 / 온도계 메뉴 (뒤로 가기 막음)
 export default function KioskHome() {
     const { id: classId } = useParams()
     const [time, setTime] = useState('')
+    const { data: classData } = useFetchData(`/api/classData/${classId}`) // 메뉴 보이기/숨기기 설정
 
     useEffect(() => {
         const preventGoBack = () => {
@@ -53,18 +56,23 @@ export default function KioskHome() {
             desc: '가지고 있는 아이템을 사용해요',
         },
         {
+            key: 'quest',
             href: `/teacher/kiosk/${classId}/quest`,
             icon: '🏆',
             title: '퀘스트',
             desc: '다 한 퀘스트를 선생님께 알려요',
         },
         {
+            key: 'thermometer',
             href: `/teacher/kiosk/${classId}/thermometer`,
             icon: '🌡️',
             title: '학급 온도계',
             desc: '우리 반 기부 현황을 확인해요',
         },
-    ]
+    ].filter((m) => !m.key || isKioskMenuOn(classData, m.key)) // 선생님이 숨긴 메뉴는 빼기
+
+    // 가로 화면에서 메뉴 수만큼 한 줄로
+    const landscapeCols = { 1: 'landscape:grid-cols-1', 2: 'landscape:grid-cols-2', 3: 'landscape:grid-cols-3', 4: 'landscape:grid-cols-4' }[menus.length]
 
     return (
         <main className="fixed inset-0 overflow-hidden bg-gradient-to-br from-orange-100 via-amber-100 to-yellow-100">
@@ -96,7 +104,7 @@ export default function KioskHome() {
                 </header>
 
 
-                <div className="grid w-full max-w-[1100px] grid-cols-2 gap-4 sm:gap-5 landscape:grid-cols-4">
+                <div className={`grid w-full max-w-[1100px] grid-cols-2 gap-4 sm:gap-5 ${landscapeCols}`}>
                     {menus.map((menu) => (
                         <Link key={menu.href} href={menu.href} className="group flex h-[150px] w-full flex-col items-center justify-center rounded-[28px] border-4 border-orange-300 bg-white/95 p-4 shadow-xl transition-all duration-200 hover:-translate-y-1 hover:border-orange-500 hover:bg-orange-500 active:scale-95 sm:h-[190px] sm:rounded-[36px] landscape:h-[230px]">
                                 <div className="mb-2 text-5xl transition-transform duration-200 group-hover:scale-110 sm:text-6xl landscape:text-7xl">

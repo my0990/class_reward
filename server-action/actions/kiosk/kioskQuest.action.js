@@ -8,6 +8,9 @@ import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
 import { isKioskOfClass } from "@/lib/auth/kioskSession";
 import { findActiveKioskDeviceService } from "@/server-action/service/kiosk/kioskDevice.service";
 import { createQuestRequestsService, listKioskQuestsService } from "@/server-action/service/request/request.service";
+import { ObjectId } from "mongodb";
+import { connectDB } from "@/lib/mongodb";
+import { isKioskMenuOn } from "@/util/kiosk/kioskMenus";
 
 async function kioskContext(classId) {
   const session = await getServerSession(authOptions);
@@ -25,10 +28,24 @@ async function kioskContext(classId) {
   return { ok: false, message: "로그인이 필요합니다." };
 }
 
+/** 선생님이 키오스크 설정에서 퀘스트 메뉴를 숨겼으면 막는다 */
+async function questMenuOn(teacher_id, classId) {
+  const classData = await (await connectDB)
+    .db("data")
+    .collection("class_data")
+    .findOne(
+      { teacher_id: ObjectId.createFromHexString(teacher_id), classId: ObjectId.createFromHexString(classId) },
+      { projection: { kioskMenus: 1 } }
+    );
+  return isKioskMenuOn(classData, "quest");
+}
+const MENU_OFF = "지금은 쓸 수 없는 메뉴예요.";
+
 export async function listKioskQuests({ classId }) {
   try {
     const ctx = await kioskContext(classId);
     if (!ctx.ok) return { result: false, message: ctx.message };
+    if (!(await questMenuOn(ctx.teacher_id, classId))) return { result: false, message: MENU_OFF };
     const quests = await listKioskQuestsService({ teacherObjectId: ctx.teacher_id, classObjectId: classId });
     return { result: true, quests };
   } catch (error) {
@@ -41,6 +58,7 @@ export async function requestKioskQuest({ classId, questId, userIds }) {
   try {
     const ctx = await kioskContext(classId);
     if (!ctx.ok) return { result: false, message: ctx.message };
+    if (!(await questMenuOn(ctx.teacher_id, classId))) return { result: false, message: MENU_OFF };
     const r = await createQuestRequestsService({ teacherObjectId: ctx.teacher_id, classObjectId: classId, questId, userIds });
     return { result: true, created: r.created.length, skipped: r.skipped.length };
   } catch (error) {

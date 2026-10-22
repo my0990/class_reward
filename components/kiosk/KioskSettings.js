@@ -3,10 +3,12 @@
 // - 열 때 선생님 비밀번호 확인 (5번 틀리면 10분 동안 버튼이 잠김, 남은 시간 표시)
 // - 선생님 로그인 기기: 「이 기기를 키오스크로 연결」 → 이 기기는 키오스크 전용(선생님 로그인 풀림)
 // - 연결된 기기: 기기 이름 바꾸기, 연결 끊기
+// - 두 경우 모두: 첫 화면 메뉴(학급 온도계·퀘스트) 보이기/숨기기
 // - 창을 닫으면 다음에 다시 비밀번호를 묻는다
 import { useCallback, useEffect, useState } from "react";
 import { signIn, signOut } from "next-auth/react";
 import { toast } from "react-hot-toast";
+import { mutate } from "swr";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import {
@@ -15,7 +17,9 @@ import {
   pairKioskDevice,
   renameThisKioskDevice,
   unpairThisKioskDevice,
+  setKioskMenus,
 } from "@/server-action/actions/kiosk/kioskSettings.action";
+import { KIOSK_TOGGLE_MENUS } from "@/util/kiosk/kioskMenus";
 
 const MODAL_ID = "KIOSK_SETTINGS";
 const fmtDate = (d) => (d ? new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric" }).format(new Date(d)) : "");
@@ -128,6 +132,40 @@ export default function KioskSettings({ classId }) {
     }
   };
 
+  const onToggleMenu = async (key, on) => {
+    const prev = unlocked.info.kioskMenus;
+    const next = { ...prev, [key]: on };
+    setUnlocked((u) => ({ ...u, info: { ...u.info, kioskMenus: next } })); // 바로 반영해 보이고
+    const r = await setKioskMenus({ classId, settingsToken: unlocked.settingsToken, menus: { [key]: on } });
+    if (!r?.result) {
+      setUnlocked((u) => ({ ...u, info: { ...u.info, kioskMenus: prev } })); // 실패하면 되돌림
+      toast.error(r?.message || "저장하지 못했어요.");
+      return;
+    }
+    mutate(`/api/classData/${classId}`); // 첫 화면 메뉴 다시 그리기
+  };
+
+  // 메뉴 보이기/숨기기 (선생님 로그인 기기·연결된 기기 공통)
+  const menuToggles = unlocked && (
+    <div className="rounded-lg border border-gray-200 p-3">
+      <div className="mb-2 text-sm font-semibold text-gray-700">첫 화면 메뉴</div>
+      <div className="space-y-2">
+        {KIOSK_TOGGLE_MENUS.map(({ key, label }) => (
+          <label key={key} className="flex cursor-pointer items-center justify-between gap-2 text-sm">
+            <span>{label}</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-warning toggle-sm"
+              checked={unlocked.info.kioskMenus?.[key] !== false}
+              onChange={(e) => onToggleMenu(key, e.target.checked)}
+            />
+          </label>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-gray-400">끄면 이 반의 모든 키오스크 첫 화면에서 숨겨져요.</p>
+    </div>
+  );
+
   const mins = Math.ceil(lockedSec / 60);
   const info = unlocked?.info;
 
@@ -195,6 +233,7 @@ export default function KioskSettings({ classId }) {
                 >
                   {busy ? "연결 중..." : confirming ? "선생님 로그인을 풀고 연결할게요" : "이 기기를 키오스크로 연결"}
                 </button>
+                {menuToggles}
                 <p className="text-xs text-gray-400">연결을 끊을 때도 이 설정에서 선생님 비밀번호로 끊을 수 있어요. 선생님 화면 &gt; 설정 &gt; 키오스크 기기에서 원격으로도 끊을 수 있어요.</p>
               </div>
             ) : (
@@ -213,6 +252,7 @@ export default function KioskSettings({ classId }) {
                     </button>
                   </div>
                 </label>
+                {menuToggles}
                 <button
                   type="button"
                   onClick={onUnpair}

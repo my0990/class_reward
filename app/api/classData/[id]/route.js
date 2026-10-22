@@ -13,6 +13,7 @@ const STUDENT_FIELDS = {
   itemList: 1,
   profileImgStorage: 1,
   profileImgOrder: 1,
+  kioskMenus: 1, // 키오스크 첫 화면 메뉴 보이기/숨기기
 };
 
 // 학급 설정/마켓/프로필 이미지 등 학급 정보 (교사 + 그 반 학생)

@@ -7,6 +7,7 @@
 // - 맞으면 설정 토큰(10분)을 주고, 창 안의 작업(연결·이름 바꾸기·연결 끊기)은 이 토큰으로 한다. 창을 닫으면 버린다.
 // - 선생님 로그인 기기: 「이 기기를 키오스크로 연결」 → 연결 토큰(2분)을 받아 키오스크로 다시 로그인
 // - 연결된 기기: 기기 이름 바꾸기, 연결 끊기
+// - 두 경우 모두: 첫 화면 메뉴(학급 온도계·퀘스트) 보이기/숨기기 (학급 설정이라 이 반 모든 키오스크에 적용)
 // - 선생님 화면(학급 설정): 연결된 기기 목록·원격 끊기
 import { getServerSession } from "next-auth";
 import { ObjectId } from "mongodb";
@@ -16,6 +17,7 @@ import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
 import { verifyTeacherPassword, lockedSeconds } from "@/lib/auth/teacherPassword";
 import { createSignedToken, readSignedToken } from "@/lib/auth/signedToken";
 import { isKioskOfClass, KIOSK_PAIR_PURPOSE, KIOSK_SETTINGS_PURPOSE } from "@/lib/auth/kioskSession";
+import { KIOSK_TOGGLE_MENUS, cleanKioskMenus, isKioskMenuOn } from "@/util/kiosk/kioskMenus";
 import {
   createKioskDeviceService,
   findActiveKioskDeviceService,
@@ -78,6 +80,14 @@ export async function unlockKioskSettings({ classId, password }) {
       .db("data")
       .collection("classes")
       .findOne({ _id: ObjectId.createFromHexString(classId) }, { projection: { className: 1 } });
+    const classData = await client
+      .db("data")
+      .collection("class_data")
+      .findOne(
+        { teacher_id: ObjectId.createFromHexString(ctx.teacher_id), classId: ObjectId.createFromHexString(classId) },
+        { projection: { kioskMenus: 1 } }
+      );
+    const kioskMenus = Object.fromEntries(KIOSK_TOGGLE_MENUS.map(({ key }) => [key, isKioskMenuOn(classData, key)]));
     let device = null;
     if (ctx.mode === "kiosk") {
       const d = await findActiveKioskDeviceService(ctx.deviceId);
@@ -87,7 +97,7 @@ export async function unlockKioskSettings({ classId, password }) {
     return {
       result: true,
       settingsToken: createSignedToken(KIOSK_SETTINGS_PURPOSE, { c: String(classId), k: ctx.lockKey }, { ttlMs: SETTINGS_TTL_MS }),
-      info: { mode: ctx.mode, className: cls?.className ?? "", device },
+      info: { mode: ctx.mode, className: cls?.className ?? "", device, kioskMenus },
     };
   } catch (error) {
     console.error("unlockKioskSettings error:", error);
@@ -107,6 +117,26 @@ export async function pairKioskDevice({ classId, settingsToken, name }) {
   } catch (error) {
     console.error("pairKioskDevice error:", error);
     return fail("기기를 연결하지 못했어요.");
+  }
+}
+
+/** 첫 화면 메뉴 보이기/숨기기 (이 반 모든 키오스크에 적용) */
+export async function setKioskMenus({ classId, settingsToken, menus }) {
+  try {
+    const ctx = await settingsContext(classId, settingsToken);
+    if (!ctx) return fail("시간이 지났어요. 설정 창을 다시 열어 주세요.");
+    const clean = cleanKioskMenus(menus);
+    if (Object.keys(clean).length === 0) return fail("바꿀 메뉴가 없어요.");
+    const set = Object.fromEntries(Object.entries(clean).map(([k, v]) => [`kioskMenus.${k}`, v]));
+    const r = await (await connectDB)
+      .db("data")
+      .collection("class_data")
+      .updateOne({ teacher_id: ObjectId.createFromHexString(ctx.teacher_id), classId: ObjectId.createFromHexString(classId) }, { $set: set });
+    if (r.matchedCount === 0) return fail("학급 정보를 찾을 수 없어요.");
+    return { result: true };
+  } catch (error) {
+    console.error("setKioskMenus error:", error);
+    return fail("메뉴 설정을 저장하지 못했어요.");
   }
 }
 
