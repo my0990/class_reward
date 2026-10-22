@@ -77,20 +77,44 @@ export async function createQuestRequestService({ teacherObjectId, classObjectId
   return { ok: true };
 }
 
-/** 키오스크: 한 학생 기준 퀘스트 목록과 상태 (done / pending / open) */
-export async function listQuestsForStudentService({ teacherObjectId, classObjectId, userId }) {
+/**
+ * 키오스크: 여러 학생이 한 번에 완료 신청 (선생님 퀘스트 화면처럼 학생을 골라서)
+ * 학생마다 따로 확인해서, 이미 완료·이미 신청·다른 반은 건너뛴다.
+ */
+export async function createQuestRequestsService({ userIds, ...rest }) {
+  const ids = [...new Set((userIds ?? []).map(String).filter(Boolean))].slice(0, 100);
+  if (ids.length === 0) throw new Error("학생을 골라 주세요.");
+  const result = { created: [], skipped: [] };
+  for (const userId of ids) {
+    try {
+      await createQuestRequestService({ ...rest, userId });
+      result.created.push(userId);
+    } catch (e) {
+      if (/퀘스트를 찾을 수 없어요/.test(e?.message)) throw e;
+      result.skipped.push({ userId, reason: e?.message ?? "" });
+    }
+  }
+  return result;
+}
+
+/** 키오스크: 퀘스트 목록 + 퀘스트마다 완료한 학생·확인 기다리는 학생 */
+export async function listKioskQuestsService({ teacherObjectId, classObjectId }) {
   const db = (await connectDB).db("data");
   const scope = { teacher_id: oid(teacherObjectId, "교사"), classId: oid(classObjectId, "학급") };
-  userId = String(userId ?? "");
   const [quests, pending] = await Promise.all([
     db
       .collection("quest")
       .find(scope, { projection: { questName: 1, questGoal: 1, questReward: 1, questExp: 1, questTitle: 1, finished: 1 } })
       .sort({ order: 1, time: -1 }) // 퀘스트 관리 화면과 같은 순서 (새 퀘스트가 위)
       .toArray(),
-    db.collection("requests").find({ ...scope, type: "quest", userId, status: "pending" }, { projection: { targetId: 1 } }).toArray(),
+    db.collection("requests").find({ ...scope, type: "quest", status: "pending" }, { projection: { targetId: 1, userId: 1 } }).toArray(),
   ]);
-  const pendingIds = new Set(pending.map((p) => String(p.targetId)));
+  const pendingByQuest = new Map();
+  for (const p of pending) {
+    const k = String(p.targetId);
+    if (!pendingByQuest.has(k)) pendingByQuest.set(k, []);
+    pendingByQuest.get(k).push(p.userId);
+  }
   return quests.map((q) => ({
     _id: String(q._id),
     questName: q.questName,
@@ -98,7 +122,8 @@ export async function listQuestsForStudentService({ teacherObjectId, classObject
     questReward: Number(q.questReward) || 0,
     questExp: Number(q.questExp) || 0,
     questTitle: q.questTitle ?? "",
-    status: (q.finished ?? []).includes(userId) ? "done" : pendingIds.has(String(q._id)) ? "pending" : "open",
+    finished: q.finished ?? [],
+    pending: pendingByQuest.get(String(q._id)) ?? [],
   }));
 }
 

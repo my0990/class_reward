@@ -16,11 +16,10 @@ export { notEnoughMessage } from "./kioskUtils";
  *   classId: string, title: string, guide?: string, onBack?: () => void,
  *   check?: (user, classData) => string | null,   // 막을 이유(문구)를 돌려주면 alert로 보여주고 멈춘다
  *   onPicked: ({ user, kioskToken }) => void,
- *   noPassword?: boolean,                          // true면 비밀번호 없이 바로 onPicked({ user }) (퀘스트 신청처럼 보상이 승인 뒤에 나가는 곳)
  *   children?: React.ReactNode,                    // 제목 아래에 보여줄 내용 (예: 고른 아이템)
  * }} props
  */
-export default function StudentPicker({ classId, title, guide = "계정을 선택하세요", onBack, check, onPicked, noPassword = false, children }) {
+export default function StudentPicker({ classId, title, guide = "계정을 선택하세요", onBack, check, onPicked, children }) {
   const studentsKey = `/api/students/${classId}`;
   const { data: classData, isLoading: l1, isError: e1 } = useFetchData(`/api/classData/${classId}`);
   const { data: students, isLoading: l2, isError: e2 } = useLiveStudents(classId); // 바뀌었을 때만 다시 불러옴
@@ -40,10 +39,6 @@ export default function StudentPicker({ classId, title, guide = "계정을 선�
     const reason = check?.(user, classData);
     if (reason) {
       toast.error(reason);
-      return;
-    }
-    if (noPassword) {
-      onPicked({ user });
       return;
     }
     setPicked(user);
@@ -67,7 +62,7 @@ export default function StudentPicker({ classId, title, guide = "계정을 선�
           />
         ))}
       </div>
-      {!noPassword && <KioskPasswordDialog userData={picked} onSuccess={(kioskToken) => onPicked({ user: picked, kioskToken })} />}
+      <KioskPasswordDialog userData={picked} onSuccess={(kioskToken) => onPicked({ user: picked, kioskToken })} />
     </div>
   );
 }

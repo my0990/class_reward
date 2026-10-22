@@ -1,5 +1,5 @@
 "use server";
-// 키오스크 퀘스트: 학생이 자기 퀘스트 상태를 보고 "다 했어요!"로 완료 신청 (비밀번호 없음)
+// 키오스크 퀘스트: 퀘스트를 고르고, 다 한 학생들이 자기 카드를 눌러 완료 신청 (비밀번호 없음)
 // 보상은 선생님이 승인 센터에서 승인할 때 지급되므로, 여기서는 '신청'만 만든다.
 // 쓸 수 있는 곳: 그 반 선생님 로그인 기기, 또는 그 반에 연결된 키오스크 기기
 import { getServerSession } from "next-auth";
@@ -7,7 +7,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
 import { isKioskOfClass } from "@/lib/auth/kioskSession";
 import { findActiveKioskDeviceService } from "@/server-action/service/kiosk/kioskDevice.service";
-import { createQuestRequestService, listQuestsForStudentService } from "@/server-action/service/request/request.service";
+import { createQuestRequestsService, listKioskQuestsService } from "@/server-action/service/request/request.service";
 
 async function kioskContext(classId) {
   const session = await getServerSession(authOptions);
@@ -25,11 +25,11 @@ async function kioskContext(classId) {
   return { ok: false, message: "로그인이 필요합니다." };
 }
 
-export async function listKioskQuests({ classId, userId }) {
+export async function listKioskQuests({ classId }) {
   try {
     const ctx = await kioskContext(classId);
     if (!ctx.ok) return { result: false, message: ctx.message };
-    const quests = await listQuestsForStudentService({ teacherObjectId: ctx.teacher_id, classObjectId: classId, userId });
+    const quests = await listKioskQuestsService({ teacherObjectId: ctx.teacher_id, classObjectId: classId });
     return { result: true, quests };
   } catch (error) {
     console.error("listKioskQuests error:", error);
@@ -37,12 +37,12 @@ export async function listKioskQuests({ classId, userId }) {
   }
 }
 
-export async function requestKioskQuest({ classId, userId, questId }) {
+export async function requestKioskQuest({ classId, questId, userIds }) {
   try {
     const ctx = await kioskContext(classId);
     if (!ctx.ok) return { result: false, message: ctx.message };
-    await createQuestRequestService({ teacherObjectId: ctx.teacher_id, classObjectId: classId, userId, questId });
-    return { result: true };
+    const r = await createQuestRequestsService({ teacherObjectId: ctx.teacher_id, classObjectId: classId, questId, userIds });
+    return { result: true, created: r.created.length, skipped: r.skipped.length };
   } catch (error) {
     return { result: false, message: error?.message || "신청하지 못했어요." };
   }

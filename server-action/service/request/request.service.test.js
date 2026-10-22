@@ -39,9 +39,19 @@ describe("퀘스트 완료 신청 (키오스크)", () => {
   it("신청 → 목록에 '확인 중', 같은 퀘스트는 한 번만", async () => {
     await ask("a");
     await expect(ask("a")).rejects.toThrow("이미 신청했어요");
-    const list = await svc.listQuestsForStudentService({ ...ctx, userId: "a" });
-    expect(list).toEqual([expect.objectContaining({ questName: "독서", status: "pending", questReward: 10 })]);
-    expect((await svc.listQuestsForStudentService({ ...ctx, userId: "b" }))[0].status).toBe("open");
+    const list = await svc.listKioskQuestsService(ctx);
+    expect(list).toEqual([expect.objectContaining({ questName: "독서", questReward: 10, finished: [], pending: ["a"] })]);
+  });
+
+  it("여러 명 한 번에 신청: 이미 신청·다른 반·이미 완료는 건너뜀", async () => {
+    await ask("a");
+    await seedStudent(mongo.db, s, { userId: "c" });
+    await mongo.db.collection("quest").updateOne({ _id: questId }, { $set: { finished: ["c"] } });
+    const r = await svc.createQuestRequestsService({ ...ctx, questId, userIds: ["a", "b", "x", "c", "b"] });
+    expect(r.created).toEqual(["b"]);
+    expect(r.skipped.map((x) => x.userId)).toEqual(["a", "x", "c"]);
+    await expect(svc.createQuestRequestsService({ ...ctx, questId, userIds: [] })).rejects.toThrow("학생을 골라");
+    await expect(svc.createQuestRequestsService({ ...ctx, questId: new ObjectId(), userIds: ["b"] })).rejects.toThrow("퀘스트를 찾을 수 없어요");
   });
 
   it("다른 반 학생·없는 퀘스트·이미 완료한 퀘스트는 신청 못 함", async () => {
@@ -64,7 +74,7 @@ describe("승인·반려", () => {
     const done = await svc.listRequestsService({ ...ctx, status: "done" });
     expect(done).toHaveLength(2);
     expect(done[0]).toMatchObject({ status: "approved", decidedBy: { role: "teacher", label: "선생님" } });
-    expect((await svc.listQuestsForStudentService({ ...ctx, userId: "a" }))[0].status).toBe("done");
+    expect((await svc.listKioskQuestsService(ctx))[0]).toMatchObject({ pending: [], finished: expect.arrayContaining(["a", "b"]) });
   });
 
   it("두 번 눌러도 한 번만 지급, 이미 완료한 학생은 보상 없이 닫음", async () => {
