@@ -25,7 +25,7 @@ export const GET = withApiHandler(async (req, { params }) => {
   const cursor = q.get("cursor");
   const [result, totals] = await Promise.all([
     getClassHistoryService({ teacherObjectId, classObjectId, kinds, userId, period, cursor, limit }),
-    // 첫 페이지일 때만 기간 합계(지급·회수 총액, 하루 평균)를 같이 보낸다
+    // 첫 페이지일 때만 기간 합계(들어온 돈·나간 돈, 하루 평균)를 같이 보낸다
     cursor ? null : getClassHistoryTotalsService({ teacherObjectId, classObjectId, userId, period }),
   ]);
   return NextResponse.json(totals ? { ...result, totals } : result);

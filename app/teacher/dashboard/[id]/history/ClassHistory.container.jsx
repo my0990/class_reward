@@ -109,25 +109,29 @@ export default function ClassHistoryContainer() {
     };
   }, [openKey]);
 
-  // 제목 아래 요약 문장: "최근 7일 동안 선생님이 학생들에게 1,200쿠키를 지급하고 300쿠키를 회수했어요."
+  // 제목 아래 요약 문장: "최근 7일 동안 학생들에게 1,500쿠키가 들어오고 800쿠키가 나갔어요."
+  // 들어온 돈 = 지급·퀘스트 보상 등 모든 입금, 나간 돈 = 회수·구입·기부 등 모든 출금
   const summary = (() => {
     if (!totals) return null;
     const when = { today: "오늘", "7d": "최근 7일 동안", all: "최근 30일 동안" }[period];
-    const to = userId ? labelOf(userId) : "학생들";
+    const who = userId ? labelOf(userId) : "학생들";
     const m = (n) => `${n.toLocaleString()}${currency}`;
-    const g = totals.grant.total;
-    const t = totals.take.total;
-    if (!g && !t) return { main: `${when} 선생님이 ${to}에게 지급하거나 회수한 기록이 없어요.`, sub: null };
-    const parts = [];
-    if (g) parts.push(<b key="g" className="text-emerald-700">{m(g)}</b>, `${josa(m(g), "을", "를")} 지급`);
-    if (g && t) parts.push("하고 ");
-    if (t) parts.push(<b key="t" className="text-rose-600">{m(t)}</b>, `${josa(m(t), "을", "를")} 회수`);
-    parts.push("했어요.");
+    const inc = totals.in.total;
+    const out = totals.out.total;
+    if (!inc && !out) {
+      const unit = currency || "돈";
+      return { main: `${when} ${who}에게 들어오거나 나간 ${unit}${josa(unit, "이", "가")} 없어요.`, sub: null };
+    }
+    const I = <b key="i" className="text-emerald-700">{m(inc)}</b>;
+    const O = <b key="o" className="text-rose-600">{m(out)}</b>;
+    const main = [`${when} ${who}${inc ? "에게" : "에게서"} `]; // 나가기만 했으면 '~에게서'
+    if (inc && out) main.push(I, `${josa(m(inc), "이", "가")} 들어오고 `, O, `${josa(m(out), "이", "가")} 나갔어요.`);
+    else if (inc) main.push(I, `${josa(m(inc), "이", "가")} 들어왔어요.`);
+    else main.push(O, `${josa(m(out), "이", "가")} 나갔어요.`);
     const subs = [];
-    if (period !== "today") subs.push(`하루 평균 ${[g && `${m(totals.grant.perDay)} 지급`, t && `${m(totals.take.perDay)} 회수`].filter(Boolean).join(", ")}`);
-    if (perPerson(g) != null) subs.push(`1인당 ${[g && `${m(perPerson(g))} 지급`, t && `${m(perPerson(t))} 회수`].filter(Boolean).join(", ")}`);
-    // 회수만 있으면 '~에게서'
-    return { main: [`${when} 선생님이 ${to}${g ? "에게" : "에게서"} `, ...parts], sub: subs.join(" · ") || null };
+    if (period !== "today") subs.push(`하루 평균 들어옴 ${m(totals.in.perDay)}, 나감 ${m(totals.out.perDay)}`);
+    if (perPerson(inc) != null) subs.push(`1인당 들어옴 ${m(perPerson(inc))}, 나감 ${m(perPerson(out))}`);
+    return { main, sub: subs.join(" · ") || null };
   })();
 
   return (

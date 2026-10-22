@@ -73,7 +73,7 @@ export async function getClassHistoryService({ limit = CLASS_HISTORY_PAGE, ...op
   };
 }
 
-// ---- 기간 합계: 선생님이 지급·회수한 총액과 하루 평균 ----
+// ---- 기간 합계: 학생들에게 들어온 돈(입금 전부)·나간 돈(출금 전부)과 하루 평균 ----
 const PERIOD_DAYS = { today: 1, "7d": 7, all: 30 }; // all = 보관 기간(30일)
 
 /** 한국 날짜 기준으로 from이 속한 날부터 now가 속한 날까지 며칠인지 (같은 날이면 1) */
@@ -96,7 +96,7 @@ export function averageDays(period, firstDate, now = new Date()) {
 export async function getClassHistoryTotalsService({ teacherObjectId, classObjectId, userId, period = "all", now = new Date() }) {
   const col = (await connectDB).db("data").collection("history");
   const scope = { teacher_id: teacherObjectId, classId: classObjectId };
-  const match = { ...scope, name: { $in: ["선생님에게 받음", "선생님에게 뺏김"] } };
+  const match = { ...scope };
   if (userId) match.userId = String(userId);
   const start = periodStart(period, now);
   if (start) match.date = { $gte: start };
@@ -106,8 +106,9 @@ export async function getClassHistoryTotalsService({ teacherObjectId, classObjec
       .aggregate([
         { $match: match },
         {
+          // 입금(선생님 지급·퀘스트 보상 등) = 들어온 돈, 출금(회수·구입·기부 등) = 나간 돈
           $group: {
-            _id: "$name",
+            _id: { $cond: [{ $in: ["$type", ["입금", "deposit"]] }, "in", "out"] },
             total: { $sum: { $convert: { input: "$amount", to: "double", onError: 0, onNull: 0 } } },
             count: { $sum: 1 },
           },
@@ -120,5 +121,5 @@ export async function getClassHistoryTotalsService({ teacherObjectId, classObjec
   const by = Object.fromEntries(sums.map((r) => [r._id, r]));
   const days = averageDays(period, first[0]?.date, now);
   const pack = (r) => ({ total: r?.total ?? 0, count: r?.count ?? 0, perDay: Math.round((r?.total ?? 0) / days) });
-  return { days, grant: pack(by["선생님에게 받음"]), take: pack(by["선생님에게 뺏김"]) };
+  return { days, in: pack(by.in), out: pack(by.out) };
 }

@@ -64,23 +64,25 @@ describe("학급 기록", () => {
     expect(decodeCursor(`${NOW.toISOString()}_${new ObjectId().toHexString()}`)).not.toBeNull();
   });
 
-  it("기간 합계: 지급·회수 총액과 하루 평균", async () => {
+  it("기간 합계: 들어온 돈(입금 전부)·나간 돈(출금 전부)과 하루 평균", async () => {
     await seed();
     await mongo.db.collection("history").insertOne({ ...base(s), userId: "a", name: "선생님에게 뺏김", type: "출금", amount: 4, date: at(2) });
     const tot = (o) => getClassHistoryTotalsService({ teacherObjectId: s.teacherObjectId, classObjectId: s.classObjectId, now: NOW, ...o });
 
+    // 들어옴: 지급 10+10, 퀘스트 5 / 나감: 구입 3, 사용 0, 기부 2, 회수 4
     const all = await tot({ period: "all" });
-    expect(all.grant).toMatchObject({ total: 20, count: 2 });
-    expect(all.take).toMatchObject({ total: 4, count: 1 });
+    expect(all.in).toMatchObject({ total: 25, count: 3 });
+    expect(all.out).toMatchObject({ total: 9, count: 4 });
     // 첫 기록이 10일 전 → 30일이 아니라 11일(한국 날짜 기준)로 나눈다
     expect(all.days).toBe(11);
-    expect(all.grant.perDay).toBe(Math.round(20 / 11));
+    expect(all.in.perDay).toBe(Math.round(25 / 11));
 
-    expect((await tot({ period: "today" })).days).toBe(1);
+    const today = await tot({ period: "today" });
+    expect(today.days).toBe(1);
+    expect(today.in.total).toBe(20); // 다른 반 지급(99)은 섞이지 않는다
+    expect(today.out.total).toBe(7); // 구입 3 + 회수 4
     expect((await tot({ period: "7d" })).days).toBe(7);
-    expect((await tot({ period: "all", userId: "b" })).grant.total).toBe(10);
-    // 다른 반 지급(99)은 섞이지 않는다
-    expect((await tot({ period: "today" })).grant.total).toBe(20);
+    expect((await tot({ period: "all", userId: "b" })).in.total).toBe(15);
   });
 
   it("하루 평균 분모", () => {
