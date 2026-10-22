@@ -14,6 +14,7 @@ const classDataRoute = await import("@/app/api/classData/[id]/route.js");
 const studentsRoute = await import("@/app/api/students/[id]/route.js");
 const questRoute = await import("@/app/api/fetchQuestList/[id]/route.js");
 const historyRoute = await import("@/app/api/fetchHistory/[id]/route.js");
+const classHistoryRoute = await import("@/app/api/classHistory/[id]/route.js");
 const thermometerRoute = await import("@/app/api/thermometer/[id]/route.js");
 const userRoute = await import("@/app/api/user/route.js");
 const noticesRoute = await import("@/app/api/notices/route.js");
@@ -56,6 +57,7 @@ describe("공통: 로그인/권한/잘못된 id", () => {
     ["students", studentsRoute],
     ["fetchQuestList", questRoute],
     ["fetchHistory", historyRoute],
+    ["classHistory", classHistoryRoute],
   ];
   const needsLogin = [...teacherOnly, ["classData", classDataRoute], ["thermometer", thermometerRoute], ["user", userRoute]];
 
@@ -77,12 +79,29 @@ describe("공통: 로그인/권한/잘못된 id", () => {
     ["students", studentsRoute],
     ["fetchQuestList", questRoute],
     ["thermometer", thermometerRoute],
+    ["classHistory", classHistoryRoute],
   ])("%s: 잘못된 id면 500이 아니라 400", async (_, route) => {
     asTeacher();
     for (const id of ["abc", "123456789012", "zzzzzzzzzzzzzzzzzzzzzzzz"]) {
       const { status } = await call(route, { id });
       expect(status).toBe(400);
     }
+  });
+});
+
+describe("/api/classHistory/[id]", () => {
+  beforeEach(() => seedClassDocs(scope, other));
+
+  it("교사: 자기 반 기록만, 다른 교사의 학급은 404", async () => {
+    await mongo.db.collection("history").insertMany([
+      { teacher_id: scope.teacherObjectId, classId: scope.classObjectId, userId: "s1", name: "기부", type: "출금", amount: 1, date: new Date() },
+      { teacher_id: other.teacherObjectId, classId: other.classObjectId, userId: "x1", name: "기부", type: "출금", amount: 1, date: new Date() },
+    ]);
+    asTeacher();
+    const { status, body } = await call(classHistoryRoute, { id: scope.classId });
+    expect(status).toBe(200);
+    expect(body.rows.map((r) => r.userId)).toEqual(["s1"]);
+    expect((await call(classHistoryRoute, { id: other.classId })).status).toBe(404);
   });
 });
 

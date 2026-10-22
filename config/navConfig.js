@@ -47,6 +47,13 @@ export const teacherNav = [
         activeMatch: (pathname, id) =>
           pathname === `/teacher/dashboard/${id}/profile`,
       },
+      {
+        key: "manage-history",
+        label: "학급 기록",
+        href: (id) => `/teacher/dashboard/${id}/history`,
+        activeMatch: (pathname, id) =>
+          pathname === `/teacher/dashboard/${id}/history`,
+      },
     ],
   },
 
