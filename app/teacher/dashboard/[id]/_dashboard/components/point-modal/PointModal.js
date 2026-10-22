@@ -4,7 +4,7 @@ import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import DialPad from "./DialPad";
 import { PointInputProvider, usePointInputContext } from "./PointInputContext";
 
-function PointModalBody({ isSend, currencyName, activeStudentLabels }) {
+export function PointModalBody({ isSend, currencyName, activeStudentLabels }) {
   const { display } = usePointInputContext();
 
   return (

@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import Modal from "./components/Modal";
+import Modal, { POINT_MODAL_ID } from "./components/Modal";
 import util from "./util";
 import { useParams } from 'next/navigation';
 // 섞기 (lodash 전체를 불러오지 않게 직접 구현)
@@ -38,7 +38,7 @@ export default function Random() {
 
 
     const [modalId, setModalId] = useState(null); // 지급/회수 키패드 창
-    const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend, openModal: () => setModalId("POINT") });
+    const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend, openModal: () => setModalId(POINT_MODAL_ID) });
     
     const audioPool = useRef([]);
     const index = useRef(0);
