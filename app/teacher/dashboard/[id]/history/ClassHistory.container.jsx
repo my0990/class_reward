@@ -89,6 +89,9 @@ export default function ClassHistoryContainer() {
   }, [load, kindsKey]);
 
   const days = useMemo(() => splitByDay(groupHistory(rows)), [rows]);
+  // 1인당 = 총액 ÷ 반 학생 수 (학생 한 명만 볼 때는 숨김)
+  const studentCount = (students ?? []).filter((s) => s.role !== "teacher").length;
+  const perPerson = (total) => (userId || studentCount === 0 ? null : Math.round(total / studentCount));
   const toggle = (key) => setOpenKey((prev) => (prev === key ? null : key));
 
   // 명단 바깥을 누르거나 ESC면 닫기
@@ -164,15 +167,17 @@ export default function ClassHistoryContainer() {
             ))}
           </div>
           {totals && (
-            // 선택한 기간(과 학생)의 선생님 지급·회수 총액 + 하루 평균 (종류 체크와는 상관없음)
+            // 선택한 기간(과 학생)의 선생님 지급·회수 총액 + 하루 평균 + 1인당 (종류 체크와는 상관없음)
             <div className="flex flex-wrap gap-[6px] text-[0.8rem]" title={`하루 평균은 ${totals.days}일로 나눈 값이에요`}>
               <span className="rounded-lg bg-emerald-50 px-[8px] py-[3px] text-emerald-800">
                 🎁 지급 <b className="tabular-nums">{totals.grant.total.toLocaleString()}{currency}</b>
                 {period !== "today" && <span className="text-emerald-700"> · 하루 평균 {totals.grant.perDay.toLocaleString()}</span>}
+                {perPerson(totals.grant.total) != null && <span className="text-emerald-700"> · 1인당 {perPerson(totals.grant.total).toLocaleString()}</span>}
               </span>
               <span className="rounded-lg bg-rose-50 px-[8px] py-[3px] text-rose-800">
                 ↩️ 회수 <b className="tabular-nums">{totals.take.total.toLocaleString()}{currency}</b>
                 {period !== "today" && <span className="text-rose-700"> · 하루 평균 {totals.take.perDay.toLocaleString()}</span>}
+                {perPerson(totals.take.total) != null && <span className="text-rose-700"> · 1인당 {perPerson(totals.take.total).toLocaleString()}</span>}
               </span>
             </div>
           )}
