@@ -192,7 +192,6 @@ export default function KioskQuestPage() {
       <KioskConfirm
         open={confirming}
         title={`${picked.size}명이 "${quest.questName}" 퀘스트를 다 했나요? 선생님께 알릴게요.`}
-        confirmLabel="네, 다 했어요"
         busy={busy}
         onConfirm={submit}
         onCancel={() => setConfirming(false)}
