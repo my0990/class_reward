@@ -228,7 +228,7 @@ export default function Random() {
                 </div>
 
             </div>
-            <Modal modalId={modalId} setModalId={setModalId} setStudentArr={setStudentArr} targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll} classId={id}/>
+            <Modal modalId={modalId} setModalId={setModalId} setStudentArr={setStudentArr} targetStudent={studentArr.filter((a) => a.isactive === true)} studentArr={studentArr} totalCount={studentData?.length ?? 0} isSend={isSend} currencyName={classData?.currencyName} clearAll={clearAll} classId={id}/>
         </div>
     )
 }

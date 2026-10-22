@@ -21,12 +21,12 @@ export default function Modal({ modalId, setModalId, ...props }) {
     );
 }
 
-function PointKeypad({ studentArr, currencyName, targetStudent, clearAll, isSend, setStudentArr, classId, close }) {
+function PointKeypad({ studentArr, totalCount, currencyName, targetStudent, clearAll, isSend, setStudentArr, classId, close }) {
     const labels = useMemo(
         () =>
             targetStudent.map((s) => {
                 const nickname = s.profileNickname || s.userId;
-                return { userId: s.userId, label: s.classNumber != null ? `${s.classNumber}번 ${nickname}` : nickname };
+                return { userId: s.userId, classNumber: s.classNumber, label: s.classNumber != null ? `${s.classNumber}번 ${nickname}` : nickname };
             }),
         [targetStudent]
     );
@@ -69,7 +69,7 @@ function PointKeypad({ studentArr, currencyName, targetStudent, clearAll, isSend
 
     return (
         <PointInputProvider display={display} actions={actions}>
-            <PointModalBody isSend={isSend} currencyName={currencyName} activeStudentLabels={labels} />
+            <PointModalBody isSend={isSend} currencyName={currencyName} activeStudentLabels={labels} totalCount={totalCount} />
         </PointInputProvider>
     );
 }

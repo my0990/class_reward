@@ -31,7 +31,7 @@ export default function useStudentSelection({ studentArr = [], setModalId }) {
         const nickname = info.profileNickname || userId;
         const label =
           info.classNumber != null ? `${info.classNumber}번 ${nickname}` : nickname;
-        return { userId, label };
+        return { userId, label, classNumber: info.classNumber };
       }),
     [activeMap]
   );
