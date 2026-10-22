@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
 import { groupHistory, splitByDay } from "@/util/history/groupHistory";
+import { historySentence, sentenceText } from "@/util/history/historySentence";
 import { HISTORY_KINDS, getHistoryKind, isDepositType } from "../manage/utils/historyKind";
 import { formatHistoryDateParts, formatFullDate } from "../manage/utils/historyDate";
 
@@ -16,7 +17,6 @@ const PERIODS = [
   { id: "all", label: "30일" },
 ];
 
-const amountText = (type, amount) => (amount ? `${isDepositType(type) ? "+" : "-"}${Number(amount).toLocaleString()}` : "");
 const byNumber = (a, b) => (Number(a.classNumber) || Infinity) - (Number(b.classNumber) || Infinity);
 
 export default function ClassHistoryContainer() {
@@ -161,44 +161,56 @@ export default function ClassHistoryContainer() {
                   const items = [...g.items].sort((a, b) => byNumber(studentMap.get(String(a.userId)) ?? {}, studentMap.get(String(b.userId)) ?? {}));
                   const many = items.length > 1;
                   const isOpen = open.has(g.key);
+                  const who = many ? `${labelOf(items[0].userId)} 외 ${items.length - 1}명` : labelOf(items[0].userId);
+                  const sentence = historySentence({ kind: getHistoryKind(g), who, many, name: g.name, amount: g.amount, currency });
                   return (
                     <li key={g.key} className={k.row}>
-                      <div className="flex items-center gap-[8px] px-[12px] py-[8px] text-[0.9rem]">
-                        <span className="w-[44px] shrink-0 tabular-nums text-[0.8rem] text-gray-500" title={formatFullDate(g.date)}>
+                      <div className="flex items-start gap-[8px] px-[12px] py-[8px] text-[0.95rem]">
+                        <span className="w-[44px] shrink-0 pt-[2px] tabular-nums text-[0.8rem] text-gray-500" title={formatFullDate(g.date)}>
                           {formatHistoryDateParts(g.date).time}
                         </span>
                         <span className={`shrink-0 whitespace-nowrap rounded-full px-[8px] py-[2px] text-[0.75rem] ${k.badge}`}>
                           {k.icon} {k.label}
                         </span>
-                        <div className="min-w-0 flex-1">
-                          {many ? (
-                            <button
-                              type="button"
-                              onClick={() => toggle(g.key)}
-                              aria-expanded={isOpen}
-                              className="max-w-full truncate rounded bg-orange-100 px-[4px] text-left font-semibold hover:bg-orange-200"
-                            >
-                              {labelOf(items[0].userId)} 외 {items.length - 1}명 {isOpen ? "▴" : "▾"}
-                            </button>
-                          ) : (
-                            <span className="font-semibold">{labelOf(items[0].userId)}</span>
-                          )}
-                          <div className="truncate text-[0.8rem] text-gray-500" title={g.name}>
-                            {g.name}
-                          </div>
-                        </div>
-                        <div className="shrink-0 text-right">
-                          <div className={`font-semibold tabular-nums ${isDepositType(g.type) ? "text-emerald-600" : "text-rose-500"}`}>
-                            {amountText(g.type, g.amount)}
-                            {many && <span className="ml-[2px] text-[0.75rem] font-normal text-gray-500">씩</span>}
-                          </div>
-                          {!many && items[0].balance != null && (
-                            <div className="text-[0.75rem] tabular-nums text-gray-400">
-                              잔액 {Number(items[0].balance).toLocaleString()}
-                              {currency}
-                            </div>
-                          )}
-                        </div>
+                        <p className="min-w-0 flex-1 leading-snug" title={sentenceText(sentence)}>
+                          {sentence.map((seg, i) => {
+                            if (seg.t === "who")
+                              return many ? (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  onClick={() => toggle(g.key)}
+                                  aria-expanded={isOpen}
+                                  className="rounded bg-orange-100 px-[3px] font-semibold hover:bg-orange-200"
+                                >
+                                  {seg.v} {isOpen ? "▴" : "▾"}
+                                </button>
+                              ) : (
+                                <b key={i} className="font-semibold">
+                                  {seg.v}
+                                </b>
+                              );
+                            if (seg.t === "amount")
+                              return (
+                                <b key={i} className={`font-semibold tabular-nums ${isDepositType(g.type) ? "text-emerald-600" : "text-rose-500"}`}>
+                                  {seg.v}
+                                </b>
+                              );
+                            if (seg.t === "item")
+                              return (
+                                <b key={i} className="font-semibold">
+                                  {seg.v}
+                                </b>
+                              );
+                            return <span key={i}>{seg.v}</span>;
+                          })}
+                        </p>
+                        {!many && items[0].balance != null && (
+                          <span className="shrink-0 text-[0.75rem] tabular-nums text-gray-400">
+                            잔액 {Number(items[0].balance).toLocaleString()}
+                            {currency}
+                          </span>
+                        )}
                       </div>
                       {many && isOpen && (
                         <ul className="grid grid-cols-1 gap-x-[16px] gap-y-[2px] border-t border-black/5 bg-white/70 px-[12px] py-[8px] text-[0.85rem] sm:grid-cols-2">
