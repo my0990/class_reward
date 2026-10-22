@@ -30,9 +30,9 @@ const PLAN = [
   [
     data,
     "requests",
-    { classId: 1, type: 1, targetId: 1, userId: 1 },
-    { unique: true, partialFilterExpression: { status: "pending" }, name: "pending_unique" },
-    "같은 학생·같은 퀘스트의 대기 요청은 하나만",
+    { classId: 1, type: 1, targetId: 1, userId: 1, cycleKey: 1 },
+    { unique: true, partialFilterExpression: { status: "pending" }, name: "pending_cycle_unique" },
+    "같은 학생·같은 퀘스트(같은 회차)의 대기 요청은 하나만",
   ],
   [data, "requests", { decidedAt: 1 }, { expireAfterSeconds: 60 * 24 * 60 * 60, name: "decidedAt_ttl_60d" }, "처리된 요청 60일 뒤 자동 삭제 (대기 중은 그대로)"],
   [user, "users", { userId: 1 }, { unique: true, partialFilterExpression: nonEmpty("userId"), name: "userId_unique" }, "로그인 아이디 중복 금지"],
@@ -69,7 +69,19 @@ async function duplicateCount(col, key, partial) {
   return r[0]?.groups ?? 0;
 }
 
+// 예전 인덱스 정리: [db, 컬렉션, 이름, 이유]
+const OBSOLETE = [[data, "requests", "pending_unique", "일일·주간 퀘스트 회차(cycleKey)를 넣은 pending_cycle_unique로 바뀜"]];
+
 try {
+  for (const [db, name, idxName, why] of OBSOLETE) {
+    const exists = (await db.listCollections({ name }).toArray()).length
+      ? (await db.collection(name).indexes()).some((i) => i.name === idxName)
+      : false;
+    if (!exists) continue;
+    if (APPLY) await db.collection(name).dropIndex(idxName);
+    lines.push(`- ${APPLY ? "🗑️ 지웠음" : "➖ 지울 예정"}: ${db.databaseName}.${name} ${idxName} (${why})`);
+  }
+
   for (const [db, name, key, options, label] of PLAN) {
     const col = db.collection(name);
     const where = `${db.databaseName}.${name} {${Object.entries(key).map(([k, v]) => `${k}:${v}`).join(",")}}`;

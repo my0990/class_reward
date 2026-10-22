@@ -21,6 +21,7 @@ export async function createQuest({
   questReward,
   questExp,
   questTitle,
+  repeat,
 }) {
   const auth = await authorizeTeacherClass(classId);
   if (!auth.ok) {
@@ -37,6 +38,7 @@ export async function createQuest({
       questReward,
       questExp,
       questTitle,
+      repeat,
     });
   } catch (err) {
     return { result: false, message: err?.message || "퀘스트 추가에 실패했습니다." };
@@ -51,6 +53,7 @@ export async function editQuest({
   questReward,
   questExp,
   questTitle,
+  repeat,
 }) {
   const auth = await authorizeTeacherClass(classId);
   if (!auth.ok) {
@@ -68,6 +71,7 @@ export async function editQuest({
       questReward,
       questExp,
       questTitle,
+      repeat,
     });
   } catch (err) {
     return { result: false, message: err?.message || "퀘스트 수정에 실패했습니다." };

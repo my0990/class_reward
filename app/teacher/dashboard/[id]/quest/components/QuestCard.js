@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 
 import usePendingAction from "@/hooks/usePendingAction";
 import { deleteQuest } from "@/server-action/actions/quest/quest.action";
+import { repeatBadge } from "@/util/quest/questRepeat";
 
 export default function QuestCard({
     data,
@@ -131,6 +132,11 @@ export default function QuestCard({
 
             <h2 className="pr-[32px] text-[1.5rem] font-bold text-red-900">
                 {data.questName}
+                {repeatBadge(data) && (
+                    <span className="ml-[8px] whitespace-nowrap rounded-full bg-sky-100 px-[8px] py-[2px] align-middle text-[0.8rem] font-semibold text-sky-700">
+                        {repeatBadge(data)}
+                    </span>
+                )}
             </h2>
 
             <div className="mb-[16px] text-red-900">

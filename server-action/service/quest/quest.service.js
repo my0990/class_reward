@@ -1,5 +1,28 @@
 import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { dayKey, weekKey } from "@/lib/stats/dailyUsage";
+import { normalizeRepeat } from "@/util/quest/questRepeat";
+
+/** 지금 회차 표시: 일일 "2026-10-23", 주간 "w2026-10-19"(그 주 월요일), 일반 null (한국 시간) */
+export function cycleKeyOf(repeat, now = new Date()) {
+  const r = normalizeRepeat(repeat);
+  if (r === "daily") return dayKey(now);
+  if (r === "weekly") return `w${weekKey(now)}`;
+  return null;
+}
+
+/**
+ * 일일·주간 퀘스트의 회차가 바뀌었으면 완료 명단을 비운다 (예약 작업 없이, 퀘스트를 읽거나 쓸 때마다 먼저 부른다)
+ * 조건부 updateMany라서 여러 사람이 동시에 불러도 한 번만 비워진다.
+ */
+export async function refreshQuestCycles(db, scope, now = new Date()) {
+  await Promise.all(
+    ["daily", "weekly"].map((repeat) => {
+      const key = cycleKeyOf(repeat, now);
+      return db.collection("quest").updateMany({ ...scope, repeat, cycleKey: { $ne: key } }, { $set: { finished: [], cycleKey: key } });
+    })
+  );
+}
 
 function toScopeFilter({ teacher_id, classId }) {
   if (!teacher_id || !classId) {
@@ -26,8 +49,10 @@ export async function createQuestService({
   questReward,
   questExp,
   questTitle,
+  repeat,
 }) {
   const scopeFilter = toScopeFilter({ teacher_id, classId });
+  const r = normalizeRepeat(repeat);
 
   if (!questName) {
     throw new Error("퀘스트 이름을 입력해주세요.");
@@ -43,7 +68,9 @@ export async function createQuestService({
     questGoal: questGoal ?? "",
     questReward: Number(questReward) || 0,
     questExp: Number(questExp) || 0,
-    questTitle: questTitle ?? "",
+    questTitle: r === "none" ? questTitle ?? "" : "", // 일일·주간은 칭호 없음
+    repeat: r,
+    cycleKey: cycleKeyOf(r),
     finished: [],
     pending: [],
     time: new Date(),
@@ -66,8 +93,10 @@ export async function editQuestService({
   questReward,
   questExp,
   questTitle,
+  repeat,
 }) {
   const scopeFilter = toScopeFilter({ teacher_id, classId });
+  const r = normalizeRepeat(repeat);
 
   if (!questId) {
     throw new Error("questId가 없습니다.");
@@ -82,6 +111,7 @@ export async function editQuestService({
 
   const db = (await connectDB).db("data");
 
+  // 종류를 바꿔도 지금 완료 명단은 그대로 두고, 다음 회차부터 리셋된다
   const result = await db.collection("quest").updateOne(
     { ...scopeFilter, _id: questObjectId },
     {
@@ -90,7 +120,9 @@ export async function editQuestService({
         questGoal: questGoal ?? "",
         questReward: Number(questReward) || 0,
         questExp: Number(questExp) || 0,
-        questTitle: questTitle ?? "",
+        questTitle: r === "none" ? questTitle ?? "" : "", // 일일·주간은 칭호 없음
+        repeat: r,
+        cycleKey: cycleKeyOf(r),
         time: new Date(),
       },
     }
@@ -167,6 +199,7 @@ export async function finishQuestService({
   classId,
   questData,
   rewarded,
+  addToFinished = true, // false: 보상만 주고 완료 명단에는 넣지 않음 (지난 회차 신청을 늦게 승인할 때)
 }) {
   const scopeFilter = toScopeFilter({ teacher_id, classId });
 
@@ -188,10 +221,11 @@ export async function finishQuestService({
 
   const questReward = Number(questData.questReward || 0);
   const questExp = Number(questData.questExp || 0);
-  const questTitle = questData.questTitle || "";
+  let questTitle = questData.questTitle || "";
 
   const client = await connectDB;
   const db = client.db("data");
+  await refreshQuestCycles(db, scopeFilter); // 회차가 바뀌었으면 먼저 비우고 지급
   const session = client.startSession();
 
   try {
@@ -202,6 +236,7 @@ export async function finishQuestService({
       if (!quest) {
         throw new Error("퀘스트를 찾을 수 없거나 권한이 없습니다.");
       }
+      if (normalizeRepeat(quest.repeat) !== "none") questTitle = ""; // 일일·주간은 칭호 없음
 
       const inc = { money: questReward, exp: questExp };
 
@@ -244,11 +279,13 @@ export async function finishQuestService({
         await db.collection("history").insertMany(historyArray, { session });
       }
 
-      await db.collection("quest").updateOne(
-        { ...scopeFilter, _id: questObjectId },
-        { $addToSet: { finished: { $each: userIds } } },
-        { session }
-      );
+      if (addToFinished) {
+        await db.collection("quest").updateOne(
+          { ...scopeFilter, _id: questObjectId },
+          { $addToSet: { finished: { $each: userIds } } },
+          { session }
+        );
+      }
     });
 
     return { result: true, message: "지급 성공" };

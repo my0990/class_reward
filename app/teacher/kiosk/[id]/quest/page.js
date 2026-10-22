@@ -10,6 +10,12 @@ import KioskHeader from "../_components/KioskHeader";
 import KioskConfirm from "../_components/KioskConfirm";
 import StudentCard from "../_components/StudentCard";
 import { listKioskQuests, requestKioskQuest } from "@/server-action/actions/kiosk/kioskQuest.action";
+import { repeatBadge } from "@/util/quest/questRepeat";
+
+function RepeatBadge({ q }) {
+  const b = repeatBadge(q);
+  return b ? <span className="ml-2 whitespace-nowrap rounded-full bg-sky-100 px-3 py-1 align-middle text-base font-bold text-sky-700">{b}</span> : null;
+}
 
 function Rewards({ q, currency, big = false }) {
   const chip = big ? "rounded-lg px-3 py-1 text-[1.2rem]" : "rounded-lg px-2 py-1 text-base";
@@ -98,7 +104,10 @@ export default function KioskQuestPage() {
                     onClick={() => openQuest(q._id)}
                     className="flex h-full w-full flex-col rounded-2xl border-4 border-orange-300 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-orange-500 active:scale-[0.98]"
                   >
-                    <h2 className="text-[1.6rem] font-black leading-tight text-orange-950">🏆 {q.questName}</h2>
+                    <h2 className="text-[1.6rem] font-black leading-tight text-orange-950">
+                      🏆 {q.questName}
+                      <RepeatBadge q={q} />
+                    </h2>
                     {q.questGoal && <p className="mt-2 line-clamp-2 whitespace-pre-wrap text-[1.1rem] text-gray-700">{q.questGoal}</p>}
                     <div className="mt-3">
                       <Rewards q={q} currency={currency} />
@@ -126,7 +135,10 @@ export default function KioskQuestPage() {
 
         <div className="mt-2 flex flex-wrap items-start justify-between gap-4 rounded-2xl bg-white p-5">
           <div className="min-w-0">
-            <h2 className="text-[1.8rem] font-black text-orange-950">🏆 {quest.questName}</h2>
+            <h2 className="text-[1.8rem] font-black text-orange-950">
+              🏆 {quest.questName}
+              <RepeatBadge q={quest} />
+            </h2>
             {quest.questGoal && <p className="mt-1 whitespace-pre-wrap text-[1.2rem] text-gray-700">{quest.questGoal}</p>}
           </div>
           <Rewards q={quest} currency={currency} big />

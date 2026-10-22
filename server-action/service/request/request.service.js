@@ -5,9 +5,12 @@
 // - 키오스크에서 학생이 "다 했어요!"를 누르면 pending 요청이 생긴다 (보상은 아직 없음)
 // - 선생님(나중엔 학생 관리자)이 승인하면 퀘스트 완료 처리(finishQuestService)로 보상을 준다
 // - 누가 처리했는지(decidedBy)를 남긴다
+// - 일일·주간 퀘스트: 요청에 그 회차(cycleKey)를 같이 저장한다. 지난 회차 신청을 늦게 승인하면
+//   보상은 주되 이번 회차 완료 명단에는 넣지 않는다 (오늘 것을 또 할 수 있게)
 import { ObjectId } from "mongodb";
 import { connectDB } from "@/lib/mongodb";
-import { finishQuestService } from "@/server-action/service/quest/quest.service";
+import { finishQuestService, refreshQuestCycles } from "@/server-action/service/quest/quest.service";
+import { normalizeRepeat } from "@/util/quest/questRepeat";
 
 export const REQUEST_TYPES = ["quest"];
 export const DONE_DAYS = 30; // '처리 완료' 탭에서 보여줄 기간
@@ -52,8 +55,9 @@ export async function createQuestRequestService({ teacherObjectId, classObjectId
   userId = String(userId ?? "");
   if (!userId) throw new Error("학생을 선택해 주세요.");
 
+  await refreshQuestCycles(db, scope, now);
   const [quest, student] = await Promise.all([
-    db.collection("quest").findOne({ ...scope, _id: questObjectId }, { projection: { finished: 1 } }),
+    db.collection("quest").findOne({ ...scope, _id: questObjectId }, { projection: { finished: 1, cycleKey: 1 } }),
     db.collection("user_data").findOne({ ...scope, role: "student", userId }, { projection: { _id: 1 } }),
   ]);
   if (!quest) throw new Error("퀘스트를 찾을 수 없어요.");
@@ -65,7 +69,7 @@ export async function createQuestRequestService({ teacherObjectId, classObjectId
     const r = await db
       .collection("requests")
       .updateOne(
-        { ...scope, type: "quest", targetId: questObjectId, userId, status: "pending" },
+        { ...scope, type: "quest", targetId: questObjectId, userId, cycleKey: quest.cycleKey ?? null, status: "pending" },
         { $setOnInsert: { createdAt: now } }, // 나머지 칸은 위 조건에서 그대로 들어간다
         { upsert: true }
       );
@@ -101,17 +105,20 @@ export async function createQuestRequestsService({ userIds, ...rest }) {
 export async function listKioskQuestsService({ teacherObjectId, classObjectId }) {
   const db = (await connectDB).db("data");
   const scope = { teacher_id: oid(teacherObjectId, "교사"), classId: oid(classObjectId, "학급") };
+  await refreshQuestCycles(db, scope);
   const [quests, pending] = await Promise.all([
     db
       .collection("quest")
-      .find(scope, { projection: { questName: 1, questGoal: 1, questReward: 1, questExp: 1, questTitle: 1, finished: 1 } })
+      .find(scope, { projection: { questName: 1, questGoal: 1, questReward: 1, questExp: 1, questTitle: 1, finished: 1, repeat: 1, cycleKey: 1 } })
       .sort({ order: 1, time: -1 }) // 퀘스트 관리 화면과 같은 순서 (새 퀘스트가 위)
       .toArray(),
-    db.collection("requests").find({ ...scope, type: "quest", status: "pending" }, { projection: { targetId: 1, userId: 1 } }).toArray(),
+    db.collection("requests").find({ ...scope, type: "quest", status: "pending" }, { projection: { targetId: 1, userId: 1, cycleKey: 1 } }).toArray(),
   ]);
+  const cycleOf = new Map(quests.map((q) => [String(q._id), q.cycleKey ?? null]));
   const pendingByQuest = new Map();
   for (const p of pending) {
     const k = String(p.targetId);
+    if ((p.cycleKey ?? null) !== cycleOf.get(k)) continue; // 지난 회차 신청은 이번 회차 '확인 중'으로 치지 않음
     if (!pendingByQuest.has(k)) pendingByQuest.set(k, []);
     pendingByQuest.get(k).push(p.userId);
   }
@@ -122,6 +129,7 @@ export async function listKioskQuestsService({ teacherObjectId, classObjectId })
     questReward: Number(q.questReward) || 0,
     questExp: Number(q.questExp) || 0,
     questTitle: q.questTitle ?? "",
+    repeat: normalizeRepeat(q.repeat),
     finished: q.finished ?? [],
     pending: pendingByQuest.get(String(q._id)) ?? [],
   }));
@@ -135,6 +143,7 @@ export async function listRequestsService({ teacherObjectId, classObjectId, stat
     status === "pending"
       ? { ...scope, status: "pending" }
       : { ...scope, status: { $in: ["approved", "rejected"] }, decidedAt: { $gte: new Date(now.getTime() - DONE_DAYS * DAY) } };
+  await refreshQuestCycles(db, scope, now);
   const rows = await db
     .collection("requests")
     .find(filter)
@@ -146,13 +155,17 @@ export async function listRequestsService({ teacherObjectId, classObjectId, stat
   const quests = questIds.length
     ? await db
         .collection("quest")
-        .find({ ...scope, _id: { $in: questIds } }, { projection: { questName: 1, questReward: 1, questExp: 1, questTitle: 1, finished: 1 } })
+        .find(
+          { ...scope, _id: { $in: questIds } },
+          { projection: { questName: 1, questReward: 1, questExp: 1, questTitle: 1, finished: 1, repeat: 1, cycleKey: 1 } }
+        )
         .toArray()
     : [];
   const questById = new Map(quests.map((q) => [String(q._id), q]));
 
   return rows.map((r) => {
     const q = questById.get(String(r.targetId));
+    const stale = Boolean(q) && normalizeRepeat(q.repeat) !== "none" && (r.cycleKey ?? null) !== (q.cycleKey ?? null);
     return {
       _id: String(r._id),
       type: r.type,
@@ -170,7 +183,9 @@ export async function listRequestsService({ teacherObjectId, classObjectId, stat
             reward: Number(q.questReward) || 0,
             exp: Number(q.questExp) || 0,
             title: q.questTitle ?? "",
-            alreadyDone: (q.finished ?? []).includes(r.userId),
+            repeat: normalizeRepeat(q.repeat),
+            stale, // 지난 회차(어제·지난주) 신청
+            alreadyDone: !stale && (q.finished ?? []).includes(r.userId),
           }
         : null, // 퀘스트가 지워졌으면 null
     };
@@ -192,6 +207,7 @@ export async function decideRequestsService({ actor, teacherObjectId, classObjec
   const db = (await connectDB).db("data");
   const scope = { teacher_id: oid(teacherObjectId, "교사"), classId: oid(classObjectId, "학급") };
   const col = db.collection("requests");
+  await refreshQuestCycles(db, scope, now);
   const requests = await col.find({ ...scope, _id: { $in: ids }, status: "pending" }).toArray();
 
   const questIds = [...new Set(requests.map((r) => String(r.targetId)))].map((id) => oid(id));
@@ -200,7 +216,7 @@ export async function decideRequestsService({ actor, teacherObjectId, classObjec
 
   const allowed = requests.filter((r) => canDecide(actor, r, questById.get(String(r.targetId))));
   const decidedBy = { role: actor.role, id: String(actor.userId ?? actor.teacherId), label: actor.label ?? (actor.role === "teacher" ? "선생님" : String(actor.userId)) };
-  const summary = { approved: 0, rejected: 0, alreadyDone: 0, skipped: ids.length - allowed.length, missingQuest: 0 };
+  const summary = { approved: 0, rejected: 0, alreadyDone: 0, skipped: ids.length - allowed.length, missingQuest: 0, lateCycle: 0 };
 
   // 먼저 '내가 처리 중'으로 잡는다: 동시에 두 사람이 눌러도 한 번만 처리되게
   const claim = async (r, set) => (await col.updateOne({ _id: r._id, status: "pending" }, { $set: { ...set, decidedAt: now, decidedBy } })).modifiedCount === 1;
@@ -227,28 +243,41 @@ export async function decideRequestsService({ actor, teacherObjectId, classObjec
       for (const r of list) if (await claim(r, { status: "rejected", reason: "퀘스트가 삭제됨" })) summary.missingQuest++;
       continue;
     }
+    const repeating = normalizeRepeat(quest.repeat) !== "none";
     const finished = new Set(quest.finished ?? []);
-    const toPay = [];
+    const toPay = []; // 이번 회차: 보상 + 완료 명단
+    const latePay = []; // 지난 회차: 보상만
     for (const r of list) {
-      if (finished.has(r.userId)) {
+      const stale = repeating && (r.cycleKey ?? null) !== (quest.cycleKey ?? null);
+      if (stale) {
+        if (await claim(r, { status: "approved", note: "지난 회차" })) latePay.push(r);
+        else summary.skipped++;
+      } else if (finished.has(r.userId)) {
         if (await claim(r, { status: "approved", note: "이미 완료" })) summary.alreadyDone++;
       } else if (await claim(r, { status: "approved" })) {
         toPay.push(r);
       } else summary.skipped++;
     }
-    if (toPay.length === 0) continue;
-    try {
-      await finishQuestService({
-        teacher_id: String(scope.teacher_id),
-        classId: String(scope.classId),
-        questData: { _id: questId, questReward: quest.questReward, questExp: quest.questExp, questTitle: quest.questTitle },
-        rewarded: toPay.map((r) => ({ userId: r.userId })),
-      });
-      summary.approved += toPay.length;
-    } catch (e) {
-      // 보상 지급이 실패하면 다시 '대기'로 되돌린다
-      await col.updateMany({ _id: { $in: toPay.map((r) => r._id) } }, { $set: { status: "pending" }, $unset: { decidedAt: "", decidedBy: "", note: "" } });
-      throw e;
+    for (const [batch, addToFinished] of [
+      [toPay, true],
+      [latePay, false],
+    ]) {
+      if (batch.length === 0) continue;
+      try {
+        await finishQuestService({
+          teacher_id: String(scope.teacher_id),
+          classId: String(scope.classId),
+          questData: { _id: questId, questReward: quest.questReward, questExp: quest.questExp, questTitle: quest.questTitle },
+          rewarded: batch.map((r) => ({ userId: r.userId })),
+          addToFinished,
+        });
+        if (addToFinished) summary.approved += batch.length;
+        else summary.lateCycle += batch.length;
+      } catch (e) {
+        // 보상 지급이 실패하면 다시 '대기'로 되돌린다
+        await col.updateMany({ _id: { $in: batch.map((r) => r._id) } }, { $set: { status: "pending" }, $unset: { decidedAt: "", decidedBy: "", note: "" } });
+        throw e;
+      }
     }
   }
   return summary;

@@ -9,12 +9,14 @@ import { toast } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
 import { listRequests, decideRequests } from "@/server-action/actions/request/request.action";
 import { formatHistoryDateParts, formatFullDate } from "../manage/utils/historyDate";
+import { repeatBadge } from "@/util/quest/questRepeat";
 
 const byNumber = (a, b) => (Number(a.classNumber) || Infinity) - (Number(b.classNumber) || Infinity);
 
 function summaryText(s) {
   const parts = [];
   if (s.approved) parts.push(`${s.approved}명 승인`);
+  if (s.lateCycle) parts.push(`${s.lateCycle}명은 지난 회차라 보상만 지급`);
   if (s.alreadyDone) parts.push(`${s.alreadyDone}명은 이미 완료라 보상 없이 닫음`);
   if (s.rejected) parts.push(`${s.rejected}명 반려`);
   if (s.missingQuest) parts.push(`삭제된 퀘스트 ${s.missingQuest}건 닫음`);
@@ -230,6 +232,9 @@ export default function ApprovalsContainer() {
                     {check(ids, `${g.target?.name ?? "삭제된 퀘스트"} 모두 선택`)}
                     <h2 className="font-bold">{g.target ? `🏆 ${g.target.name}` : "삭제된 퀘스트"}</h2>
                   </label>
+                  {g.target && repeatBadge(g.target) && (
+                    <span className="rounded-full bg-sky-100 px-[8px] py-[1px] text-[0.75rem] font-semibold text-sky-700">{repeatBadge(g.target)}</span>
+                  )}
                   {reward(g.target)}
                   <span className="text-[0.85rem] text-gray-500">신청 {g.items.length}명</span>
                 </header>
@@ -242,6 +247,11 @@ export default function ApprovalsContainer() {
                         <span className="text-[0.8rem] text-gray-500" title={formatFullDate(r.createdAt)}>
                           {timeOf(r.createdAt)}
                         </span>
+                        {r.target?.stale && (
+                          <span className="rounded bg-sky-100 px-[6px] py-[1px] text-[0.75rem] text-sky-700" title="승인하면 보상은 주고, 이번 회차 완료 명단에는 넣지 않아요">
+                            {r.target.repeat === "weekly" ? "지난주 신청" : "지난 날 신청"}
+                          </span>
+                        )}
                         {r.target?.alreadyDone && (
                           <span className="rounded bg-gray-100 px-[6px] py-[1px] text-[0.75rem] text-gray-600" title="승인하면 보상 없이 닫혀요">
                             이미 완료됨
