@@ -152,7 +152,7 @@ export default function ApprovalsContainer() {
   return (
     <div className="space-y-[12px]">
       <p className="text-[0.95rem] text-gray-700">
-        학생이 키오스크 <b>🏆 퀘스트</b>에서 &quot;다 했어요!&quot;를 누르면 여기에 와요. 승인하면 퀘스트 보상이 지급돼요.
+        학생이 키오스크 <b>🏆 퀘스트</b>에서 자기 카드를 고르고 &quot;확인&quot;을 누르면 여기에 와요. 승인하면 퀘스트 보상이 지급돼요.
       </p>
 
       <div className="flex flex-wrap items-center gap-[8px]">
