@@ -84,9 +84,6 @@ export default function KioskHome() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <div className="rounded-full bg-white/80 px-4 py-2 text-base font-black text-orange-700 shadow-md sm:px-5 sm:text-xl">
-                            {time}
-                        </div>
                         {/* 설정: 선생님 비밀번호로 열기 (기기 연결·연결 끊기) */}
                         <KioskSettings classId={classId} />
                     </div>
@@ -112,7 +109,11 @@ export default function KioskHome() {
                 </div>
 
                 {/* 안내를 닫아도 이 자리(맨 아래 칸)는 남겨 둬야 메뉴가 가운데에 있다 (justify-between) */}
-                <div className="flex w-full justify-center">
+                <div className="flex w-full flex-col items-center gap-3">
+                    {/* 시계: 아래 가운데 */}
+                    <div className="rounded-full bg-white/80 px-5 py-2 text-xl font-black tabular-nums text-orange-700 shadow-md sm:px-6 sm:text-2xl">
+                        {time}
+                    </div>
                     <KioskInstallPrompt />
                 </div>
             </section>
