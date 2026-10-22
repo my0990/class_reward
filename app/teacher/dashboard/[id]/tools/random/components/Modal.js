@@ -8,6 +8,7 @@ import { mutate } from "swr";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import usePointInput from "@/hooks/dashboard/usePointInput";
 import { handlePoint } from "@/server-action/actions/class/handlePoint";
+import { josa } from "@/util/history/historySentence";
 import { PointModalBody } from "@/app/teacher/dashboard/[id]/_dashboard/components/point-modal/PointModal";
 import { PointInputProvider } from "@/app/teacher/dashboard/[id]/_dashboard/components/point-modal/PointInputContext";
 
@@ -42,11 +43,14 @@ function PointKeypad({ studentArr, currencyName, targetStudent, clearAll, isSend
             const res = await handlePoint({ classId, targetStudent: payload, point: value, isSend });
             if (!res?.result) throw new Error(res?.message || "처리 중 오류가 발생했습니다.");
 
-            const names = targetStudent.map((s) => s.userId).join(", ");
+            // 아이디 대신 "3번 문어" (여러 명이면 "3번 문어 외 2명")
+            const sorted = [...labels].sort((a, b) => (Number(a.classNumber) || Infinity) - (Number(b.classNumber) || Infinity));
+            const names = sorted.length > 1 ? `${sorted[0].label} 외 ${sorted.length - 1}명` : sorted[0]?.label ?? "";
+            const money = `${value}${currencyName ?? ""}`;
             toast.success(
                 isSend
-                    ? `${names}에게 ${value}${currencyName ?? ""}를(을) 지급하였습니다.`
-                    : `${names}에게서 ${value}${currencyName ?? ""}를(을) 회수하였습니다.`
+                    ? `${names}에게 ${money}${josa(money, "을", "를")} 지급하였습니다.`
+                    : `${names}에게서 ${money}${josa(money, "을", "를")} 회수하였습니다.`
             );
 
             const activeIds = new Set(targetStudent.map((s) => s._id));
@@ -62,7 +66,7 @@ function PointKeypad({ studentArr, currencyName, targetStudent, clearAll, isSend
             );
             close();
         },
-        [targetStudent, classId, isSend, currencyName, clearAll, setStudentArr, studentArr, close]
+        [targetStudent, labels, classId, isSend, currencyName, clearAll, setStudentArr, studentArr, close]
     );
 
     const { display, actions } = usePointInput({ onEnter: handleConfirm });
