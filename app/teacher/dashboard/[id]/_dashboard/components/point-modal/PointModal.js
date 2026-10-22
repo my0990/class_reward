@@ -26,7 +26,7 @@ function Recipients({ isSend, activeStudentLabels, totalCount }) {
   }
 
   return (
-    <div className="mb-5 ml-[10px]">
+    <div className="relative mb-5 ml-[10px]">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="font-bold text-lg">
           {who} 사람:{" "}
@@ -50,12 +50,24 @@ function Recipients({ isSend, activeStudentLabels, totalCount }) {
         </p>
       )}
       {showNames && (
-        // 높이를 정해 두고 안에서 스크롤 → 키패드가 밀려나지 않게
-        <ul className="mt-2 max-h-[96px] overflow-y-auto rounded-xl bg-white/60 px-3 py-2 text-sm">
-          {activeStudentLabels.map((s) => (
-            <li key={s.userId}>{s.label}</li>
-          ))}
-        </ul>
+        // 창 위에 덮어서 보여준다 → 창 높이·키패드 위치는 그대로
+        <div className="absolute inset-x-0 top-full z-20 mt-1 rounded-xl bg-white text-gray-800 shadow-xl ring-1 ring-black/10">
+          <div className="flex items-center justify-between border-b border-gray-100 px-3 py-2 text-sm">
+            <span className="font-semibold">선택한 학생 {sum.count}명</span>
+            <button type="button" onClick={() => setShowNames(false)} aria-label="이름 목록 닫기" className="rounded-full p-1 text-gray-500 hover:bg-gray-100">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-4 w-4" aria-hidden="true">
+                <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+              </svg>
+            </button>
+          </div>
+          <ul className="grid max-h-[260px] grid-cols-2 gap-x-3 gap-y-1 overflow-y-auto px-3 py-2 text-sm">
+            {activeStudentLabels.map((s) => (
+              <li key={s.userId} className="truncate">
+                {s.label}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
