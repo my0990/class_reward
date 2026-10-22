@@ -85,7 +85,7 @@ export default function DonateAmount({ classId, user, kioskToken }) {
                 <div className="flex justify-between items-center mb-[6px]">
                     <div>
                         <div className="text-[1.2rem] font-bold text-orange-500 leading-tight">
-                            {userData.profileNickname} ({userData.userId})
+                            {userData.classNumber}번 {userData.profileNickname}
                         </div>
                     </div>
 

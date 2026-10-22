@@ -44,7 +44,7 @@ export default function ConfirmBuy({ classId, item, user, kioskToken }) {
     <div className="mx-auto flex min-h-[100vh] w-[800px] max-w-[90%] flex-col py-[16px]">
       <KioskHeader classId={classId} title="결제" onBack={() => router.push(kioskHome(classId))} showHome={false} />
       <div className="text-[2rem] text-orange-400">
-        {user.profileNickname} ({user.userId})
+        {user.classNumber}번 {user.profileNickname}
       </div>
       <ItemDetail item={item} currencyName={currencyName} />
 
