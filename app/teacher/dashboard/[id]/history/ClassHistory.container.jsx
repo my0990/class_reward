@@ -36,7 +36,8 @@ export default function ClassHistoryContainer() {
   }, [students]);
   const labelOf = (userId) => studentMap.get(String(userId))?.label ?? `${userId} (삭제된 학생)`;
 
-  const [kind, setKind] = useState("");
+  const [kinds, setKinds] = useState(KIND_FILTERS); // 체크한 종류 (처음엔 전부)
+  const kindsKey = KIND_FILTERS.filter((k) => kinds.includes(k)).join(",");
   const [userId, setUserId] = useState("");
   const [period, setPeriod] = useState("all");
   const [rows, setRows] = useState([]);
@@ -52,7 +53,7 @@ export default function ClassHistoryContainer() {
       setLoading(true);
       setError(null);
       const q = new URLSearchParams({ period });
-      if (kind) q.set("kind", kind);
+      if (kindsKey !== KIND_FILTERS.join(",")) q.set("kinds", kindsKey);
       if (userId) q.set("userId", userId);
       if (fromCursor) q.set("cursor", fromCursor);
       try {
@@ -69,12 +70,20 @@ export default function ClassHistoryContainer() {
         if (my === reqId.current) setLoading(false);
       }
     },
-    [id, kind, userId, period]
+    [id, kindsKey, userId, period]
   );
 
   useEffect(() => {
+    if (!kindsKey) {
+      reqId.current++; // 진행 중인 요청 결과는 버린다
+      setRows([]);
+      setCursor(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
     load();
-  }, [load]);
+  }, [load, kindsKey]);
 
   const days = useMemo(() => splitByDay(groupHistory(rows)), [rows]);
   const toggle = (key) => setOpenKey((prev) => (prev === key ? null : key));
@@ -94,23 +103,33 @@ export default function ClassHistoryContainer() {
     };
   }, [openKey]);
 
-  const chip = (active) =>
-    `whitespace-nowrap rounded-full px-[12px] py-[4px] text-[0.85rem] font-medium transition ${
-      active ? "bg-orange-500 text-white" : "bg-white text-gray-700 hover:bg-orange-50"
-    }`;
-
   return (
     <div className="space-y-[12px]">
       {/* 필터 */}
       <div className="space-y-[8px] rounded-xl bg-white/60 p-[12px]">
-        <div className="flex flex-wrap gap-[6px]">
-          <button type="button" className={chip(kind === "")} onClick={() => setKind("")}>
+        <div className="flex flex-wrap items-center gap-x-[14px] gap-y-[6px]">
+          <label className="flex cursor-pointer items-center gap-[6px] text-[0.9rem] font-semibold">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-sm checkbox-warning"
+              checked={kinds.length === KIND_FILTERS.length}
+              ref={(el) => el && (el.indeterminate = kinds.length > 0 && kinds.length < KIND_FILTERS.length)}
+              onChange={(e) => setKinds(e.target.checked ? KIND_FILTERS : [])}
+            />
             전체
-          </button>
+          </label>
           {KIND_FILTERS.map((k) => (
-            <button key={k} type="button" className={chip(kind === k)} onClick={() => setKind(k)}>
-              {HISTORY_KINDS[k].icon} {HISTORY_KINDS[k].label}
-            </button>
+            <label key={k} className="flex cursor-pointer items-center gap-[6px] text-[0.9rem]">
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm checkbox-warning"
+                checked={kinds.includes(k)}
+                onChange={(e) => setKinds((prev) => (e.target.checked ? [...prev, k] : prev.filter((x) => x !== k)))}
+              />
+              <span className={`rounded-full px-[8px] py-[1px] ${HISTORY_KINDS[k].badge}`}>
+                {HISTORY_KINDS[k].icon} {HISTORY_KINDS[k].label}
+              </span>
+            </label>
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-[8px]">
@@ -157,7 +176,7 @@ export default function ClassHistoryContainer() {
       {error ? (
         <div className="rounded-xl bg-white py-10 text-center text-red-500">{error}</div>
       ) : rows.length === 0 ? (
-        <div className="rounded-xl bg-white py-10 text-center text-gray-500">{loading ? "불러오는 중..." : "기록이 없습니다."}</div>
+        <div className="rounded-xl bg-white py-10 text-center text-gray-500">{!kindsKey ? "보고 싶은 종류를 하나 이상 체크해 주세요." : loading ? "불러오는 중..." : "기록이 없습니다."}</div>
       ) : (
         <div className="space-y-[12px]">
           {days.map(({ day, groups }) => (

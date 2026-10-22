@@ -8,7 +8,7 @@ import {
   CLASS_HISTORY_MAX,
 } from "@/server-action/service/history/classHistory.service";
 
-// 학급 기록 (담임 교사만): ?kind=grant&userId=..&period=today|7d|all&cursor=..&limit=50
+// 학급 기록 (담임 교사만): ?kinds=grant,take&userId=..&period=today|7d|all&cursor=..&limit=50
 export const GET = withApiHandler(async (req, { params }) => {
   const { id } = await params;
   const classObjectId = parseObjectId(id, "학급 id");
@@ -16,7 +16,7 @@ export const GET = withApiHandler(async (req, { params }) => {
   await requireActiveClass(teacherObjectId, classObjectId);
 
   const q = new URL(req.url).searchParams;
-  const kind = CLASS_HISTORY_KINDS.includes(q.get("kind")) ? q.get("kind") : null;
+  const kinds = (q.get("kinds") ?? "").split(",").filter((k) => CLASS_HISTORY_KINDS.includes(k));
   const period = CLASS_HISTORY_PERIODS.includes(q.get("period")) ? q.get("period") : "all";
   const userId = q.get("userId")?.slice(0, 100) || null;
   const limit = parseIntParam(q.get("limit"), { defaultValue: CLASS_HISTORY_PAGE, min: 1, max: CLASS_HISTORY_MAX });
@@ -24,7 +24,7 @@ export const GET = withApiHandler(async (req, { params }) => {
   const result = await getClassHistoryService({
     teacherObjectId,
     classObjectId,
-    kind,
+    kinds,
     userId,
     period,
     cursor: q.get("cursor"),

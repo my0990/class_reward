@@ -40,9 +40,13 @@ export function periodStart(period, now = new Date()) {
   return null;
 }
 
-export function buildClassHistoryFilter({ teacherObjectId, classObjectId, kind, userId, period, cursor, now = new Date() }) {
+/** kinds: 고른 종류들. 비었거나 전부면 거르지 않는다 (그 밖의 예전 입출금 기록도 보이게) */
+export function buildClassHistoryFilter({ teacherObjectId, classObjectId, kinds = [], userId, period, cursor, now = new Date() }) {
   const and = [{ teacher_id: teacherObjectId, classId: classObjectId }];
-  if (kind && KIND_FILTER[kind]) and.push(KIND_FILTER[kind]);
+  const picked = [...new Set(kinds)].filter((k) => KIND_FILTER[k]);
+  if (picked.length > 0 && picked.length < CLASS_HISTORY_KINDS.length) {
+    and.push(picked.length === 1 ? KIND_FILTER[picked[0]] : { $or: picked.map((k) => KIND_FILTER[k]) });
+  }
   if (userId) and.push({ userId: String(userId) });
   const start = periodStart(period, now);
   if (start) and.push({ date: { $gte: start } });

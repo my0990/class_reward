@@ -37,9 +37,11 @@ describe("학급 기록", () => {
 
   it("종류·학생·기간으로 거른다", async () => {
     await seed();
-    expect((await get({ kind: "buy" })).rows.map((r) => r.name)).toEqual(["연필 구입"]);
-    expect((await get({ kind: "use" })).rows.map((r) => r.name)).toEqual(["아이템 사용: 연필"]);
-    expect((await get({ kind: "grant" })).rows).toHaveLength(2);
+    expect((await get({ kinds: ["buy"] })).rows.map((r) => r.name)).toEqual(["연필 구입"]);
+    expect((await get({ kinds: ["use"] })).rows.map((r) => r.name)).toEqual(["아이템 사용: 연필"]);
+    expect((await get({ kinds: ["buy", "donate"] })).rows.map((r) => r.name)).toEqual(["연필 구입", "기부"]);
+    expect((await get({ kinds: ["grant", "take", "buy", "quest", "donate", "use"] })).rows).toHaveLength(6); // 전부 고르면 거르지 않음
+    expect((await get({ kinds: ["grant"] })).rows).toHaveLength(2);
     expect((await get({ userId: "b" })).rows.map((r) => r.name)).toEqual(["선생님에게 받음", "퀘스트 완료", "기부"]);
     expect((await get({ period: "today" })).rows).toHaveLength(4); // 한국 오늘 0시 이후
     expect((await get({ period: "7d" })).rows).toHaveLength(5);
