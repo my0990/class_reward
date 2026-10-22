@@ -8,11 +8,12 @@ import { PointInputProvider, usePointInputContext } from "./PointInputContext";
 // 번호순으로 (번호 없는 학생은 뒤로)
 const byNumber = (a, b) => (Number(a.classNumber) || Infinity) - (Number(b.classNumber) || Infinity);
 
-// 받는/잃는 사람: 1명이면 "3번 홍길동", 여러 명이면 "3번 홍길동 외 3명" → '외 3명'을 누르면 나머지 명단
+// 받는/잃는 사람: 1명이면 "3번 홍길동", 여러 명이면 "3번 홍길동 외 3명" → 누르면 선택한 학생 전체 명단
 function Recipients({ isSend, activeStudentLabels }) {
   const [showRest, setShowRest] = useState(false);
   const who = isSend ? "받는" : "잃는";
-  const [first, ...rest] = [...activeStudentLabels].sort(byNumber);
+  const sorted = [...activeStudentLabels].sort(byNumber);
+  const [first, ...rest] = sorted;
 
   return (
     <div className="relative mb-5 ml-[10px]">
@@ -20,7 +21,7 @@ function Recipients({ isSend, activeStudentLabels }) {
         {who} 사람:{" "}
         {first && rest.length === 0 && <span className="text-[1.4rem] ml-[4px] bg-orange-200">{first.label}</span>}
         {first && rest.length > 0 && (
-          // "3번 홍길동 외 3명" 전체를 눌러 나머지 명단 보기
+          // "3번 홍길동 외 3명" 전체를 눌러 선택한 학생 전체 명단 보기
           <button
             type="button"
             onClick={() => setShowRest((v) => !v)}
@@ -36,7 +37,7 @@ function Recipients({ isSend, activeStudentLabels }) {
         // 창 위에 덮어서 보여준다 → 창 높이·키패드 위치는 그대로
         <div className="absolute inset-x-0 top-full z-20 mt-1 rounded-xl bg-white text-gray-800 shadow-xl ring-1 ring-black/10">
           <div className="flex items-center justify-between border-b border-gray-100 px-3 py-2 text-sm">
-            <span className="font-semibold">나머지 {rest.length}명</span>
+            <span className="font-semibold">선택한 학생 {sorted.length}명</span>
             <button
               type="button"
               onClick={() => setShowRest(false)}
@@ -49,7 +50,7 @@ function Recipients({ isSend, activeStudentLabels }) {
             </button>
           </div>
           <ul className="grid max-h-[260px] grid-cols-2 gap-x-3 gap-y-1 overflow-y-auto px-3 py-2 text-sm">
-            {rest.map((s) => (
+            {sorted.map((s) => (
               <li key={s.userId} className="truncate">
                 {s.label}
               </li>
