@@ -17,7 +17,7 @@ import { useCountdown } from "@/hooks/timer/useCountdown";
 import { useNoiseMeter } from "@/hooks/timer/useNoiseMeter";
 import { useTimerSettings } from "@/hooks/timer/useTimerSettings";
 import { NOISE_COLORS, TIMER_THEMES, noiseLevel } from "@/util/timer/timerMath";
-import { playCountdown, playDone, playLoud, unlockSound } from "@/util/timer/sounds";
+import { playCountdown, playDone, playLoud, unlockSound, setSoundVolume } from "@/util/timer/sounds";
 import TimeDisplay from "./components/TimeDisplay";
 import CircleTimer from "./components/CircleTimer";
 import SettingsModal from "./components/SettingsModal";
@@ -47,6 +47,9 @@ export default function TimerPage() {
     onSecond: (sec) => sec <= 3 && playCountdown(),
     onDone: playDone,
   });
+
+  // 알림음 크기 설정 반영
+  useEffect(() => setSoundVolume(settings.volume), [settings.volume]);
 
   const muteRef = useRef(settings.muteAlert);
   muteRef.current = settings.muteAlert;

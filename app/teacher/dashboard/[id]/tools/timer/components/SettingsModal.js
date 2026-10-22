@@ -1,4 +1,5 @@
 "use client";
+import { playCountdown } from "@/util/timer/sounds";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import { TIMER_THEMES } from "@/util/timer/timerMath";
 
@@ -29,6 +30,22 @@ export default function SettingsModal({ modalId, setModalId, settings, update })
         className="range range-warning range-sm mb-1"
       />
       <p className="mb-5 text-xs text-gray-500">숫자가 클수록 작은 소리에도 숫자가 크게 올라가요.</p>
+
+      <label className="mb-1 flex justify-between text-sm font-semibold">
+        <span>알림음 크기</span>
+        <span className="text-orange-500">{settings.volume}%</span>
+      </label>
+      <input
+        type="range"
+        min={50}
+        max={200}
+        step={10}
+        value={settings.volume}
+        onChange={(e) => update({ volume: Number(e.target.value) })}
+        onPointerUp={() => playCountdown()}
+        className="range range-warning range-sm mb-1"
+      />
+      <p className="mb-5 text-xs text-gray-500">놓으면 미리 들려줘요. 그래도 작으면 컴퓨터·스피커 볼륨을 올려 주세요.</p>
 
       <label className="mb-1 block text-sm font-semibold">테마</label>
       <select
