@@ -45,7 +45,7 @@ export default function TimerPage() {
   const timer = useCountdown({
     initialMs: 0, // 처음엔 0분
     onSecond: (sec) => sec <= 3 && playCountdown(),
-    onDone: playDone,
+    onDone: () => playDone(settings.doneSound),
   });
 
   // 알림음 크기 설정 반영

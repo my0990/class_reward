@@ -1,5 +1,5 @@
 "use client";
-import { playCountdown } from "@/util/timer/sounds";
+import { playCountdown, playDone, unlockSound, DONE_SOUNDS } from "@/util/timer/sounds";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import { TIMER_THEMES } from "@/util/timer/timerMath";
 
@@ -30,6 +30,36 @@ export default function SettingsModal({ modalId, setModalId, settings, update })
         className="range range-warning range-sm mb-1"
       />
       <p className="mb-5 text-xs text-gray-500">숫자가 클수록 작은 소리에도 숫자가 크게 올라가요.</p>
+
+      <label className="mb-1 block text-sm font-semibold">끝 알림음</label>
+      <div className="mb-5 flex gap-2">
+        <select
+          value={settings.doneSound}
+          onChange={(e) => {
+            update({ doneSound: e.target.value });
+            unlockSound();
+            playDone(e.target.value); // 고르면 바로 들려준다
+          }}
+          className="select select-bordered select-sm flex-1"
+        >
+          {Object.entries(DONE_SOUNDS).map(([key, s]) => (
+            <option key={key} value={key}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={() => {
+            unlockSound();
+            playDone(settings.doneSound);
+          }}
+          className="btn btn-sm"
+          aria-label="끝 알림음 미리 듣기"
+        >
+          ▶ 듣기
+        </button>
+      </div>
 
       <label className="mb-1 flex justify-between text-sm font-semibold">
         <span>알림음 크기</span>
