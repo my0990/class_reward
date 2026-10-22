@@ -226,7 +226,7 @@ export default function TimerPage() {
             onClick={timer.reset}
             className="rounded-full px-[0.8em] py-[0.35em] font-semibold opacity-70 transition hover:bg-black/10 hover:opacity-100"
           >
-            리셋
+            초기화
           </button>
         </div>
       </section>
