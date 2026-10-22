@@ -215,16 +215,10 @@ export default function ClassHistoryContainer() {
                             return <span key={i}>{seg.v}</span>;
                           })}
                         </p>
-                        {!many && items[0].balance != null && (
-                          <span className="shrink-0 text-[0.75rem] tabular-nums text-gray-400">
-                            잔액 {Number(items[0].balance).toLocaleString()}
-                            {currency}
-                          </span>
-                        )}
                       </div>
                       {many && isOpen && (
                         // 아래 줄 위에 덮어서 보여준다 → 목록 위치는 그대로
-                        <div className="absolute left-[12px] right-[12px] top-full z-20 -mt-[4px] rounded-xl bg-white text-gray-800 shadow-xl ring-1 ring-black/10 sm:left-[60px] sm:right-auto sm:w-[420px]">
+                        <div className="absolute left-[12px] right-[12px] top-full z-20 -mt-[4px] rounded-xl bg-white text-gray-800 shadow-xl ring-1 ring-black/10 sm:left-[60px] sm:right-auto sm:w-[400px]">
                           <div className="flex items-center justify-between border-b border-gray-100 px-[12px] py-[6px] text-[0.85rem]">
                             <span className="font-semibold">{items.length}명</span>
                             <button
@@ -238,16 +232,10 @@ export default function ClassHistoryContainer() {
                               </svg>
                             </button>
                           </div>
-                          <ul className="grid max-h-[280px] grid-cols-1 gap-x-[16px] gap-y-[2px] overflow-y-auto px-[12px] py-[8px] text-[0.85rem] sm:grid-cols-2">
+                          <ul className="grid max-h-[280px] grid-cols-2 gap-x-[16px] gap-y-[2px] overflow-y-auto px-[12px] py-[8px] text-[0.85rem] sm:grid-cols-3">
                             {items.map((it) => (
-                              <li key={it._id} className="flex justify-between gap-[8px]">
-                                <span className="truncate">{labelOf(it.userId)}</span>
-                                {it.balance != null && (
-                                  <span className="shrink-0 tabular-nums text-gray-500">
-                                    잔액 {Number(it.balance).toLocaleString()}
-                                    {currency}
-                                  </span>
-                                )}
+                              <li key={it._id} className="truncate">
+                                {labelOf(it.userId)}
                               </li>
                             ))}
                           </ul>
