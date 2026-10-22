@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
 import { groupHistory, splitByDay } from "@/util/history/groupHistory";
-import { historySentence, sentenceText } from "@/util/history/historySentence";
+import { historySentence, sentenceText, josa } from "@/util/history/historySentence";
 import { HISTORY_KINDS, getHistoryKind, isDepositType } from "../manage/utils/historyKind";
 import { formatHistoryDateParts, formatFullDate } from "../manage/utils/historyDate";
 
@@ -109,8 +109,40 @@ export default function ClassHistoryContainer() {
     };
   }, [openKey]);
 
+  // 제목 아래 요약 문장: "최근 7일 동안 선생님이 학생들에게 1,200쿠키를 지급하고 300쿠키를 회수했어요."
+  const summary = (() => {
+    if (!totals) return null;
+    const when = { today: "오늘", "7d": "최근 7일 동안", all: "최근 30일 동안" }[period];
+    const to = userId ? labelOf(userId) : "학생들";
+    const m = (n) => `${n.toLocaleString()}${currency}`;
+    const g = totals.grant.total;
+    const t = totals.take.total;
+    if (!g && !t) return { main: `${when} 선생님이 ${to}에게 지급하거나 회수한 기록이 없어요.`, sub: null };
+    const parts = [];
+    if (g) parts.push(<b key="g" className="text-emerald-700">{m(g)}</b>, `${josa(m(g), "을", "를")} 지급`);
+    if (g && t) parts.push("하고 ");
+    if (t) parts.push(<b key="t" className="text-rose-600">{m(t)}</b>, `${josa(m(t), "을", "를")} 회수`);
+    parts.push("했어요.");
+    const subs = [];
+    if (period !== "today") subs.push(`하루 평균 ${[g && `${m(totals.grant.perDay)} 지급`, t && `${m(totals.take.perDay)} 회수`].filter(Boolean).join(", ")}`);
+    if (perPerson(g) != null) subs.push(`1인당 ${[g && `${m(perPerson(g))} 지급`, t && `${m(perPerson(t))} 회수`].filter(Boolean).join(", ")}`);
+    // 회수만 있으면 '~에게서'
+    return { main: [`${when} 선생님이 ${to}${g ? "에게" : "에게서"} `, ...parts], sub: subs.join(" · ") || null };
+  })();
+
   return (
     <div className="space-y-[12px]">
+      {summary && (
+        <div className="leading-relaxed">
+          <p className="text-[1rem] sm:text-[1.1rem]">{summary.main}</p>
+          {summary.sub && (
+            <p className="text-[0.85rem] text-gray-600" title={period !== "today" ? `하루 평균은 ${totals.days}일로 나눈 값이에요` : undefined}>
+              {summary.sub}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* 필터 */}
       <div className="space-y-[8px] rounded-xl bg-white/60 p-[12px]">
         <div className="flex flex-wrap items-center gap-x-[14px] gap-y-[6px]">
@@ -166,21 +198,6 @@ export default function ClassHistoryContainer() {
               </button>
             ))}
           </div>
-          {totals && (
-            // 선택한 기간(과 학생)의 선생님 지급·회수 총액 + 하루 평균 + 1인당 (종류 체크와는 상관없음)
-            <div className="flex flex-wrap gap-[6px] text-[0.8rem]" title={`하루 평균은 ${totals.days}일로 나눈 값이에요`}>
-              <span className="rounded-lg bg-emerald-50 px-[8px] py-[3px] text-emerald-800">
-                🎁 지급 <b className="tabular-nums">{totals.grant.total.toLocaleString()}{currency}</b>
-                {period !== "today" && <span className="text-emerald-700"> · 하루 평균 {totals.grant.perDay.toLocaleString()}</span>}
-                {perPerson(totals.grant.total) != null && <span className="text-emerald-700"> · 1인당 {perPerson(totals.grant.total).toLocaleString()}</span>}
-              </span>
-              <span className="rounded-lg bg-rose-50 px-[8px] py-[3px] text-rose-800">
-                ↩️ 회수 <b className="tabular-nums">{totals.take.total.toLocaleString()}{currency}</b>
-                {period !== "today" && <span className="text-rose-700"> · 하루 평균 {totals.take.perDay.toLocaleString()}</span>}
-                {perPerson(totals.take.total) != null && <span className="text-rose-700"> · 1인당 {perPerson(totals.take.total).toLocaleString()}</span>}
-              </span>
-            </div>
-          )}
           <button
             type="button"
             onClick={() => load()}
