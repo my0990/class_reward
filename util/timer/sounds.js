@@ -4,7 +4,6 @@
 // 크게 들리게 하는 방법
 // - 모든 소리를 '전체 볼륨 → 압축기(compressor)'에 통과시킨다: 큰 봉우리를 눌러 깨지지 않게 하면서 전체를 크게
 // - 귀가 잘 듣는 높은 음(1~2kHz)과 배음이 섞인 파형을 쓰고, 한 옥타브 위 소리를 겹친다
-// - 끝 알림은 3번 반복
 let ctx = null;
 let master = null; // 소리들이 모이는 곳 (압축기 앞, 고정으로 키움)
 let output = null; // 압축기 뒤 볼륨 (설정의 '알림음 크기')
@@ -68,12 +67,9 @@ export const unlockSound = () => void audio();
 /** 끝나기 3·2·1초 전 */
 export const playCountdown = () => tone(1047, 0, 0.18, { gain: 0.7 });
 
-/** 끝: 올라가는 4음을 천천히, 3번 (음 사이 0.3초, 한 번에 약 1.9초, 전체 약 6초) */
-export const playDone = () => {
-  for (let r = 0; r < 3; r++) {
-    [523, 659, 784, 1047].forEach((f, i) => tone(f, r * 2.0 + i * 0.3, i === 3 ? 0.9 : 0.6, { gain: 0.7 }));
-  }
-};
+/** 끝: 올라가는 4음을 천천히 한 번 (음 사이 0.5초, 마지막 음은 길게, 전체 약 2.8초) */
+export const playDone = () =>
+  [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.5, i === 3 ? 1.3 : 0.8, { gain: 0.7 }));
 
 /** 너무 시끄러울 때 */
 export const playLoud = () => {
