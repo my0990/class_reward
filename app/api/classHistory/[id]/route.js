@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withApiHandler, requireTeacher, parseObjectId, requireActiveClass, parseIntParam } from "@/lib/api/routeHelpers";
 import {
   getClassHistoryService,
+  getClassHistoryTotalsService,
   CLASS_HISTORY_KINDS,
   CLASS_HISTORY_PERIODS,
   CLASS_HISTORY_PAGE,
@@ -21,14 +22,11 @@ export const GET = withApiHandler(async (req, { params }) => {
   const userId = q.get("userId")?.slice(0, 100) || null;
   const limit = parseIntParam(q.get("limit"), { defaultValue: CLASS_HISTORY_PAGE, min: 1, max: CLASS_HISTORY_MAX });
 
-  const result = await getClassHistoryService({
-    teacherObjectId,
-    classObjectId,
-    kinds,
-    userId,
-    period,
-    cursor: q.get("cursor"),
-    limit,
-  });
-  return NextResponse.json(result);
+  const cursor = q.get("cursor");
+  const [result, totals] = await Promise.all([
+    getClassHistoryService({ teacherObjectId, classObjectId, kinds, userId, period, cursor, limit }),
+    // 첫 페이지일 때만 기간 합계(지급·회수 총액, 하루 평균)를 같이 보낸다
+    cursor ? null : getClassHistoryTotalsService({ teacherObjectId, classObjectId, userId, period }),
+  ]);
+  return NextResponse.json(totals ? { ...result, totals } : result);
 });

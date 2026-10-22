@@ -42,6 +42,7 @@ export default function ClassHistoryContainer() {
   const [period, setPeriod] = useState("all");
   const [rows, setRows] = useState([]);
   const [cursor, setCursor] = useState(null);
+  const [totals, setTotals] = useState(null); // 기간 합계: 지급·회수 총액과 하루 평균
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [openKey, setOpenKey] = useState(null); // 명단을 띄운 묶음 (한 번에 하나)
@@ -63,6 +64,7 @@ export default function ClassHistoryContainer() {
         if (my !== reqId.current) return;
         setRows((prev) => (fromCursor ? [...prev, ...body.rows] : body.rows));
         setCursor(body.nextCursor);
+        if (!fromCursor) setTotals(body.totals ?? null);
         if (!fromCursor) setOpenKey(null);
       } catch (e) {
         if (my === reqId.current) setError(e.message);
@@ -78,6 +80,7 @@ export default function ClassHistoryContainer() {
       reqId.current++; // 진행 중인 요청 결과는 버린다
       setRows([]);
       setCursor(null);
+      setTotals(null);
       setLoading(false);
       setError(null);
       return;
@@ -160,6 +163,19 @@ export default function ClassHistoryContainer() {
               </button>
             ))}
           </div>
+          {totals && (
+            // 선택한 기간(과 학생)의 선생님 지급·회수 총액 + 하루 평균 (종류 체크와는 상관없음)
+            <div className="flex flex-wrap gap-[6px] text-[0.8rem]" title={`하루 평균은 ${totals.days}일로 나눈 값이에요`}>
+              <span className="rounded-lg bg-emerald-50 px-[8px] py-[3px] text-emerald-800">
+                🎁 지급 <b className="tabular-nums">{totals.grant.total.toLocaleString()}{currency}</b>
+                {period !== "today" && <span className="text-emerald-700"> · 하루 평균 {totals.grant.perDay.toLocaleString()}</span>}
+              </span>
+              <span className="rounded-lg bg-rose-50 px-[8px] py-[3px] text-rose-800">
+                ↩️ 회수 <b className="tabular-nums">{totals.take.total.toLocaleString()}{currency}</b>
+                {period !== "today" && <span className="text-rose-700"> · 하루 평균 {totals.take.perDay.toLocaleString()}</span>}
+              </span>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => load()}

@@ -72,3 +72,53 @@ export async function getClassHistoryService({ limit = CLASS_HISTORY_PAGE, ...op
     nextCursor: rows.length > n ? encodeCursor(page.at(-1)) : null,
   };
 }
+
+// ---- 기간 합계: 선생님이 지급·회수한 총액과 하루 평균 ----
+const PERIOD_DAYS = { today: 1, "7d": 7, all: 30 }; // all = 보관 기간(30일)
+
+/** 한국 날짜 기준으로 from이 속한 날부터 now가 속한 날까지 며칠인지 (같은 날이면 1) */
+export function kstDaysBetween(from, now) {
+  const a = Date.parse(`${dayKey(from)}T00:00:00Z`);
+  const b = Date.parse(`${dayKey(now)}T00:00:00Z`);
+  return Math.floor((b - a) / DAY) + 1;
+}
+
+/**
+ * 하루 평균의 분모: 기간 일수. 단, 이 반의 첫 기록이 기간보다 최근이면 그날부터 센다
+ * (새로 만든 반이 30일로 나눠져 평균이 너무 작게 나오지 않게)
+ */
+export function averageDays(period, firstDate, now = new Date()) {
+  const max = PERIOD_DAYS[period] ?? 30;
+  if (!firstDate) return max;
+  return Math.max(1, Math.min(max, kstDaysBetween(firstDate, now)));
+}
+
+export async function getClassHistoryTotalsService({ teacherObjectId, classObjectId, userId, period = "all", now = new Date() }) {
+  const col = (await connectDB).db("data").collection("history");
+  const scope = { teacher_id: teacherObjectId, classId: classObjectId };
+  const match = { ...scope, name: { $in: ["선생님에게 받음", "선생님에게 뺏김"] } };
+  if (userId) match.userId = String(userId);
+  const start = periodStart(period, now);
+  if (start) match.date = { $gte: start };
+
+  const [sums, first] = await Promise.all([
+    col
+      .aggregate([
+        { $match: match },
+        {
+          $group: {
+            _id: "$name",
+            total: { $sum: { $convert: { input: "$amount", to: "double", onError: 0, onNull: 0 } } },
+            count: { $sum: 1 },
+          },
+        },
+      ])
+      .toArray(),
+    col.find(scope, { projection: { date: 1 } }).sort({ date: 1 }).limit(1).toArray(),
+  ]);
+
+  const by = Object.fromEntries(sums.map((r) => [r._id, r]));
+  const days = averageDays(period, first[0]?.date, now);
+  const pack = (r) => ({ total: r?.total ?? 0, count: r?.count ?? 0, perDay: Math.round((r?.total ?? 0) / days) });
+  return { days, grant: pack(by["선생님에게 받음"]), take: pack(by["선생님에게 뺏김"]) };
+}
