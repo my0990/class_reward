@@ -128,6 +128,9 @@ export async function deleteQuestService({ teacher_id, classId, questId }) {
     throw new Error("삭제할 퀘스트를 찾을 수 없거나 권한이 없습니다.");
   }
 
+  // 이 퀘스트에 대한 승인 요청도 지운다 (승인 센터에 '삭제된 퀘스트'가 남지 않게)
+  await db.collection("requests").deleteMany({ ...scopeFilter, type: "quest", targetId: questObjectId });
+
   return { result: true, message: "delete 성공" };
 }
 

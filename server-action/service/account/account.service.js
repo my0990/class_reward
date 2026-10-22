@@ -229,6 +229,7 @@ export async function deleteStudentAccountService({ student, teacher_id, classId
       );
 
       await userDb.collection("kiosk_pwd_attempts").deleteMany({ teacher_id: teacherObjectId, userId }, { session });
+      await data.collection("requests").deleteMany({ ...scope, userId }, { session }); // 승인 요청
 
       const classNumber = studentData?.classNumber;
       if (Number.isInteger(classNumber)) {

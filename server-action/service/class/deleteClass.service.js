@@ -162,6 +162,7 @@ export async function purgeClassService({ teacherObjectId, classObjectId }) {
       ).deletedCount;
       removed.quests = (await data.collection("quest").deleteMany(scope, { session })).deletedCount;
       removed.thermometer = (await data.collection("thermometer").deleteMany(scope, { session })).deletedCount;
+      removed.requests = (await data.collection("requests").deleteMany(scope, { session })).deletedCount;
       removed.kioskDevices = (await userDb.collection("kiosk_devices").deleteMany(scope, { session })).deletedCount;
       removed.kiosk = (
         await userDb.collection("kiosk_pwd_attempts").deleteMany({ teacher_id: teacherObjectId, userId: { $in: userIds } }, { session })

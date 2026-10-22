@@ -53,6 +53,12 @@ export default function KioskHome() {
             desc: '가지고 있는 아이템을 사용해요',
         },
         {
+            href: `/teacher/kiosk/${classId}/quest`,
+            icon: '🏆',
+            title: '퀘스트',
+            desc: '다 한 퀘스트를 선생님께 알려요',
+        },
+        {
             href: `/teacher/kiosk/${classId}/thermometer`,
             icon: '🌡️',
             title: '학급 온도계',
@@ -90,7 +96,7 @@ export default function KioskHome() {
                 </header>
 
 
-                <div className="grid w-full max-w-[1100px] grid-cols-1 gap-4 sm:gap-5 landscape:grid-cols-3">
+                <div className="grid w-full max-w-[1100px] grid-cols-2 gap-4 sm:gap-5 landscape:grid-cols-4">
                     {menus.map((menu) => (
                         <Link key={menu.href} href={menu.href} className="group flex h-[150px] w-full flex-col items-center justify-center rounded-[28px] border-4 border-orange-300 bg-white/95 p-4 shadow-xl transition-all duration-200 hover:-translate-y-1 hover:border-orange-500 hover:bg-orange-500 active:scale-95 sm:h-[190px] sm:rounded-[36px] landscape:h-[230px]">
                                 <div className="mb-2 text-5xl transition-transform duration-200 group-hover:scale-110 sm:text-6xl landscape:text-7xl">

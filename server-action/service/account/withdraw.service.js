@@ -70,7 +70,7 @@ export async function withdrawTeacherService({ teacher_id, password, confirmText
   // 4) 학급 문서 없이 남아 있던 데이터 (예전 데이터 등)
   const byTeacher = { teacher_id: teacherOid };
   const leftovers = {};
-  for (const name of ["user_data", "history", "quest", "thermometer", "class_data", "classes"]) {
+  for (const name of ["user_data", "history", "quest", "requests", "thermometer", "class_data", "classes"]) {
     leftovers[name] = (await data.collection(name).deleteMany(byTeacher)).deletedCount;
   }
   leftovers.studentUsers = (await userDb.collection("users").deleteMany({ ...byTeacher, role: "student" })).deletedCount;
