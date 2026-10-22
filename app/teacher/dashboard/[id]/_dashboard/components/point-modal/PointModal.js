@@ -18,15 +18,16 @@ function Recipients({ isSend, activeStudentLabels }) {
     <div className="relative mb-5 ml-[10px]">
       <h3 className="font-bold text-lg">
         {who} 사람:{" "}
-        {first && <span className="text-[1.4rem] ml-[4px] bg-orange-200">{first.label}</span>}
-        {rest.length > 0 && (
+        {first && rest.length === 0 && <span className="text-[1.4rem] ml-[4px] bg-orange-200">{first.label}</span>}
+        {first && rest.length > 0 && (
+          // "3번 홍길동 외 3명" 전체를 눌러 나머지 명단 보기
           <button
             type="button"
             onClick={() => setShowRest((v) => !v)}
             aria-expanded={showRest}
-            className="ml-1.5 text-[1.2rem] underline underline-offset-4 decoration-2"
+            className="text-[1.4rem] ml-[4px] bg-orange-200 font-bold text-left cursor-pointer hover:bg-orange-300"
           >
-            외 {rest.length}명
+            {first.label} 외 {rest.length}명
           </button>
         )}
       </h3>
