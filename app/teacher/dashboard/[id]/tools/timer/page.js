@@ -189,13 +189,6 @@ export default function TimerPage() {
           </button>
         </div>
 
-        {/* 다른 화면에 있는 동안 끝났으면 (소리는 내지 않음) — 자리를 차지하지 않게 겹쳐서 */}
-        {timer.finishedAway && (
-          <div className="absolute left-1/2 top-[13%] -translate-x-1/2 whitespace-nowrap rounded-full bg-black/10 px-[1em] py-[0.35em] text-[min(2.4cqw,4.5cqh)] font-semibold">
-            다른 화면에 있는 동안 끝났어요
-          </div>
-        )}
-
         {settings.circle ? (
           <CircleTimer totalMs={timer.setMs} remainingMs={timer.remainingMs} running={running} runId={timer.runId}>
             <TimeDisplay ms={timer.remainingMs} editable={editable} onChange={timer.setTime} hideZeroHours />
