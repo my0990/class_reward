@@ -45,12 +45,12 @@ export default function QuestFormModal({ id, modalId, setModalId, title, submitL
     if (await onSubmit(quest)) setModalId(null);
   };
 
-  const field = "mb-[16px] border-2 p-[8px] focus:outline-orange-500";
+  const field = "mb-[10px] border-2 px-[8px] py-[4px] focus:outline-orange-500";
   return (
     <ModalTemplate id={id} modalId={modalId} setModalId={setModalId} className="w-[calc(100%-32px)] max-w-[600px]">
       {() => (
-        <form onSubmit={submit} className="flex flex-col p-[24px] text-[1.2rem] text-red-900 min-[600px]:p-[32px]">
-          <h1 className="mb-[16px] text-center text-[2rem] font-bold">{title}</h1>
+        <form onSubmit={submit} className="flex flex-col p-[20px] text-[1.1rem] text-red-900 min-[600px]:px-[28px] min-[600px]:py-[20px]">
+          <h1 className="mb-[10px] text-center text-[1.6rem] font-bold">{title}</h1>
 
           <label htmlFor={`${id}-name`} className="font-bold">퀘스트 이름</label>
           <input id={`${id}-name`} name="questName" value={input.questName} onChange={onChange} disabled={busy} className={field} />
@@ -68,7 +68,7 @@ export default function QuestFormModal({ id, modalId, setModalId, title, submitL
                 aria-checked={input.repeat === r.key}
                 disabled={busy}
                 onClick={() => setInput((prev) => ({ ...prev, repeat: r.key }))}
-                className={`flex-1 rounded-lg border-2 py-[6px] font-semibold transition ${
+                className={`flex-1 rounded-lg border-2 py-[3px] font-semibold transition ${
                   input.repeat === r.key ? "border-orange-500 bg-orange-500 text-white" : "border-orange-200 bg-white text-orange-700 hover:bg-orange-50"
                 }`}
               >
@@ -76,7 +76,7 @@ export default function QuestFormModal({ id, modalId, setModalId, title, submitL
               </button>
             ))}
           </div>
-          <p className="mb-[16px] text-[0.85rem] text-gray-500">
+          <p className="mb-[10px] text-[0.8rem] text-gray-500">
             {input.repeat === "daily"
               ? "매일 밤 12시에 완료 명단이 비워져서 매일 다시 할 수 있어요. (칭호는 줄 수 없어요)"
               : input.repeat === "weekly"
@@ -85,7 +85,7 @@ export default function QuestFormModal({ id, modalId, setModalId, title, submitL
           </p>
 
           <h2 className="font-bold">퀘스트 보상</h2>
-          <div className="mb-[8px]">
+          <div className="mb-[4px]">
             <RewardInput label={currency?.name ?? "화폐"} icon={currency?.emoji ?? "🍪"} name="questReward" value={input.questReward} numeric disabled={busy} onChange={onChange} />
             <RewardInput label="경험치" icon="🆙" name="questExp" value={input.questExp} numeric disabled={busy} onChange={onChange} />
             {input.repeat === "none" && (
@@ -93,17 +93,20 @@ export default function QuestFormModal({ id, modalId, setModalId, title, submitL
             )}
           </div>
 
-          <button type="submit" disabled={busy} className="btn mt-[16px] w-full border-0 bg-orange-500 text-[1.2rem] text-white disabled:opacity-60">
-            {busy ? "처리 중..." : submitLabel}
-          </button>
-          <button
-            type="button"
-            onClick={close}
-            disabled={busy}
-            className="btn mt-[16px] w-full border-0 bg-white text-[1.2rem] text-orange-500 shadow-transparent hover:bg-orange-500 hover:text-white disabled:opacity-60"
-          >
-            취소
-          </button>
+          {/* 취소 · 확인을 한 줄로 (창 높이를 줄여 스크롤이 생기지 않게) */}
+          <div className="mt-[10px] flex gap-[10px]">
+            <button
+              type="button"
+              onClick={close}
+              disabled={busy}
+              className="btn flex-1 border-0 bg-white text-[1.1rem] text-orange-500 shadow-transparent hover:bg-orange-500 hover:text-white disabled:opacity-60"
+            >
+              취소
+            </button>
+            <button type="submit" disabled={busy} className="btn flex-1 border-0 bg-orange-500 text-[1.1rem] text-white disabled:opacity-60">
+              {busy ? "처리 중..." : submitLabel}
+            </button>
+          </div>
         </form>
       )}
     </ModalTemplate>
@@ -113,7 +116,7 @@ export default function QuestFormModal({ id, modalId, setModalId, title, submitL
 function RewardInput({ label, icon, name, value, numeric = false, disabled, onChange }) {
   const checked = value.trim() !== "";
   return (
-    <div className="mb-[8px] flex min-h-[32px] justify-between gap-[16px]">
+    <div className="mb-[6px] flex min-h-[30px] justify-between gap-[16px]">
       <div className="flex items-center">
         <input type="checkbox" checked={checked} readOnly tabIndex={-1} aria-hidden="true" className="checkbox checkbox-warning pointer-events-none mr-[8px]" />
         <span>{label}</span>
