@@ -31,14 +31,6 @@ export default function DeleteModal() {
                 // pickedItem이 null일 수 있으므로 방어적으로 렌더링을 건너뛴다.
                 !pickedItem ? null : (
                 <div className="relative max-w-[520px] min-[600px]:p-[24px] p-[16px] dark:bg-orange-200">
-                    <button
-                        type="button"
-                        onClick={close}
-                        className="absolute top-3 right-3 text-[1.2rem] cursor-pointer leading-none hover:bg-gray-300 hover:rounded-full w-[34px] h-[34px] flex justify-center items-center"
-                    >
-                        x
-                    </button>
-
                     <div className="flex items-center mb-[8px]">
                         <h1 className="text-[1.5rem] font-bold outline-none" tabIndex={99}>
                             {pickedItem.itemName}
