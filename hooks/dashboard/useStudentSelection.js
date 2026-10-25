@@ -1,15 +1,64 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-export default function useStudentSelection({ studentArr = [], setModalId }) {
+// 고른 학생은 이 탭(sessionStorage)에 학급별로 기억한다:
+// 다른 메뉴에 갔다 오거나 새로고침해도 그대로, 탭·브라우저를 닫으면 지워진다 (다음 날 남아 있지 않게)
+const storageKey = (classId) => `kkyul:dashboard-selected:${classId}`;
+
+function readSaved(classId) {
+  try {
+    const ids = JSON.parse(sessionStorage.getItem(storageKey(classId)) || "[]");
+    return Array.isArray(ids) ? ids.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeSaved(classId, ids) {
+  try {
+    if (ids.length) sessionStorage.setItem(storageKey(classId), JSON.stringify(ids));
+    else sessionStorage.removeItem(storageKey(classId));
+  } catch {}
+}
+
+const toInfo = (student) => ({
+  money: Number(student.money ?? 0),
+  classNumber: student.classNumber,
+  profileNickname: student.profileNickname,
+});
+
+export default function useStudentSelection({ studentArr = [], setModalId, classId }) {
   // userId -> { money, classNumber, profileNickname } (표시용 정보까지 같이 들고 있는다)
   const [activeMap, setActiveMap] = useState(() => new Map());
   const [isSend, setIsSend] = useState(null);
+  const restoredFor = useRef(null); // 어느 학급의 기억을 불러왔는지
 
-  const toInfo = (student) => ({
-    money: Number(student.money ?? 0),
-    classNumber: student.classNumber,
-    profileNickname: student.profileNickname,
-  });
+  // 학생 목록이 오면 이 학급에서 고르던 학생을 되살린다 (그사이 지워진 학생은 빠짐)
+  // 목록이 바뀌면(학생 삭제 등) 없는 학생은 선택에서 빼고, 표시 정보는 최신으로
+  useEffect(() => {
+    if (!classId || studentArr.length === 0) return;
+    const byId = new Map(studentArr.map((s) => [String(s.userId), s]));
+    if (restoredFor.current !== classId) {
+      restoredFor.current = classId;
+      const ids = readSaved(classId).filter((id) => byId.has(id));
+      setActiveMap(new Map(ids.map((id) => [id, toInfo(byId.get(id))])));
+      return;
+    }
+    setActiveMap((prev) => {
+      let changed = false;
+      const next = new Map();
+      for (const id of prev.keys()) {
+        if (byId.has(id)) next.set(id, toInfo(byId.get(id)));
+        else changed = true;
+      }
+      return changed || next.size !== prev.size ? next : prev;
+    });
+  }, [classId, studentArr]);
+
+  // 고른 학생이 바뀌면 저장 (되살리기 전에는 저장하지 않음: 빈 값으로 덮어쓰지 않게)
+  useEffect(() => {
+    if (!classId || restoredFor.current !== classId) return;
+    writeSaved(classId, Array.from(activeMap.keys()));
+  }, [classId, activeMap]);
 
   // ✅ [{ userId, money }] 형태로 내보내기 (서버 호출용)
   const activeStudents = useMemo(

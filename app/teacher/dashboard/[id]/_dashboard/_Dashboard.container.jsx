@@ -44,6 +44,7 @@ export default function DashboardContainer({ classId }) {
   } = useStudentSelection({
     studentArr: studentsData ?? [],
     setModalId,
+    classId, // 학급별로 이 탭에 선택 기억
   });
 
   // ✅ point-modal 트리(PointModal/DialPad)는 이제 성공/실패 이후에 뭘 할지 몰라도 된다.
@@ -136,13 +137,27 @@ export default function DashboardContainer({ classId }) {
       {/* 헤더·버튼 줄·카드·푸터가 같은 폭(.page-width)이라 좌우 끝이 맞는다 */}
       <div className="page-width">
         <div className="flex flex-wrap gap-2 py-[16px] justify-between">
-          <button
-            className="btn bg-orange-500 text-white"
-            onClick={handleToggleAll}
-            disabled={studentsData.length === 0}
-          >
-            {isSelectedAll ? '모두 해제' : '모두 선택'}
-          </button>
+          <div className="flex items-center gap-[12px]">
+            <button
+              className="btn bg-orange-500 text-white"
+              onClick={handleToggleAll}
+              disabled={studentsData.length === 0}
+            >
+              {isSelectedAll ? '모두 해제' : '모두 선택'}
+            </button>
+            {/* 기억된 선택이 남아 있는 걸 바로 알 수 있게 */}
+            {hasSelectedStudent && !isSelectedAll && (
+              <span className="flex items-center gap-[6px] rounded-full bg-orange-100 px-[12px] py-[4px] text-[0.95rem] font-semibold text-orange-800">
+                {activeIds.length}명 선택됨
+                <button type="button" onClick={clearAll} className="text-[0.85rem] font-normal text-orange-700 underline underline-offset-2 hover:text-orange-900">
+                  모두 해제
+                </button>
+              </span>
+            )}
+            {isSelectedAll && (
+              <span className="rounded-full bg-orange-100 px-[12px] py-[4px] text-[0.95rem] font-semibold text-orange-800">전체 {activeIds.length}명 선택됨</span>
+            )}
+          </div>
 
           <div>
             <button
