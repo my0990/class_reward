@@ -147,11 +147,8 @@ export default function DashboardContainer({ classId }) {
             </button>
             {/* 기억된 선택이 남아 있는 걸 바로 알 수 있게 */}
             {hasSelectedStudent && !isSelectedAll && (
-              <span className="flex items-center gap-[6px] rounded-full bg-orange-100 px-[12px] py-[4px] text-[0.95rem] font-semibold text-orange-800">
+              <span className="rounded-full bg-orange-100 px-[12px] py-[4px] text-[0.95rem] font-semibold text-orange-800">
                 {activeIds.length}명 선택됨
-                <button type="button" onClick={clearAll} className="text-[0.85rem] font-normal text-orange-700 underline underline-offset-2 hover:text-orange-900">
-                  모두 해제
-                </button>
               </span>
             )}
             {isSelectedAll && (
