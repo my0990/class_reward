@@ -1,10 +1,13 @@
 "use client";
+import useBackdropClose from "@/hooks/ui/useBackdropClose";
 // 키오스크 확인 창: 큰 글씨 제목 + [확인(주황)] [취소(빨강)]
 export default function KioskConfirm({ open, title, confirmLabel = "확인", cancelLabel = "취소", busy = false, onConfirm, onCancel }) {
+  // 바깥을 누를 때와 뗄 때 모두 바깥일 때만 닫음 (hook은 return 전에)
+  const backdrop = useBackdropClose(onCancel, { disabled: busy });
   if (!open) return null;
   const btn = "rounded-lg py-[16px] text-[1.4rem] font-semibold text-black transition-all hover:text-white disabled:opacity-50";
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={busy ? undefined : onCancel}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" {...backdrop}>
       <div className="w-full max-w-[600px] rounded-2xl bg-orange-100 p-[32px]" onClick={(e) => e.stopPropagation()}>
         <h1 className="text-[2rem]">{title}</h1>
         <div className="mt-[16px] flex flex-col gap-[16px]">

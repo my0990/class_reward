@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import useBackdropClose from "@/hooks/ui/useBackdropClose";
 
 export default function ModalTemplate({
   id,
@@ -41,12 +42,8 @@ export default function ModalTemplate({
     };
   }, [isOpen]);
 
-  // 외부 클릭 닫기
-  const onOutsideClick = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
-      close();
-    }
-  };
+  // 바깥 클릭 닫기: 누를 때와 뗄 때 모두 바깥일 때만 (창 안에서 드래그하다 바깥에서 떼면 닫히지 않음)
+  const backdrop = useBackdropClose(close);
 
   return (
     <AnimatePresence>
@@ -55,7 +52,7 @@ export default function ModalTemplate({
           // 창이 화면보다 길면 바깥(배경)이 스크롤된다. items-center로 가운데 정렬하면
           // 화면보다 긴 창은 위아래가 잘려서 스크롤로도 볼 수 없으므로, m-auto로 가운데 정렬한다.
           className="fixed inset-0 z-50 flex overflow-y-auto overscroll-contain bg-black/40 p-[16px]"
-          onClick={onOutsideClick}
+          {...backdrop}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
