@@ -156,15 +156,7 @@ export default function Random() {
                 <div className="flex items-center">
                     나온 번호: {pickedStudentArr.map((a, i) => a.classNumber).sort((a, b) => Number(a) - Number(b)).join(', ')}
                 </div>
-                <div className="flex items-center gap-[16px]">
-                    {/* 카드 크기 */}
-                    <div className="flex items-center gap-[4px] rounded-full bg-orange-100 px-[6px] py-[2px] text-[1rem]">
-                        <span className="pl-[6px] text-gray-600">카드 크기</span>
-                        <button type="button" aria-label="카드 작게" disabled={cardScale <= CARD_SCALE_MIN} onClick={() => changeCardScale(-CARD_SCALE_STEP)} className="flex h-[32px] w-[32px] items-center justify-center rounded-full text-[1.4rem] font-bold hover:bg-orange-200 disabled:opacity-30">−</button>
-                        <button type="button" title="원래 크기로" onClick={() => changeCardScale(1 - cardScale)} className="w-[52px] text-center tabular-nums hover:underline">{Math.round(cardScale * 100)}%</button>
-                        <button type="button" aria-label="카드 크게" disabled={cardScale >= CARD_SCALE_MAX} onClick={() => changeCardScale(CARD_SCALE_STEP)} className="flex h-[32px] w-[32px] items-center justify-center rounded-full text-[1.4rem] font-bold hover:bg-orange-200 disabled:opacity-30">+</button>
-                    </div>
-
+                <div className="">
                     <button onClick={onRefresh} style={{ transform: `rotate(${rotation}deg)`, transition: "transform 0.5s ease-in-out" }}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 transition-all hover:scale-110">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -217,7 +209,15 @@ export default function Random() {
                     : <div className="text-[2rem]">뽑기 버튼을 클릭해주세요</div>}
 
             </div>
-            <div className="bg-orange-300 mb-[32px] pb-[16px] w-full flex justify-end pr-[16px] text-[1.5rem]" style={{ color: originalStudentArr.length === 0 ? 'red' : null }}>남은 학생: {originalStudentArr.length}명</div>
+            <div className="bg-orange-300 mb-[32px] pb-[16px] w-full flex items-center justify-between px-[16px] text-[1.5rem]">
+                {/* 카드 크기 (주황 영역 왼쪽 아래) */}
+                <div className="flex items-center gap-[4px] rounded-full bg-orange-100 px-[4px] py-[2px] text-[1rem]">
+                    <button type="button" aria-label="카드 작게" title="카드 작게" disabled={cardScale <= CARD_SCALE_MIN} onClick={() => changeCardScale(-CARD_SCALE_STEP)} className="flex h-[32px] w-[32px] items-center justify-center rounded-full text-[1.4rem] font-bold hover:bg-orange-200 disabled:opacity-30">−</button>
+                    <button type="button" title="카드 크기 (누르면 원래 크기로)" onClick={() => changeCardScale(1 - cardScale)} className="w-[52px] text-center tabular-nums hover:underline">{Math.round(cardScale * 100)}%</button>
+                    <button type="button" aria-label="카드 크게" title="카드 크게" disabled={cardScale >= CARD_SCALE_MAX} onClick={() => changeCardScale(CARD_SCALE_STEP)} className="flex h-[32px] w-[32px] items-center justify-center rounded-full text-[1.4rem] font-bold hover:bg-orange-200 disabled:opacity-30">+</button>
+                </div>
+                <div style={{ color: originalStudentArr.length === 0 ? 'red' : null }}>남은 학생: {originalStudentArr.length}명</div>
+            </div>
             <div className="flex items-center mb-[32px]">
                 <div onClick={() => setStudentNum(prev => prev > 1 ? prev - 1 : 1)} className="cursor-pointer transition-all hover:scale-110">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9">
