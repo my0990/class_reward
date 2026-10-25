@@ -44,6 +44,7 @@ export default function TimerPage() {
 
   const timer = useCountdown({
     initialMs: 0, // 처음엔 0분
+    storageKey: `kkyul:timer-state:${id}`, // 다른 화면에 갔다 와도 이어서 (이 탭에서만)
     onSecond: (sec) => sec <= 3 && playCountdown(),
     onDone: () => playDone(settings.doneSound, settings.doneRepeat),
   });
@@ -187,6 +188,13 @@ export default function TimerPage() {
             <PencilSquareIcon className="h-[60%] w-[60%]" />
           </button>
         </div>
+
+        {/* 다른 화면에 있는 동안 끝났으면 (소리는 내지 않음) — 자리를 차지하지 않게 겹쳐서 */}
+        {timer.finishedAway && (
+          <div className="absolute left-1/2 top-[13%] -translate-x-1/2 whitespace-nowrap rounded-full bg-black/10 px-[1em] py-[0.35em] text-[min(2.4cqw,4.5cqh)] font-semibold">
+            다른 화면에 있는 동안 끝났어요
+          </div>
+        )}
 
         {settings.circle ? (
           <CircleTimer totalMs={timer.setMs} remainingMs={timer.remainingMs} running={running} runId={timer.runId}>
