@@ -17,6 +17,11 @@ function shuffle(arr) {
     return a;
 }
 
+const CARD_SCALE_KEY = "kkyul:random-card-scale";
+const CARD_SCALE_MIN = 0.6;
+const CARD_SCALE_MAX = 2;
+const CARD_SCALE_STEP = 0.1;
+
 export default function Random() {
     const params = useParams();
     const id = params.id;
@@ -38,6 +43,23 @@ export default function Random() {
 
 
     const [modalId, setModalId] = useState(null); // 지급/회수 키패드 창
+
+    // 학생 카드 크기 (비율 그대로 확대·축소, 이 기기에 기억)
+    const [cardScale, setCardScale] = useState(1);
+    useEffect(() => {
+        try {
+            const saved = Number(localStorage.getItem(CARD_SCALE_KEY));
+            if (saved >= CARD_SCALE_MIN && saved <= CARD_SCALE_MAX) setCardScale(saved);
+        } catch {}
+    }, []);
+    const changeCardScale = (delta) =>
+        setCardScale((prev) => {
+            const next = Math.round(Math.min(CARD_SCALE_MAX, Math.max(CARD_SCALE_MIN, prev + delta)) * 10) / 10;
+            try {
+                localStorage.setItem(CARD_SCALE_KEY, String(next));
+            } catch {}
+            return next;
+        });
     const { onClick, selectAll, clearAll, onSend, onTake } = util({ setStudentArr, setIsSelectedAll, studentArr, setIsSend, openModal: () => setModalId(POINT_MODAL_ID) });
     
     const audioPool = useRef([]);
@@ -134,7 +156,14 @@ export default function Random() {
                 <div className="flex items-center">
                     나온 번호: {pickedStudentArr.map((a, i) => a.classNumber).sort((a, b) => Number(a) - Number(b)).join(', ')}
                 </div>
-                <div className="">
+                <div className="flex items-center gap-[16px]">
+                    {/* 카드 크기 */}
+                    <div className="flex items-center gap-[4px] rounded-full bg-orange-100 px-[6px] py-[2px] text-[1rem]">
+                        <span className="pl-[6px] text-gray-600">카드 크기</span>
+                        <button type="button" aria-label="카드 작게" disabled={cardScale <= CARD_SCALE_MIN} onClick={() => changeCardScale(-CARD_SCALE_STEP)} className="flex h-[32px] w-[32px] items-center justify-center rounded-full text-[1.4rem] font-bold hover:bg-orange-200 disabled:opacity-30">−</button>
+                        <button type="button" title="원래 크기로" onClick={() => changeCardScale(1 - cardScale)} className="w-[52px] text-center tabular-nums hover:underline">{Math.round(cardScale * 100)}%</button>
+                        <button type="button" aria-label="카드 크게" disabled={cardScale >= CARD_SCALE_MAX} onClick={() => changeCardScale(CARD_SCALE_STEP)} className="flex h-[32px] w-[32px] items-center justify-center rounded-full text-[1.4rem] font-bold hover:bg-orange-200 disabled:opacity-30">+</button>
+                    </div>
 
                     <button onClick={onRefresh} style={{ transform: `rotate(${rotation}deg)`, transition: "transform 0.5s ease-in-out" }}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-9 transition-all hover:scale-110">
@@ -166,7 +195,8 @@ export default function Random() {
                                 exit={{ opacity: 0, scale: 0.5 }}
                                 transition={{ delay: i * 0.3, duration: 0.5, ease: "easeOut" }}
                             >
-                                <div key={i} onClick={(e) => onClick(selectedStudent)}>
+                                {/* zoom: 카드 안의 글자·그림·간격까지 같은 비율로 커지고, 줄 바꿈도 그 크기에 맞춰짐 */}
+                                <div key={i} onClick={(e) => onClick(selectedStudent)} style={{ zoom: cardScale }}>
                                     <div className={`shadow-[4px_6px_0px_0px_#050071] w-[160px] p-[16px] m-[8px] bg-orange-200 rounded-xl cursor-pointer ${selectedStudent.isactive ? "bg-orange-500" : ""}`}>
                                         <div className="flex justify-between mb-[8px]">
                                             <div className="font-semibold">LV. {findLargestSumUnderTarget(selectedStudent)}</div>
