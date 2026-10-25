@@ -4,14 +4,13 @@
 // - 1초마다 그 값을 읽어 '돌아가는 중 + 끝나는 시각이 지났음'이면 한 번만 알림 (같은 끝 시각은 다시 알리지 않음)
 // - 타이머 화면에 있을 때는 그 화면이 직접 소리·표시를 하므로 건너뜀
 import { useEffect } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 const stateKey = (classId) => `kkyul:timer-state:${classId}`;
 const notifiedKey = (classId) => `kkyul:timer-notified:${classId}`;
 
-export default function TimerDoneWatcher({ classId, linkToTimer = true }) {
+export default function TimerDoneWatcher({ classId }) {
   const pathname = usePathname();
   const onTimerPage = pathname?.startsWith(`/teacher/dashboard/${classId}/tools/timer`);
 
@@ -27,15 +26,16 @@ export default function TimerDoneWatcher({ classId, linkToTimer = true }) {
           (t) => (
             <div className="flex items-center gap-3">
               <span className="font-semibold">⏰ 타이머가 끝났어요</span>
-              {linkToTimer && (
-                <Link
-                  href={`/teacher/dashboard/${classId}/tools/timer`}
-                  onClick={() => toast.dismiss(t.id)}
-                  className="rounded-lg bg-orange-500 px-3 py-1 text-sm font-semibold text-white"
-                >
-                  타이머 보기
-                </Link>
-              )}
+              <button
+                type="button"
+                aria-label="알림 닫기"
+                onClick={() => toast.dismiss(t.id)}
+                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} className="h-4 w-4" aria-hidden="true">
+                  <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
             </div>
           ),
           { id: `timer-done-${classId}`, duration: 15000 }
@@ -45,7 +45,7 @@ export default function TimerDoneWatcher({ classId, linkToTimer = true }) {
     check();
     const t = setInterval(check, 1000);
     return () => clearInterval(t);
-  }, [classId, onTimerPage, linkToTimer]);
+  }, [classId, onTimerPage]);
 
   return null;
 }

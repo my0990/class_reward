@@ -14,8 +14,8 @@ export default async function KioskLayout({ children, params }) {
   const { id } = await params;
   return (
     <>
-      {/* 선생님이 타이머를 켜 둔 채 같은 탭에서 키오스크로 왔을 때, 끝나면 토스트 (키오스크에서는 선생님 화면 링크 없음) */}
-      <TimerDoneWatcher classId={id} linkToTimer={false} />
+      {/* 선생님이 타이머를 켜 둔 채 같은 탭에서 키오스크로 왔을 때, 끝나면 토스트 */}
+      <TimerDoneWatcher classId={id} />
       {children}
     </>
   );
