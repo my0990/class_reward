@@ -31,6 +31,7 @@ export default function useStudentSelection({ studentArr = [], setModalId, class
   const [activeMap, setActiveMap] = useState(() => new Map());
   const [isSend, setIsSend] = useState(null);
   const restoredFor = useRef(null); // 어느 학급의 기억을 불러왔는지
+  const [savedClass, setSavedClass] = useState(null); // 불러온 '다음 화면'부터 저장 (같은 순간에 저장하면 빈 값으로 덮어씀)
 
   // 학생 목록이 오면 이 학급에서 고르던 학생을 되살린다 (그사이 지워진 학생은 빠짐)
   // 목록이 바뀌면(학생 삭제 등) 없는 학생은 선택에서 빼고, 표시 정보는 최신으로
@@ -41,6 +42,7 @@ export default function useStudentSelection({ studentArr = [], setModalId, class
       restoredFor.current = classId;
       const ids = readSaved(classId).filter((id) => byId.has(id));
       setActiveMap(new Map(ids.map((id) => [id, toInfo(byId.get(id))])));
+      setSavedClass(classId);
       return;
     }
     setActiveMap((prev) => {
@@ -56,9 +58,9 @@ export default function useStudentSelection({ studentArr = [], setModalId, class
 
   // 고른 학생이 바뀌면 저장 (되살리기 전에는 저장하지 않음: 빈 값으로 덮어쓰지 않게)
   useEffect(() => {
-    if (!classId || restoredFor.current !== classId) return;
+    if (!classId || savedClass !== classId) return;
     writeSaved(classId, Array.from(activeMap.keys()));
-  }, [classId, activeMap]);
+  }, [classId, savedClass, activeMap]);
 
   // ✅ [{ userId, money }] 형태로 내보내기 (서버 호출용)
   const activeStudents = useMemo(

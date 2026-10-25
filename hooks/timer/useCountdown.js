@@ -31,12 +31,13 @@ export function useCountdown({ initialMs = 10 * 60_000, onSecond, onDone, storag
   const lastSecRef = useRef(null);
   const cbRef = useRef({});
   cbRef.current = { onSecond, onDone };
-  const restoredRef = useRef(!storageKey); // 기억한 상태를 불러오기 전에는 저장하지 않음
+  // 기억한 상태를 불러온 '다음 화면'부터 저장한다.
+  // (불러오는 effect와 같은 순간에 저장하면, 아직 바뀌기 전 값(00:00)으로 기억을 덮어써 버린다 — 개발 모드에서는 effect가 두 번 돌아 실제로 지워짐)
+  const [restored, setRestored] = useState(!storageKey);
 
   // 처음: 기억한 상태 되살리기
   useEffect(() => {
     if (!storageKey) return;
-    restoredRef.current = false;
     const v = readState(storageKey);
     const num = (x) => (Number.isFinite(Number(x)) && Number(x) >= 0 ? Number(x) : null);
     if (v && num(v.setMs) !== null) {
@@ -59,20 +60,20 @@ export function useCountdown({ initialMs = 10 * 60_000, onSecond, onDone, storag
       }
       setRunId((n) => n + 1);
     }
-    restoredRef.current = true;
+    setRestored(true);
   }, [storageKey]);
 
   // 상태가 바뀌면 기억 (돌아가는 중에는 끝나는 시각만 있으면 되므로 매초 저장하지 않음)
   const savedRemaining = status === "running" ? null : remainingMs;
   useEffect(() => {
-    if (!storageKey || !restoredRef.current) return;
+    if (!storageKey || !restored) return;
     try {
       sessionStorage.setItem(
         storageKey,
         JSON.stringify({ status, setMs, remainingMs: savedRemaining, endAt: status === "running" ? endAtRef.current : null }),
       );
     } catch {}
-  }, [storageKey, status, setMs, savedRemaining]);
+  }, [storageKey, restored, status, setMs, savedRemaining]);
 
   useEffect(() => {
     if (status !== "running") return undefined;
