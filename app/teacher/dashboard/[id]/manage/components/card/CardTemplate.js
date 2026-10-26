@@ -1,5 +1,6 @@
 import { profileImgProps } from "@/util/image/profileImage";
 import { calculateLevel } from "@/util/level/level.utils";
+import ClampText from "@/components/ui/common/ClampText";
 
 export default function CardTemplate({ picked, startExp, commonDifference }) {
 
@@ -21,7 +22,10 @@ export default function CardTemplate({ picked, startExp, commonDifference }) {
                 </div>
                 <div className=" py-[12px] w-full text-center text-[1.2rem] h-[52.8px] bg-green-400 text-white font-bold rounded-xl">{picked?.profileTitle}</div>
             </div>
-            <div className="w-full h-[134px] max-[480px]:h-auto max-[480px]:min-h-[60px] bg-white rounded-xl p-[8px] break-words">{picked?.profileState}</div>
+            {/* 자기소개: 4줄 넘으면 ... / 누르면 같은 자리에 덮어서 전체 보기 */}
+            <ClampText lines={4} className="w-full h-[134px] max-[480px]:h-auto max-[480px]:min-h-[60px] bg-white rounded-xl p-[8px]">
+                {picked?.profileState}
+            </ClampText>
         </div>
     )
 }
