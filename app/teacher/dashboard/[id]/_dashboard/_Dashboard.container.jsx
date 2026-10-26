@@ -170,10 +170,10 @@ export default function DashboardContainer({ classId }) {
   const currencyEmoji = classData?.currencyEmoji ?? "💰"
   return (
 
-    <div className="mb-[48px] min-h-[calc(100dvh-160px)]" {...marquee.rootProps}>
+    <div className="mb-[24px] flex min-h-[calc(100dvh-160px)] flex-col" {...marquee.rootProps}>
       {marquee.boxElement}
       {/* 헤더·버튼 줄·카드·푸터가 같은 폭(.page-width)이라 좌우 끝이 맞는다 */}
-      <div className="page-width">
+      <div className="page-width flex-1">
         <div className="flex flex-wrap gap-2 py-[16px] justify-between">
           <div className="flex items-center gap-[12px]">
             <button
@@ -248,39 +248,38 @@ export default function DashboardContainer({ classId }) {
           </>
         )}
       </div>
-      {/* 오른쪽 아래: 보기 전환 (번호순 | 자리 배치) + 자리 배치일 때 방향 */}
-      <div data-no-marquee className="fixed bottom-[16px] right-[16px] z-30 flex items-center gap-[8px]">
-        {layoutMode === "seat" && showSeats && (
-          <button
-            type="button"
-            onClick={flipSeatView}
-            title="앞줄 위치 바꾸기"
-            className="rounded-full bg-white px-[14px] py-[8px] text-[0.9rem] font-semibold text-gray-700 shadow-md ring-1 ring-black/10 hover:bg-gray-50"
-          >
-            앞줄 {seatView === "teacher" ? "아래 ↓" : "위 ↑"}
-          </button>
-        )}
-        <div className="inline-flex rounded-full bg-white p-[3px] shadow-md ring-1 ring-black/10" role="tablist" aria-label="학생 카드 보기">
-          {[
-            ["number", "번호순"],
-            ["seat", "자리 배치"],
-          ].map(([m, label]) => (
+      {/* 왼쪽 아래(푸터 바로 위): 보기 전환 (번호순 | 자리 배치) + 자리 배치일 때 방향 */}
+      <div data-no-marquee className="page-width mt-[32px] flex items-center gap-[8px]">
+          <div className="inline-flex rounded-full bg-white p-[3px] shadow-md ring-1 ring-black/10" role="tablist" aria-label="학생 카드 보기">
+            {[
+              ["number", "번호순"],
+              ["seat", "자리 배치"],
+            ].map(([m, label]) => (
+              <button
+                key={m}
+                type="button"
+                role="tab"
+                aria-selected={layoutMode === m}
+                onClick={() => changeLayoutMode(m)}
+                className={`rounded-full px-[14px] py-[6px] text-[0.9rem] font-semibold ${
+                  layoutMode === m ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {layoutMode === "seat" && showSeats && (
             <button
-              key={m}
               type="button"
-              role="tab"
-              aria-selected={layoutMode === m}
-              onClick={() => changeLayoutMode(m)}
-              className={`rounded-full px-[14px] py-[6px] text-[0.9rem] font-semibold ${
-                layoutMode === m ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-gray-100"
-              }`}
+              onClick={flipSeatView}
+              title="앞줄 위치 바꾸기"
+              className="rounded-full bg-white px-[14px] py-[8px] text-[0.9rem] font-semibold text-gray-700 shadow-md ring-1 ring-black/10 hover:bg-gray-50"
             >
-              {label}
+              앞줄 {seatView === "teacher" ? "아래 ↓" : "위 ↑"}
             </button>
-          ))}
-        </div>
+          )}
       </div>
-
       <PointModal
         isSend={isSend}
         currencyName={currencyName}
