@@ -129,7 +129,7 @@ export default function DashboardContainer({ classId }) {
   const isError =
     isClassError || isStudentsError
 
-  // 보기: 번호순 | 자리 배치 (자리 바꾸기에서 마지막으로 저장한 자리), 방향(칠판 아래/위) — 이 기기에 기억
+  // 보기: 번호순 | 자리 배치 (자리 바꾸기에서 마지막으로 저장한 자리), 방향(앞줄 아래/위) — 이 기기에 기억
   const [layoutMode, setLayoutMode] = useState("number");
   const [seatView, setSeatView] = useState("teacher");
   useEffect(() => {
@@ -254,10 +254,10 @@ export default function DashboardContainer({ classId }) {
           <button
             type="button"
             onClick={flipSeatView}
-            title="칠판 위치 바꾸기"
+            title="앞줄 위치 바꾸기"
             className="rounded-full bg-white px-[14px] py-[8px] text-[0.9rem] font-semibold text-gray-700 shadow-md ring-1 ring-black/10 hover:bg-gray-50"
           >
-            칠판 {seatView === "teacher" ? "아래 ↓" : "위 ↑"}
+            앞줄 {seatView === "teacher" ? "아래 ↓" : "위 ↑"}
           </button>
         )}
         <div className="inline-flex rounded-full bg-white p-[3px] shadow-md ring-1 ring-black/10" role="tablist" aria-label="학생 카드 보기">

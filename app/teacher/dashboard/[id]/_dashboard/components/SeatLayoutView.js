@@ -1,6 +1,6 @@
 "use client";
 // 대시보드 '자리 배치' 보기: 자리 바꾸기에서 마지막으로 저장한 자리 그대로 학생 카드를 놓는다
-// - view "teacher": 칠판이 아래 (교탁에서 반을 바라보는 방향, 앞줄이 화면 아래) / "student": 칠판이 위
+// - view "teacher": 앞줄이 화면 아래 (교탁에서 반을 바라보는 방향) / "student": 앞줄이 위 (칠판 그림은 그리지 않음)
 // - 통로는 빈칸, 카드는 화면 폭에 맞춰 줄어듦 (작아지면 사진·번호·별명·잔액만)
 // - 자리 없는 학생(자리 저장 뒤 새로 만든 학생 등)은 맨 아래 '자리 없음'에 모음
 import { profileImgProps } from "@/util/image/profileImage";
@@ -41,20 +41,6 @@ function SeatCard({ student, isActive, onClick, currencyEmoji }) {
   );
 }
 
-function Chalkboard() {
-  return (
-    <div
-      role="img"
-      aria-label="칠판"
-      className="mx-auto h-[28px] w-[min(480px,45%)] rounded-md"
-      style={{
-        background: "linear-gradient(180deg, #2f5d4f 0%, #264941 60%, #213f38 100%)",
-        border: "4px solid #8b5a2b",
-      }}
-    />
-  );
-}
-
 export default function SeatLayoutView({ layout, assignment = {}, students = [], view = "teacher", isActive, onToggle, currencyEmoji }) {
   const byId = new Map(students.map((s) => [String(s.userId), s]));
   const teacher = view === "teacher";
@@ -67,7 +53,6 @@ export default function SeatLayoutView({ layout, assignment = {}, students = [],
 
   return (
     <div className="flex flex-col gap-[20px]">
-      {!teacher && <Chalkboard />}
       <div
         className="mx-auto grid w-full gap-[10px]"
         // 책상이 하나도 없는 세로줄(통로)은 좁게 → 카드를 더 크게
@@ -88,7 +73,6 @@ export default function SeatLayoutView({ layout, assignment = {}, students = [],
           })
         )}
       </div>
-      {teacher && <Chalkboard />}
 
       {unseated.length > 0 && (
         <div className="mt-[8px]">
