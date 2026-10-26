@@ -44,6 +44,10 @@ export async function proxy(req) {
     if (role !== "teacher") {
       return NextResponse.redirect(new URL(role === "admin" ? "/admin" : "/", req.url));
     }
+    // 관리자가 임시 비밀번호를 발급한 계정: 새 비밀번호를 정할 때까지 다른 화면에 못 간다
+    if (token.user?.mustChangePassword && pathname !== "/teacher/change-password") {
+      return NextResponse.redirect(new URL("/teacher/change-password", req.url));
+    }
   }
 
   return NextResponse.next();

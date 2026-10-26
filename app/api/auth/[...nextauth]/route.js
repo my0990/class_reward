@@ -104,6 +104,8 @@ export const authOptions = {
             role: "teacher",
             email: user.email ?? null,
             teacherId: user.teacherId ?? user.userId ?? null, // 너 DB 필드명에 맞춰 사용
+            // 관리자가 임시 비밀번호를 발급했으면 먼저 새 비밀번호를 정해야 한다 (proxy가 /teacher/change-password로 보냄)
+            mustChangePassword: Boolean(user.mustChangePassword),
 
           };
         }
@@ -143,7 +145,8 @@ export const authOptions = {
             role: "teacher",
             email: user.email ?? null,
             _id: user._id.toString(),
-            teacher_id: user._id.toString()
+            teacher_id: user._id.toString(),
+            mustChangePassword: Boolean(user.mustChangePassword),
           };
         } else if (user.role === "student") {
           token.user = {

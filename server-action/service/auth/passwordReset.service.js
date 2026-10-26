@@ -101,7 +101,7 @@ export async function resetPasswordService({ resetToken, newPassword, now = new 
 
   await db.collection("users").updateOne(
     { _id: teacher._id },
-    { $set: { passwordHash: await hash(pwd, 12), passwordChangedAt: now, updatedAt: now }, $unset: { password: "" } }
+    { $set: { passwordHash: await hash(pwd, 12), passwordChangedAt: now, updatedAt: now }, $unset: { password: "", mustChangePassword: "" } }
   );
   return { ok: true, message: "비밀번호를 바꿨습니다. 새 비밀번호로 로그인해주세요." };
 }

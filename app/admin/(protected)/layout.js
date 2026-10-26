@@ -19,6 +19,7 @@ export default async function AdminLayout({ children }) {
           <nav className="flex gap-4 text-sm">
             <Link href="/admin" className="hover:underline">대시보드</Link>
             <Link href="/admin/notices" className="hover:underline">공지사항</Link>
+            <Link href="/admin/accounts" className="hover:underline">계정 도우미</Link>
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm text-slate-500">
             <span className="hidden sm:inline">{adminEmail}</span>

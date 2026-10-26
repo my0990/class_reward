@@ -89,7 +89,8 @@ export async function updatePasswordService({
   const newPasswordHash = await hash(nextPassword, 12);
   // 교사는 비밀번호를 바꾸면 다른 기기의 로그인도 끝낸다 (passwordChangedAt 이후 세션 무효)
   const $set = role === "teacher" ? { passwordHash: newPasswordHash, passwordChangedAt: new Date() } : { passwordHash: newPasswordHash };
-  await db.collection("users").updateOne(filter, { $set, $unset: { password: "" } });
+  // mustChangePassword: 관리자 임시 비밀번호 상태였다면 해제
+  await db.collection("users").updateOne(filter, { $set, $unset: { password: "", mustChangePassword: "" } });
 
   return { result: true, message: "비밀번호 변경 성공" };
 }

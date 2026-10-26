@@ -19,6 +19,9 @@ const ACTION_LABEL = {
   account_create: "관리자 계정 생성",
   account_reset: "관리자 비밀번호 변경",
   teacher_withdraw: "교사 회원 탈퇴",
+  teacher_unlock: "교사 로그인 잠금 풀기",
+  teacher_mail_limit_clear: "교사 메일 제한 풀기",
+  teacher_temp_password: "교사 임시 비밀번호 발급",
 };
 
 function Stat({ label, value, sub }) {
