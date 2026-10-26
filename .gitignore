@@ -48,3 +48,6 @@ next-env.d.ts
 /.next-e2e
 /test-results
 /playwright-report
+
+# Claude가 만든 미리 듣기·결과 파일 (커밋하지 않음)
+/Claude outputs/
