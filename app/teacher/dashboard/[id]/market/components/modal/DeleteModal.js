@@ -30,7 +30,7 @@ export default function DeleteModal() {
                 // 닫힘 애니메이션 도중(모달이 닫힌 뒤 pickedItem이 초기화되는 짧은 구간)
                 // pickedItem이 null일 수 있으므로 방어적으로 렌더링을 건너뛴다.
                 !pickedItem ? null : (
-                <div className="relative max-w-[520px] min-[600px]:p-[24px] p-[16px] dark:bg-orange-200">
+                <div className="relative max-w-[520px] min-[600px]:p-[24px] p-[16px]">
                     <div className="flex items-center mb-[8px]">
                         <h1 className="text-[1.5rem] font-bold outline-none" tabIndex={99}>
                             {pickedItem.itemName}

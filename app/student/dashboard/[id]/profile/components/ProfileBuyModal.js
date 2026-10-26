@@ -6,7 +6,7 @@ export default function ProfileBuyModal({ pickedData, currencyName, modalId, set
         <ModalTemplate id="BUY_PROFILE" modalId={modalId} setModalId={setModalId}>
             {({ close }) => (
                 <div>
-                    <div className="p-[24px] rounded-lg dark:bg-orange-200 flex flex-col bg-orange-100 max-w-[320px] text-[1.2rem]">
+                    <div className="p-[24px] rounded-lg flex flex-col bg-orange-100 max-w-[320px] text-[1.2rem]">
                         <h1>이 그림을 구매하시겠습니까?</h1>
                         <div className="flex justify-center my-[16px]">
                             <div className="w-[160px] h-[160px] border-[8px] border-white rounded-full bg-white flex justify-center items-center overflow-hidden">

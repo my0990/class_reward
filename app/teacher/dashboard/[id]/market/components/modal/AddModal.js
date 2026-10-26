@@ -22,7 +22,7 @@ export default function AddModal() {
     return (
         <ModalTemplate id="CREATE_ITEM" modalId={modalId} setModalId={setModalId} onClose={onAddModalClose} className="w-[840px]">
             {({ close }) => (
-                <div className=" max-w-[840px]  p-[16px] min-[600px]:p-[32px] dark:bg-orange-200">
+                <div className=" max-w-[840px]  p-[16px] min-[600px]:p-[32px]">
                     <h1 className="text-[1.5rem] mb-[32px]">학급 아이템 추가하기</h1>
                     <div className="flex justify-evenly flex-wrap">
                         <div className="mb-[16px] w-[352px]">

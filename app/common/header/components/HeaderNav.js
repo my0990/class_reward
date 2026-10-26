@@ -118,7 +118,7 @@ export default function HeaderNav({ navItems, pathname, classId, badges = {} }) 
                 className={`
                   flex items-center gap-1 cursor-pointer
                   transition-colors duration-200 hover:text-orange-500
-                  ${highlight ? "text-orange-500" : "dark:text-white"}
+                  ${highlight ? "text-orange-500" : ""}
                   ${isActive ? "border-b-8 border-orange-400" : "border-b-8 border-white"}
                 `}
               >
@@ -134,7 +134,7 @@ export default function HeaderNav({ navItems, pathname, classId, badges = {} }) 
                 className={`
                   flex items-center gap-1 cursor-pointer
                   transition-colors duration-200
-                  ${highlight ? "text-orange-500" : "dark:text-white"}
+                  ${highlight ? "text-orange-500" : ""}
                   ${isActive ? "border-b-8 border-orange-400" : ""}
                 `}
               >
@@ -173,7 +173,7 @@ export default function HeaderNav({ navItems, pathname, classId, badges = {} }) 
                 className={`
                   absolute top-[62.5px] z-50
                   min-w-[180px]
-                  dark:bg-zinc-800
+
                   border rounded-b-md bg-white
                   overflow-hidden
                   transition-all duration-200 ease-out
@@ -199,9 +199,9 @@ export default function HeaderNav({ navItems, pathname, classId, badges = {} }) 
                         className={`
                           block px-4 py-2 whitespace-nowrap
                           transition-colors
-                          hover:bg-orange-100 dark:hover:bg-zinc-700 text-center 
+                          hover:bg-orange-100 text-center 
                           ${subActive
-                            ? "bg-orange-50 dark:bg-zinc-700 font-semibold"
+                            ? "bg-orange-50 font-semibold"
                             : ""}
                         `}
                       >

@@ -8,7 +8,7 @@ export default function AddProfileImgModal({ modalId, setModalId, onChangeProfil
     return (
         <ModalTemplate id="ADD_PROFILE" modalId={modalId} setModalId={setModalId} onClose={()=>setUrl(null)}>
             {({ close }) => (
-                <div className="p-[24px] dark:bg-orange-100 flex flex-col bg-orange-100 max-w-[320px] rounded-lg p-6">
+                <div className="p-[24px] flex flex-col bg-orange-100 max-w-[320px] rounded-lg p-6">
                     <div className="flex justify-between items-center mb-[16px]">
                         <h1 className="text-[1.6rem] ">프로필 이미지 등록하기</h1>
                         <a href="https://unique-wildcat-2d5.notion.site/1b327dcf545c80e3afb3d6000b98f3f5" target="_blank" rel="noopener noreferrer" className="rounded-full bg-orange-300 cursor-pointer w-[24px] h-[24px] flex justify-center items-center">

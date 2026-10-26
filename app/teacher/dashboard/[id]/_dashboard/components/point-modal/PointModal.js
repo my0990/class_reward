@@ -67,7 +67,7 @@ export function PointModalBody({ isSend, currencyName, activeStudentLabels }) {
 
   return (
     <div
-      className={`w-[320px] flex justify-center dark:bg-gray-400 ${
+      className={`w-[320px] flex justify-center ${
         isSend ? "bg-green-500" : "bg-red-500"
       } rounded-2xl p-4`}
     >

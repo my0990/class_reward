@@ -6,6 +6,6 @@ export default function AuthInput(props){
         spellCheck="false" 
         {...props} 
         placeholder={props.placeholder} 
-        className="focus:border-orange-500 border-2  input input-bordered w-full  dark:placeholder:text-white dark:bg-gray-600" />
+        className="focus:border-orange-500 border-2  input input-bordered w-full" />
     )
 }

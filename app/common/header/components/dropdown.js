@@ -109,7 +109,7 @@ export default function DropDown({
   const { data: classes } = useFetchData(role === "teacher" ? "/api/classes" : null);
 
   return (
-    <nav className="border-b-2 min-[979px]:hidden dark:text-white" aria-label="Mobile menu">
+    <nav className="border-b-2 min-[979px]:hidden" aria-label="Mobile menu">
       <ul>
         {/* 상단 유저/로그아웃 */}
         <li className="mt-[1rem]">
@@ -149,7 +149,7 @@ export default function DropDown({
         {/* 학급 바꾸기 (교사) */}
         {role === "teacher" && (classes?.length ?? 0) > 1 && (
           <li className="mt-[0.5rem]">
-            <div className="px-[16px] text-[0.95rem] text-gray-500 dark:text-gray-300">학급 바꾸기</div>
+            <div className="px-[16px] text-[0.95rem] text-gray-500">학급 바꾸기</div>
             <ul className="mt-[0.25rem]">
               {classes.map((cls) => {
                 const isCurrent = String(cls._id) === String(id);
@@ -168,7 +168,7 @@ export default function DropDown({
                 );
               })}
             </ul>
-            <div className="mx-[16px] mt-[0.5rem] border-b border-gray-200 dark:border-zinc-700" />
+            <div className="mx-[16px] mt-[0.5rem] border-b border-gray-200" />
           </li>
         )}
 
@@ -196,7 +196,7 @@ export default function DropDown({
         <li className="mt-[1rem]">
           {sections.map((section, idx) => (
             <div key={section.key} className="mb-[1rem]">
-              <div className="px-[16px] text-[0.95rem] text-gray-500 dark:text-gray-300 flex items-center gap-2">
+              <div className="px-[16px] text-[0.95rem] text-gray-500 flex items-center gap-2">
                 {section.title}
               </div>
 
@@ -219,7 +219,7 @@ export default function DropDown({
               </ul>
 
               {idx !== sections.length - 1 && (
-                <div className="mx-[16px] mt-[0.5rem] border-b border-gray-200 dark:border-zinc-700" />
+                <div className="mx-[16px] mt-[0.5rem] border-b border-gray-200" />
               )}
             </div>
           ))}

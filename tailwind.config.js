@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // 다크 모드는 쓰지 않는다: 기기가 다크 모드여도 dark: 색이 저절로 켜지지 않게 'class' 방식 (.dark를 붙이는 곳 없음)
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -22,5 +24,10 @@ module.exports = {
     },
   },
   plugins: [require("daisyui")],
+  // daisyUI도 밝은 테마 하나만: 기기가 다크 모드여도 버튼·입력칸이 까맣게 바뀌지 않음
+  daisyui: {
+    themes: ["light"],
+    darkTheme: "light",
+  },
   mode: "jit",
 };

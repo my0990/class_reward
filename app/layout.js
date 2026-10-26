@@ -51,12 +51,14 @@ export const metadata = {
 
 export const viewport = {
   themeColor: "#FFFFFF",
+  // 항상 밝은 화면 (브라우저의 다크 모드 자동 변환도 최대한 막음)
+  colorScheme: "only light",
   initialScale: 1,
 };
 export default async function RootLayout({ children }) {
 
   return (
-    <html lang="en" className="w-full dark:bg-gray-700">
+    <html lang="en" className="w-full" data-theme="light" style={{ colorScheme: "only light" }}>
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>

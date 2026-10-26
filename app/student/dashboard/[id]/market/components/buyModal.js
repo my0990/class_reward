@@ -64,7 +64,7 @@ export default function BuyModal({ buyList, money, currencyName, currencyEmoji, 
     return (
         <ModalTemplate id="BUY" modalId={modalId} setModalId={setModalId} className="w-[calc(100%-32px)] max-w-[520px]">
             {() => (
-            <div className="p-[24px] min-[600px]:p-[48px] dark:bg-orange-200">
+            <div className="p-[24px] min-[600px]:p-[48px]">
                 <div className="flex justify-end">
                     <div className="w-[20px] h-[20px] mr-[8px]">
                     </div>

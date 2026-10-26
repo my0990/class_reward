@@ -7,7 +7,7 @@ export default function UpdateProfileImgModal({ modalData, currencyEmoji, setIsE
         <ModalTemplate id="UPDATE_PROFILE" modalId={modalId} setModalId={setModalId} onClose={() => setIsEdited(false)}>
             {({ close }) => (
                 <div >
-                    <div className="bg-orange-200 dark:bg-orange-200 rounded-lg p-[24px]  flex flex-col bg-orange-100 max-w-[320px] overflow-hidden">
+                    <div className="bg-orange-200 rounded-lg p-[24px]  flex flex-col bg-orange-100 max-w-[320px] overflow-hidden">
                         <div className="flex justify-between items-center mb-[16px]">
                             <h1 className="text-[1.4rem] ">프로필 이미지 삭제 및 수정</h1>
                         </div>

@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 뀰은 항상 밝은 화면 (기기 다크 모드를 따라가지 않음) */
+:root {
+  color-scheme: only light;
+}
+
+/* 아주 오래된 브라우저(oklch 미지원)에서 daisyUI가 쓰는 대체 색도 다크로 바뀌지 않게 밝은 값으로 고정 */
+@supports not (color: oklch(0% 0 0)) {
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: light;
+      --fallback-p: #491eff;
+      --fallback-pc: #d4dbff;
+      --fallback-s: #ff41c7;
+      --fallback-sc: #fff9fc;
+      --fallback-a: #00cfbd;
+      --fallback-ac: #00100d;
+      --fallback-n: #2b3440;
+      --fallback-nc: #d7dde4;
+      --fallback-b1: #ffffff;
+      --fallback-b2: #e5e6e6;
+      --fallback-b3: #e5e6e6;
+      --fallback-bc: #1f2937;
+      --fallback-in: #00b3f0;
+      --fallback-inc: #000000;
+      --fallback-su: #00ca92;
+      --fallback-suc: #000000;
+      --fallback-wa: #ffc22d;
+      --fallback-wac: #000000;
+      --fallback-er: #ff6f70;
+      --fallback-erc: #000000;
+    }
+  }
+}
+
 
 
 @layer utilities {

@@ -206,7 +206,7 @@ export default function SignUpView() {
                             type="button"
                             onClick={onSendEmailCode}
                             disabled={!canSendCode}
-                            className="btn bg-orange-500 dark:hover:bg-orange-300 border-0 text-white whitespace-nowrap"
+                            className="btn bg-orange-500 border-0 text-white whitespace-nowrap"
                         >
                             {isSendingCode ? "전송중" : sendCooldown > 0 ? `${sendCooldown}초` : "코드전송"}
                         </button>
@@ -222,7 +222,7 @@ export default function SignUpView() {
                             type="button"
                             onClick={onVerifyEmailCode}
                             disabled={!canVerifyCode || isEmailVerified}
-                            className="btn bg-black dark:hover:bg-zinc-700 border-0 text-white whitespace-nowrap "
+                            className="btn bg-black border-0 text-white whitespace-nowrap "
                             style={{ background: isEmailVerified ? "green" : null, cursor: isEmailVerified ? "default" : null }}
                         >
                             {isEmailVerified ?
@@ -289,7 +289,7 @@ export default function SignUpView() {
                     </div>
 
                     {/* 폼 안의 <button>은 기본이 '제출'이라 회원가입이 같이 실행됐다 → 버튼 대신 링크 자체를 버튼 모양으로 */}
-                    <Link href="/auth/login/teacher" className="btn btn-block bg-orange-500 dark:hover:bg-orange-300 mb-4 text-lg border-0 text-white">
+                    <Link href="/auth/login/teacher" className="btn btn-block bg-orange-500 mb-4 text-lg border-0 text-white">
                         로그인
                     </Link>
 
