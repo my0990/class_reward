@@ -1,5 +1,6 @@
 'use client';
 
+import LoadError from "@/components/ui/common/LoadError";
 import { useState } from "react";
 import { mutate } from "swr";
 import SortableList from "@/components/sortable/SortableList";
@@ -73,7 +74,7 @@ export default function Quest() {
     }
 
     if (isError) {
-        return <div>Error loading data</div>;
+        return <LoadError />;
     }
 
     const questList = Array.isArray(questListData)

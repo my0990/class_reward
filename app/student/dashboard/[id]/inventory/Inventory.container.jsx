@@ -1,5 +1,6 @@
 'use client';
 
+import LoadError from "@/components/ui/common/LoadError";
 import { toast } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useStudentRefresh } from "@/hooks/useLiveInterval";
@@ -85,7 +86,7 @@ export default function InventoryContainer() {
     };
 
     if (isUserLoading) return <div>Loading data...</div>;
-    if (isUserError) return <div>Error loading data</div>;
+    if (isUserError) return <LoadError />;
 
     const { userId, money } = userData;
 

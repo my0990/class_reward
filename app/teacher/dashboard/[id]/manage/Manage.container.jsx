@@ -1,4 +1,5 @@
 'use client'
+import LoadError from "@/components/ui/common/LoadError";
 import DeleteModal from "./components/modal/DeleteModal";
 import DetailModal from "./components/modal/DetailModal";
 import CreateModal from "./components/modal/CreateModal";
@@ -141,7 +142,7 @@ export default function ManageContainer() {
         isClassError || isStudentsError
 
     if (isLoading) return <div>불러오는 중...</div>;
-    if (isError) return <div>데이터 로드 실패</div>;
+    if (isError) return <LoadError />;
     // ✅ 로딩/에러 둘 다 아니어도 classData 자체가 없을 수 있음(예: 학급이 삭제된 경우) —
     // 방어 없이 바로 destructure하면 여기서 렌더링이 통째로 크래시남
     if (!classData) return <div>학급 정보를 찾을 수 없습니다.</div>;

@@ -1,9 +1,15 @@
 "use client";
-// 화면을 그리다 오류가 났을 때 (전체가 하얗게 멈추지 않도록)
+// 화면을 그리다 오류가 났을 때 (전체가 하얗게 멈추지 않도록) + 관리자 '최근 에러'로 신고
+import { useEffect } from "react";
 import Link from "next/link";
+import { reportClientError } from "@/lib/errorLog/reportClientError";
 
 export default function ErrorBoundary({ error, reset }) {
-  console.error(error);
+  useEffect(() => {
+    console.error(error);
+    reportClientError(error, { source: "render" });
+  }, [error]);
+
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center bg-orange-100 px-6 text-center">
       <div className="text-[4rem] leading-none" aria-hidden="true">🍊💦</div>

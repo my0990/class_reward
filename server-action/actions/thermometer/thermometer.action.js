@@ -1,4 +1,5 @@
 'use server'
+import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 import { updateThermometerSettingService } from "@/server-action/service/thermometer/thermometer.service";
 import { getServerSession } from "next-auth";
@@ -26,7 +27,7 @@ export async function updateThermometerSetting({ rewardObj, requireCurrency, cla
       data: response,
     };
   } catch (error) {
-    console.error("error:", error);
+    logError("error:", error);
 
     return {
       result: false,
@@ -53,7 +54,7 @@ export async function donate({ userId, amount, classId, kioskToken }) {
 
     return await donateCookieService({ ...target, amount });
   } catch (error) {
-    console.error("donateCookieAction error:", error);
+    logError("donateCookieAction error:", error);
 
     return {
       result: false,
@@ -83,7 +84,7 @@ export async function updateManualDegree({ classId, degreeChange, type }) {
       data: result,
     };
   } catch (error) {
-    console.error("updateManualDegreeAction error:", error);
+    logError("updateManualDegreeAction error:", error);
 
     return {
       result: false,

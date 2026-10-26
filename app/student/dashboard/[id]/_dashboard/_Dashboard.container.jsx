@@ -1,4 +1,5 @@
 'use client'
+import LoadError from "@/components/ui/common/LoadError";
 import { profileImgProps } from "@/util/image/profileImage";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useStudentRefresh } from "@/hooks/useLiveInterval";
@@ -44,7 +45,7 @@ export default function Page({ classId }) {
     }
 
     if (isError) {
-        return <div>데이터 로드 실패</div>;
+        return <LoadError />;
     }
 
 

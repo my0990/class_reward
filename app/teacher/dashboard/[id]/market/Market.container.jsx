@@ -2,6 +2,7 @@
 
 'use client';
 
+import LoadError from "@/components/ui/common/LoadError";
 import { useFetchData } from "@/hooks/useFetchData";
 import AddModal from "./components/modal/AddModal";
 import DeleteModal from "./components/modal/DeleteModal";
@@ -325,7 +326,7 @@ export default function MarketContainer() {
     }
 
     if (isClassDataError) {
-        return <div>Error loading data</div>;
+        return <LoadError />;
     }
 
     if (!classData) {

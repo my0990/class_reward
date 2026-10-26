@@ -1,5 +1,6 @@
 'use client'
 
+import LoadError from "@/components/ui/common/LoadError";
 import ProfileCard from "./components/ProfileCard"
 import ProfileBuyModal from "./components/ProfileBuyModal";
 import { useState, useEffect } from "react";
@@ -23,7 +24,7 @@ export default function ProfileContainer({ }) {
 
 
     if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
-    if (isClassError || isUserError) return <div>Error loading data</div>;
+    if (isClassError || isUserError) return <LoadError />;
 
     const { currencyName } = classData;
     const { money, userId } = userData;

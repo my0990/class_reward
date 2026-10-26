@@ -13,7 +13,7 @@ export default function EditQuestModal({ classId, currency, questDetailData, set
   const onSubmit = async (quest) => {
     if (!questId) return false;
     try {
-      const res = await runAction("editQuest", questId, () => editQuest({ ...quest, questId, classId }));
+      const res = await runAction("editQuest", questId, () => editQuest({ ...quest, questId, classId }), { onError: () => {} }) /* 실패 안내는 아래 catch에서 */;
       if (!res?.result) {
         toast.error(res?.message || "퀘스트 수정에 실패했습니다.");
         return false;

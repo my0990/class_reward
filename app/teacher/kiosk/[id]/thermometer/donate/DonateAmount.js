@@ -1,5 +1,6 @@
 "use client";
 // 기부 수량 입력: 숫자 키패드 → 보유/기부/잔액 → 기부하기
+import LoadError from "@/components/ui/common/LoadError";
 import { useState } from "react";
 import { useFetchData } from "@/hooks/useFetchData";
 import Link from "next/link";
@@ -30,7 +31,7 @@ export default function DonateAmount({ classId, user, kioskToken }) {
     const isError = isClassDataError || isThermometerDataError;
 
     if (isDataLoading) return <div>불러오는 중...</div>;
-    if (isError) return <div>데이터 로드 실패</div>;
+    if (isError) return <LoadError />;
     const { userId, money } = user;
 
     const { currencyName = "호박", currencyEmoji = "🎃" } = classData;

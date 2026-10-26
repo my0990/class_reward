@@ -1,4 +1,5 @@
 'use client'
+import LoadError from "@/components/ui/common/LoadError";
 import BuyModal from "./components/buyModal";
 import ItemCard from "./components/ItemCard"
 import { useState, useRef } from "react"
@@ -28,7 +29,7 @@ export default function MarketContainer() {
 
     const nodeRef = useRef();
     if (isClassLoading || isUserLoading) return <div>Loading data...</div>;
-    if (isClassError || isUserError) return <div>Error loading data</div>;
+    if (isClassError || isUserError) return <LoadError />;
 
 
     const { currencyEmoji, currencyName, itemList = [] } = classData;

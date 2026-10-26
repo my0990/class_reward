@@ -198,7 +198,7 @@ export default function DetailModal() {
               <div className="py-10 text-center">불러오는 중...</div>
             ) : isHistoryError ? (
               <div className="py-10 text-center text-red-500">
-                데이터 로드 실패
+                기록을 불러오지 못했어요. 창을 닫았다가 다시 열어주세요.
               </div>
             ) : rows.length === 0 ? (
               <div className="py-10 text-center text-gray-500">

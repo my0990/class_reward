@@ -3,6 +3,8 @@ import { getDashboardStatsService } from "@/server-action/service/admin/dashboar
 import DailyBarChart from "@/components/admin/DailyBarChart";
 import UsageTrends from "@/components/admin/UsageTrends";
 import SystemStatus from "@/components/admin/SystemStatus";
+import ErrorLogList from "@/components/admin/ErrorLogList";
+import { getRecentErrorsService } from "@/server-action/service/admin/errorLog.service";
 import { getDbUsageService, getDeployStatusService } from "@/server-action/service/admin/systemStatus.service";
 import { requireAdminPage } from "@/lib/auth/actionAuth";
 
@@ -34,7 +36,7 @@ const fmtTime = (iso) =>
 
 export default async function AdminDashboard() {
   await requireAdminPage();
-  const [s, db, deploy] = await Promise.all([getDashboardStatsService(), getDbUsageService(), getDeployStatusService()]);
+  const [s, db, deploy, errors] = await Promise.all([getDashboardStatsService(), getDbUsageService(), getDeployStatusService(), getRecentErrorsService()]);
   const emailPct = Math.round((s.email.last24h / s.email.dailyLimit) * 100);
 
   return (
@@ -64,6 +66,8 @@ export default async function AdminDashboard() {
       </p>
 
       <SystemStatus db={db} deploy={deploy} />
+
+      <ErrorLogList errors={errors} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <DailyBarChart title="일별 교사 가입" unit="명" data={s.signupsByDay} />

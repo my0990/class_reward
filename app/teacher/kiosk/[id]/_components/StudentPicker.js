@@ -1,4 +1,5 @@
 "use client";
+import LoadError from "@/components/ui/common/LoadError";
 import { toast } from "react-hot-toast";
 // 키오스크 학생 선택 (구매·사용·기부 공용)
 // 학생 카드를 누르면 → check(학생)로 막을지 확인 → 비밀번호 키패드 → onPicked({ user, kioskToken })
@@ -31,7 +32,7 @@ export default function StudentPicker({ classId, title, guide = "계정을 선�
   }, [studentsKey]);
 
   if (l1 || l2) return <div className="p-8">불러오는 중...</div>;
-  if (e1 || e2) return <div className="p-8">데이터 로드 실패</div>;
+  if (e1 || e2) return <LoadError />;
 
   const { currencyEmoji, expTable = {} } = classData;
 

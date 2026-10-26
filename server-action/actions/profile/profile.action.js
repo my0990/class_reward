@@ -1,4 +1,5 @@
 'use server'
+import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 import { createProfileImgService, updateProfileImgService, deleteProfileImgService, buyProfileImgService, selectProfileImgService, selectProfileTitleService, reorderProfileImgsService } from "@/server-action/service/profile/profile.service";
 import { getServerSession } from "next-auth";
@@ -37,7 +38,7 @@ export async function createProfileImg({ createdProfileImgUrl, classId }) {
       data: response,
     };
   } catch (error) {
-    console.error("error:", error);
+    logError("error:", error);
 
     return {
       result: false,
@@ -68,7 +69,7 @@ export async function updateProfileImg({ url, price, classId, urlId }) {
         data: response,
       };
     } catch (error) {
-      console.error("error:", error);
+      logError("error:", error);
   
       return {
         result: false,
@@ -98,7 +99,7 @@ export async function updateProfileImg({ url, price, classId, urlId }) {
         data: response,
       };
     } catch (error) {
-      console.error("error:", error);
+      logError("error:", error);
   
       return {
         result: false,
@@ -134,7 +135,7 @@ export async function updateProfileImg({ url, price, classId, urlId }) {
         data: response,
       };
     } catch (error) {
-      console.error("error:", error);
+      logError("error:", error);
   
       return {
         result: false,
@@ -164,7 +165,7 @@ export async function updateProfileImg({ url, price, classId, urlId }) {
         data: response,
       };
     } catch (error) {
-      console.error("error:", error);
+      logError("error:", error);
   
       return {
         result: false,
@@ -195,7 +196,7 @@ export async function updateProfileImg({ url, price, classId, urlId }) {
         data: response,
       };
     } catch (error) {
-      console.error("error:", error);
+      logError("error:", error);
   
       return {
         result: false,

@@ -1,4 +1,7 @@
 import { useState, useRef, useCallback } from "react";
+import { toast } from "react-hot-toast";
+import { reportClientError } from "@/lib/errorLog/reportClientError";
+import { actionErrorMessage } from "@/lib/errorLog/errorCore";
 
 /**
  * 범용 중복 실행 방지 훅
@@ -69,8 +72,16 @@ export default function usePendingAction() {
 
       return result;
     } catch (err) {
-      onError?.(err);
-      throw err;
+      // 서버 액션이 결과를 돌려주지 못하고 실패한 경우 (인터넷 끊김, 배포 직후 옛 화면, 서버 오류)
+      reportClientError(err, { source: "client-action" });
+      if (onError) {
+        onError(err);
+        throw err;
+      }
+      // onError가 없으면 공통 안내를 띄우고 조용히 끝낸다 (버튼을 눌렀는데 아무 반응 없는 일이 없게)
+      console.error(err);
+      toast.error(actionErrorMessage(err), { id: "action-error" });
+      return undefined;
     } finally {
       pendingRef.current.delete(key);
 

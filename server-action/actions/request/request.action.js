@@ -1,5 +1,6 @@
 "use server";
 // 승인 센터 (지금은 선생님만. 학생 관리자는 2단계에서 actor만 바꿔 같은 서비스를 쓴다)
+import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
 import {
   listRequestsService,
@@ -18,7 +19,7 @@ export async function listRequests({ classId, status = "pending" }) {
     });
     return { result: true, rows };
   } catch (error) {
-    console.error("listRequests error:", error);
+    logError("listRequests error:", error);
     return { result: false, message: "요청 목록을 불러오지 못했어요." };
   }
 }

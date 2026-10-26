@@ -1,5 +1,6 @@
 "use server";
 
+import { logError } from "@/lib/errorLog/errorLog";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { verifyKioskToken } from "@/lib/auth/kioskToken";
@@ -16,7 +17,7 @@ export async function changeMyDefaultPassword({ newPassword }) {
     const res = await changeDefaultStudentPasswordService({ teacher_id: user.teacher_id, userId: user.userId, newPassword });
     return res.ok ? { result: true, message: "비밀번호를 바꿨어요." } : fail(res.message);
   } catch (error) {
-    console.error("changeMyDefaultPassword error:", error);
+    logError("changeMyDefaultPassword error:", error);
     return fail("비밀번호를 바꾸지 못했어요. 다시 시도해주세요.");
   }
 }
@@ -36,7 +37,7 @@ export async function changeKioskStudentPassword({ classId, userId, kioskToken, 
     const res = await changeDefaultStudentPasswordService({ teacher_id, userId, newPassword });
     return res.ok ? { result: true, message: "비밀번호를 바꿨어요." } : fail(res.message);
   } catch (error) {
-    console.error("changeKioskStudentPassword error:", error);
+    logError("changeKioskStudentPassword error:", error);
     return fail("비밀번호를 바꾸지 못했어요. 다시 시도해주세요.");
   }
 }

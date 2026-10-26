@@ -1,5 +1,6 @@
 'use client'
 
+import LoadError from "@/components/ui/common/LoadError";
 import ThermometerObject from "@/components/thermometer/ThermometerObject";
 import { useParams, useRouter } from "next/navigation";
 import { useThermometerBoard } from "@/hooks/thermometer/useThermometerBoard";
@@ -24,7 +25,7 @@ export default function ThermometerPage() {
     }
 
     if (isError) {
-        return <div>데이터 로드 실패</div>;
+        return <LoadError />;
     }
 
     return (

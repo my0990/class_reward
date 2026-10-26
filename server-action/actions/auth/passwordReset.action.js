@@ -1,5 +1,6 @@
 "use server";
 // 교사 비밀번호 찾기 (로그인 전 화면이라 세션 확인 없음 — 서비스에서 발송 제한·코드 횟수·통과권으로 막는다)
+import { logError } from "@/lib/errorLog/errorLog";
 import { headers } from "next/headers";
 import { sendMailWithResend, getClientIpFromHeaders } from "@/lib/mail/resend";
 import {
@@ -21,7 +22,7 @@ async function safe(fn) {
   try {
     return toResult(await fn());
   } catch (err) {
-    console.error("[password reset]", err);
+    logError("[password reset]", err);
     return { result: false, message: "처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요." };
   }
 }

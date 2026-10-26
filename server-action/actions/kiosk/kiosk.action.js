@@ -1,5 +1,6 @@
 "use server";
 
+import { logError } from "@/lib/errorLog/errorLog";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { verifyStudentPasswordService } from "@/server-action/service/kiosk/kioskAuth.service";
@@ -47,7 +48,7 @@ export async function checkKioskPassword({ userId, userPwd }) {
       mustChangePassword: Boolean(res.mustChangePassword),
     };
   } catch (error) {
-    console.error("checkKioskPassword error:", error);
+    logError("checkKioskPassword error:", error);
     return { result: false, message: "비밀번호 확인 중 오류가 발생했습니다." };
   }
 }

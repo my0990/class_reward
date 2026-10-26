@@ -1,5 +1,6 @@
 'use client'
 
+import LoadError from "@/components/ui/common/LoadError";
 import SettingModal from "./components/SettingModal";
 import ThermometerObject from "@/components/thermometer/ThermometerObject";
 import TemperatureManageModal from "@/components/thermometer/TemperatureManageModal";
@@ -33,7 +34,7 @@ export default function ThermometerContainer({ }) {
     }
 
     if (isError) {
-        return <div>데이터 로드 실패</div>;
+        return <LoadError />;
     }
 
     return (

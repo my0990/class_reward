@@ -1,4 +1,5 @@
 "use server";
+import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
@@ -18,7 +19,7 @@ export async function updateCurrencyName({ classId, currencyName, currencyEmoji 
       currencyEmoji,
     });
   } catch (error) {
-    console.error("updateCurrencyName error:", error);
+    logError("updateCurrencyName error:", error);
 
     return {
       result: false,

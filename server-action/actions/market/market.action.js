@@ -1,5 +1,6 @@
 // server-action/action/item/item.action.js
 "use server";
+import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
@@ -37,7 +38,7 @@ export async function createItem({
       data: result,
     };
   } catch (error) {
-    console.error("createItemAction error:", error);
+    logError("createItemAction error:", error);
 
     return {
       result: false,
@@ -74,7 +75,7 @@ export async function deleteItem({
       data,
     };
   } catch (error) {
-    console.error("deleteItem action error:", error);
+    logError("deleteItem action error:", error);
 
     return {
       result: false,
@@ -159,7 +160,7 @@ export async function updateItem({
           data,
       };
   } catch (error) {
-      console.error("updateItem action error:", error);
+      logError("updateItem action error:", error);
 
       return {
           result: false,
@@ -194,7 +195,7 @@ export async function buyItem({ itemId, userId, classId, kioskToken }) {
 
     return { result: true, message: "구매 완료", itemId: purchasedItemId };
   } catch (error) {
-    if (!error?.status || error.status >= 500) console.error("buyItem action error:", error);
+    if (!error?.status || error.status >= 500) logError("buyItem action error:", error);
     return { result: false, message: error?.message || "구매 처리 중 오류가 발생했습니다." };
   }
 }
@@ -208,7 +209,7 @@ export async function reorderItems({ classId, orderedIds }) {
     await reorderItemsService({ teacher_id: auth.teacher_id, classId, orderedIds });
     return { result: true, message: "순서를 바꿨습니다." };
   } catch (error) {
-    console.error("reorderItems error:", error);
+    logError("reorderItems error:", error);
     return { result: false, message: error.message || "순서를 저장하지 못했습니다." };
   }
 }

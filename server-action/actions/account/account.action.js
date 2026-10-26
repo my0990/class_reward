@@ -1,4 +1,5 @@
 'use server'
+import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 import { createStudentAccountService, deleteStudentAccountService, resetPwdService, checkUniqueNicknameService } from "@/server-action/service/account/account.service";
 import { getServerSession } from "next-auth";
@@ -28,7 +29,7 @@ export async function createStudentAccount({ accountArr, classId }) {
       data: response,
     };
   } catch (error) {
-    console.error("createStudentAccountsAction error:", error);
+    logError("createStudentAccountsAction error:", error);
 
     return {
       result: false,
@@ -58,7 +59,7 @@ export async function deleteStudentAccount({ student, classNumber, classId }) {
       data: response,
     };
   } catch (error) {
-    console.error("createStudentAccountsAction error:", error);
+    logError("createStudentAccountsAction error:", error);
 
     return {
       result: false,
@@ -88,7 +89,7 @@ export async function resetPwd({ student, classId }) {
       data: response,
     };
   } catch (error) {
-    console.error("createStudentAccountsAction error:", error);
+    logError("createStudentAccountsAction error:", error);
 
     return {
       result: false,
@@ -112,7 +113,7 @@ export async function checkUniqueNickname({ uniqueNickname, classId }) {
 
     return response;
   } catch (error) {
-    console.error("checkUniqueNickname error:", error);
+    logError("checkUniqueNickname error:", error);
 
     return {
       result: false,

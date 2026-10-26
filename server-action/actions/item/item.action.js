@@ -1,5 +1,6 @@
 "use server";
 
+import { logError } from "@/lib/errorLog/errorLog";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { resolveStudentTarget, StudentTargetError } from "@/lib/auth/studentTarget";
@@ -33,7 +34,7 @@ export async function useItem({ userId, itemId, itemName, classId, kioskToken })
       itemName,
     });
   } catch (error) {
-    console.error("useItem error:", error);
+    logError("useItem error:", error);
 
     return {
       result: false,

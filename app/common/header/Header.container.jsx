@@ -1,5 +1,6 @@
 "use client";
 
+import LoadError from "@/components/ui/common/LoadError";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
@@ -64,7 +65,7 @@ export default function HeaderContainer({ classId }) {
     }
 
     if (isError) {
-        return <div>데이터 로드 실패</div>;
+        return <LoadError compact />;
     }
 
 

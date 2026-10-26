@@ -50,6 +50,9 @@ const PLAN = [
   [admins, "admin_login_attempts", { updatedAt: 1 }, { expireAfterSeconds: 24 * 60 * 60, name: "updatedAt_ttl_1d" }, "관리자 로그인 시도 기록 하루 뒤 자동 삭제"],
   [admins, "notices", { pinned: -1, pinnedAt: -1, createdAt: -1 }, {}, "공지 목록 (고정 먼저)"],
   [admins, "audit_log", { at: -1 }, {}, "관리자 작업 기록 (최신순)"],
+  [admins, "error_logs", { fp: 1, day: 1 }, { unique: true, name: "fp_day_unique" }, "에러 기록: 같은 에러는 하루 한 줄"],
+  [admins, "error_logs", { day: 1 }, {}, "에러 기록: 하루 새 종류 수 세기"],
+  [admins, "error_logs", { lastAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60, name: "lastAt_ttl_30d" }, "에러 기록 30일 뒤 자동 삭제"],
 ];
 
 const sameKey = (a, b) => JSON.stringify(a) === JSON.stringify(b);

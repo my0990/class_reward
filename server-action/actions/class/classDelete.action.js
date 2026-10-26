@@ -1,5 +1,6 @@
 "use server";
 
+import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
 import { softDeleteClassService, restoreClassService } from "@/server-action/service/class/deleteClass.service";
 
@@ -12,7 +13,7 @@ export async function deleteClass({ classId, password }) {
     const res = await softDeleteClassService({ teacher_id: auth.teacher_id, classId, password });
     return { result: true, message: "학급을 삭제했습니다. 30일 안에는 '삭제된 학급'에서 복구할 수 있어요.", data: res };
   } catch (error) {
-    console.error("deleteClass error:", error);
+    logError("deleteClass error:", error);
     return { result: false, message: error.message || "학급 삭제에 실패했습니다." };
   }
 }
@@ -26,7 +27,7 @@ export async function restoreClass({ classId }) {
     await restoreClassService({ teacher_id: auth.teacher_id, classId });
     return { result: true, message: "학급을 복구했습니다." };
   } catch (error) {
-    console.error("restoreClass error:", error);
+    logError("restoreClass error:", error);
     return { result: false, message: error.message || "학급 복구에 실패했습니다." };
   }
 }

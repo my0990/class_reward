@@ -1,5 +1,6 @@
 "use client";
 
+import LoadError from "@/components/ui/common/LoadError";
 import useStudentSelection from "@/hooks/dashboard/useStudentSelection";
 import useMarqueeSelect from "@/hooks/dashboard/useMarqueeSelect";
 import SeatLayoutView from "./components/SeatLayoutView";
@@ -165,7 +166,7 @@ export default function DashboardContainer({ classId }) {
   });
 
   if (isLoading) return <div>불러오는 중...</div>;
-  if (isError) return <div>데이터 로드 실패</div>;
+  if (isError) return <LoadError />;
 
   const currencyName = classData?.currencyName ?? "원"
   const currencyEmoji = classData?.currencyEmoji ?? "💰"

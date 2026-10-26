@@ -1,5 +1,6 @@
 'use client'
 
+import LoadError from "@/components/ui/common/LoadError";
 import ProfileSection from "./components/ProfileSection";
 import { useState, useEffect } from "react"
 import { useFetchData } from "@/hooks/useFetchData";
@@ -124,7 +125,7 @@ export default function SettingContainer() {
         isClassError ||  isUserError;
 
     if (isLoading) return <div>불러오는 중...</div>;
-    if (isError) return <div>데이터 로드 실패</div>;
+    if (isError) return <LoadError />;
 
     const { profileNickname, profileState, profileUrl } = userData;
     const { currencyEmoji, currencyName } = classData;

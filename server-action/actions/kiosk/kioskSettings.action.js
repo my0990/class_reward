@@ -9,6 +9,7 @@
 // - 연결된 기기: 기기 이름 바꾸기, 연결 끊기
 // - 두 경우 모두: 첫 화면 메뉴(학급 온도계·퀘스트) 보이기/숨기기 (학급 설정이라 이 반 모든 키오스크에 적용)
 // - 선생님 화면(학급 설정): 연결된 기기 목록·원격 끊기
+import { logError } from "@/lib/errorLog/errorLog";
 import { getServerSession } from "next-auth";
 import { ObjectId } from "mongodb";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -60,7 +61,7 @@ export async function kioskSettingsStatus({ classId }) {
     const userDb = (await connectDB).db("user");
     return { result: true, mode: ctx.mode, lockedSec: await lockedSeconds(userDb, ctx.lockKey) };
   } catch (error) {
-    console.error("kioskSettingsStatus error:", error);
+    logError("kioskSettingsStatus error:", error);
     return fail("설정 상태를 확인하지 못했어요.");
   }
 }
@@ -100,7 +101,7 @@ export async function unlockKioskSettings({ classId, password }) {
       info: { mode: ctx.mode, className: cls?.className ?? "", device, kioskMenus },
     };
   } catch (error) {
-    console.error("unlockKioskSettings error:", error);
+    logError("unlockKioskSettings error:", error);
     return fail("비밀번호를 확인하지 못했어요. 다시 시도해주세요.");
   }
 }
@@ -115,7 +116,7 @@ export async function pairKioskDevice({ classId, settingsToken, name }) {
     if (!res.ok) return fail(res.message);
     return { result: true, pairToken: createSignedToken(KIOSK_PAIR_PURPOSE, { d: res.deviceId }, { ttlMs: PAIR_TTL_MS }) };
   } catch (error) {
-    console.error("pairKioskDevice error:", error);
+    logError("pairKioskDevice error:", error);
     return fail("기기를 연결하지 못했어요.");
   }
 }
@@ -135,7 +136,7 @@ export async function setKioskMenus({ classId, settingsToken, menus }) {
     if (r.matchedCount === 0) return fail("학급 정보를 찾을 수 없어요.");
     return { result: true };
   } catch (error) {
-    console.error("setKioskMenus error:", error);
+    logError("setKioskMenus error:", error);
     return fail("메뉴 설정을 저장하지 못했어요.");
   }
 }
@@ -148,7 +149,7 @@ export async function renameThisKioskDevice({ classId, settingsToken, name }) {
     const res = await renameKioskDeviceService({ teacher_id: ctx.teacher_id, deviceId: ctx.deviceId, name });
     return res.ok ? { result: true, message: "기기 이름을 바꿨어요." } : fail(res.message);
   } catch (error) {
-    console.error("renameThisKioskDevice error:", error);
+    logError("renameThisKioskDevice error:", error);
     return fail("이름을 바꾸지 못했어요.");
   }
 }
@@ -161,7 +162,7 @@ export async function unpairThisKioskDevice({ classId, settingsToken }) {
     await revokeKioskDeviceService({ teacher_id: ctx.teacher_id, deviceId: ctx.deviceId, classId });
     return { result: true, message: "키오스크 연결을 끊었어요." };
   } catch (error) {
-    console.error("unpairThisKioskDevice error:", error);
+    logError("unpairThisKioskDevice error:", error);
     return fail("연결을 끊지 못했어요.");
   }
 }
@@ -177,7 +178,7 @@ export async function listKioskDevices({ classId }) {
       data: list.map((d) => ({ ...d, createdAt: d.createdAt?.toISOString?.() ?? null, lastSeenAt: d.lastSeenAt?.toISOString?.() ?? null })),
     };
   } catch (error) {
-    console.error("listKioskDevices error:", error);
+    logError("listKioskDevices error:", error);
     return fail("기기 목록을 불러오지 못했어요.");
   }
 }
@@ -190,7 +191,7 @@ export async function revokeKioskDevice({ classId, deviceId }) {
     const res = await revokeKioskDeviceService({ teacher_id: auth.teacher_id, deviceId, classId });
     return res.ok ? { result: true, message: "연결을 끊었어요. 그 기기는 곧 로그아웃됩니다." } : fail(res.message);
   } catch (error) {
-    console.error("revokeKioskDevice error:", error);
+    logError("revokeKioskDevice error:", error);
     return fail("연결을 끊지 못했어요.");
   }
 }

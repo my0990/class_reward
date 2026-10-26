@@ -1,5 +1,6 @@
 "use client";
 // 아이템 구매: 아이템 선택 → 학생 선택(잔액 확인 + 비밀번호) → 결제
+import LoadError from "@/components/ui/common/LoadError";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
@@ -15,7 +16,7 @@ export default function ItemBuyPage() {
   const { data: classData, isLoading, isError } = useFetchData(`/api/classData/${classId}`);
 
   if (isLoading) return <div className="p-8">불러오는 중...</div>;
-  if (isError) return <div className="p-8">데이터 로드 실패</div>;
+  if (isError) return <LoadError />;
   const { itemList = [], currencyName } = classData;
 
   // 3) 결제

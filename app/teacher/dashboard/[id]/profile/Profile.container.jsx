@@ -1,4 +1,5 @@
 'use client'
+import LoadError from "@/components/ui/common/LoadError";
 import UpdateProfileImgModal from "./components/modal/UpdateProfileImgModal";
 import AddProfileImgModal from "./components/modal/AddProfileImgModal";
 import ProfileCard from "./components/profileCard";
@@ -170,7 +171,7 @@ export default function ProfileContainer() {
     }
 
     if (isError) {
-        return <div>데이터 로드 실패</div>;
+        return <LoadError />;
     }
     const { currencyName, currencyEmoji } = classData;
     return (

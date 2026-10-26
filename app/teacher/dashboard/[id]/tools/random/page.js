@@ -1,4 +1,5 @@
 'use client'
+import LoadError from "@/components/ui/common/LoadError";
 import { profileImgProps } from "@/util/image/profileImage";
 import { toast } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
@@ -135,7 +136,7 @@ export default function Random() {
         }
     }, []);
     if (isStudentLoading || isClassLoading) return <div>Loading data...</div>;
-    if (isStudentError || isClassError) return <div>Error loading data</div>;
+    if (isStudentError || isClassError) return <LoadError />;
     const { startExp, commonDifference } = classData.expTable;
     const { currencyName } = classData;
     const findLargestSumUnderTarget = (selectedStudent) => {

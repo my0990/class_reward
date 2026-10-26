@@ -11,7 +11,7 @@ export default function AddQuestModal({ classId, currency, modalId, setModalId }
 
   const onSubmit = async (quest) => {
     try {
-      const res = await runAction("createQuest", () => createQuest({ ...quest, classId }));
+      const res = await runAction("createQuest", () => createQuest({ ...quest, classId }), { onError: () => {} }) /* 실패 안내는 아래 catch에서 */;
       if (!res?.result) {
         toast.error(res?.message || "퀘스트 등록에 실패했습니다.");
         return false;

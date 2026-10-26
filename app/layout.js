@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Analytics from "@/components/common/Analytics";
+import ClientErrorReporter from "@/components/common/ClientErrorReporter";
 import { Toaster } from "react-hot-toast";
 
 // import Head from "next/head";
@@ -65,6 +66,8 @@ export default async function RootLayout({ children }) {
       <body className={inter.className}>
         {/* 방문 통계: 선생님 화면에서만 (components/common/Analytics.js) */}
         <Analytics />
+        {/* 브라우저 에러를 관리자 '최근 에러'로 신고 (배포된 사이트에서만) */}
+        <ClientErrorReporter />
         {/* 알림(토스트)은 여기 하나로: 페이지를 옮겨도 메시지가 남는다 */}
         <Toaster position="top-center" toastOptions={{ style: { fontSize: "1.05rem" } }} />
         {children}

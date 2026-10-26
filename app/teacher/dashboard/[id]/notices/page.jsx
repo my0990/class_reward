@@ -1,5 +1,6 @@
 'use client';
 
+import LoadError from "@/components/ui/common/LoadError";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -27,7 +28,7 @@ export default function Notices() {
   const NEW_LIMIT = 1000 * 60 * 60 * 48; // 48시간
 
   if (isNoticesDataLoading) return <div>Loading data...</div>;
-  if (isNoticesDataError) return <div>Error loading data</div>;
+  if (isNoticesDataError) return <LoadError />;
 
   // API가 { notices, total, page, limit } 형식일 때
   const notices = noticesData?.notices ?? [];
