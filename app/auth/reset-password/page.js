@@ -105,6 +105,12 @@ export default function ResetPasswordPage() {
           />
         )}
 
+        {step === "email" && (
+          <p className="-mt-2 mb-3 text-sm text-gray-500">
+            회원가입할 때 쓴 이메일을 입력해주세요. 학생은 담임 선생님께 비밀번호 초기화를 부탁하세요.
+          </p>
+        )}
+
         {step === "code" && (
           <>
             <AuthInput
@@ -121,6 +127,18 @@ export default function ResetPasswordPage() {
               <button type="button" disabled={cooldown > 0 || busy} className="text-orange-500 underline disabled:text-gray-400 disabled:no-underline" onClick={sendCode}>
                 {cooldown > 0 ? `${cooldown}초 후 재전송` : "코드 다시 받기"}
               </button>
+            </div>
+            {/* 가입 여부는 알려주지 않으므로(같은 응답) 메일이 안 올 때 스스로 확인할 수 있게 안내 */}
+            <div className="mb-3 rounded-lg bg-orange-50 p-3 text-sm text-gray-600">
+              <p className="mb-1 font-semibold text-gray-700">메일이 오지 않나요?</p>
+              <ul className="list-disc space-y-0.5 pl-5">
+                <li>
+                  입력한 이메일 <b className="break-all text-gray-800">{email.trim()}</b>이(가) 회원가입할 때 쓴 이메일이 맞는지 확인해주세요.
+                  오타가 있거나 다른 이메일로 가입했다면 메일이 가지 않아요.
+                </li>
+                <li>스팸함·프로모션함도 확인해주세요. 1~2분 늦게 올 수 있어요.</li>
+                <li>코드를 다시 받았다면 가장 최근 메일의 코드만 쓸 수 있어요.</li>
+              </ul>
             </div>
           </>
         )}
