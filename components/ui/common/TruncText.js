@@ -8,6 +8,7 @@ export default function TruncText({ as: Tag = "div", className = "", children })
   const ref = useRef(null);
   const textRef = useRef(null);
   const [open, setOpen] = useState(false);
+  const [canExpand, setCanExpand] = useState(false); // 마우스를 올렸을 때 실제로 잘려 있으면 글자 쪽 스타일 표시
 
   useEffect(() => {
     if (!open) return;
@@ -35,8 +36,20 @@ export default function TruncText({ as: Tag = "div", className = "", children })
     }
   };
 
+  const onMouseEnter = () => {
+    const el = textRef.current;
+    setCanExpand(!!el && el.scrollWidth > el.clientWidth + 1);
+  };
+
   return (
-    <Tag ref={ref} className={`relative ${className}`} onClick={onClick}>
+    <Tag
+      ref={ref}
+      className={`relative ${className} ${
+        canExpand ? "cursor-help rounded-md hover:ring-2 hover:ring-orange-700/60 hover:underline hover:decoration-dotted hover:underline-offset-[3px]" : ""
+      }`}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+    >
       <span ref={textRef} className="block truncate">
         {children}
       </span>

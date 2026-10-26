@@ -25,8 +25,8 @@ export default function StudentInfoCard({
             tabIndex={0}
             onClick={onClick}
             onKeyDown={handleKeyDown}
-            className={`w-[160px] p-[16px] rounded-xl cursor-pointer
-                        ${isActive ? "bg-orange-500" : "bg-orange-200"}
+            className={`w-[160px] p-[16px] rounded-xl cursor-pointer transition hover:-translate-y-[2px] hover:shadow-lg
+                        ${isActive ? "bg-orange-500" : "bg-orange-200 hover:bg-orange-300"}
                         ${rest.className ?? ""}`}
         >
             <div className="flex justify-between mb-[8px]">

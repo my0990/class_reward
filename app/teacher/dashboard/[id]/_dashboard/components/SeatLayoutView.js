@@ -21,8 +21,8 @@ function SeatCard({ student, isActive, onClick, currencyEmoji }) {
       data-select-id={student.userId}
       onClick={onClick}
       onKeyDown={onKeyDown}
-      className={`flex w-full cursor-pointer select-none flex-col items-center rounded-xl p-[7%] [container-type:inline-size] ${
-        isActive ? "bg-orange-500 text-white" : "bg-orange-200 text-gray-800"
+      className={`flex w-full cursor-pointer select-none flex-col items-center rounded-xl p-[7%] transition [container-type:inline-size] hover:-translate-y-[2px] hover:shadow-lg ${
+        isActive ? "bg-orange-500 text-white" : "bg-orange-200 text-gray-800 hover:bg-orange-300"
       }`}
     >
       <div className="aspect-square w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-white">
