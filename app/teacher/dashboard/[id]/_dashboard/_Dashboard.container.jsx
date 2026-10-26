@@ -157,10 +157,11 @@ export default function DashboardContainer({ classId }) {
   const seatAssignment = seatPlan?.current?.assignment ?? null;
   const showSeats = layoutMode === "seat" && seatLayout && seatAssignment;
 
-  // 빈 곳에서 끌어 네모로 묶어 고르기 (원래 선택에 더해짐)
+  // 빈 곳에서 끌어 네모로 묶어 고르기 (원래 선택에 더해짐), 빈 곳 클릭은 모두 해제
   const marquee = useMarqueeSelect({
     getBase: () => new Set(activeIds),
     onChange: setSelectedIds,
+    onEmptyClick: clearAll, // 빈 곳을 클릭하면 모두 해제 (손을 뗄 때)
   });
 
   if (isLoading) return <div>불러오는 중...</div>;

@@ -4,6 +4,7 @@
 // - 터치·펜: 0.3초 길게 누른 뒤 끌어야 시작 (그냥 끌면 지금처럼 화면 스크롤)
 // - 카드·버튼 위에서 시작하면 동작하지 않음 (카드 클릭은 그대로)
 // - 화면 위·아래 끝에 가까워지면 자동으로 스크롤
+// - 끌지 않고 빈 곳을 눌렀다 떼면(누를 때·뗄 때 모두 빈 곳) onEmptyClick (예: 모두 해제)
 import { useEffect, useRef, useState } from "react";
 
 const MOUSE_START_PX = 5;
@@ -11,17 +12,17 @@ const TOUCH_HOLD_MS = 300;
 const TOUCH_SLOP_PX = 10;
 const EDGE_PX = 48;
 const SCROLL_STEP = 16;
-const NO_START = "button,a,input,textarea,select,label,[role=dialog],[data-no-marquee]";
+const NO_START = "button,a,input,textarea,select,label,[role=dialog],[aria-modal],[data-no-marquee]";
 
 /**
- * @param {{ itemSelector?: string, getBase: () => Set<string>, onChange: (ids: string[]) => void }} opts
+ * @param {{ itemSelector?: string, getBase: () => Set<string>, onChange: (ids: string[]) => void, onEmptyClick?: () => void }} opts
  *   카드 요소에 data-select-id="아이디"를 붙인다
  */
-export default function useMarqueeSelect({ itemSelector = "[data-select-id]", getBase, onChange }) {
+export default function useMarqueeSelect({ itemSelector = "[data-select-id]", getBase, onChange, onEmptyClick }) {
   const [box, setBox] = useState(null); // 화면에 그릴 네모 (client 좌표)
   const drag = useRef(null);
-  const cb = useRef({ getBase, onChange });
-  cb.current = { getBase, onChange };
+  const cb = useRef({ getBase, onChange, onEmptyClick });
+  cb.current = { getBase, onChange, onEmptyClick };
 
   useEffect(() => () => drag.current?.cleanup?.(), []);
 
@@ -84,10 +85,18 @@ export default function useMarqueeSelect({ itemSelector = "[data-select-id]", ge
     const onTouchMove = (ev) => {
       if (d.active) ev.preventDefault();
     };
+    // 끌지 않고 뗐는데 뗀 곳도 빈 곳이면 '빈 곳 클릭'
+    const onUp = (ev) => {
+      const wasActive = d.active;
+      cleanup();
+      const t = ev.target;
+      const emptyUp = t instanceof Element && d.root.contains(t) && !t.closest(itemSelector) && !t.closest(NO_START);
+      if (!wasActive && emptyUp) cb.current.onEmptyClick?.();
+    };
     const cleanup = () => {
       clearTimeout(d.timer);
       window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", cleanup);
+      window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", cleanup);
       window.removeEventListener("touchmove", onTouchMove);
       if (d.active) document.body.style.userSelect = "";
@@ -97,7 +106,7 @@ export default function useMarqueeSelect({ itemSelector = "[data-select-id]", ge
     d.cleanup = cleanup;
 
     window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", cleanup);
+    window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", cleanup);
     window.addEventListener("touchmove", onTouchMove, { passive: false });
     if (!isMouse) d.timer = setTimeout(activate, TOUCH_HOLD_MS);

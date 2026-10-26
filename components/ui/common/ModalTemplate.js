@@ -52,6 +52,7 @@ export default function ModalTemplate({
           // 창이 화면보다 길면 바깥(배경)이 스크롤된다. items-center로 가운데 정렬하면
           // 화면보다 긴 창은 위아래가 잘려서 스크롤로도 볼 수 없으므로, m-auto로 가운데 정렬한다.
           className="fixed inset-0 z-50 flex overflow-y-auto overscroll-contain bg-black/40 p-[16px]"
+          aria-modal="true" // 창이 떠 있는 동안 뒤 화면의 '빈 곳 클릭'·네모 고르기가 동작하지 않게 (useMarqueeSelect)
           {...backdrop}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
