@@ -1,6 +1,7 @@
 'use client'
 
 import { profileImgProps } from "@/util/image/profileImage";
+import TruncText from "@/components/ui/common/TruncText";
 export default function StudentInfoCard({
     data,
     level,
@@ -31,13 +32,13 @@ export default function StudentInfoCard({
             <div className="flex justify-between mb-[8px]">
                 <div className="font-semibold">LV. {level}</div>
                 {/* 잔액이 마이너스면 빨간색 (선택된 진한 주황 바탕에서는 더 진한 빨강) */}
-                <div
-                    className={`w-[80px] text-right overflow-hidden whitespace-nowrap ${
+                <TruncText
+                    className={`w-[80px] text-right ${
                         Number(data.money) < 0 ? `font-bold ${isActive ? "text-red-800" : "text-red-600"}` : ""
                     }`}
                 >
                     {currencyemoji} {data.money}
-                </div>
+                </TruncText>
             </div>
 
             <div className="flex overflow-hidden border-4 border-white justify-center items-center w-[110px] h-[110px] mb-[8px] mx-auto bg-white rounded-full">
@@ -56,13 +57,14 @@ export default function StudentInfoCard({
                 )}
             </div>
 
-            <h1 className="text-[1rem] font-bold text-center overflow-hidden">
+            {/* 넘치면 ... 으로 자르고, 클릭하면 전체 글자를 말풍선으로 */}
+            <TruncText as="h1" className="text-[1rem] font-bold text-center">
                 {data.classNumber}. {data.profileNickname}
-            </h1>
+            </TruncText>
 
-            <div className="bg-white rounded-lg flex items-center justify-center">
+            <TruncText className="bg-white rounded-lg px-[6px] text-center">
                 {data.profileTitle}
-            </div>
+            </TruncText>
         </div>
     );
 }
