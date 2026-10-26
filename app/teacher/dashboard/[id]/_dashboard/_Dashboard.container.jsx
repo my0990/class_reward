@@ -1,6 +1,7 @@
 "use client";
 
 import useStudentSelection from "@/hooks/dashboard/useStudentSelection";
+import useMarqueeSelect from "@/hooks/dashboard/useMarqueeSelect";
 import { useMemo, useCallback, useState } from "react";
 import { calculateLevel } from "@/util/level/level.utils";
 import usePointInput from "@/hooks/dashboard/usePointInput";
@@ -36,6 +37,7 @@ export default function DashboardContainer({ classId }) {
     toggleStudent,
     selectAll,
     clearAll,
+    setSelectedIds,
     onSend,
     onTake,
     isSend,
@@ -126,6 +128,12 @@ export default function DashboardContainer({ classId }) {
   const isError =
     isClassError || isStudentsError
 
+  // 빈 곳에서 끌어 네모로 묶어 고르기 (원래 선택에 더해짐)
+  const marquee = useMarqueeSelect({
+    getBase: () => new Set(activeIds),
+    onChange: setSelectedIds,
+  });
+
   if (isLoading) return <div>불러오는 중...</div>;
   if (isError) return <div>데이터 로드 실패</div>;
 
@@ -133,7 +141,8 @@ export default function DashboardContainer({ classId }) {
   const currencyEmoji = classData?.currencyEmoji ?? "💰"
   return (
 
-    <div className="mb-[48px]">
+    <div className="mb-[48px] min-h-[calc(100dvh-160px)]" {...marquee.rootProps}>
+      {marquee.boxElement}
       {/* 헤더·버튼 줄·카드·푸터가 같은 폭(.page-width)이라 좌우 끝이 맞는다 */}
       <div className="page-width">
         <div className="flex flex-wrap gap-2 py-[16px] justify-between">
@@ -185,6 +194,7 @@ export default function DashboardContainer({ classId }) {
                 currencyemoji={currencyEmoji}
                 isActive={isStudentActive(student)}
                 onClick={() => toggleStudent(student)}
+                data-select-id={student.userId}
               />
             )
           })}

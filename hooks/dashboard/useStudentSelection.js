@@ -106,6 +106,12 @@ export default function useStudentSelection({ studentArr = [], setModalId, class
 
   const clearAll = () => setActiveMap(new Map());
 
+  // 여러 명을 한 번에 정하기 (네모로 묶어 고르기)
+  const setSelectedIds = (ids) => {
+    const byId = new Map(studentArr.map((s) => [String(s.userId), s]));
+    setActiveMap(new Map(ids.map(String).filter((id) => byId.has(id)).map((id) => [id, toInfo(byId.get(id))])));
+  };
+
   const openTransactionModal = (sendMode) => {
     if (!hasSelectedStudent) return alert("학생을 선택해주세요");
     setIsSend(sendMode);
@@ -130,6 +136,7 @@ export default function useStudentSelection({ studentArr = [], setModalId, class
     toggleStudent,
     selectAll,
     clearAll,
+    setSelectedIds,
     onSend: () => openTransactionModal(true),
     onTake: () => openTransactionModal(false),
   };
