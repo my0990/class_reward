@@ -248,8 +248,8 @@ export default function DashboardContainer({ classId }) {
           </>
         )}
       </div>
-      {/* 왼쪽 아래(푸터 바로 위): 보기 전환 (번호순 | 자리 배치) + 자리 배치일 때 방향 */}
-      <div data-no-marquee className="page-width mt-[32px] flex items-center gap-[8px]">
+      {/* 오른쪽 아래(푸터 바로 위): 보기 전환 (번호순 | 자리 배치) + 자리 배치일 때 방향 */}
+      <div data-no-marquee className="page-width mt-[32px] flex flex-row-reverse items-center gap-[8px]">
           <div className="inline-flex rounded-full bg-white p-[3px] shadow-md ring-1 ring-black/10" role="tablist" aria-label="학생 카드 보기">
             {[
               ["number", "번호순"],
