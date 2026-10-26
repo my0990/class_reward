@@ -6,6 +6,7 @@
 // - 임시 비밀번호: 관리자 화면에 한 번만 보여주고, 선생님은 다음 로그인 때 새 비밀번호를 정해야 한다
 //   (users.mustChangePassword → proxy가 /teacher/change-password로 보냄)
 import crypto from "crypto";
+import { ObjectId } from "mongodb";
 import { hash } from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import { normalizeEmail, isValidEmailFormat } from "@/lib/auth/email";
@@ -156,4 +157,48 @@ export async function issueTeacherTempPasswordService({ adminEmail, email, now =
   ]);
   await writeAuditLog(admins, { adminEmail, action: "teacher_temp_password", target: e, detail: e, now });
   return { ok: true, tempPassword, message: "임시 비밀번호를 만들었습니다." };
+}
+
+/**
+ * 반 고유 아이디(학급 고유 별명) 또는 학생 아이디로 그 반 선생님의 이메일 찾기
+ * - 학생 아이디는 '고유 아이디 + 번호'라서 끝의 숫자를 떼고 다시 찾는다 (예: 해바라기3 → 해바라기)
+ * - 이메일이 화면에 나오므로 관리자 작업 기록에 남긴다
+ */
+export async function findTeacherByClassNicknameService({ adminEmail, keyword, now = new Date() }) {
+  const k = String(keyword ?? "").trim();
+  if (!k || k.length > 30) return fail("반 고유 아이디나 학생 아이디를 입력해주세요.");
+  const { user, data, admins } = await dbs();
+
+  const candidates = [k];
+  const stripped = k.replace(/\d+$/, "");
+  if (stripped && stripped !== k) candidates.push(stripped);
+
+  let classData = null;
+  let matchedBy = null;
+  for (const nick of candidates) {
+    classData = await data.collection("class_data").findOne({ uniqueNickname: nick }, { projection: { teacher_id: 1, classId: 1, className: 1, uniqueNickname: 1 } });
+    if (classData) {
+      matchedBy = nick === k ? "class" : "student";
+      break;
+    }
+  }
+  if (!classData) return fail("그 아이디를 쓰는 반이 없습니다. 띄어쓰기·오타를 확인해주세요.");
+
+  const tid = classData.teacher_id instanceof ObjectId ? classData.teacher_id : ObjectId.isValid(String(classData.teacher_id)) ? new ObjectId(String(classData.teacher_id)) : null;
+  const teacher = tid ? await user.collection("users").findOne({ _id: tid, role: "teacher" }, { projection: { email: 1 } }) : null;
+  if (!teacher?.email) return fail("반은 찾았지만 선생님 계정을 찾지 못했습니다.");
+
+  const cls = classData.classId
+    ? await data.collection("classes").findOne({ _id: classData.classId }, { projection: { deletedAt: 1 } })
+    : null;
+
+  await writeAuditLog(admins, { adminEmail, action: "teacher_find_by_class", target: teacher.email, detail: `${classData.uniqueNickname} → ${teacher.email}`, now });
+  return {
+    ok: true,
+    email: teacher.email,
+    className: classData.className ?? "",
+    uniqueNickname: classData.uniqueNickname,
+    matchedBy,
+    classDeleted: Boolean(cls?.deletedAt),
+  };
 }

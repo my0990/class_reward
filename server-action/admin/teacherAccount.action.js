@@ -7,6 +7,7 @@ import {
   unlockTeacherLoginService,
   clearTeacherEmailLimitService,
   issueTeacherTempPasswordService,
+  findTeacherByClassNicknameService,
 } from "@/server-action/service/admin/teacherAccount.service";
 
 async function run(fn) {
@@ -37,4 +38,8 @@ export async function clearTeacherEmailLimitAction({ email }) {
 export async function issueTeacherTempPasswordAction({ email, confirmed }) {
   if (confirmed !== true) return { result: false, message: "본인 확인을 먼저 해주세요." };
   return run((adminEmail) => issueTeacherTempPasswordService({ adminEmail, email }));
+}
+
+export async function findTeacherByClassNicknameAction({ keyword }) {
+  return run((adminEmail) => findTeacherByClassNicknameService({ adminEmail, keyword }));
 }

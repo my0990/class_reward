@@ -8,6 +8,7 @@ import {
   unlockTeacherLoginAction,
   clearTeacherEmailLimitAction,
   issueTeacherTempPasswordAction,
+  findTeacherByClassNicknameAction,
 } from "@/server-action/admin/teacherAccount.action";
 
 const fmt = (iso) =>
@@ -41,14 +42,18 @@ function diagnose(r) {
 }
 
 export default function TeacherAccountHelper() {
+  const [mode, setMode] = useState("email"); // email | class (반 고유 아이디·학생 아이디로 찾기)
   const [email, setEmail] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [via, setVia] = useState(null); // 반 고유 아이디로 찾았을 때: { className, uniqueNickname, matchedBy, classDeleted }
   const [res, setRes] = useState(null); // 조회 결과
   const [confirmed, setConfirmed] = useState(false);
   const [temp, setTemp] = useState(null); // 방금 만든 임시 비밀번호 (화면을 떠나면 사라짐)
   const [pending, start] = useTransition();
 
-  const lookup = (target = email) =>
+  const lookup = (target = email, from = null) =>
     start(async () => {
+      setVia(from);
       setTemp(null);
       setConfirmed(false);
       const r = await lookupTeacherAccountAction({ email: target });
@@ -58,6 +63,21 @@ export default function TeacherAccountHelper() {
         return;
       }
       setRes(r.data);
+    });
+
+  // 반 고유 아이디(또는 학생 아이디) → 선생님 이메일 → 계정 상태 보기
+  const findByClass = () =>
+    start(async () => {
+      const r = await findTeacherByClassNicknameAction({ keyword });
+      if (!r.result) {
+        setRes(null);
+        setVia(null);
+        toast.error(r.message || "찾지 못했습니다.");
+        return;
+      }
+      const { email: found, ...from } = r.data;
+      setEmail(found);
+      lookup(found, from);
     });
 
   const act = (fn, after) =>
@@ -100,24 +120,54 @@ export default function TeacherAccountHelper() {
         <p className="mt-1 text-sm text-slate-500">선생님 이메일로 계정 상태를 보고, 로그인·비밀번호 문제를 해결합니다. 이메일은 정확히 입력해야 찾아요.</p>
       </div>
 
+      <div className="inline-flex rounded-lg border border-slate-300 bg-white p-0.5 text-sm" role="tablist">
+        {[
+          ["email", "이메일로"],
+          ["class", "반 고유 아이디로"],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={mode === id}
+            onClick={() => setMode(id)}
+            className={`rounded-md px-3 py-1.5 ${mode === id ? "bg-slate-900 font-semibold text-white" : "text-slate-600"}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          lookup();
+          mode === "email" ? lookup() : findByClass();
         }}
         className="flex flex-wrap gap-2"
       >
-        <input
-          type="email"
-          inputMode="email"
-          autoComplete="off"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="선생님 이메일"
-          className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2"
-          required
-        />
-        <button type="submit" disabled={pending || !email.trim()} className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white disabled:opacity-50">
+        {mode === "email" ? (
+          <input
+            type="email"
+            inputMode="email"
+            autoComplete="off"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="선생님 이메일"
+            className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2"
+            required
+          />
+        ) : (
+          <input
+            type="text"
+            autoComplete="off"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="반 고유 아이디 또는 학생 아이디 (예: 해바라기, 해바라기3)"
+            className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2"
+            required
+          />
+        )}
+        <button type="submit" disabled={pending || !(mode === "email" ? email : keyword).trim()} className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white disabled:opacity-50">
           {pending && !res ? "찾는 중..." : "조회"}
         </button>
       </form>
@@ -130,6 +180,17 @@ export default function TeacherAccountHelper() {
               {res.found ? (a.disabled ? "탈퇴 처리 중" : "가입됨") : "계정 없음"}
             </span>
           </div>
+
+          {via && (
+            <p className="rounded-lg bg-sky-50 p-3 text-sm text-sky-900">
+              🔎 반 고유 아이디 <b>{via.uniqueNickname}</b>
+              {via.className ? ` (${via.className})` : ""}
+              {via.matchedBy === "student" ? "에 속한 학생 아이디로" : "로"} 찾은 선생님 계정이에요.
+              {via.classDeleted ? " 이 반은 휴지통에 있어요." : ""}
+              <br />
+              <span className="text-sky-900/70">이메일을 알려 주기 전에 본인인지 꼭 확인하세요. 필요하면 앞부분만 알려 주세요.</span>
+            </p>
+          )}
 
           <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">💡 {diagnose(res)}</p>
 

@@ -126,3 +126,21 @@ describe("임시 비밀번호 만들기", () => {
     for (let i = 0; i < 200; i++) expect(svc.generateTempPassword()).not.toMatch(/[0O1lI]/);
   });
 });
+
+describe("반 고유 아이디로 선생님 찾기", () => {
+  it("고유 아이디나 학생 아이디(끝 숫자)로 이메일을 찾고 기록을 남긴다", async () => {
+    const data = mongo.client.db("data");
+    const classId = new ObjectId();
+    await data.collection("classes").insertOne({ _id: classId, teacher_id: teacherId, className: "6학년 2반" });
+    await data.collection("class_data").insertOne({ classId, teacher_id: teacherId, className: "6학년 2반", uniqueNickname: "해바라기" });
+
+    const a = await svc.findTeacherByClassNicknameService({ adminEmail: ADMIN, keyword: " 해바라기 ", now: NOW });
+    expect(a).toMatchObject({ ok: true, email: EMAIL, className: "6학년 2반", matchedBy: "class", classDeleted: false });
+
+    const b = await svc.findTeacherByClassNicknameService({ adminEmail: ADMIN, keyword: "해바라기12", now: NOW });
+    expect(b).toMatchObject({ ok: true, email: EMAIL, matchedBy: "student" });
+
+    expect(await admins().collection("audit_log").countDocuments({ action: "teacher_find_by_class" })).toBe(2);
+    expect((await svc.findTeacherByClassNicknameService({ adminEmail: ADMIN, keyword: "없는반" })).ok).toBe(false);
+  });
+});

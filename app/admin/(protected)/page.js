@@ -22,6 +22,7 @@ const ACTION_LABEL = {
   teacher_unlock: "교사 로그인 잠금 풀기",
   teacher_mail_limit_clear: "교사 메일 제한 풀기",
   teacher_temp_password: "교사 임시 비밀번호 발급",
+  teacher_find_by_class: "반 고유 아이디로 교사 찾기",
 };
 
 function Stat({ label, value, sub }) {
