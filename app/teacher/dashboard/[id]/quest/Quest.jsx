@@ -28,7 +28,9 @@ export default function Quest() {
     } = useFetchData(
         classId
             ? `/api/fetchQuestList/${classId}`
-            : null
+            : null,
+        // 승인 센터(다른 기기 포함)에서 승인하면 완료 명단이 바뀌므로 화면에 들어올 때마다 새로 받는다
+        { revalidateOnMount: true, revalidateIfStale: true }
     );
 
     const {

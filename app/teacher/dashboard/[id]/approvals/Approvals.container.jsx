@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { mutate } from "swr";
 import { useFetchData } from "@/hooks/useFetchData";
 import { listRequests, decideRequests } from "@/server-action/actions/request/request.action";
 import { formatHistoryDateParts, formatFullDate } from "../manage/utils/historyDate";
@@ -78,8 +79,15 @@ export default function ApprovalsContainer() {
     const res = await decideRequests({ classId, requestIds: ids, decision, reason });
     setBusy(false);
     setRejecting(null);
-    if (res?.result) toast.success(summaryText(res.summary));
-    else toast.error(res?.message || "처리하지 못했어요.");
+    if (res?.result) {
+      toast.success(summaryText(res.summary));
+      // 승인하면 퀘스트 완료 명단·잔액이 바뀐다 → 퀘스트·대시보드 화면의 저장된 데이터도 새로 받게
+      if (decision === "approve") {
+        mutate(`/api/fetchQuestList/${classId}`);
+        mutate(`/api/classData/${classId}`);
+        mutate(`/api/students/${classId}`);
+      }
+    } else toast.error(res?.message || "처리하지 못했어요.");
     load();
   };
 
