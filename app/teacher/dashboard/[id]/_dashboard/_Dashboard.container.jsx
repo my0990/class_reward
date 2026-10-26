@@ -2,7 +2,8 @@
 
 import useStudentSelection from "@/hooks/dashboard/useStudentSelection";
 import useMarqueeSelect from "@/hooks/dashboard/useMarqueeSelect";
-import { useMemo, useCallback, useState } from "react";
+import SeatLayoutView from "./components/SeatLayoutView";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import { calculateLevel } from "@/util/level/level.utils";
 import usePointInput from "@/hooks/dashboard/usePointInput";
 import { handlePoint } from "@/server-action/actions/class/handlePoint";
@@ -128,6 +129,34 @@ export default function DashboardContainer({ classId }) {
   const isError =
     isClassError || isStudentsError
 
+  // 보기: 번호순 | 자리 배치 (자리 바꾸기에서 마지막으로 저장한 자리), 방향(칠판 아래/위) — 이 기기에 기억
+  const [layoutMode, setLayoutMode] = useState("number");
+  const [seatView, setSeatView] = useState("teacher");
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("kkyul:dashboard-layout") === "seat") setLayoutMode("seat");
+      if (localStorage.getItem("kkyul:dashboard-seat-view") === "student") setSeatView("student");
+    } catch {}
+  }, []);
+  const changeLayoutMode = (m) => {
+    setLayoutMode(m);
+    try {
+      localStorage.setItem("kkyul:dashboard-layout", m);
+    } catch {}
+  };
+  const flipSeatView = () =>
+    setSeatView((v) => {
+      const next = v === "teacher" ? "student" : "teacher";
+      try {
+        localStorage.setItem("kkyul:dashboard-seat-view", next);
+      } catch {}
+      return next;
+    });
+  const { data: seatPlan, isLoading: isSeatLoading } = useFetchData(layoutMode === "seat" && classId ? `/api/seat/${classId}` : null);
+  const seatLayout = seatPlan?.current?.layout ?? seatPlan?.layout ?? null;
+  const seatAssignment = seatPlan?.current?.assignment ?? null;
+  const showSeats = layoutMode === "seat" && seatLayout && seatAssignment;
+
   // 빈 곳에서 끌어 네모로 묶어 고르기 (원래 선택에 더해짐)
   const marquee = useMarqueeSelect({
     getBase: () => new Set(activeIds),
@@ -183,23 +212,75 @@ export default function DashboardContainer({ classId }) {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-[repeat(auto-fill,160px)] justify-between gap-4 max-[543px]:justify-center">
-          {studentsData.map((student) => {
-            const level = levelMap?.[student.userId] ?? 1
-            return (
-              <StudentInfoCard
-                key={student.userId}
-                data={student}
-                level={level}
-                currencyemoji={currencyEmoji}
-                isActive={isStudentActive(student)}
-                onClick={() => toggleStudent(student)}
-                data-select-id={student.userId}
-              />
-            )
-          })}
+        {showSeats ? (
+          <SeatLayoutView
+            layout={seatLayout}
+            assignment={seatAssignment}
+            students={studentsData}
+            view={seatView}
+            isActive={isStudentActive}
+            onToggle={toggleStudent}
+            currencyEmoji={currencyEmoji}
+          />
+        ) : (
+          <>
+            {layoutMode === "seat" && !isSeatLoading && (
+              <p className="mb-[12px] rounded-lg bg-orange-50 px-[12px] py-[8px] text-[0.95rem] text-orange-800">
+                아직 저장한 자리가 없어요. 도구 → 자리 바꾸기에서 자리를 저장하면 그 자리대로 보여요.
+              </p>
+            )}
+          <div className="grid grid-cols-[repeat(auto-fill,160px)] justify-between gap-4 max-[543px]:justify-center">
+            {studentsData.map((student) => {
+              const level = levelMap?.[student.userId] ?? 1
+              return (
+                <StudentInfoCard
+                  key={student.userId}
+                  data={student}
+                  level={level}
+                  currencyemoji={currencyEmoji}
+                  isActive={isStudentActive(student)}
+                  onClick={() => toggleStudent(student)}
+                  data-select-id={student.userId}
+                />
+              )
+            })}
+          </div>
+          </>
+        )}
+      </div>
+      {/* 오른쪽 아래: 보기 전환 (번호순 | 자리 배치) + 자리 배치일 때 방향 */}
+      <div data-no-marquee className="fixed bottom-[16px] right-[16px] z-30 flex items-center gap-[8px]">
+        {layoutMode === "seat" && showSeats && (
+          <button
+            type="button"
+            onClick={flipSeatView}
+            title="칠판 위치 바꾸기"
+            className="rounded-full bg-white px-[14px] py-[8px] text-[0.9rem] font-semibold text-gray-700 shadow-md ring-1 ring-black/10 hover:bg-gray-50"
+          >
+            칠판 {seatView === "teacher" ? "아래 ↓" : "위 ↑"}
+          </button>
+        )}
+        <div className="inline-flex rounded-full bg-white p-[3px] shadow-md ring-1 ring-black/10" role="tablist" aria-label="학생 카드 보기">
+          {[
+            ["number", "번호순"],
+            ["seat", "자리 배치"],
+          ].map(([m, label]) => (
+            <button
+              key={m}
+              type="button"
+              role="tab"
+              aria-selected={layoutMode === m}
+              onClick={() => changeLayoutMode(m)}
+              className={`rounded-full px-[14px] py-[6px] text-[0.9rem] font-semibold ${
+                layoutMode === m ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
+
       <PointModal
         isSend={isSend}
         currencyName={currencyName}
