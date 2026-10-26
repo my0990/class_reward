@@ -54,7 +54,7 @@ export default function SeatLayoutView({ layout, assignment = {}, students = [],
   return (
     <div className="flex flex-col gap-[20px]">
       <div
-        className="mx-auto grid w-full gap-[10px]"
+        className="mx-auto grid w-full gap-x-[10px] gap-y-[20px]"
         // 책상이 하나도 없는 세로줄(통로)은 좁게 → 카드를 더 크게
         style={{
           gridTemplateColumns: colOrder
@@ -77,7 +77,7 @@ export default function SeatLayoutView({ layout, assignment = {}, students = [],
       {unseated.length > 0 && (
         <div className="mt-[8px]">
           <div className="mb-[8px] text-[0.95rem] font-semibold text-gray-600">자리 없음 ({unseated.length}명)</div>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,120px))] gap-[10px]">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,120px))] gap-x-[10px] gap-y-[20px]">
             {unseated.map((s) => (
               <SeatCard key={s.userId} student={s} isActive={isActive(s)} onClick={() => onToggle(s)} currencyEmoji={currencyEmoji} />
             ))}

@@ -229,7 +229,7 @@ export default function DashboardContainer({ classId }) {
                 아직 저장한 자리가 없어요. 도구 → 자리 바꾸기에서 자리를 저장하면 그 자리대로 보여요.
               </p>
             )}
-          <div className="grid grid-cols-[repeat(auto-fill,160px)] justify-between gap-4 max-[543px]:justify-center">
+          <div className="grid grid-cols-[repeat(auto-fill,160px)] justify-between gap-x-4 gap-y-6 max-[543px]:justify-center">
             {studentsData.map((student) => {
               const level = levelMap?.[student.userId] ?? 1
               return (
