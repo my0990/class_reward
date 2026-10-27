@@ -2,7 +2,6 @@
 // 번호뽑기: 지급/회수 금액 키패드 창
 // 대시보드 화폐 지급 창(PointModalBody·DialPad·usePointInput)을 그대로 같이 쓴다.
 // - 키패드 입력은 창이 열려 있을 때만 받는다 (usePointInput을 창 안쪽에서 쓰기 때문)
-import { rememberReason } from "@/app/teacher/dashboard/[id]/_dashboard/components/point-modal/ReasonInput";
 import { useCallback, useMemo } from "react";
 import { toast } from "react-hot-toast";
 import { mutate } from "swr";
@@ -35,15 +34,14 @@ function PointKeypad({ studentArr, currencyName, targetStudent, clearAll, isSend
 
     // 실패하면 throw → DialPad가 에러 토스트, 입력값은 그대로 / 성공하면 입력값은 자동으로 비워짐
     const handleConfirm = useCallback(
-        async (value, memo) => {
+        async (value) => {
             if (!value) throw new Error("숫자를 입력해주세요");
             if (targetStudent.length === 0) throw new Error("학생을 선택해주세요");
 
             // 서버 쪽 권한/검증 로직(server action)만 신뢰: 학생 목록은 userId/money만 최소로 전달
             const payload = targetStudent.map((s) => ({ userId: s.userId, money: s.money }));
-            const res = await handlePoint({ classId, targetStudent: payload, point: value, isSend, memo });
+            const res = await handlePoint({ classId, targetStudent: payload, point: value, isSend });
             if (!res?.result) throw new Error(res?.message || "처리 중 오류가 발생했습니다.");
-            rememberReason(classId, isSend, memo); // 자주 쓰는 이유 버튼에 앞으로
 
             // 아이디 대신 "3번 문어" (여러 명이면 "3번 문어 외 2명")
             const sorted = [...labels].sort((a, b) => (Number(a.classNumber) || Infinity) - (Number(b.classNumber) || Infinity));

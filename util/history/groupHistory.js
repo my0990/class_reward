@@ -5,8 +5,7 @@ const sameAction = (a, b) =>
   new Date(a.date).getTime() === new Date(b.date).getTime() &&
   a.name === b.name &&
   a.type === b.type &&
-  Number(a.amount) === Number(b.amount) &&
-  (a.memo ?? "") === (b.memo ?? "");
+  Number(a.amount) === Number(b.amount);
 
 /** rows(최신순) → [{ key, date, name, type, amount, kind, items:[원래 줄들] }] */
 export function groupHistory(rows) {
@@ -14,7 +13,7 @@ export function groupHistory(rows) {
   for (const r of rows) {
     const last = groups.at(-1);
     if (last && sameAction(last.items[0], r)) last.items.push(r);
-    else groups.push({ key: String(r._id), date: r.date, name: r.name, type: r.type, amount: r.amount, kind: r.kind, memo: r.memo ?? null, items: [r] });
+    else groups.push({ key: String(r._id), date: r.date, name: r.name, type: r.type, amount: r.amount, kind: r.kind, items: [r] });
   }
   return groups;
 }

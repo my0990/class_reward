@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 import { handlePointService } from "@/server-action/service/class/handlePointService";
-export async function handlePoint({ classId, targetStudent, point, isSend, memo }) {
+export async function handlePoint({ classId, targetStudent, point, isSend }) {
     const auth = await authorizeTeacherClass(classId);
     if (!auth.ok) {
         return { result: false, message: auth.message };
@@ -21,7 +21,6 @@ export async function handlePoint({ classId, targetStudent, point, isSend, memo 
             targetStudent,
             point,
             isSend,
-            memo,
         });
 
         // 서비스는 { success, data | message }를 준다 → action 공통 형식 { result, message, data }로

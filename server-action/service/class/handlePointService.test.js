@@ -4,7 +4,7 @@ import { setupTestMongo, makeScope, seedStudent, getStudent } from "@/test/helpe
 
 vi.mock("@/lib/mongodb", async () => (await import("@/test/helpers/testMongo")).mongodbMock);
 
-const { handlePointService, cleanMemo, MEMO_MAX } = await import("./handlePointService.js");
+const { handlePointService } = await import("./handlePointService.js");
 
 const mongo = setupTestMongo();
 const scope = makeScope();
@@ -110,26 +110,4 @@ describe("handlePointService (포인트 지급/회수)", () => {
     const res = await handlePointService({ teacher_id: "bad", classId: "bad", targetStudent: [{ userId: "s1" }], point: 10, isSend: true });
     expect(res.success).toBe(false);
   });
-
-  it("이유(memo)를 정리해서 기록에 남긴다 (이름은 그대로)", async () => {
-    await seedStudent(mongo.db, scope, { userId: "s1", money: 0 });
-    await seedStudent(mongo.db, scope, { userId: "s2", money: 0 });
-    const res = await handlePointService({ ...scope, targetStudent: [{ userId: "s1" }, { userId: "s2" }], point: 5, isSend: true, memo: "  발표를\n 잘해서  " });
-    expect(res.success).toBe(true);
-    const rows = await mongo.db.collection("history").find({ userId: { $in: ["s1", "s2"] } }).toArray();
-    expect(rows.map((r) => [r.name, r.memo])).toEqual([
-      ["선생님에게 받음", "발표를 잘해서"],
-      ["선생님에게 받음", "발표를 잘해서"],
-    ]);
-  });
-
-  it("이유가 없거나 비면 memo 필드를 만들지 않고, 길면 자른다", async () => {
-    await seedStudent(mongo.db, scope, { userId: "s1", money: 0 });
-    await send([{ userId: "s1" }], 1);
-    expect((await mongo.db.collection("history").findOne({ userId: "s1" })).memo).toBeUndefined();
-    expect(cleanMemo("   ")).toBeNull();
-    expect(cleanMemo(123)).toBeNull();
-    expect(cleanMemo("가".repeat(50))).toHaveLength(MEMO_MAX);
-  });
 });
-

@@ -61,7 +61,7 @@ export async function getClassHistoryService({ limit = CLASS_HISTORY_PAGE, ...op
   const rows = await db
     .collection("history")
     .find(buildClassHistoryFilter(opts), {
-      projection: { userId: 1, name: 1, type: 1, amount: 1, date: 1, kind: 1, memo: 1 },
+      projection: { userId: 1, name: 1, type: 1, amount: 1, date: 1, kind: 1 },
     })
     .sort({ date: -1, _id: -1 })
     .limit(n + 1)
