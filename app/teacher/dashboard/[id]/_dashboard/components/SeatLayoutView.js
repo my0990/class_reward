@@ -1,7 +1,7 @@
 "use client";
 // 대시보드 '자리 배치' 보기: 자리 바꾸기에서 마지막으로 저장한 자리 그대로 학생 카드를 놓는다
 // - view "teacher": 앞줄이 화면 아래 (교탁에서 반을 바라보는 방향) / "student": 앞줄이 위 (칠판 그림은 그리지 않음)
-// - 통로는 빈칸, 카드는 화면 폭에 맞춰 줄어듦. 레벨·사진·번호·별명·잔액·칭호 (세로로 길어지면 스크롤)
+// - 통로는 빈칸, 카드는 화면 폭에 맞춰 줄어듦. 레벨·잔액(위 줄)·사진·번호·별명·칭호 (세로로 길어지면 스크롤)
 // - 자리 없는 학생(자리 저장 뒤 새로 만든 학생 등)은 맨 아래 '자리 없음'에 모음
 import { profileImgProps } from "@/util/image/profileImage";
 import { seatId } from "@/util/seat/seatAlgorithm";
@@ -25,19 +25,20 @@ function SeatCard({ student, level, isActive, onClick, currencyEmoji }) {
         isActive ? "bg-orange-500 text-white" : "bg-orange-200 text-gray-800 hover:bg-orange-300"
       }`}
     >
-      <div className="mb-[4%] w-full text-left text-[clamp(8px,8.5cqw,13px)] font-semibold leading-tight">LV. {level}</div>
+      {/* 위 줄: 왼쪽 레벨, 오른쪽 화폐 (번호순 카드와 같은 배치) */}
+      <div className="mb-[4%] flex w-full items-center justify-between gap-[4%] text-[clamp(8px,8.5cqw,13px)] leading-tight">
+        <span className="shrink-0 font-semibold">LV. {level}</span>
+        <TruncText
+          className={`min-w-0 text-right ${Number(student.money) < 0 ? `font-bold ${isActive ? "text-red-800" : "text-red-600"}` : ""}`}
+        >
+          {currencyEmoji} {student.money}
+        </TruncText>
+      </div>
       <div className="aspect-square w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-white">
         <img {...profileImgProps(student.profileUrl, 100)} width="100" height="100" alt="" className="h-full w-full object-cover" />
       </div>
       <TruncText className="mt-[6%] w-full text-center text-[clamp(10px,11cqw,17px)] font-bold leading-tight">
         {student.classNumber}. {student.profileNickname}
-      </TruncText>
-      <TruncText
-        className={`w-full text-center text-[clamp(9px,9.5cqw,15px)] leading-tight ${
-          Number(student.money) < 0 ? `font-bold ${isActive ? "text-red-800" : "text-red-600"}` : ""
-        }`}
-      >
-        {currencyEmoji} {student.money}
       </TruncText>
       {student.profileTitle && (
         <TruncText className="mt-[5%] w-full rounded-md bg-white px-[4%] py-[2%] text-center text-[clamp(8px,8.5cqw,13px)] leading-tight text-gray-800">
