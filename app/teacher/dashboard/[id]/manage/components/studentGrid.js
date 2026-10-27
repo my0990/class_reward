@@ -2,6 +2,11 @@
 
 import { useManageContext } from "./ManageContext";
 import RepToggle from "./RepToggle";
+import EditableText from "./card/EditableText";
+import { useParams } from "next/navigation";
+import { mutate } from "swr";
+import { toast } from "react-hot-toast";
+import { updateStudentProfileByTeacher } from "@/server-action/actions/account/studentProfile.action";
 
 // 비밀번호 초기화·계정 삭제 버튼
 // 컴포넌트 안에서 만들면 목록이 새로 그려질 때마다(대표 지정 등) 버튼이 새로 생겨서
@@ -28,6 +33,19 @@ function ActionButtons({ student, compact, onResetClick, onDeleteClick }) {
 // PC·태블릿: 표 / 휴대폰(640px 미만): 학생마다 카드
 export default function StudentGrid() {
     const { currencyEmoji, currencyName, studentsData, onDetailClick, onResetClick, onDeleteClick } = useManageContext();
+    const { id: classId } = useParams();
+
+    // 표에서 별명을 눌러 바로 고치기
+    const saveNickname = async (student, value) => {
+        const r = await updateStudentProfileByTeacher({ classId, userId: student.userId, profileNickname: value });
+        if (!r?.result) {
+            toast.error(r?.message || "수정하지 못했어요.");
+            return false;
+        }
+        await mutate(`/api/students/${classId}`);
+        toast.success("별명을 바꿨어요.");
+        return true;
+    };
 
     return (
         <>
@@ -47,7 +65,15 @@ export default function StudentGrid() {
                         {studentsData?.map((a) => (
                             <tr key={a.userId}>
                                 <td onClick={() => onDetailClick(a)} className="cursor-pointer rounded-xl transition-all hover:bg-orange-200">{a.userId}</td>
-                                <td>{a.profileNickname}</td>
+                                <td className="p-[4px]">
+                                    <EditableText
+                                        value={a.profileNickname ?? ""}
+                                        maxLength={20}
+                                        placeholder="별명"
+                                        onSave={(v) => saveNickname(a, v)}
+                                        className="mx-auto w-full max-w-[200px] rounded-lg px-[8px] py-[4px] pr-[24px] text-center"
+                                    />
+                                </td>
                                 <td>{a.money}{currencyName}</td>
                                 <td>
                                     <RepToggle student={a} />

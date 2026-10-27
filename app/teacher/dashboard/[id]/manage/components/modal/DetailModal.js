@@ -1,4 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
+import { toast } from "react-hot-toast";
+import { updateStudentProfileByTeacher } from "@/server-action/actions/account/studentProfile.action";
 import { mutate } from "swr";
 import CardTemplate from "../card/CardTemplate";
 import { useFetchData } from "@/hooks/useFetchData";
@@ -17,7 +20,22 @@ function getAmountText(type, amount) {
 }
 
 export default function DetailModal() {
-  const { picked, startExp, commonDifference, modalId, setModalId, studentsData, onDetailClick } = useManageContext();
+  const { picked, setPicked, startExp, commonDifference, modalId, setModalId, studentsData, onDetailClick } = useManageContext();
+  const { id: classId } = useParams();
+
+  // 별명·자기소개 바로 고치기 → 성공하면 카드와 학생 목록에 반영
+  const onEditProfile = async (patch) => {
+    if (!picked?.userId) return false;
+    const r = await updateStudentProfileByTeacher({ classId, userId: picked.userId, ...patch });
+    if (!r?.result) {
+      toast.error(r?.message || "수정하지 못했어요.");
+      return false;
+    }
+    setPicked((prev) => (prev ? { ...prev, ...r.data } : prev));
+    mutate(`/api/students/${classId}`);
+    toast.success("수정했어요.");
+    return true;
+  };
   const [rotation, setRotation] = useState(0);
 
   const userId = picked?.userId;
@@ -150,6 +168,7 @@ export default function DetailModal() {
           <section className="flex shrink-0 justify-center max-[900px]:w-full max-[900px]:snap-start max-[900px]:snap-always" aria-label="프로필">
           <div className="flex w-full max-w-[352px] justify-center rounded-xl bg-green-400 p-[8px]">
             <CardTemplate
+              onEdit={onEditProfile}
               picked={picked}
               startExp={startExp}
               commonDifference={commonDifference}

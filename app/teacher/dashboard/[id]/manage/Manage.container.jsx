@@ -157,6 +157,7 @@ export default function ManageContainer() {
         modalId,
         setModalId,
         picked,
+        setPicked,
         studentArr,
         nums,
         currencyEmoji,
