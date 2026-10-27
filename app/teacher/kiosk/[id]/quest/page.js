@@ -2,7 +2,7 @@
 // 키오스크 퀘스트: 퀘스트 목록 → 퀘스트 하나를 고르면 학생 카드들 (선생님 퀘스트 화면처럼)
 // 다 한 학생들이 자기 카드를 눌러 고르고(토글) "선생님께 알리기" → 완료 신청 (비밀번호 없음)
 // 보상은 선생님이 승인 센터에서 승인할 때 지급된다.
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { useFetchData } from "@/hooks/useFetchData";
@@ -11,6 +11,7 @@ import KioskConfirm from "../_components/KioskConfirm";
 import StudentCard from "../_components/StudentCard";
 import { listKioskQuests, requestKioskQuest } from "@/server-action/actions/kiosk/kioskQuest.action";
 import { repeatBadge, repeatColors, groupByRepeat, REPEAT_COLORS } from "@/util/quest/questRepeat";
+import { useDetailParam } from "@/hooks/useDetailParam";
 
 function RepeatBadge({ q }) {
   const b = repeatBadge(q);
@@ -28,13 +29,24 @@ function Rewards({ q, currency, big = false }) {
   );
 }
 
+// 주소의 ?q=(고른 퀘스트)를 읽으므로(useSearchParams) Suspense로 감싼다
 export default function KioskQuestPage() {
+  return (
+    <Suspense fallback={null}>
+      <KioskQuest />
+    </Suspense>
+  );
+}
+
+function KioskQuest() {
   const { id: classId } = useParams();
   const { data: classData } = useFetchData(`/api/classData/${classId}`);
   const { data: students } = useFetchData(`/api/students/${classId}`);
   const [quests, setQuests] = useState(null);
   const [error, setError] = useState(null);
-  const [questId, setQuestId] = useState(null); // 고른 퀘스트
+  // 고른 퀘스트는 주소(?q=)로: 태블릿 뒤로가기 → 퀘스트 목록
+  const detail = useDetailParam("q");
+  const questId = detail.value;
   const [picked, setPicked] = useState(() => new Set()); // 고른 학생 userId
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -55,10 +67,19 @@ export default function KioskQuestPage() {
   const currency = classData?.currencyName ?? "";
 
   const openQuest = (id) => {
-    setPicked(new Set());
-    setQuestId(id);
+    detail.open(id);
     load(); // 들어갈 때 최신 상태로
   };
+
+  // 다른 퀘스트로 바뀌면(뒤로가기 포함) 고른 학생은 비운다
+  useEffect(() => {
+    setPicked(new Set());
+  }, [questId]);
+
+  // 주소의 퀘스트가 없으면(지워짐 등) 목록으로
+  useEffect(() => {
+    if (questId && quests && !quests.some((q) => q._id === questId)) detail.close();
+  }, [questId, quests]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = (userId) =>
     setPicked((prev) => {
@@ -140,7 +161,7 @@ export default function KioskQuestPage() {
   return (
     <div className="min-h-[100vh] bg-orange-100">
       <div className="mx-auto w-full max-w-[1410px] px-4 pb-32">
-        <KioskHeader classId={classId} title={quest.questName} onBack={() => setQuestId(null)} onRefresh={load} />
+        <KioskHeader classId={classId} title={quest.questName} onBack={detail.close} onRefresh={load} />
 
         <div className="mt-2 flex flex-wrap items-start justify-between gap-4 rounded-2xl bg-white p-5">
           <div className="min-w-0">

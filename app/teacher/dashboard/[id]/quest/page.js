@@ -1,12 +1,11 @@
+import { Suspense } from "react";
 import Quest from "./Quest";
 
-export default async function Layout({ }) {
-
-
-
+// Quest는 주소의 ?id=(퀘스트 상세)를 읽는다(useSearchParams) → Suspense로 감싼다
+export default function Page() {
   return (
-    <>
-      <Quest/>
-    </>
-  )
+    <Suspense fallback={null}>
+      <Quest />
+    </Suspense>
+  );
 }

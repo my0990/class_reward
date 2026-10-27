@@ -1,7 +1,7 @@
 'use client';
 
 import LoadError from "@/components/ui/common/LoadError";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { mutate } from "swr";
 import SortableList from "@/components/sortable/SortableList";
 import useReorder from "@/hooks/useReorder";
@@ -15,12 +15,14 @@ import QuestCard from "./components/QuestCard";
 import AddQuestModal from "./components/modal/AddQuestModal";
 import QuestDetailTemplate from "./components/detail/QuestDetailTemplate";
 import { groupByRepeat, REPEAT_COLORS } from "@/util/quest/questRepeat";
+import { useDetailParam } from "@/hooks/useDetailParam";
 
 export default function Quest() {
     const params = useParams();
     const classId = params.id;
     const [modalId, setModalId] = useState(null);
-    const [isDetail, setIsDetail] = useState(false);
+    // 상세는 주소(?id=퀘스트)로: 뒤로가기 → 목록, 새로고침해도 상세 유지
+    const detail = useDetailParam("id");
     const [questDetailData, setQuestDetailData] = useState(null);
 
     const {
@@ -70,6 +72,15 @@ export default function Quest() {
         () => mutate(`/api/fetchQuestList/${classId}`)
     );
 
+    // 주소의 퀘스트 id에 맞춰 상세 데이터를 채운다 (새로고침·앞으로가기로 들어온 경우). 없는 퀘스트면 목록으로
+    useEffect(() => {
+        if (!detail.value || !Array.isArray(questListData)) return;
+        if (questDetailData && getQuestId(questDetailData) === detail.value) return;
+        const found = questListData.find((q) => getQuestId(q) === detail.value);
+        if (found) setQuestDetailData(found);
+        else detail.close();
+    }, [detail.value, questListData]); // eslint-disable-line react-hooks/exhaustive-deps
+
     if (isLoading) {
         return <div>Loading data...</div>;
     }
@@ -104,10 +115,10 @@ export default function Quest() {
 
     const onOpenQuestDetail = (quest) => {
         setQuestDetailData(quest);
-        setIsDetail(true);
+        detail.open(getQuestId(quest));
     };
 
-    if (isDetail && questDetailData) {
+    if (detail.value && questDetailData && getQuestId(questDetailData) === detail.value) {
         return (
             <QuestDetailTemplate
                 classData={classData}
@@ -116,7 +127,10 @@ export default function Quest() {
                 role="teacher"
                 questDetailData={questDetailData}
                 setQuestDetailData={setQuestDetailData}
-                setIsDetail={setIsDetail}
+                // 상세의 '뒤로'·퀘스트 삭제 후: 뒤로가기와 똑같이 목록으로
+                setIsDetail={(v) => {
+                    if (!v) detail.close();
+                }}
             />
         );
     }
