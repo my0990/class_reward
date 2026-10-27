@@ -3,11 +3,11 @@
 import { useManageContext } from "./ManageContext";
 import RepToggle from "./RepToggle";
 
-// PC·태블릿: 표 / 휴대폰(640px 미만): 학생마다 카드
-export default function StudentGrid() {
-    const { currencyEmoji, currencyName, studentsData, onDetailClick, onResetClick, onDeleteClick } = useManageContext();
-
-    const ActionButtons = ({ student, compact }) => (
+// 비밀번호 초기화·계정 삭제 버튼
+// 컴포넌트 안에서 만들면 목록이 새로 그려질 때마다(대표 지정 등) 버튼이 새로 생겨서
+// daisyUI 버튼의 등장 애니메이션 때문에 떨리는 것처럼 보인다 → 밖에 둔다
+function ActionButtons({ student, compact, onResetClick, onDeleteClick }) {
+    return (
         <div className={`flex justify-center ${compact ? "gap-[6px]" : "gap-[8px]"}`}>
             <button
                 onClick={() => onResetClick(student)}
@@ -23,6 +23,11 @@ export default function StudentGrid() {
             </button>
         </div>
     );
+}
+
+// PC·태블릿: 표 / 휴대폰(640px 미만): 학생마다 카드
+export default function StudentGrid() {
+    const { currencyEmoji, currencyName, studentsData, onDetailClick, onResetClick, onDeleteClick } = useManageContext();
 
     return (
         <>
@@ -45,10 +50,10 @@ export default function StudentGrid() {
                                 <td>{a.profileNickname}</td>
                                 <td>{a.money}{currencyName}</td>
                                 <td>
-                                    <RepToggle key={`${a.userId}:${Boolean(a.representative)}`} student={a} />
+                                    <RepToggle student={a} />
                                 </td>
                                 <td className="p-[8px]">
-                                    <ActionButtons student={a} />
+                                    <ActionButtons student={a} onResetClick={onResetClick} onDeleteClick={onDeleteClick} />
                                 </td>
                             </tr>
                         ))}
@@ -66,8 +71,8 @@ export default function StudentGrid() {
                             <div className="text-[0.9rem]">{currencyEmoji} {a.money}{currencyName}</div>
                         </button>
                         <div className="flex flex-col items-end gap-[8px]">
-                            <RepToggle key={`${a.userId}:${Boolean(a.representative)}`} student={a} compact />
-                            <ActionButtons student={a} compact />
+                            <RepToggle student={a} compact />
+                            <ActionButtons student={a} compact onResetClick={onResetClick} onDeleteClick={onDeleteClick} />
                         </div>
                     </li>
                 ))}

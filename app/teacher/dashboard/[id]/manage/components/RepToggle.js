@@ -1,6 +1,6 @@
 "use client";
 // 학생 관리: 학생 대표 지정 스위치 (대표는 친구에게 화폐 지급·회수를 '신청'할 수 있다 → 승인 센터)
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { mutate } from "swr";
 import { toast } from "react-hot-toast";
@@ -10,6 +10,11 @@ export default function RepToggle({ student, compact = false }) {
   const { id: classId } = useParams();
   const [on, setOn] = useState(Boolean(student.representative));
   const [busy, setBusy] = useState(false);
+  // 목록이 새로 오면 값만 맞춘다 (스위치를 새로 만들지 않아 깜빡이지 않게)
+  // (서버 값이 바뀌었을 때만 맞춤: 저장 직후 새 목록이 오기 전에 스위치가 되돌아가지 않게)
+  useEffect(() => {
+    setOn(Boolean(student.representative));
+  }, [student.representative]);
   const name = student.profileNickname || student.userId;
 
   const change = async (next) => {
