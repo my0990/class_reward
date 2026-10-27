@@ -17,11 +17,12 @@ export default function AuthPage({ role }) {
     []
   );
 
-  // 귤 애니메이션(116KB)은 화면 코드에 넣지 않고, 화면이 뜬 뒤에 따로 불러온다
+  // 귤 애니메이션은 화면 코드에 넣지 않고, 화면이 뜬 뒤에 따로 불러온다
+  // kkyul-hello.json: 뀰에서 직접 만든 로티 (통통 튀는 귤 + 잎 + 눈 깜빡임 + 반짝이, 20KB, 3초 반복)
   const [lottieJson, setLottieJson] = useState(null);
   useEffect(() => {
     let alive = true;
-    fetch("/tangerine.json")
+    fetch("/kkyul-hello.json")
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => alive && json && setLottieJson(json))
       .catch(() => {});
