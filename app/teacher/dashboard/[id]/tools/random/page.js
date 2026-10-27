@@ -20,6 +20,9 @@ function shuffle(arr) {
 }
 
 const CARD_SCALE_KEY = "kkyul:random-card-scale";
+// 뽑기 상태(남은 학생·나온 학생·지금 보이는 학생·한 번에 뽑을 수)를 이 탭에서 기억 → 다른 화면에 갔다 와도 이어서
+const stateKey = (classId) => `kkyul:random-state:${classId}`;
+const ids = (arr) => (arr ?? []).map((s) => String(s.userId));
 const CARD_SCALE_MIN = 0.6;
 const CARD_SCALE_MAX = 2;
 const CARD_SCALE_STEP = 0.1;
@@ -117,12 +120,48 @@ export default function Random() {
         trackFeature("random_pick", id); // 관리자 '기능 사용량'
 
     }
+    // 처음 학생 목록이 오면: 이 탭에 저장해 둔 뽑기 상태가 있으면 이어서, 없으면 새로 섞기
+    // (학생 정보는 저장하지 않고 아이디만 → 잔액·이름은 늘 최신, 지워진 학생은 빼고 새 학생은 남은 학생에 넣음)
+    const [restored, setRestored] = useState(false);
     useEffect(() => {
-        if (studentData && isFirst) {
-            setOriginalStudentArr(shuffle(studentData))
-            setIsFirst(false)
+        if (!studentData || !isFirst) return;
+        setIsFirst(false);
+        let saved = null;
+        try {
+            saved = JSON.parse(sessionStorage.getItem(stateKey(id)) ?? "null");
+        } catch {}
+        if (saved && Array.isArray(saved.remaining) && Array.isArray(saved.picked)) {
+            const byId = new Map(studentData.map((s) => [String(s.userId), s]));
+            const take = (list) => list.map((u) => byId.get(String(u))).filter(Boolean);
+            const known = new Set([...saved.remaining, ...saved.picked].map(String));
+            const newcomers = studentData.filter((s) => !known.has(String(s.userId)));
+            setOriginalStudentArr([...take(saved.remaining), ...shuffle(newcomers)]);
+            setPickedStudentArr(take(saved.picked));
+            setStudentArr(take(saved.shown ?? []));
+            setIsClicked(Boolean(saved.isClicked));
+            if (Number(saved.studentNum) >= 1) setStudentNum(Number(saved.studentNum));
+        } else {
+            setOriginalStudentArr(shuffle(studentData));
         }
-    }, [studentData])
+        setRestored(true);
+    }, [studentData]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // 바뀔 때마다 저장 (불러오기가 끝난 뒤부터: 개발 모드에서 두 번 실행돼도 빈 상태로 덮어쓰지 않게)
+    useEffect(() => {
+        if (!restored) return;
+        try {
+            sessionStorage.setItem(
+                stateKey(id),
+                JSON.stringify({
+                    remaining: ids(originalStudentArr),
+                    picked: ids(pickedStudentArr),
+                    shown: ids(studentArr),
+                    isClicked,
+                    studentNum,
+                })
+            );
+        } catch {}
+    }, [restored, id, originalStudentArr, pickedStudentArr, studentArr, isClicked, studentNum]);
 
     const onRefresh = () => {
         
