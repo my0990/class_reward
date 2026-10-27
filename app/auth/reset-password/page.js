@@ -84,7 +84,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex min-h-[80vh] flex-col items-center justify-center py-12">
+    <form onSubmit={onSubmit} className="flex flex-1 flex-col items-center justify-center py-12">
       <div className="mx-5 w-10/12 min-[500px]:w-[400px]">
         <h1 className="mb-2 text-[1.8rem]">비밀번호 찾기</h1>
         <ol className="mb-6 flex gap-2 text-sm text-gray-400">
