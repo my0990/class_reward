@@ -21,12 +21,12 @@ function SeatCard({ student, level, isActive, onClick, currencyEmoji }) {
       data-select-id={student.userId}
       onClick={onClick}
       onKeyDown={onKeyDown}
-      className={`flex w-full cursor-pointer select-none flex-col items-center rounded-xl p-[7%] transition [container-type:inline-size] hover:-translate-y-[2px] hover:shadow-lg ${
+      className={`flex aspect-[3/4] w-full cursor-pointer select-none flex-col items-center rounded-xl px-[7%] py-[9%] transition [container-type:inline-size] hover:-translate-y-[2px] hover:shadow-lg ${
         isActive ? "bg-orange-500 text-white" : "bg-orange-200 text-gray-800 hover:bg-orange-300"
       }`}
     >
       {/* 위 줄: 왼쪽 레벨, 오른쪽 화폐 (번호순 카드와 같은 배치) */}
-      <div className="mb-[4%] flex w-full items-center justify-between gap-[4%] text-[clamp(8px,8.5cqw,13px)] leading-tight">
+      <div className="mb-[8%] flex w-full items-center justify-between gap-[4%] text-[clamp(10px,10.5cqw,16px)] leading-tight">
         <span className="shrink-0 font-semibold">LV. {level}</span>
         <TruncText
           className={`min-w-0 text-right ${Number(student.money) < 0 ? `font-bold ${isActive ? "text-red-800" : "text-red-600"}` : ""}`}
@@ -37,13 +37,18 @@ function SeatCard({ student, level, isActive, onClick, currencyEmoji }) {
       <div className="aspect-square w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-white">
         <img {...profileImgProps(student.profileUrl, 100)} width="100" height="100" alt="" className="h-full w-full object-cover" />
       </div>
-      <TruncText className="mt-[6%] w-full text-center text-[clamp(10px,11cqw,17px)] font-bold leading-tight">
+      <TruncText className="mt-[9%] w-full text-center text-[clamp(12px,13.5cqw,21px)] font-bold leading-tight">
         {student.classNumber}. {student.profileNickname}
       </TruncText>
-      {student.profileTitle && (
-        <TruncText className="mt-[5%] w-full rounded-md bg-white px-[4%] py-[2%] text-center text-[clamp(8px,8.5cqw,13px)] leading-tight text-gray-800">
+      {/* 칭호가 없어도 같은 자리를 비워 둬서 카드 높이가 같게 */}
+      {student.profileTitle ? (
+        <TruncText className="mt-[8%] w-full rounded-md bg-white px-[4%] py-[3%] text-center text-[clamp(10px,10.5cqw,16px)] leading-tight text-gray-800">
           {student.profileTitle}
         </TruncText>
+      ) : (
+        <div aria-hidden="true" className="invisible mt-[8%] w-full py-[3%] text-[clamp(10px,10.5cqw,16px)] leading-tight">
+          &nbsp;
+        </div>
       )}
     </div>
   );
