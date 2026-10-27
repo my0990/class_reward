@@ -13,5 +13,6 @@ export async function onRequestError(error, request) {
     digest: error?.digest,
     device: summarizeUserAgent(Array.isArray(ua) ? ua[0] : ua),
     build: serverBuild(),
+    error,
   });
 }
