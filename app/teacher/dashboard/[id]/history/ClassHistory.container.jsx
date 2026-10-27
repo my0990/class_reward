@@ -257,7 +257,7 @@ export default function ClassHistoryContainer() {
                         <span className={`shrink-0 whitespace-nowrap rounded-full px-[8px] py-[2px] text-[0.75rem] ${k.badge}`}>
                           {k.icon} {k.label}
                         </span>
-                        <p className="min-w-0 flex-1 leading-snug" title={sentenceText(sentence)}>
+                        <p className="min-w-0 flex-1 leading-snug" title={sentenceText(sentence) + (g.memo ? ` · ${g.memo}` : "")}>
                           {sentence.map((seg, i) => {
                             if (seg.t === "who")
                               return many ? (
@@ -289,6 +289,10 @@ export default function ClassHistoryContainer() {
                               );
                             return <span key={i}>{seg.v}</span>;
                           })}
+                          {g.memo && (
+                            // 화폐를 줄 때 적은 이유
+                            <span className="ml-[6px] inline-block rounded bg-white/70 px-[6px] text-[0.85rem] text-gray-600">💬 {g.memo}</span>
+                          )}
                         </p>
                       </div>
                       {many && isOpen && (

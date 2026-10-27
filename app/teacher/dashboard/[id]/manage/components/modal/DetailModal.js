@@ -239,9 +239,15 @@ export default function DetailModal() {
                       </td>
                       {/* 긴 내용은 ...으로 줄이고, 마우스를 올리면 전체 내용 */}
                       <td className="max-w-[170px] max-[480px]:max-w-[110px]">
-                        <div className="truncate" title={item?.name}>
+                        <div className="truncate" title={item?.memo ? `${item.name} · ${item.memo}` : item?.name}>
                           {item?.name}
                         </div>
+                        {item?.memo && (
+                          // 화폐를 줄 때 적은 이유
+                          <div className="truncate text-[0.8rem] text-gray-500" title={item.memo}>
+                            💬 {item.memo}
+                          </div>
+                        )}
                       </td>
                       <td>
                         <span

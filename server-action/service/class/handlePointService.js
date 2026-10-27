@@ -8,9 +8,20 @@ import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
  * - history.balance는 클라이언트가 보낸 money가 아니라 변경 후 서버에서 다시 읽은 잔액이다.
  * - 잔액 변경과 기록 저장을 트랜잭션으로 묶어 한쪽만 반영되는 일이 없다.
  * - 회수는 잔액이 0 아래로 내려가는 것을 막지 않는다 (교사 판단에 맡김, 기존 동작 유지).
+ * - memo: 이유 (선택, MEMO_MAX자). 이름(name)은 그대로 두고 따로 저장한다 → 학급 기록의 지급/회수 구분은 그대로
  */
-export async function handlePointService({ teacher_id, classId, targetStudent, point, isSend }) {
+export const MEMO_MAX = 30;
+
+/** 이유 정리: 줄바꿈·연속 공백을 한 칸으로, 앞뒤 공백 제거, 최대 MEMO_MAX자. 비면 null */
+export function cleanMemo(memo) {
+  if (typeof memo !== "string") return null;
+  const m = memo.replace(/\s+/g, " ").trim().slice(0, MEMO_MAX);
+  return m || null;
+}
+
+export async function handlePointService({ teacher_id, classId, targetStudent, point, isSend, memo }) {
   const amount = toNonNegativeInt(point);
+  const reason = cleanMemo(memo);
 
   if (amount === null || amount === 0) {
     return { success: false, message: "포인트는 1 이상의 정수로 입력해주세요." };
@@ -70,6 +81,7 @@ export async function handlePointService({ teacher_id, classId, targetStudent, p
           type: isSend ? "입금" : "출금",
           name: isSend ? "선생님에게 받음" : "선생님에게 뺏김",
           amount,
+          ...(reason ? { memo: reason } : {}),
           date: now,
           expiresAfter: now,
         })),

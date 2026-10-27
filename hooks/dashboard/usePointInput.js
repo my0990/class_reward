@@ -6,6 +6,7 @@ const BASE_FONT = 1.7;
 
 export default function usePointInput({ onEnter } = {}) {
   const [value, setValue] = useState("");
+  const [memo, setMemo] = useState(""); // 이유 (선택)
   const [activeKey, setActiveKey] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,6 +22,10 @@ export default function usePointInput({ onEnter } = {}) {
   useEffect(() => {
     valueRef.current = value;
   }, [value]);
+  const memoRef = useRef(memo);
+  useEffect(() => {
+    memoRef.current = memo;
+  }, [memo]);
 
   const onEnterRef = useRef(onEnter);
   useEffect(() => {
@@ -51,6 +56,7 @@ export default function usePointInput({ onEnter } = {}) {
 
   const clear = () => {
     setValue("");
+    setMemo("");
     setActiveKey(null);
   };
 
@@ -64,7 +70,7 @@ export default function usePointInput({ onEnter } = {}) {
     setActiveKey("Enter");
 
     try {
-      const result = await onEnterRef.current?.(valueRef.current);
+      const result = await onEnterRef.current?.(valueRef.current, memoRef.current.trim());
       clear();
       return result;
     } finally {
@@ -84,6 +90,12 @@ export default function usePointInput({ onEnter } = {}) {
 
     const handleKeyDown = (e) => {
       if (!allowed.has(e.key)) return;
+      if (e.isComposing) return; // 한글 입력 중
+
+      // 이유 입력칸에 글자를 쓰는 중이면 숫자·지우기는 금액에 넣지 않는다 (Enter만 제출)
+      const t = e.target;
+      const typing = t instanceof HTMLElement && (t.isContentEditable || ["INPUT", "TEXTAREA"].includes(t.tagName));
+      if (typing && e.key !== "Enter") return;
 
       if (e.key >= "0" && e.key <= "9") {
         appendNumber(e.key);
@@ -123,6 +135,7 @@ export default function usePointInput({ onEnter } = {}) {
   return {
     display: {
       value,
+      memo,
       fontSize,
       activeKey,
       isSubmitting,   // ✅ 버튼/키보드 어느 경로로 제출했든 동일하게 반영됨
@@ -132,6 +145,7 @@ export default function usePointInput({ onEnter } = {}) {
       onBackspace: removeLast,  // ⌫ 버튼 클릭
       onSubmit: submit,         // 입력 버튼 클릭
       clear,
+      setMemo,                  // 이유 입력
     },
   };
 }

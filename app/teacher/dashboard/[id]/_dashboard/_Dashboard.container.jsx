@@ -1,5 +1,6 @@
 "use client";
 
+import { rememberReason } from "./components/point-modal/ReasonInput";
 import LoadError from "@/components/ui/common/LoadError";
 import useStudentSelection from "@/hooks/dashboard/useStudentSelection";
 import useMarqueeSelect from "@/hooks/dashboard/useMarqueeSelect";
@@ -56,7 +57,7 @@ export default function DashboardContainer({ classId }) {
   // - 실패(검증 실패 포함): throw -> DialPad가 잡아서 에러 토스트 표시, 입력값은 보존됨
   // - 성공: 선택 해제 + 모달 닫기 + 목록 갱신 + 성공 토스트. 입력값은 usePointInput이 자동으로 비움
   const handleConfirm = useCallback(
-    async (value) => {
+    async (value, memo) => {
       if (!value) throw new Error("숫자를 입력해주세요");
       if (!hasSelectedStudent) throw new Error("학생을 선택해주세요");
 
@@ -78,12 +79,14 @@ export default function DashboardContainer({ classId }) {
         targetStudent,
         point: value,
         isSend,
+        memo,
       });
 
       if (!res?.result) {
         throw new Error(res?.message ?? "오류 발생");
       }
 
+      rememberReason(classId, isSend, memo); // 자주 쓰는 이유 버튼에 앞으로
       clearAll();
       setModalId(null);
       mutateStudentsData();

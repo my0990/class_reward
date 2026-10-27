@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import DialPad from "./DialPad";
+import ReasonInput from "./ReasonInput";
 import { PointInputProvider, usePointInputContext } from "./PointInputContext";
 
 // 번호순으로 (번호 없는 학생은 뒤로)
@@ -16,7 +17,7 @@ function Recipients({ isSend, activeStudentLabels }) {
   const [first, ...rest] = sorted;
 
   return (
-    <div className="relative mb-5 ml-[10px]">
+    <div className="relative mb-3 ml-[10px]">
       <h3 className="font-bold text-lg">
         {who} 사람:{" "}
         {first && rest.length === 0 && <span className="text-[1.4rem] ml-[4px] bg-orange-200">{first.label}</span>}
@@ -74,7 +75,9 @@ export function PointModalBody({ isSend, currencyName, activeStudentLabels }) {
       <div className="w-[272px]">
         <Recipients isSend={isSend} activeStudentLabels={activeStudentLabels} />
 
-        <div className="h-[64px] bg-gray-200 mb-5 rounded-2xl flex justify-between items-center px-[16px]">
+        <ReasonInput isSend={isSend} />
+
+        <div className="h-[64px] bg-gray-200 mb-4 rounded-2xl flex justify-between items-center px-[16px]">
           <div className="text-gray-500">
             {isSend ? "받는" : "잃는"} 금액
           </div>
