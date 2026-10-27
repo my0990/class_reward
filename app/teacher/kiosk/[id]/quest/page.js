@@ -10,11 +10,11 @@ import KioskHeader from "../_components/KioskHeader";
 import KioskConfirm from "../_components/KioskConfirm";
 import StudentCard from "../_components/StudentCard";
 import { listKioskQuests, requestKioskQuest } from "@/server-action/actions/kiosk/kioskQuest.action";
-import { repeatBadge } from "@/util/quest/questRepeat";
+import { repeatBadge, repeatColors, groupByRepeat, REPEAT_COLORS } from "@/util/quest/questRepeat";
 
 function RepeatBadge({ q }) {
   const b = repeatBadge(q);
-  return b ? <span className="ml-2 whitespace-nowrap rounded-full bg-sky-100 px-3 py-1 align-middle text-base font-bold text-sky-700">{b}</span> : null;
+  return b ? <span className={`ml-2 whitespace-nowrap rounded-full px-3 py-1 align-middle text-base font-bold ${repeatColors(q).badge}`}>{b}</span> : null;
 }
 
 function Rewards({ q, currency, big = false }) {
@@ -96,16 +96,23 @@ export default function KioskQuestPage() {
           ) : quests.length === 0 ? (
             <div className="mt-16 text-center text-[1.6rem] text-gray-500">아직 퀘스트가 없어요.</div>
           ) : (
+            // 일일 → 주간 → 일반 순서로 나눠서
+            groupByRepeat(quests).map((sec) => (
+              <section key={sec.key} className="mt-6">
+                <h2 className={`flex items-baseline gap-3 border-b-4 pb-1 text-[1.6rem] font-black ${REPEAT_COLORS[sec.key].title} ${REPEAT_COLORS[sec.key].line}`}>
+                  {sec.title}
+                  <span className="text-[1rem] font-semibold opacity-70">{sec.hint}</span>
+                </h2>
             <ul className="mt-4 grid gap-4 md:grid-cols-2">
-              {quests.map((q) => (
+              {sec.items.map((q) => (
                 <li key={q._id}>
                   <button
                     type="button"
                     onClick={() => openQuest(q._id)}
-                    className="flex h-full w-full flex-col rounded-2xl border-4 border-orange-300 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-orange-500 active:scale-[0.98]"
+                    className={`flex h-full w-full flex-col rounded-2xl border-4 bg-white p-5 text-left transition hover:-translate-y-0.5 active:scale-[0.98] ${repeatColors(q).border} ${repeatColors(q).hover}`}
                   >
                     <h2 className="text-[1.6rem] font-black leading-tight text-orange-950">
-                      🏆 {q.questName}
+                      {q.questName}
                       <RepeatBadge q={q} />
                     </h2>
                     {q.questGoal && <p className="mt-2 line-clamp-2 whitespace-pre-wrap text-[1.1rem] text-gray-700">{q.questGoal}</p>}
@@ -119,6 +126,8 @@ export default function KioskQuestPage() {
                 </li>
               ))}
             </ul>
+              </section>
+            ))
           )}
         </div>
       </div>

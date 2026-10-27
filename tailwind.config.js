@@ -6,6 +6,10 @@ module.exports = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    // util에 색 클래스를 모아 둔 파일이 있다 (예: util/quest/questRepeat.js의 퀘스트 종류별 색)
+    "./util/**/*.{js,jsx}",
+    "./config/**/*.{js,jsx}",
+    "./hooks/**/*.{js,jsx}",
   ],
   theme: {
     extend: {

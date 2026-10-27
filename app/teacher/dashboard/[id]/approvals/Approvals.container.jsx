@@ -10,7 +10,7 @@ import { mutate } from "swr";
 import { useFetchData } from "@/hooks/useFetchData";
 import { listRequests, decideRequests } from "@/server-action/actions/request/request.action";
 import { formatHistoryDateParts, formatFullDate } from "../manage/utils/historyDate";
-import { repeatBadge } from "@/util/quest/questRepeat";
+import { repeatBadge, repeatColors } from "@/util/quest/questRepeat";
 
 const byNumber = (a, b) => (Number(a.classNumber) || Infinity) - (Number(b.classNumber) || Infinity);
 
@@ -265,7 +265,7 @@ export default function ApprovalsContainer() {
                         <h2 className="font-bold">{g.target ? `🏆 ${g.target.name}` : "삭제된 퀘스트"}</h2>
                       </label>
                       {g.target && repeatBadge(g.target) && (
-                        <span className="rounded-full bg-sky-100 px-[8px] py-[1px] text-[0.75rem] font-semibold text-sky-700">{repeatBadge(g.target)}</span>
+                        <span className={`rounded-full px-[8px] py-[1px] text-[0.75rem] font-semibold ${repeatColors(g.target).badge}`}>{repeatBadge(g.target)}</span>
                       )}
                       {reward(g.target)}
                       <span className="text-[0.85rem] text-gray-500">신청 {g.items.length}명</span>

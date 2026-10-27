@@ -14,6 +14,7 @@ import { useLiveStudents } from "@/hooks/useLiveStudents";
 import QuestCard from "./components/QuestCard";
 import AddQuestModal from "./components/modal/AddQuestModal";
 import QuestDetailTemplate from "./components/detail/QuestDetailTemplate";
+import { groupByRepeat, REPEAT_COLORS } from "@/util/quest/questRepeat";
 
 export default function Quest() {
     const params = useParams();
@@ -88,6 +89,13 @@ export default function Quest() {
     const currency = {
         name: classData?.currencyName ?? "",
         emoji: classData?.currencyEmoji ?? "",
+    };
+
+    // 종류별로 나눈 목록. 한 종류 안에서 순서를 바꾸면 전체 순서(일일 → 주간 → 일반)로 합쳐서 저장한다
+    const sections = groupByRepeat(orderedQuests);
+    const onReorderSection = (key, sectionIds) => {
+        const all = sections.flatMap((sec) => (sec.key === key ? sectionIds : sec.items.map(getQuestId)));
+        onReorder(all);
     };
 
     const onOpenAddQuestModal = () => {
@@ -182,22 +190,33 @@ export default function Quest() {
                     )}
 
                     {questList.length > 0 ? (
-                        <SortableList
-                            items={orderedQuests}
-                            getId={getQuestId}
-                            onReorder={onReorder}
-                            enabled={isReordering}
-                            layout="vertical"
-                            renderItem={(quest) => (
-                                <QuestCard
-                                    data={quest}
-                                    classId={classId}
-                                    studentCount={studentCount}
-                                    role="teacher"
-                                    onDetail={onOpenQuestDetail}
+                        // 일일 → 주간 → 일반 순서로 나눠서. 순서 바꾸기는 같은 종류 안에서만
+                        sections.map((sec) => (
+                            <div key={sec.key} className="mt-[28px] first:mt-[16px]">
+                                <h3 className={`flex items-baseline gap-[8px] border-b-2 pb-[4px] text-[1.3rem] font-bold ${REPEAT_COLORS[sec.key].title} ${REPEAT_COLORS[sec.key].line}`}>
+                                    {sec.title}
+                                    <span className="text-[0.85rem] font-medium opacity-70">
+                                        {sec.items.length}개 · {sec.hint}
+                                    </span>
+                                </h3>
+                                <SortableList
+                                    items={sec.items}
+                                    getId={getQuestId}
+                                    onReorder={(ids) => onReorderSection(sec.key, ids)}
+                                    enabled={isReordering}
+                                    layout="vertical"
+                                    renderItem={(quest) => (
+                                        <QuestCard
+                                            data={quest}
+                                            classId={classId}
+                                            studentCount={studentCount}
+                                            role="teacher"
+                                            onDetail={onOpenQuestDetail}
+                                        />
+                                    )}
                                 />
-                            )}
-                        />
+                            </div>
+                        ))
                     ) : (
                         <div className="py-[48px] text-center text-red-900">
                             등록된 퀘스트가 없습니다.

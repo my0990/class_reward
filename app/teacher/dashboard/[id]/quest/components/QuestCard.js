@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 
 import usePendingAction from "@/hooks/usePendingAction";
 import { deleteQuest } from "@/server-action/actions/quest/quest.action";
-import { repeatBadge } from "@/util/quest/questRepeat";
+import { repeatBadge, repeatColors } from "@/util/quest/questRepeat";
 
 export default function QuestCard({
     data,
@@ -95,11 +95,8 @@ export default function QuestCard({
 
     return (
         <article
-            className="
-                relative mt-[24px] w-full
-                rounded-xl border-4 border-orange-500
-                p-[16px]
-            "
+            // 종류별 테두리 색: 일일 하늘색, 주간 보라색, 일반 주황색
+            className={`relative mt-[16px] w-full rounded-xl border-4 ${repeatColors(data).border} bg-white/40 p-[16px]`}
         >
             {role !== "student" && (
                 <button
@@ -133,7 +130,7 @@ export default function QuestCard({
             <h2 className="pr-[32px] text-[1.5rem] font-bold text-red-900">
                 {data.questName}
                 {repeatBadge(data) && (
-                    <span className="ml-[8px] whitespace-nowrap rounded-full bg-sky-100 px-[8px] py-[2px] align-middle text-[0.8rem] font-semibold text-sky-700">
+                    <span className={`ml-[8px] whitespace-nowrap rounded-full px-[8px] py-[2px] align-middle text-[0.8rem] font-semibold ${repeatColors(data).badge}`}>
                         {repeatBadge(data)}
                     </span>
                 )}
