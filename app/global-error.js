@@ -10,7 +10,7 @@ export default function GlobalError({ error, reset }) {
   }, [error]);
 
   return (
-    <html lang="ko" style={{ colorScheme: "only light" }}>
+    <html lang="ko" translate="no" className="notranslate" style={{ colorScheme: "only light" }}>
       <body style={{ margin: 0, fontFamily: "system-ui, sans-serif", background: "#ffedd5", color: "#1f2937" }}>
         <main style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
           <div style={{ fontSize: "4rem", lineHeight: 1 }} aria-hidden="true">🍊💦</div>

@@ -15,13 +15,14 @@ const fmtTime = (iso) =>
     : "";
 
 export default function ErrorLogList({ errors }) {
-  const { items, today, recentCount, days } = errors;
+  const { items, today, recentCount, days, currentBuild } = errors;
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-4">
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="font-semibold">최근 에러</h2>
         <span className="text-sm text-slate-500">
           오늘 {today.count.toLocaleString()}건 ({today.kinds}종류) · 최근 {days}일 {recentCount.toLocaleString()}건
+          {currentBuild && <> · 지금 버전 <code>{currentBuild}</code></>}
         </span>
       </div>
 
@@ -44,6 +45,23 @@ export default function ErrorLogList({ errors }) {
                     <div className="break-all text-slate-800">{e.message}</div>
                     {e.path && <div>화면/주소: <code>{e.path}</code></div>}
                     {e.roles.length > 0 && <div>누가: {e.roles.map((r) => ROLE_LABEL[r] ?? r).join(", ")}</div>}
+                    {e.devices.length > 0 && <div>기기: {e.devices.join(", ")}</div>}
+                    {e.builds.length > 0 && (
+                      <div>
+                        버전:{" "}
+                        {e.builds.map((b) => (
+                          <code key={b} className={`mr-1 rounded px-1 ${currentBuild && b !== currentBuild ? "bg-amber-100 text-amber-800" : "bg-white"}`}>
+                            {b}
+                          </code>
+                        ))}
+                        {currentBuild && e.builds.some((b) => b !== currentBuild) && <span className="text-amber-700">(예전 버전 포함: 배포 직후 열려 있던 화면일 수 있어요)</span>}
+                      </div>
+                    )}
+                    {e.digest && (
+                      <div>
+                        digest: <code className="select-all">{e.digest}</code> <span className="text-slate-400">(Vercel 로그에서 이 값으로 찾으면 서버 쪽 원인이 보여요)</span>
+                      </div>
+                    )}
                     <div>처음 {fmtTime(e.firstAt)} · 마지막 {fmtTime(e.lastAt)}</div>
                     {e.stack && <pre className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap break-all rounded bg-white p-2 text-[11px] leading-snug">{e.stack}</pre>}
                   </div>

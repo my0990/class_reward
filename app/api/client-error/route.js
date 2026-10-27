@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { withApiHandler, ApiError } from "@/lib/api/routeHelpers";
 import { recordError } from "@/lib/errorLog/errorLog";
-import { CLIENT_SOURCES } from "@/lib/errorLog/errorCore";
+import { CLIENT_SOURCES, summarizeUserAgent } from "@/lib/errorLog/errorCore";
 
 const MAX_BODY = 8_000;
 
@@ -28,6 +28,8 @@ export const POST = withApiHandler(async (req) => {
     path: typeof body.path === "string" ? body.path : "",
     digest: typeof body.digest === "string" ? body.digest : null,
     role: session?.user?.role ?? "guest",
+    device: summarizeUserAgent(req.headers.get("user-agent"), { touch: body.touch === true }),
+    build: typeof body.build === "string" ? body.build : null,
   });
   return new NextResponse(null, { status: 204 });
 });

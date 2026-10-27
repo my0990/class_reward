@@ -28,6 +28,9 @@ export async function getRecentErrorsService({ db, days = 7, limit = 30, now = n
             stack: { $first: "$stack" },
             path: { $first: "$path" },
             roles: { $addToSet: "$role" },
+            digest: { $first: "$digest" },
+            devices: { $push: "$devices" },
+            builds: { $push: "$builds" },
           },
         },
         { $sort: { lastAt: -1 } },
@@ -39,6 +42,7 @@ export async function getRecentErrorsService({ db, days = 7, limit = 30, now = n
   ]);
 
   return {
+    currentBuild: (process.env.VERCEL_GIT_COMMIT_SHA ?? "").slice(0, 7) || null,
     days,
     today: { count: todayAgg[0]?.n ?? 0, kinds: todayAgg[0]?.kinds ?? 0 },
     recentCount: weekAgg[0]?.n ?? 0,
@@ -52,6 +56,10 @@ export async function getRecentErrorsService({ db, days = 7, limit = 30, now = n
       stack: g.stack ?? "",
       path: g.path ?? null,
       roles: (g.roles ?? []).filter(Boolean).sort(),
+      digest: g.digest ?? null,
+      // 날짜별로 모은 목록을 합쳐서 (같은 것은 한 번만)
+      devices: [...new Set((g.devices ?? []).flat().filter(Boolean))].slice(0, 10),
+      builds: [...new Set((g.builds ?? []).flat().filter(Boolean))].slice(0, 10),
     })),
   };
 }
