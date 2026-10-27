@@ -36,6 +36,10 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
     setEditing(false);
   };
 
+  // 넘겨받은 className이 absolute(예: 레벨 동그라미 옆에 붙는 별명)면 relative를 덧붙이지 않는다
+  // (둘 다 붙으면 relative가 이겨서 별명이 레벨에서 떨어져 보였다)
+  const pos = /(^|\s)(absolute|fixed)(\s|$)/.test(className) ? "" : "relative";
+
   if (!editing) {
     return (
       <div
@@ -44,7 +48,7 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
         title="눌러서 수정"
         onClick={() => setEditing(true)}
         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setEditing(true))}
-        className={`group relative cursor-text transition hover:ring-2 hover:ring-orange-400 ${className}`}
+        className={`group ${pos} cursor-text transition hover:ring-2 hover:ring-orange-400 ${className}`}
       >
         {display ?? (value || <span className="text-gray-400">{placeholder}</span>)}
         <PencilSquareIcon className="pointer-events-none absolute right-[6px] top-[6px] h-[16px] w-[16px] text-orange-500 opacity-0 transition group-hover:opacity-100" aria-hidden="true" />
