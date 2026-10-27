@@ -42,11 +42,11 @@ function SeatCard({ student, level, isActive, onClick, currencyEmoji }) {
       </TruncText>
       {/* 칭호가 없어도 같은 자리를 비워 둬서 카드 높이가 같게 */}
       {student.profileTitle ? (
-        <TruncText className="mt-[8%] w-full rounded-md bg-white px-[4%] py-[3%] text-center text-[clamp(10px,10.5cqw,16px)] leading-tight text-gray-800">
+        <TruncText className="mt-[8%] w-full rounded-md bg-white px-[4%] py-[3%] text-center text-[clamp(12px,12.5cqw,19px)] font-medium leading-tight text-gray-800">
           {student.profileTitle}
         </TruncText>
       ) : (
-        <div aria-hidden="true" className="invisible mt-[8%] w-full py-[3%] text-[clamp(10px,10.5cqw,16px)] leading-tight">
+        <div aria-hidden="true" className="invisible mt-[8%] w-full py-[3%] text-[clamp(12px,12.5cqw,19px)] leading-tight">
           &nbsp;
         </div>
       )}
