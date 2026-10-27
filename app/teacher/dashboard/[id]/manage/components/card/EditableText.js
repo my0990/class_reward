@@ -84,7 +84,8 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
 
   return (
     // 보이던 칸과 같은 크기 안에서 고친다 (카드 밖으로 넘치지 않게): 입력칸이 칸을 채우고, 글자 수는 안쪽 오른쪽 아래
-    <div className={`relative flex flex-col ${className}`}>
+    // 테두리는 칸 바깥선에 (보던 칸에 마우스를 올렸을 때와 같은 자리). 입력칸은 테두리·여백 없이 칸을 채워 글자 위치도 그대로
+    <div className={`relative flex flex-col ring-2 ring-orange-500 ${className}`}>
       <textarea
         ref={ref}
         value={draft}
@@ -101,10 +102,10 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
         }}
         onBlur={save}
         placeholder={placeholder}
-        className="min-h-[96px] w-full flex-1 resize-none rounded-lg p-[6px] pb-[20px] outline-none ring-2 ring-orange-500 [font:inherit]"
+        className="min-h-[96px] w-full flex-1 resize-none bg-transparent p-0 pb-[16px] outline-none [font:inherit]"
       />
       {maxLength && (
-        <span className="pointer-events-none absolute bottom-[12px] right-[14px] rounded bg-white/90 px-[4px] text-[0.75rem] text-gray-400">
+        <span className="pointer-events-none absolute bottom-[6px] right-[10px] rounded bg-white/90 px-[4px] text-[0.75rem] text-gray-400">
           {busy ? "저장 중..." : `${draft.length}/${maxLength}`}
         </span>
       )}
