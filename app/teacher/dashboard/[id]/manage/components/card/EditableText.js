@@ -1,7 +1,8 @@
 "use client";
 // 학생 관리 카드: 눌러서 바로 고치기 (별명 한 줄 / 자기소개 여러 줄)
 // - 한 줄: Enter 저장, Esc 취소, 바깥을 누르면 저장
-// - 여러 줄: [저장] [취소] 버튼, Ctrl(⌘)+Enter 저장, Esc 취소
+// - 여러 줄: 바깥을 누르면(포커스가 빠지면) 저장, Ctrl(⌘)+Enter 저장, Esc 취소
+// - 바뀐 게 없으면 저장하지 않고 그냥 닫는다
 import { useEffect, useRef, useState } from "react";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
@@ -89,18 +90,15 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
           }
           if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) save();
         }}
+        onBlur={save}
         placeholder={placeholder}
         className="w-full resize-none rounded-lg p-[6px] outline-none ring-2 ring-orange-500"
       />
-      <div className="flex items-center justify-end gap-[6px] text-[0.85rem]">
-        {maxLength && <span className="mr-auto text-gray-400">{draft.length}/{maxLength}</span>}
-        <button type="button" onClick={cancel} disabled={busy} className="btn btn-xs border-0 bg-gray-100">
-          취소
-        </button>
-        <button type="button" onClick={save} disabled={busy} className="btn btn-xs border-0 bg-orange-500 text-white hover:bg-orange-600">
-          {busy ? "저장 중..." : "저장"}
-        </button>
-      </div>
+      {maxLength && (
+        <span className="self-end text-[0.8rem] text-gray-400">
+          {busy ? "저장 중..." : `${draft.length}/${maxLength}`}
+        </span>
+      )}
     </div>
   );
 }
