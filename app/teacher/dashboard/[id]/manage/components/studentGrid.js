@@ -1,6 +1,7 @@
 "use client";
 
 import { useManageContext } from "./ManageContext";
+import RepToggle from "./RepToggle";
 
 // PC·태블릿: 표 / 휴대폰(640px 미만): 학생마다 카드
 export default function StudentGrid() {
@@ -33,6 +34,7 @@ export default function StudentGrid() {
                             <th>아이디</th>
                             <th>닉네임</th>
                             <th>{currencyEmoji} 소지{currencyName}</th>
+                            <th title="대표는 친구에게 화폐 지급·회수를 신청할 수 있어요 (승인 센터에서 확인)">⭐ 대표</th>
                             <th>계정 관리</th>
                         </tr>
                     </thead>
@@ -42,6 +44,9 @@ export default function StudentGrid() {
                                 <td onClick={() => onDetailClick(a)} className="cursor-pointer rounded-xl transition-all hover:bg-orange-200">{a.userId}</td>
                                 <td>{a.profileNickname}</td>
                                 <td>{a.money}{currencyName}</td>
+                                <td>
+                                    <RepToggle key={`${a.userId}:${Boolean(a.representative)}`} student={a} />
+                                </td>
                                 <td className="p-[8px]">
                                     <ActionButtons student={a} />
                                 </td>
@@ -60,7 +65,10 @@ export default function StudentGrid() {
                             <div className="truncate text-[0.85rem] text-gray-500">{a.profileNickname}</div>
                             <div className="text-[0.9rem]">{currencyEmoji} {a.money}{currencyName}</div>
                         </button>
-                        <ActionButtons student={a} compact />
+                        <div className="flex flex-col items-end gap-[8px]">
+                            <RepToggle key={`${a.userId}:${Boolean(a.representative)}`} student={a} compact />
+                            <ActionButtons student={a} compact />
+                        </div>
                     </li>
                 ))}
             </ul>

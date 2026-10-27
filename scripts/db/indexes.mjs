@@ -34,6 +34,7 @@ const PLAN = [
     { unique: true, partialFilterExpression: { status: "pending" }, name: "pending_cycle_unique" },
     "같은 학생·같은 퀘스트(같은 회차)의 대기 요청은 하나만",
   ],
+  [data, "requests", { teacher_id: 1, classId: 1, type: 1, requestedBy: 1, createdAt: -1 }, {}, "학생 대표의 내 화폐 신청 목록"],
   [data, "requests", { decidedAt: 1 }, { expireAfterSeconds: 60 * 24 * 60 * 60, name: "decidedAt_ttl_60d" }, "처리된 요청 60일 뒤 자동 삭제 (대기 중은 그대로)"],
   [user, "users", { userId: 1 }, { unique: true, partialFilterExpression: nonEmpty("userId"), name: "userId_unique" }, "로그인 아이디 중복 금지"],
   [user, "users", { email: 1 }, { unique: true, partialFilterExpression: nonEmpty("email"), name: "email_unique" }, "교사 이메일 중복 금지"],

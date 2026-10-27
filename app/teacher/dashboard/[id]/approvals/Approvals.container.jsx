@@ -21,6 +21,9 @@ function summaryText(s) {
   if (s.alreadyDone) parts.push(`${s.alreadyDone}명은 이미 완료라 보상 없이 닫음`);
   if (s.rejected) parts.push(`${s.rejected}명 반려`);
   if (s.missingQuest) parts.push(`삭제된 퀘스트 ${s.missingQuest}건 닫음`);
+  if (s.currency) parts.push(`화폐 신청 ${s.currency}명 반영`);
+  if (s.notRep) parts.push(`${s.notRep}건은 대표가 아니어서 취소`);
+  if (s.missingStudent) parts.push(`${s.missingStudent}명은 학생이 없어 닫음`);
   if (s.skipped) parts.push(`${s.skipped}건은 이미 처리됨`);
   return parts.join(" · ") || "처리할 요청이 없었어요.";
 }
@@ -35,7 +38,7 @@ export default function ApprovalsContainer() {
     const m = new Map();
     for (const s of students ?? []) {
       const nickname = s.profileNickname || s.userId;
-      m.set(String(s.userId), { classNumber: s.classNumber, label: s.classNumber != null ? `${s.classNumber}번 ${nickname}` : nickname });
+      m.set(String(s.userId), { classNumber: s.classNumber, money: Number(s.money) || 0, label: s.classNumber != null ? `${s.classNumber}번 ${nickname}` : nickname });
     }
     return m;
   }, [students]);
@@ -96,7 +99,8 @@ export default function ApprovalsContainer() {
     if (tab !== "pending" || !rows) return [];
     const map = new Map();
     for (const r of rows) {
-      if (!map.has(r.targetId)) map.set(r.targetId, { targetId: r.targetId, target: r.target, items: [] });
+      if (!map.has(r.targetId))
+        map.set(r.targetId, { targetId: r.targetId, type: r.type, target: r.target, requestedBy: r.requestedBy, amount: r.amount, isSend: r.isSend, items: [] });
       map.get(r.targetId).items.push(r);
     }
     for (const g of map.values()) g.items.sort((a, b) => byNumber(studentMap.get(a.userId) ?? {}, studentMap.get(b.userId) ?? {}));
@@ -161,6 +165,8 @@ export default function ApprovalsContainer() {
     <div className="space-y-[12px]">
       <p className="text-[0.95rem] text-gray-700">
         학생이 키오스크 <b>🏆 퀘스트</b>에서 자기 카드를 고르고 &quot;확인&quot;을 누르면 여기에 와요. 승인하면 퀘스트 보상이 지급돼요.
+        <br />
+        <b>⭐ 학생 대표</b>가 화폐 지급·회수를 신청해도 여기에 와요. 승인해야 반영돼요. (대표 지정: 학생 관리)
       </p>
 
       <div className="flex flex-wrap items-center gap-[8px]">
@@ -236,15 +242,35 @@ export default function ApprovalsContainer() {
             return (
               <section key={g.targetId} className="rounded-xl bg-white">
                 <header className="flex flex-wrap items-center gap-[8px] rounded-t-xl border-b border-gray-100 bg-gray-50 px-[14px] py-[10px]">
-                  <label className="flex cursor-pointer items-center gap-[8px]">
-                    {check(ids, `${g.target?.name ?? "삭제된 퀘스트"} 모두 선택`)}
-                    <h2 className="font-bold">{g.target ? `🏆 ${g.target.name}` : "삭제된 퀘스트"}</h2>
-                  </label>
-                  {g.target && repeatBadge(g.target) && (
-                    <span className="rounded-full bg-sky-100 px-[8px] py-[1px] text-[0.75rem] font-semibold text-sky-700">{repeatBadge(g.target)}</span>
+                  {g.type === "currency" ? (
+                    <>
+                      <label className="flex cursor-pointer items-center gap-[8px]">
+                        {check(ids, "화폐 신청 모두 선택")}
+                        <h2 className="font-bold">💰 화폐 {g.isSend ? "지급" : "회수"} 신청</h2>
+                      </label>
+                      <span className={`rounded px-[6px] py-[1px] text-[0.85rem] font-bold tabular-nums ${g.isSend ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
+                        {g.isSend ? "+" : "-"}
+                        {Number(g.amount).toLocaleString()}
+                        {currency}
+                      </span>
+                      <span className="rounded-full bg-orange-100 px-[8px] py-[1px] text-[0.8rem] font-semibold text-orange-700">⭐ {labelOf(g.requestedBy)} 신청</span>
+                      <span className="text-[0.85rem] text-gray-500">
+                        {g.items.length}명 · {timeOf(g.items[0]?.createdAt)}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <label className="flex cursor-pointer items-center gap-[8px]">
+                        {check(ids, `${g.target?.name ?? "삭제된 퀘스트"} 모두 선택`)}
+                        <h2 className="font-bold">{g.target ? `🏆 ${g.target.name}` : "삭제된 퀘스트"}</h2>
+                      </label>
+                      {g.target && repeatBadge(g.target) && (
+                        <span className="rounded-full bg-sky-100 px-[8px] py-[1px] text-[0.75rem] font-semibold text-sky-700">{repeatBadge(g.target)}</span>
+                      )}
+                      {reward(g.target)}
+                      <span className="text-[0.85rem] text-gray-500">신청 {g.items.length}명</span>
+                    </>
                   )}
-                  {reward(g.target)}
-                  <span className="text-[0.85rem] text-gray-500">신청 {g.items.length}명</span>
                 </header>
                 <ul className="divide-y divide-gray-100">
                   {g.items.map((r) => (
@@ -260,6 +286,17 @@ export default function ApprovalsContainer() {
                             {r.target.repeat === "weekly" ? "지난주 신청" : "지난 날 신청"}
                           </span>
                         )}
+                        {r.type === "currency" && !r.isSend && (() => {
+                          // 회수: 승인하면 잔액이 어떻게 되는지 (마이너스면 빨간색)
+                          const now = studentMap.get(String(r.userId))?.money ?? 0;
+                          const after = now - (Number(r.amount) || 0);
+                          return (
+                            <span className={`rounded px-[6px] py-[1px] text-[0.75rem] tabular-nums ${after < 0 ? "bg-rose-100 font-semibold text-rose-700" : "bg-gray-100 text-gray-600"}`}>
+                              잔액 {now.toLocaleString()} → {after.toLocaleString()}
+                              {after < 0 ? " ⚠️" : ""}
+                            </span>
+                          );
+                        })()}
                         {r.target?.alreadyDone && (
                           <span className="rounded bg-gray-100 px-[6px] py-[1px] text-[0.75rem] text-gray-600" title="승인하면 보상 없이 닫혀요">
                             이미 완료됨
@@ -278,7 +315,7 @@ export default function ApprovalsContainer() {
           {rows.map((r) => ({
             ...r,
             // 예전 기록(보상 기록 없음)은 지금 퀘스트 보상으로 보여줌. '이미 완료'는 보상을 안 줬음
-            paid: r.paid ?? (r.status === "approved" && r.note !== "이미 완료" && r.target ? { money: r.target.reward, exp: r.target.exp } : null),
+            paid: r.paid ?? (r.type !== "currency" && r.status === "approved" && r.note !== "이미 완료" && r.target ? { money: r.target.reward, exp: r.target.exp } : null),
           })).map((r) => (
             <li key={r._id} className="flex flex-wrap items-center gap-[8px] px-[14px] py-[10px] text-[0.95rem]">
               <span className="w-[110px] shrink-0 text-[0.8rem] text-gray-500" title={formatFullDate(r.decidedAt)}>
@@ -293,8 +330,9 @@ export default function ApprovalsContainer() {
               </span>
               <span className="font-semibold">{labelOf(r.userId)}</span>
               <span className="min-w-0 truncate text-gray-700">
-                {r.status === "approved" ? "퀘스트 완료: " : "퀘스트: "}
-                {r.target ? r.target.name : "삭제된 퀘스트"}
+                {r.type === "currency"
+                  ? `화폐 ${r.isSend ? "지급" : "회수"} 신청 (⭐ ${labelOf(r.requestedBy)})`
+                  : `${r.status === "approved" ? "퀘스트 완료: " : "퀘스트: "}${r.target ? r.target.name : "삭제된 퀘스트"}`}
               </span>
               {r.note && <span className="text-[0.8rem] text-gray-500">({r.note})</span>}
               {r.reason && <span className="text-[0.8rem] text-rose-600">사유: {r.reason}</span>}
@@ -303,6 +341,7 @@ export default function ApprovalsContainer() {
                 {r.status === "approved" && r.paid ? (
                   <>
                     {r.paid.money > 0 && <span className="text-emerald-700">{currency || "화폐"} +{r.paid.money.toLocaleString()}</span>}
+                    {r.paid.money < 0 && <span className="text-rose-600">{currency || "화폐"} {r.paid.money.toLocaleString()}</span>}
                     {r.paid.exp > 0 && <span className="text-sky-700">경험치 +{r.paid.exp.toLocaleString()}</span>}
                     {!r.paid.money && !r.paid.exp && <span className="text-gray-400">보상 없음</span>}
                   </>

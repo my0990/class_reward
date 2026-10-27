@@ -155,6 +155,14 @@ export const studentNav = [
 
 ];
 
+// 학생 대표에게만 보이는 메뉴 (user_data.representative)
+export const studentRepNav = {
+  key: "rep",
+  label: "⭐ 화폐 신청",
+  href: (id) => `/student/dashboard/${id}/rep`,
+  activeMatch: (pathname, id) => pathname === `/student/dashboard/${id}/rep`,
+};
+
 export const resolveNav = (role, pathname) => {
   const items = role === "teacher" ? teacherNav : studentNav;
   return items.map((it) => ({

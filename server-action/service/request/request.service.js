@@ -1,5 +1,5 @@
 // 승인 요청 (승인 센터)
-// data.requests: { teacher_id, classId, type: "quest", targetId(퀘스트 _id), userId(신청 학생), cycleKey,
+// data.requests: { teacher_id, classId, type: "quest" | "currency", targetId(퀘스트 _id / 화폐 신청 묶음 id), userId(신청·대상 학생), cycleKey,
 //                  status: "pending" | "approved" | "rejected", createdAt,
 //                  decidedAt?, decidedBy?: { role, id, label }, reason?, note?, paid?: { money, exp } }
 // - 키오스크에서 학생이 "다 했어요!"를 누르면 pending 요청이 생긴다 (보상은 아직 없음)
@@ -7,12 +7,15 @@
 // - 누가 처리했는지(decidedBy)를 남긴다
 // - 일일·주간 퀘스트: 요청에 그 회차(cycleKey)를 같이 저장한다. 지난 회차 신청을 늦게 승인하면
 //   보상은 주되 이번 회차 완료 명단에는 넣지 않는다 (오늘 것을 또 할 수 있게)
+// - "currency": 학생 대표가 친구에게 화폐 지급·회수를 신청 (currencyRequest.service.js).
+//   { requestedBy(대표), amount, isSend }. 승인하면 handlePointService로 선생님이 준 것과 똑같이 처리
 import { ObjectId } from "mongodb";
 import { connectDB } from "@/lib/mongodb";
 import { finishQuestService, refreshQuestCycles } from "@/server-action/service/quest/quest.service";
 import { normalizeRepeat } from "@/util/quest/questRepeat";
+import { handlePointService } from "@/server-action/service/class/handlePointService";
 
-export const REQUEST_TYPES = ["quest"];
+export const REQUEST_TYPES = ["quest", "currency"];
 export const DONE_DAYS = 30; // '처리 완료' 탭에서 보여줄 기간
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -178,7 +181,9 @@ export async function listRequestsService({ teacherObjectId, classObjectId, stat
       reason: r.reason ?? "",
       note: r.note ?? "",
       paid: r.paid ?? null, // 승인 때 실제로 준 보상 { money, exp } (이미 완료라 안 줬으면 null)
-      target: q
+      // 화폐 신청: 신청한 대표, 금액, 지급(true)/회수(false)
+      ...(r.type === "currency" ? { requestedBy: r.requestedBy ?? null, amount: Number(r.amount) || 0, isSend: Boolean(r.isSend) } : {}),
+      target: r.type === "currency" ? null : q
         ? {
             name: q.questName,
             reward: Number(q.questReward) || 0,
@@ -211,13 +216,13 @@ export async function decideRequestsService({ actor, teacherObjectId, classObjec
   await refreshQuestCycles(db, scope, now);
   const requests = await col.find({ ...scope, _id: { $in: ids }, status: "pending" }).toArray();
 
-  const questIds = [...new Set(requests.map((r) => String(r.targetId)))].map((id) => oid(id));
-  const quests = await db.collection("quest").find({ ...scope, _id: { $in: questIds } }).toArray();
+  const questIds = [...new Set(requests.filter((r) => r.type === "quest").map((r) => String(r.targetId)))].map((id) => oid(id));
+  const quests = questIds.length ? await db.collection("quest").find({ ...scope, _id: { $in: questIds } }).toArray() : [];
   const questById = new Map(quests.map((q) => [String(q._id), q]));
 
   const allowed = requests.filter((r) => canDecide(actor, r, questById.get(String(r.targetId))));
   const decidedBy = { role: actor.role, id: String(actor.userId ?? actor.teacherId), label: actor.label ?? (actor.role === "teacher" ? "선생님" : String(actor.userId)) };
-  const summary = { approved: 0, rejected: 0, alreadyDone: 0, skipped: ids.length - allowed.length, missingQuest: 0, lateCycle: 0 };
+  const summary = { approved: 0, rejected: 0, alreadyDone: 0, skipped: ids.length - allowed.length, missingQuest: 0, lateCycle: 0, currency: 0, notRep: 0, missingStudent: 0 };
 
   // 먼저 '내가 처리 중'으로 잡는다: 동시에 두 사람이 눌러도 한 번만 처리되게
   const claim = async (r, set) => (await col.updateOne({ _id: r._id, status: "pending" }, { $set: { ...set, decidedAt: now, decidedBy } })).modifiedCount === 1;
@@ -230,9 +235,12 @@ export async function decideRequestsService({ actor, teacherObjectId, classObjec
     return summary;
   }
 
+  // 승인: 화폐 신청은 신청 한 번(묶음)씩
+  await approveCurrencyRequests({ db, col, scope, list: allowed.filter((r) => r.type === "currency"), claim, summary });
+
   // 승인: 퀘스트별로
   const byQuest = new Map();
-  for (const r of allowed) {
+  for (const r of allowed.filter((r) => r.type !== "currency")) {
     const key = String(r.targetId);
     if (!byQuest.has(key)) byQuest.set(key, []);
     byQuest.get(key).push(r);
@@ -284,6 +292,63 @@ export async function decideRequestsService({ actor, teacherObjectId, classObjec
     }
   }
   return summary;
+}
+
+/**
+ * 화폐 신청 승인: 묶음(targetId)마다
+ * - 신청한 학생이 지금도 대표인지 다시 확인 (아니면 반려)
+ * - 먼저 '승인'으로 잡고 handlePointService로 지급·회수 → 실패하면 '대기'로 되돌림
+ * - 그 사이 삭제된 학생은 '반려(학생 없음)'
+ */
+async function approveCurrencyRequests({ db, col, scope, list, claim, summary }) {
+  const byBatch = new Map();
+  for (const r of list) {
+    const k = String(r.targetId);
+    if (!byBatch.has(k)) byBatch.set(k, []);
+    byBatch.get(k).push(r);
+  }
+  for (const batch of byBatch.values()) {
+    const { requestedBy, amount, isSend } = batch[0];
+    const rep = await db
+      .collection("user_data")
+      .findOne({ ...scope, role: "student", userId: String(requestedBy), representative: true }, { projection: { _id: 1 } });
+    if (!rep) {
+      for (const r of batch) if (await claim(r, { status: "rejected", reason: "대표가 아니어서 취소" })) summary.notRep++;
+      continue;
+    }
+    const money = (isSend ? 1 : -1) * (Number(amount) || 0);
+    const claimed = [];
+    for (const r of batch) {
+      if (await claim(r, { status: "approved", paid: { money, exp: 0 } })) claimed.push(r);
+      else summary.skipped++;
+    }
+    if (claimed.length === 0) continue;
+
+    let res;
+    try {
+      res = await handlePointService({
+        teacher_id: String(scope.teacher_id),
+        classId: String(scope.classId),
+        targetStudent: claimed.map((r) => ({ userId: r.userId })),
+        point: amount,
+        isSend: Boolean(isSend),
+        requestedBy: String(requestedBy),
+      });
+    } catch (e) {
+      await col.updateMany({ _id: { $in: claimed.map((r) => r._id) } }, { $set: { status: "pending" }, $unset: { decidedAt: "", decidedBy: "", paid: "" } });
+      throw e;
+    }
+    const done = new Set(res.success ? res.data.userIds.map(String) : []);
+    const missing = claimed.filter((r) => !done.has(String(r.userId)));
+    if (missing.length) {
+      await col.updateMany(
+        { _id: { $in: missing.map((r) => r._id) } },
+        { $set: { status: "rejected", reason: res.success ? "학생을 찾을 수 없음" : res.message }, $unset: { paid: "" } }
+      );
+      summary.missingStudent += missing.length;
+    }
+    summary.currency += done.size;
+  }
 }
 
 /** 대기 중 요청 수 (메뉴 숫자 표시용) */

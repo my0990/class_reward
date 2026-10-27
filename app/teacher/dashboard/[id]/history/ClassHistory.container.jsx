@@ -289,6 +289,10 @@ export default function ClassHistoryContainer() {
                               );
                             return <span key={i}>{seg.v}</span>;
                           })}
+                          {g.requestedBy && (
+                            // 학생 대표가 신청하고 선생님이 승인한 지급·회수
+                            <span className="ml-[6px] inline-block rounded bg-orange-100 px-[6px] text-[0.8rem] text-orange-700">⭐ {labelOf(g.requestedBy)} 신청</span>
+                          )}
                         </p>
                       </div>
                       {many && isOpen && (

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useFetchData } from "@/hooks/useFetchData";
 import { useStudentRefresh } from "@/hooks/useLiveInterval";
-import { teacherNav, studentNav } from "@/config/navConfig";
+import { teacherNav, studentNav, studentRepNav } from "@/config/navConfig";
 import HomeBtn from "./components/HomeBtn";
 import ClassSwitcher from "./components/ClassSwitcher";
 import HeaderNav from "./components/HeaderNav";
@@ -71,7 +71,8 @@ export default function HeaderContainer({ classId }) {
 
     const { className = "", currencyEmoji, currencyName } = classData;
     const { profileUrl = "", role, userId, money } = userData;
-    const navItems = userData.role === "teacher" ? teacherNav : studentNav
+    // 학생 대표는 '화폐 신청' 메뉴가 하나 더
+    const navItems = userData.role === "teacher" ? teacherNav : userData.representative ? [...studentNav, studentRepNav] : studentNav
     const homeHref = `/${role}/dashboard/${classId}`
     const settingHref = `/${role}/dashboard/${classId}/setting`
 

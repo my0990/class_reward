@@ -8,8 +8,9 @@ import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
  * - history.balance는 클라이언트가 보낸 money가 아니라 변경 후 서버에서 다시 읽은 잔액이다.
  * - 잔액 변경과 기록 저장을 트랜잭션으로 묶어 한쪽만 반영되는 일이 없다.
  * - 회수는 잔액이 0 아래로 내려가는 것을 막지 않는다 (교사 판단에 맡김, 기존 동작 유지).
+ * - requestedBy: 학생 대표의 신청을 승인해서 처리한 경우 그 대표 userId (기록에 남김)
  */
-export async function handlePointService({ teacher_id, classId, targetStudent, point, isSend }) {
+export async function handlePointService({ teacher_id, classId, targetStudent, point, isSend, requestedBy = null }) {
   const amount = toNonNegativeInt(point);
 
   if (amount === null || amount === 0) {
@@ -70,6 +71,7 @@ export async function handlePointService({ teacher_id, classId, targetStudent, p
           type: isSend ? "입금" : "출금",
           name: isSend ? "선생님에게 받음" : "선생님에게 뺏김",
           amount,
+          ...(requestedBy ? { requestedBy: String(requestedBy) } : {}),
           date: now,
           expiresAfter: now,
         })),
