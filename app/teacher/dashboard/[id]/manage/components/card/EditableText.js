@@ -48,7 +48,7 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
         title="눌러서 수정"
         onClick={() => setEditing(true)}
         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setEditing(true))}
-        className={`group ${pos} cursor-text transition hover:ring-2 hover:ring-orange-400 ${className}`}
+        className={`group ${pos} cursor-pointer transition hover:ring-2 hover:ring-orange-400 ${className}`}
       >
         {display ?? (value || <span className="text-gray-400">{placeholder}</span>)}
         <PencilSquareIcon className="pointer-events-none absolute right-[6px] top-[6px] h-[16px] w-[16px] text-orange-500 opacity-0 transition group-hover:opacity-100" aria-hidden="true" />
