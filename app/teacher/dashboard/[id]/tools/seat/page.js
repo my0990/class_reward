@@ -49,6 +49,7 @@ export default function SeatPage() {
   const [revealed, setRevealed] = useState(Infinity);
   const [printView, setPrintView] = useState("student"); // 인쇄 방향: student 칠판이 위 / teacher 180도 돌려 칠판이 아래
   const [printing, setPrinting] = useState(false); // 인쇄하는 동안만 화면 자리표를 printView로
+  const [printTarget, setPrintTarget] = useState(null); // 기록에서 인쇄할 때 그 기록 { layout, assignment, label } (없으면 지금 화면 자리)
   const [savedDraft, setSavedDraft] = useState(null); // 마지막으로 저장한 draft (같은 결과를 두 번 저장하지 않게)
   const [busy, setBusy] = useState(false);
   const timer = useRef(null);
@@ -188,7 +189,13 @@ export default function SeatPage() {
     setTimeout(() => {
       window.print();
       setPrinting(false);
+      setPrintTarget(null);
     }, 100);
+  };
+  // 기록(설정 창 > 기록)에서 '인쇄' → 그 기록으로 인쇄 미리보기
+  const onPrintRecord = (record) => {
+    setPrintTarget(record);
+    setModalId(PRINT_PREVIEW_ID);
   };
   // 오른쪽 위 아이콘 버튼은 모두 같은 모양 (흰 배경 + 회색 선)
   const iconBtn = "btn btn-square btn-sm h-10 w-10 border-0 bg-white text-gray-600 hover:bg-orange-50";
@@ -211,7 +218,10 @@ export default function SeatPage() {
               {/* 저장 안 한 새 자리가 있으면 작은 주황 점 */}
               {unsaved && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-orange-500" />}
             </button>
-            <button type="button" title="인쇄 (미리보기)" aria-label="인쇄" className={iconBtn} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => setModalId(PRINT_PREVIEW_ID)}>
+            <button type="button" title="인쇄 (미리보기)" aria-label="인쇄" className={iconBtn} disabled={!order.length || Boolean(hiddenSeats)} onClick={() => {
+              setPrintTarget(null);
+              setModalId(PRINT_PREVIEW_ID);
+            }}>
               <PrinterIcon className="h-6 w-6" />
             </button>
             <button type="button" title="책상 배치·조건 설정" aria-label="설정" className={iconBtn} onClick={() => setModalId(SEAT_SETTINGS_ID)}>
@@ -224,7 +234,15 @@ export default function SeatPage() {
           {/* 남은 화면(너비·높이)에 맞춰 자리표 크기를 정한다 (SeatGrid size="fit")
               인쇄할 때는 globals.css가 종이 한 장 크기로 바꿔 가로·세로 가운데에 놓는다 */}
           <div className="seat-print-area flex min-h-[240px] w-full flex-1 justify-center pb-2 [container-type:size]">
-            <SeatGrid layout={layout} assignment={shown} students={byId} view={printing ? printView : "student"} hiddenSeats={hiddenSeats} size="fit" />
+            {/* 인쇄하는 동안: 기록에서 고른 자리가 있으면 그 자리로 */}
+            <SeatGrid
+              layout={printing && printTarget ? printTarget.layout : layout}
+              assignment={printing && printTarget ? printTarget.assignment : shown}
+              students={byId}
+              view={printing ? printView : "student"}
+              hiddenSeats={printing && printTarget ? null : hiddenSeats}
+              size="fit"
+            />
           </div>
           <div className="print:hidden">
             <button
@@ -241,12 +259,13 @@ export default function SeatPage() {
       <PrintPreviewModal
         modalId={modalId}
         setModalId={setModalId}
-        layout={layout}
-        assignment={shown}
+        layout={printTarget?.layout ?? layout}
+        assignment={printTarget?.assignment ?? shown}
         students={byId}
         printView={printView}
         setPrintView={setPrintView}
         onPrint={onPrint}
+        label={printTarget?.label}
       />
       <SeatSettingsModal
         modalId={modalId}
@@ -259,6 +278,7 @@ export default function SeatPage() {
         students={students}
         plan={plan}
         onDeleteRecord={onDeleteRecord}
+        onPrintRecord={onPrintRecord}
         busy={busy}
       />
     </div>

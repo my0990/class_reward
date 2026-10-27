@@ -18,7 +18,7 @@ const tabs = [
   ["history", "기록"],
 ];
 
-export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, setLayout, rules, setRules, students, plan, onDeleteRecord, busy }) {
+export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, setLayout, rules, setRules, students, plan, onDeleteRecord, onPrintRecord, busy }) {
   const [tab, setTab] = useState("layout"); // 창을 닫았다 열어도 마지막 탭 유지
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
   const name = (u) => (byId[u] ? `${byId[u].classNumber}. ${byId[u].profileNickname}` : u);
@@ -49,7 +49,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
               <GroupEditor groups={rules.groups ?? []} setGroups={(groups) => setRules({ ...rules, groups })} layout={layout} students={students} name={name} />
             </div>
           )}
-          {tab === "history" && <HistoryEditor plan={plan} layout={layout} studentsById={byId} onDelete={onDeleteRecord} busy={busy} />}
+          {tab === "history" && <HistoryEditor plan={plan} layout={layout} studentsById={byId} onDelete={onDeleteRecord} onPrint={onPrintRecord} busy={busy} />}
           </div>
           <p className="mt-5 text-center text-xs text-gray-400">바꾼 내용은 자동으로 저장됩니다.</p>
         </div>

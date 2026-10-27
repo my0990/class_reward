@@ -7,12 +7,16 @@ import SeatGrid from "./SeatGrid";
 
 export const PRINT_PREVIEW_ID = "PRINT_PREVIEW";
 
-export default function PrintPreviewModal({ modalId, setModalId, layout, assignment, students, printView, setPrintView, onPrint }) {
+export default function PrintPreviewModal({ modalId, setModalId, layout, assignment, students, printView, setPrintView, onPrint, label }) {
   return (
     <ModalTemplate id={PRINT_PREVIEW_ID} modalId={modalId} setModalId={setModalId} className="w-[960px] max-w-[95vw] print:hidden">
       {({ close }) => (
         <div className="p-5 sm:p-6">
-          <h2 className="mb-4 text-lg font-bold">인쇄 미리보기</h2>
+          <h2 className="mb-4 text-lg font-bold">
+            인쇄 미리보기
+            {/* 기록에서 연 경우: 언제 자리인지 */}
+            {label && <span className="ml-2 text-base font-normal text-gray-500">· {label} 자리</span>}
+          </h2>
           <div className="flex h-[60vh] w-full justify-center rounded-xl border border-gray-200 bg-white p-4 [container-type:size]">
             <SeatGrid layout={layout} assignment={assignment} students={students} view={printView} size="fit" />
           </div>
