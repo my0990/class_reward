@@ -17,8 +17,9 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
   }, [value, editing]);
   useEffect(() => {
     if (editing) {
-      ref.current?.focus();
-      ref.current?.select?.();
+      // preventScroll: 포커스할 때 브라우저가 화면을 움직이지 않게 (편집을 누르면 화면이 들썩이던 것)
+      ref.current?.focus({ preventScroll: true });
+      if (!multiline) ref.current?.select?.();
     }
   }, [editing]);
 
@@ -29,7 +30,7 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
     const ok = await onSave(draft);
     setBusy(false);
     if (ok) setEditing(false);
-    else ref.current?.focus();
+    else ref.current?.focus({ preventScroll: true });
   };
   const cancel = () => {
     setDraft(value ?? "");
@@ -73,7 +74,10 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
           }
         }}
         onBlur={save}
-        className={`outline-none ring-2 ring-orange-500 ${className}`}
+        // 보던 칸과 같은 크기·글꼴로 (바뀌는 순간 크기가 달라져 깜빡이지 않게)
+        className={`min-w-0 outline-none ring-2 ring-orange-500 [font:inherit] ${className}`}
+        // 레벨 옆 별명처럼 글자만큼 폭인 칸: 입력칸도 글자 수만큼만 (갑자기 넓어지지 않게)
+        style={pos ? undefined : { width: `calc(${Math.max(2, draft.length) + 0.5}em + 64px)` }}
       />
     );
   }
@@ -97,7 +101,7 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
         }}
         onBlur={save}
         placeholder={placeholder}
-        className="min-h-[96px] w-full flex-1 resize-none rounded-lg p-[6px] pb-[20px] outline-none ring-2 ring-orange-500"
+        className="min-h-[96px] w-full flex-1 resize-none rounded-lg p-[6px] pb-[20px] outline-none ring-2 ring-orange-500 [font:inherit]"
       />
       {maxLength && (
         <span className="pointer-events-none absolute bottom-[12px] right-[14px] rounded bg-white/90 px-[4px] text-[0.75rem] text-gray-400">

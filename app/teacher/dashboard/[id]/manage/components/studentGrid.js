@@ -71,7 +71,7 @@ export default function StudentGrid() {
                                         maxLength={20}
                                         placeholder="별명"
                                         onSave={(v) => saveNickname(a, v)}
-                                        className="mx-auto w-full max-w-[200px] rounded-lg px-[8px] py-[4px] pr-[24px] text-center"
+                                        className="mx-auto flex h-[36px] w-full max-w-[200px] items-center justify-center rounded-lg px-[8px] pr-[24px] text-center"
                                     />
                                 </td>
                                 <td>{a.money}{currencyName}</td>
