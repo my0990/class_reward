@@ -1,4 +1,5 @@
 'use server'
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 import { updateThermometerSettingService } from "@/server-action/service/thermometer/thermometer.service";
@@ -52,7 +53,9 @@ export async function donate({ userId, amount, classId, kioskToken }) {
       throw error;
     }
 
-    return await donateCookieService({ ...target, amount });
+    const res = await donateCookieService({ ...target, amount });
+    if (res?.result) bumpFeature("donate", { classId: target.classId });
+    return res;
   } catch (error) {
     logError("donateCookieAction error:", error);
 

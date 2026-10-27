@@ -1,5 +1,6 @@
 "use server";
 
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { logError } from "@/lib/errorLog/errorLog";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -39,6 +40,7 @@ export async function checkKioskPassword({ userId, userPwd }) {
     }
 
     await bumpDailyUsage("kiosk"); // 관리자 대시보드: 일별 키오스크 사용 수
+    bumpFeature("kiosk_login", { classId: res.classId });
 
     return {
       result: true,

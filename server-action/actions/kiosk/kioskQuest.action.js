@@ -2,6 +2,7 @@
 // 키오스크 퀘스트: 퀘스트를 고르고, 다 한 학생들이 자기 카드를 눌러 완료 신청 (비밀번호 없음)
 // 보상은 선생님이 승인 센터에서 승인할 때 지급되므로, 여기서는 '신청'만 만든다.
 // 쓸 수 있는 곳: 그 반 선생님 로그인 기기, 또는 그 반에 연결된 키오스크 기기
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { logError } from "@/lib/errorLog/errorLog";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -61,6 +62,7 @@ export async function requestKioskQuest({ classId, questId, userIds }) {
     if (!ctx.ok) return { result: false, message: ctx.message };
     if (!(await questMenuOn(ctx.teacher_id, classId))) return { result: false, message: MENU_OFF };
     const r = await createQuestRequestsService({ teacherObjectId: ctx.teacher_id, classObjectId: classId, questId, userIds });
+    if (r.created.length) bumpFeature("quest_request", { classId });
     return { result: true, created: r.created.length, skipped: r.skipped.length };
   } catch (error) {
     return { result: false, message: error?.message || "신청하지 못했어요." };

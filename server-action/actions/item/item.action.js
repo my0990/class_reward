@@ -1,5 +1,6 @@
 "use server";
 
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { logError } from "@/lib/errorLog/errorLog";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -26,13 +27,15 @@ export async function useItem({ userId, itemId, itemName, classId, kioskToken })
     const targetUserId = target.userId;
     const targetClassId = target.classId;
 
-    return await useItemService({
+    const res = await useItemService({
       teacher_id,
       classId: targetClassId,
       userId: targetUserId,
       itemId,
       itemName,
     });
+    if (res?.result) bumpFeature("item_use", { classId: targetClassId });
+    return res;
   } catch (error) {
     logError("useItem error:", error);
 

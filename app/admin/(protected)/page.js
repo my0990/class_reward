@@ -4,6 +4,8 @@ import DailyBarChart from "@/components/admin/DailyBarChart";
 import UsageTrends from "@/components/admin/UsageTrends";
 import SystemStatus from "@/components/admin/SystemStatus";
 import ErrorLogList from "@/components/admin/ErrorLogList";
+import FeatureUsage from "@/components/admin/FeatureUsage";
+import { getFeatureUsageService } from "@/server-action/service/admin/featureUsage.service";
 import { getRecentErrorsService } from "@/server-action/service/admin/errorLog.service";
 import { getDbUsageService, getDeployStatusService } from "@/server-action/service/admin/systemStatus.service";
 import { requireAdminPage } from "@/lib/auth/actionAuth";
@@ -40,7 +42,13 @@ const fmtTime = (iso) =>
 
 export default async function AdminDashboard() {
   await requireAdminPage();
-  const [s, db, deploy, errors] = await Promise.all([getDashboardStatsService(), getDbUsageService(), getDeployStatusService(), getRecentErrorsService()]);
+  const [s, db, deploy, errors, features] = await Promise.all([
+    getDashboardStatsService(),
+    getDbUsageService(),
+    getDeployStatusService(),
+    getRecentErrorsService(),
+    getFeatureUsageService(),
+  ]);
   const emailPct = Math.round((s.email.last24h / s.email.dailyLimit) * 100);
 
   return (
@@ -68,6 +76,8 @@ export default async function AdminDashboard() {
       <p className="text-xs text-slate-500">
         Google Analytics는 선생님 화면만 세기 때문에, 학생·키오스크 이용은 여기서 봅니다.
       </p>
+
+      <FeatureUsage usage={features} />
 
       <SystemStatus db={db} deploy={deploy} />
 

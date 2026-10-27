@@ -1,5 +1,6 @@
 "use server";
 // 승인 센터 (지금은 선생님만. 학생 관리자는 2단계에서 actor만 바꿔 같은 서비스를 쓴다)
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
 import {
@@ -36,6 +37,7 @@ export async function decideRequests({ classId, requestIds, decision, reason }) 
       decision,
       reason,
     });
+    bumpFeature("request_decide", { classId });
     return { result: true, summary };
   } catch (error) {
     return { result: false, message: error?.message || "처리하지 못했어요." };

@@ -1,4 +1,5 @@
 "use server";
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
@@ -114,7 +115,9 @@ export async function finishQuest({ classId, questData, rewarded }) {
   const teacher_id = auth.teacher_id;
 
   try {
-    return await finishQuestService({ teacher_id, classId, questData, rewarded });
+    const res = await finishQuestService({ teacher_id, classId, questData, rewarded });
+    if (res?.result) bumpFeature("quest_finish", { classId });
+    return res;
   } catch (err) {
     return { result: false, message: err?.message || "지급에 실패했습니다." };
   }

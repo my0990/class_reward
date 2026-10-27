@@ -1,4 +1,5 @@
 'use client'
+import { trackFeature } from "@/lib/stats/trackFeature";
 import LoadError from "@/components/ui/common/LoadError";
 import { profileImgProps } from "@/util/image/profileImage";
 import { toast } from "react-hot-toast";
@@ -113,6 +114,8 @@ export default function Random() {
 
         setPickedStudentArr(prev => [...prev, ...selected]);
         setOriginalStudentArr(remain);
+        trackFeature("random_pick", id); // 관리자 '기능 사용량'
+
     }
     useEffect(() => {
         if (studentData && isFirst) {

@@ -38,6 +38,7 @@ const COLLECTION_LABEL = {
   "admins.period_usage": "주·월별 이용 통계",
   "admins.db_size": "DB 용량 기록",
   "admins.error_logs": "에러 기록",
+  "admins.feature_usage": "기능 사용량",
 };
 const DB_LABEL = { user: "계정", data: "학급·학생", admins: "관리자" };
 const SHOW_TOP = 6;

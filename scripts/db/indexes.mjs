@@ -53,6 +53,8 @@ const PLAN = [
   [admins, "error_logs", { fp: 1, day: 1 }, { unique: true, name: "fp_day_unique" }, "에러 기록: 같은 에러는 하루 한 줄"],
   [admins, "error_logs", { day: 1 }, {}, "에러 기록: 하루 새 종류 수 세기"],
   [admins, "error_logs", { lastAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60, name: "lastAt_ttl_30d" }, "에러 기록 30일 뒤 자동 삭제"],
+  [admins, "feature_usage", { day: 1 }, {}, "기능 사용량: 최근 30일 조회"],
+  [admins, "feature_usage", { date: 1 }, { expireAfterSeconds: 400 * 24 * 60 * 60, name: "date_ttl_400d" }, "기능 사용량 400일 뒤 자동 삭제"],
 ];
 
 const sameKey = (a, b) => JSON.stringify(a) === JSON.stringify(b);

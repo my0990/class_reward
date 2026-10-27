@@ -4,6 +4,7 @@
 // - 자동 새로고침 없음 (탭을 열 때·필터를 바꿀 때·새로고침 버튼을 누를 때만 불러온다)
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
+import { trackFeature } from "@/lib/stats/trackFeature";
 import { useFetchData } from "@/hooks/useFetchData";
 import { groupHistory, splitByDay } from "@/util/history/groupHistory";
 import { historySentence, sentenceText, josa } from "@/util/history/historySentence";
@@ -21,6 +22,10 @@ const byNumber = (a, b) => (Number(a.classNumber) || Infinity) - (Number(b.class
 
 export default function ClassHistoryContainer() {
   const { id } = useParams();
+  // 관리자 '기능 사용량': 학급 기록을 연 횟수
+  useEffect(() => {
+    if (id) trackFeature("history_view", id);
+  }, [id]);
   const { data: students } = useFetchData(`/api/students/${id}`);
   const { data: classData } = useFetchData(`/api/classData/${id}`);
   const currency = classData?.currencyName ?? "";

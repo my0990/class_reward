@@ -1,4 +1,5 @@
 "use client";
+import { trackFeature } from "@/lib/stats/trackFeature";
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
@@ -38,6 +39,14 @@ export default function TimerPage() {
   const [modalId, setModalId] = useState(null);
   const [count, setCount] = useState(0);
   const [boardPct, setBoardPct] = useState(0);
+  // 관리자 '기능 사용량': 판서를 연 화면 한 번에 1번만
+  const boardCounted = useRef(false);
+  useEffect(() => {
+    if (boardPct > 0 && !boardCounted.current) {
+      boardCounted.current = true;
+      trackFeature("board_open", id);
+    }
+  }, [boardPct, id]);
   const [isFull, setIsFull] = useState(false);
   const wrapRef = useRef(null);
   const cursor = useBigCursor({ highlight: settings.pointerHighlight });
@@ -72,8 +81,12 @@ export default function TimerPage() {
   const toggleRun = useCallback(() => {
     unlockSound();
     if (running) timer.pause();
-    else timer.start();
-  }, [running, timer.pause, timer.start]);
+    else {
+      // 관리자 '기능 사용량': 일시정지 후 다시 시작은 세지 않음
+      if (timer.status !== "paused") trackFeature("timer_start", id);
+      timer.start();
+    }
+  }, [running, timer.pause, timer.start, timer.status, id]);
 
   // 스페이스바로 시작·일시정지 (입력 중일 때는 제외)
   useEffect(() => {
@@ -93,6 +106,7 @@ export default function TimerPage() {
     try {
       unlockSound();
       await meter.start();
+      trackFeature("noise_meter", id);
     } catch {
       toast.error("마이크를 쓸 수 없어요. 브라우저 주소창의 마이크 권한을 확인해 주세요.");
     }

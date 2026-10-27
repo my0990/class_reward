@@ -1,5 +1,6 @@
 // server-action/action/item/item.action.js
 "use server";
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
@@ -192,6 +193,7 @@ export async function buyItem({ itemId, userId, classId, kioskToken }) {
     }
 
     const { itemId: purchasedItemId } = await buyItemService({ ...target, itemId });
+    bumpFeature("item_buy", { classId: target.classId });
 
     return { result: true, message: "구매 완료", itemId: purchasedItemId };
   } catch (error) {

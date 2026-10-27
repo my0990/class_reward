@@ -1,4 +1,5 @@
 "use server";
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
@@ -23,6 +24,7 @@ export async function handlePoint({ classId, targetStudent, point, isSend }) {
         });
 
         // 서비스는 { success, data | message }를 준다 → action 공통 형식 { result, message, data }로
+        if (res.success) bumpFeature(isSend ? "currency_give" : "currency_take", { classId }); // 관리자 '기능 사용량'
         return res.success
             ? { result: true, message: "완료", data: res.data }
             : { result: false, message: res.message };

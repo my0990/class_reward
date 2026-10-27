@@ -1,5 +1,6 @@
 "use server";
 
+import { bumpFeature } from "@/lib/stats/featureUsage";
 import { logError } from "@/lib/errorLog/errorLog";
 import { authorizeTeacherClass } from "@/lib/auth/actionAuth";
 import { saveSeatSetupService, confirmSeatsService, deleteSeatRecordService } from "@/server-action/service/seat/seat.service";
@@ -23,6 +24,7 @@ export async function confirmSeats({ classId, assignment, replace = false }) {
     const auth = await authorizeTeacherClass(classId);
     if (!auth.ok) return { result: false, message: auth.message };
     const res = await confirmSeatsService({ teacher_id: auth.teacher_id, classId, assignment, replace: replace === true });
+    if (res.ok) bumpFeature("seat_confirm", { classId });
     return res.ok ? { result: true, message: "새 자리를 저장했습니다." } : { result: false, message: res.message };
   } catch (error) {
     logError("confirmSeats error:", error);
