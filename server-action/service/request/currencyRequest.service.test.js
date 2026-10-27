@@ -107,4 +107,14 @@ describe("대표 해제·취소", () => {
     expect((await requests().findOne()).status).toBe("canceled");
     expect((await rep.cancelMyCurrencyRequestService({ ...me, batchId: String(targetId) })).ok).toBe(false);
   });
+
+  it("신청 이유를 정리해서 남기고, 승인 센터·내 신청 목록에 보인다", async () => {
+    await rep.createCurrencyRequestService({ ...me, targetUserIds: ["a"], amount: 5, isSend: true, memo: "  청소를\n  열심히 " });
+    expect((await requests().findOne()).memo).toBe("청소를 열심히");
+    const list = await req.listRequestsService({ teacherObjectId: s.teacher_id, classObjectId: s.classId });
+    expect(list[0].memo).toBe("청소를 열심히");
+    expect((await rep.listMyCurrencyRequestsService(me)).groups[0].memo).toBe("청소를 열심히");
+    expect(rep.cleanMemo("   ")).toBeNull();
+    expect(rep.cleanMemo("가".repeat(80))).toHaveLength(rep.MEMO_MAX);
+  });
 });

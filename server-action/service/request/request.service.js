@@ -182,7 +182,7 @@ export async function listRequestsService({ teacherObjectId, classObjectId, stat
       note: r.note ?? "",
       paid: r.paid ?? null, // 승인 때 실제로 준 보상 { money, exp } (이미 완료라 안 줬으면 null)
       // 화폐 신청: 신청한 대표, 금액, 지급(true)/회수(false)
-      ...(r.type === "currency" ? { requestedBy: r.requestedBy ?? null, amount: Number(r.amount) || 0, isSend: Boolean(r.isSend) } : {}),
+      ...(r.type === "currency" ? { requestedBy: r.requestedBy ?? null, amount: Number(r.amount) || 0, isSend: Boolean(r.isSend), memo: r.memo ?? "" } : {}),
       target: r.type === "currency" ? null : q
         ? {
             name: q.questName,

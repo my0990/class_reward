@@ -35,9 +35,9 @@ export async function listRepClassmates() {
   return run("listRepClassmates", (me) => listRepClassmatesService(me));
 }
 
-export async function createCurrencyRequest({ targetUserIds, amount, isSend }) {
+export async function createCurrencyRequest({ targetUserIds, amount, isSend, memo }) {
   return run("createCurrencyRequest", async (me) => {
-    const res = await createCurrencyRequestService({ ...me, targetUserIds, amount, isSend: isSend === true });
+    const res = await createCurrencyRequestService({ ...me, targetUserIds, amount, isSend: isSend === true, memo });
     if (res.ok) bumpFeature("rep_request", { classId: me.classId });
     return res;
   });

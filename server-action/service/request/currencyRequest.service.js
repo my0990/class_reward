@@ -3,7 +3,7 @@
 // - 대표: user_data.representative = true (학생 관리에서 선생님이 지정, 여러 명 가능)
 // - 신청 한 번 = 같은 targetId(묶음 id)를 가진 요청 여러 개 (대상 학생마다 하나)
 //   data.requests: { teacher_id, classId, type: "currency", targetId(묶음), userId(대상 학생),
-//                    requestedBy(대표 userId), amount, isSend, status, createdAt, ... }
+//                    requestedBy(대표 userId), amount, isSend, memo?(신청 이유), status, createdAt, ... }
 // - 지급·회수 모두 가능, 금액 한도 없음 (실수 방지용 상한만)
 // - 자기 자신은 대상이 될 수 없다
 // - 대표를 해제하면 그 학생의 대기 중 신청은 자동으로 취소(반려)된다
@@ -15,6 +15,14 @@ import { toNonNegativeInt } from "@/util/number/toNonNegativeInt";
 export const MAX_TARGETS = 60;
 export const MAX_AMOUNT = 1_000_000; // 한도가 아니라 0을 여러 개 잘못 누르는 실수 방지용
 export const MY_REQUEST_DAYS = 30;
+export const MEMO_MAX = 50; // 신청 이유 (선택)
+
+/** 신청 이유 정리: 줄바꿈·연속 공백은 한 칸, 앞뒤 공백 제거, 최대 MEMO_MAX자. 비면 null */
+export function cleanMemo(memo) {
+  if (typeof memo !== "string") return null;
+  const m = memo.replace(/\s+/g, " ").trim().slice(0, MEMO_MAX);
+  return m || null;
+}
 const DAY = 24 * 60 * 60 * 1000;
 
 export const NOT_REP_MESSAGE = "학생 대표만 쓸 수 있어요.";
@@ -79,7 +87,7 @@ export async function listRepClassmatesService({ teacher_id, classId, userId }) 
 }
 
 /** 대표: 화폐 신청 (대기 중으로 저장, 잔액은 그대로) */
-export async function createCurrencyRequestService({ teacher_id, classId, userId, targetUserIds, amount, isSend, now = new Date() }) {
+export async function createCurrencyRequestService({ teacher_id, classId, userId, targetUserIds, amount, isSend, memo, now = new Date() }) {
   const scope = scopeOf(teacher_id, classId);
   if (!scope) return fail("잘못된 요청입니다.");
   const me = String(userId ?? "");
@@ -103,6 +111,7 @@ export async function createCurrencyRequestService({ teacher_id, classId, userId
   if (targets.length === 0) return fail("우리 반 친구만 고를 수 있어요.");
 
   const batch = new ObjectId();
+  const reason = cleanMemo(memo);
   await db.collection("requests").insertMany(
     targets.map((t) => ({
       ...scope,
@@ -112,6 +121,7 @@ export async function createCurrencyRequestService({ teacher_id, classId, userId
       requestedBy: me,
       amount: amt,
       isSend: Boolean(isSend),
+      ...(reason ? { memo: reason } : {}),
       status: "pending",
       createdAt: now,
     }))
@@ -142,7 +152,7 @@ export async function listMyCurrencyRequestsService({ teacher_id, classId, userI
   for (const r of rows) {
     const k = String(r.targetId);
     if (!groups.has(k)) {
-      groups.set(k, { batchId: k, createdAt: r.createdAt?.toISOString?.() ?? null, amount: r.amount, isSend: Boolean(r.isSend), items: [] });
+      groups.set(k, { batchId: k, createdAt: r.createdAt?.toISOString?.() ?? null, amount: r.amount, isSend: Boolean(r.isSend), memo: r.memo ?? "", items: [] });
     }
     groups.get(k).items.push({
       userId: r.userId,

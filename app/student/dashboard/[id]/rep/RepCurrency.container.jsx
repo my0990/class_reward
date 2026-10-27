@@ -35,6 +35,7 @@ export default function RepCurrencyContainer() {
   const [selected, setSelected] = useState(() => new Set());
   const [isSend, setIsSend] = useState(true);
   const [amount, setAmount] = useState("");
+  const [memo, setMemo] = useState(""); // 신청 이유 (선택)
   const [busy, setBusy] = useState(false);
 
   const loadMine = useCallback(async () => {
@@ -73,12 +74,13 @@ export default function RepCurrencyContainer() {
     if (!Number.isInteger(n) || n < 1) return toast.error("금액을 1 이상의 숫자로 입력해 주세요.");
     if (selected.size === 0) return toast.error("친구를 골라 주세요.");
     setBusy(true);
-    const r = await createCurrencyRequest({ targetUserIds: [...selected], amount: n, isSend });
+    const r = await createCurrencyRequest({ targetUserIds: [...selected], amount: n, isSend, memo });
     setBusy(false);
     if (!r?.result) return toast.error(r?.message || "신청하지 못했어요.");
     toast.success(`${r.data.count}명에게 ${isSend ? "지급" : "회수"} 신청했어요. 선생님이 확인하면 반영돼요.`);
     setSelected(new Set());
     setAmount("");
+    setMemo("");
     loadMine();
   };
 
@@ -162,6 +164,19 @@ export default function RepCurrencyContainer() {
           )}
         </div>
 
+        {/* 이유 (선택) */}
+        <label className="block">
+          <span className="mb-1 block font-semibold">이유 <span className="text-sm font-normal text-gray-500">(선택, 선생님이 볼 수 있어요)</span></span>
+          <input
+            type="text"
+            value={memo}
+            maxLength={50}
+            onChange={(e) => setMemo(e.target.value)}
+            placeholder={isSend ? "예: 청소를 열심히 했어요" : "예: 약속을 지키지 않았어요"}
+            className="w-full rounded-xl bg-white px-3 py-2 outline-none ring-orange-300 focus:ring-2"
+          />
+        </label>
+
         {/* 금액 + 신청 */}
         <div className="flex flex-wrap items-center gap-2">
           <label className="flex items-center gap-2 rounded-xl bg-white px-3 py-2">
@@ -222,6 +237,7 @@ export default function RepCurrencyContainer() {
                       {g.amount}
                     </span>
                     <span className="text-sm text-gray-600">{g.items.length}명</span>
+                    {g.memo && <span className="min-w-0 truncate text-sm text-gray-600">💬 {g.memo}</span>}
                     {pending > 0 && (
                       <button type="button" onClick={() => cancel(g.batchId)} className="ml-auto text-sm text-gray-500 underline">
                         신청 취소

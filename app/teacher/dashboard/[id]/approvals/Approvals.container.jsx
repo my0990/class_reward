@@ -100,7 +100,7 @@ export default function ApprovalsContainer() {
     const map = new Map();
     for (const r of rows) {
       if (!map.has(r.targetId))
-        map.set(r.targetId, { targetId: r.targetId, type: r.type, target: r.target, requestedBy: r.requestedBy, amount: r.amount, isSend: r.isSend, items: [] });
+        map.set(r.targetId, { targetId: r.targetId, type: r.type, target: r.target, requestedBy: r.requestedBy, amount: r.amount, isSend: r.isSend, memo: r.memo, items: [] });
       map.get(r.targetId).items.push(r);
     }
     for (const g of map.values()) g.items.sort((a, b) => byNumber(studentMap.get(a.userId) ?? {}, studentMap.get(b.userId) ?? {}));
@@ -257,6 +257,10 @@ export default function ApprovalsContainer() {
                       <span className="text-[0.85rem] text-gray-500">
                         {g.items.length}명 · {timeOf(g.items[0]?.createdAt)}
                       </span>
+                      {g.memo && (
+                        // 대표가 적은 신청 이유
+                        <p className="w-full rounded-lg bg-white px-[10px] py-[6px] text-[0.95rem] text-gray-700">💬 {g.memo}</p>
+                      )}
                     </>
                   ) : (
                     <>
@@ -331,7 +335,7 @@ export default function ApprovalsContainer() {
               <span className="font-semibold">{labelOf(r.userId)}</span>
               <span className="min-w-0 truncate text-gray-700">
                 {r.type === "currency"
-                  ? `화폐 ${r.isSend ? "지급" : "회수"} 신청 (⭐ ${labelOf(r.requestedBy)})`
+                  ? `화폐 ${r.isSend ? "지급" : "회수"} 신청 (⭐ ${labelOf(r.requestedBy)})${r.memo ? ` · 💬 ${r.memo}` : ""}`
                   : `${r.status === "approved" ? "퀘스트 완료: " : "퀘스트: "}${r.target ? r.target.name : "삭제된 퀘스트"}`}
               </span>
               {r.note && <span className="text-[0.8rem] text-gray-500">({r.note})</span>}
