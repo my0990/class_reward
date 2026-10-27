@@ -79,7 +79,8 @@ export function PointModalBody({ isSend, currencyName, activeStudentLabels }) {
 
         <div className="h-[64px] bg-gray-200 mb-4 rounded-2xl flex justify-between items-center px-[16px]">
           <div className="text-gray-500">
-            {isSend ? "받는" : "잃는"} 금액
+            {/* "받는 쿠키"처럼 화폐 이름으로 (이름이 없으면 "금액") */}
+            {isSend ? "받는" : "잃는"} {currencyName || "금액"}
           </div>
           <div
             style={{ fontSize: display.fontSize + "rem" }}
