@@ -69,11 +69,18 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
 
             <div className="text-[1.2rem]  rounded-lg   mt-[32px] text-orange-500 flex flex-col justify-center w-[896px] max-[896px]:w-[744px] max-[744px]:w-[592px] max-[592px]:w-[440px] max-[440px]:w-[288px]">
                 <div className="flex justify-between mb-[8px]">
-                    <div className="px-[4px] rounded-full hover:bg-orange-100 transition-all cursor-pointer text-[2rem] text-right text-black hover:scale-110  flex items-center" onClick={() => setIsDetail(false)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-[40px] h-[40px] mb-[4px]">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                    {/* 목록으로 (뒤로가기와 같음) */}
+                    <button
+                        type="button"
+                        onClick={() => setIsDetail(false)}
+                        aria-label="목록으로"
+                        title="목록으로"
+                        className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-white text-black transition-all hover:scale-110 hover:bg-orange-100"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-[34px] w-[34px]" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                         </svg>
-                    </div>
+                    </button>
                     {role === 'teacher' ?
                         <button onClick={() => setModalId("EDIT_QUEST")} className="flex justify-center items-center   bg-white outline-none border-none rounded-full hover:bg-orange-100 transition-all w-[48px] h-[48px] hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="p-[4px] w-[40px] h-[40px]">
