@@ -58,27 +58,45 @@ export default function EditableText({ value, onSave, multiline = false, maxLeng
   }
 
   if (!multiline) {
+    const inputProps = {
+      ref,
+      value: draft,
+      maxLength,
+      readOnly: busy, // disabled면 저장 실패 뒤 입력칸 포커스가 빠져 Esc가 창을 닫음
+      onChange: (e) => setDraft(e.target.value),
+      onKeyDown: (e) => {
+        if (e.nativeEvent.isComposing) return; // 한글 입력 중
+        if (e.key === "Enter") save();
+        if (e.key === "Escape") {
+          e.stopPropagation(); // 창(모달)까지 닫히지 않게
+          cancel();
+        }
+      },
+      onBlur: save,
+      size: 1, // 입력칸 기본 폭(약 20글자)이 주변을 밀어 넓히지 않게
+    };
+
+    // 레벨 옆 별명처럼 위치가 정해진(absolute) 칸: 입력칸 자체를 그 자리에, 폭은 글자 수만큼
+    if (!pos) {
+      return (
+        <input
+          {...inputProps}
+          className={`min-w-0 outline-none ring-2 ring-orange-500 [font:inherit] ${className}`}
+          style={{ width: `calc(${Math.max(2, draft.length) + 0.5}em + 64px)` }}
+        />
+      );
+    }
+
+    // 표 안 같은 칸: 보던 칸을 그대로 두고(글자는 숨김) 그 위에 입력칸을 덮는다
+    // → 칸·열 폭이 조금도 바뀌지 않는다 (입력칸이 표의 열 폭 계산에 끼어들어 양옆으로 넓어지던 것)
     return (
-      <input
-        ref={ref}
-        value={draft}
-        maxLength={maxLength}
-        readOnly={busy} // disabled면 저장 실패 뒤 입력칸 포커스가 빠져 Esc가 창을 닫음
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.nativeEvent.isComposing) return; // 한글 입력 중
-          if (e.key === "Enter") save();
-          if (e.key === "Escape") {
-            e.stopPropagation(); // 창(모달)까지 닫히지 않게
-            cancel();
-          }
-        }}
-        onBlur={save}
-        // 보던 칸과 같은 크기·글꼴로 (바뀌는 순간 크기가 달라져 깜빡이지 않게)
-        className={`min-w-0 outline-none ring-2 ring-orange-500 [font:inherit] ${className}`}
-        // 레벨 옆 별명처럼 글자만큼 폭인 칸: 입력칸도 글자 수만큼만 (갑자기 넓어지지 않게)
-        style={pos ? undefined : { width: `calc(${Math.max(2, draft.length) + 0.5}em + 64px)` }}
-      />
+      <div className={`relative ring-2 ring-orange-500 ${className}`}>
+        <span className="invisible whitespace-pre">{value || placeholder || " "}</span>
+        <input
+          {...inputProps}
+          className="absolute inset-0 h-full w-full min-w-0 rounded-[inherit] bg-transparent outline-none [font:inherit] [padding:inherit] [text-align:inherit]"
+        />
+      </div>
     );
   }
 
