@@ -1,13 +1,13 @@
 "use client";
 // 대시보드 '자리 배치' 보기: 자리 바꾸기에서 마지막으로 저장한 자리 그대로 학생 카드를 놓는다
 // - view "teacher": 앞줄이 화면 아래 (교탁에서 반을 바라보는 방향) / "student": 앞줄이 위 (칠판 그림은 그리지 않음)
-// - 통로는 빈칸, 카드는 화면 폭에 맞춰 줄어듦 (작아지면 사진·번호·별명·잔액만)
+// - 통로는 빈칸, 카드는 화면 폭에 맞춰 줄어듦. 레벨·사진·번호·별명·잔액·칭호 (세로로 길어지면 스크롤)
 // - 자리 없는 학생(자리 저장 뒤 새로 만든 학생 등)은 맨 아래 '자리 없음'에 모음
 import { profileImgProps } from "@/util/image/profileImage";
 import { seatId } from "@/util/seat/seatAlgorithm";
 import TruncText from "@/components/ui/common/TruncText";
 
-function SeatCard({ student, isActive, onClick, currencyEmoji }) {
+function SeatCard({ student, level, isActive, onClick, currencyEmoji }) {
   const onKeyDown = (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -25,6 +25,7 @@ function SeatCard({ student, isActive, onClick, currencyEmoji }) {
         isActive ? "bg-orange-500 text-white" : "bg-orange-200 text-gray-800 hover:bg-orange-300"
       }`}
     >
+      <div className="mb-[4%] w-full text-left text-[clamp(8px,8.5cqw,13px)] font-semibold leading-tight">LV. {level}</div>
       <div className="aspect-square w-[62%] overflow-hidden rounded-full border-[3px] border-white bg-white">
         <img {...profileImgProps(student.profileUrl, 100)} width="100" height="100" alt="" className="h-full w-full object-cover" />
       </div>
@@ -38,11 +39,16 @@ function SeatCard({ student, isActive, onClick, currencyEmoji }) {
       >
         {currencyEmoji} {student.money}
       </TruncText>
+      {student.profileTitle && (
+        <TruncText className="mt-[5%] w-full rounded-md bg-white px-[4%] py-[2%] text-center text-[clamp(8px,8.5cqw,13px)] leading-tight text-gray-800">
+          {student.profileTitle}
+        </TruncText>
+      )}
     </div>
   );
 }
 
-export default function SeatLayoutView({ layout, assignment = {}, students = [], view = "teacher", isActive, onToggle, currencyEmoji }) {
+export default function SeatLayoutView({ layout, assignment = {}, students = [], view = "teacher", isActive, onToggle, currencyEmoji, levelOf = () => 1 }) {
   const byId = new Map(students.map((s) => [String(s.userId), s]));
   const teacher = view === "teacher";
   const rows = [...Array(layout.rows).keys()];
@@ -70,7 +76,7 @@ export default function SeatLayoutView({ layout, assignment = {}, students = [],
             if (!layout.desks?.[r]?.[c]) return <div key={key} aria-hidden="true" />; // 통로
             const s = byId.get(String(assignment[seatId(r, c)] ?? ""));
             if (!s) return <div key={key} aria-hidden="true" className="min-h-[60px] rounded-xl border-2 border-dashed border-orange-200" />; // 빈 책상
-            return <SeatCard key={key} student={s} isActive={isActive(s)} onClick={() => onToggle(s)} currencyEmoji={currencyEmoji} />;
+            return <SeatCard key={key} student={s} level={levelOf(s)} isActive={isActive(s)} onClick={() => onToggle(s)} currencyEmoji={currencyEmoji} />;
           })
         )}
       </div>
@@ -80,7 +86,7 @@ export default function SeatLayoutView({ layout, assignment = {}, students = [],
           <div className="mb-[8px] text-[0.95rem] font-semibold text-gray-600">자리 없음 ({unseated.length}명)</div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,120px))] gap-[10px]">
             {unseated.map((s) => (
-              <SeatCard key={s.userId} student={s} isActive={isActive(s)} onClick={() => onToggle(s)} currencyEmoji={currencyEmoji} />
+              <SeatCard key={s.userId} student={s} level={levelOf(s)} isActive={isActive(s)} onClick={() => onToggle(s)} currencyEmoji={currencyEmoji} />
             ))}
           </div>
         </div>

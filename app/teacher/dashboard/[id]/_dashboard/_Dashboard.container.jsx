@@ -225,6 +225,7 @@ export default function DashboardContainer({ classId }) {
             isActive={isStudentActive}
             onToggle={toggleStudent}
             currencyEmoji={currencyEmoji}
+            levelOf={(s) => levelMap?.[String(s.userId)] ?? 1}
           />
         ) : (
           <>
