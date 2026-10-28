@@ -6,6 +6,7 @@ import FinishQuestModal from "./finishQuestModal"
 import DeleteQuestCardModal from "./deleteQuestCardModal"
 import EditQuestModal from "./EditQuestModal"
 import ResetQuestModal from "./ResetQuestModal"
+import Link from "next/link"
 
 export default function QuestDetailTemplate({ classData, studentData, classId, role, questDetailData, setQuestDetailData, setIsDetail }) {
 
@@ -125,6 +126,15 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
                             </div>
                         </div>
                         : null}
+                    {/* 키오스크에서 완료를 신청해 승인 센터에서 확인을 기다리는 학생 */}
+                    {questDetailData.pending?.length > 0 && (
+                        <div className="mb-[12px] flex flex-wrap items-center gap-[8px] rounded-lg bg-amber-50 px-[12px] py-[8px] text-[1rem] text-amber-900">
+                            <span>⏳ 승인 대기 <b>{questDetailData.pending.length}명</b>: 키오스크에서 완료를 신청했어요.</span>
+                            <Link href={`/teacher/dashboard/${classId}/approvals`} className="font-semibold underline">
+                                승인 센터로 →
+                            </Link>
+                        </div>
+                    )}
                     <div className="flex flex-wrap justify-start gap-[16px] ">
 
                         {studentArr.map((a, i) => {
@@ -141,8 +151,13 @@ export default function QuestDetailTemplate({ classData, studentData, classId, r
                             return (
 
 
-                                <div key={a._id} onClick={(e) => onClick(a)} className={` ${a.isactive ? "bg-orange-400" : undefined} bg-orange-200 cursor-pointer text-gray-600 rounded-lg font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px]`}>
+                                <div key={a._id} onClick={(e) => onClick(a)} className={` ${a.isactive ? "bg-orange-400" : undefined} relative bg-orange-200 cursor-pointer text-gray-600 rounded-lg font-bold text-[1.1rem]  flex justify-center items-center  w-[136px] h-[180px]`}>
                                     {a['classNumber']}. {a['profileNickname']}
+                                    {questDetailData.pending?.includes(a.userId) && (
+                                        <span className="pointer-events-none absolute inset-x-[8px] bottom-[10px] rounded-md bg-amber-400 py-[2px] text-center text-[0.9rem] font-black text-amber-950">
+                                            ⏳ 승인 대기
+                                        </span>
+                                    )}
                                 </div>
 
                                 // </label>

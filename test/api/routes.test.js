@@ -232,6 +232,23 @@ describe("/api/fetchQuestList/[id]", () => {
     const { body } = await call(questRoute, { id: scope.classId });
     expect(body.map((q) => q.questName)).toEqual(["우리 퀘스트"]);
   });
+
+  it("승인 대기 중인 학생(이번 회차, 대기 상태만)을 퀘스트마다 붙여 준다", async () => {
+    const { insertedId: qid } = await mongo.db
+      .collection("quest")
+      .insertOne({ teacher_id: scope.teacherObjectId, classId: scope.classObjectId, questName: "독서", time: 1 });
+    const base = { teacher_id: scope.teacherObjectId, classId: scope.classObjectId, type: "quest", targetId: qid, cycleKey: null };
+    await mongo.db.collection("requests").insertMany([
+      { ...base, userId: "a", status: "pending" },
+      { ...base, userId: "b", status: "approved" },
+      { ...base, userId: "c", status: "pending", cycleKey: "2026-10-01" }, // 지난 회차
+      { ...base, teacher_id: other.teacherObjectId, userId: "x", status: "pending" }, // 남의 요청
+    ]);
+    asTeacher();
+    const { body } = await call(questRoute, { id: scope.classId });
+    expect(body[0].pending).toEqual(["a"]);
+    await mongo.db.collection("requests").deleteMany({});
+  });
 });
 
 describe("/api/fetchHistory/[id]", () => {

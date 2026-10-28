@@ -22,5 +22,19 @@ export const GET = withApiHandler(async (req, { params }) => {
     .sort({ order: 1, time: -1 })
     .toArray();
 
-  return NextResponse.json(quests);
+  // 승인 대기: 키오스크에서 학생이 완료를 신청했지만 아직 승인 센터에서 처리하지 않은 학생 (이번 회차 것만)
+  const pending = await db
+    .collection("requests")
+    .find({ teacher_id: teacherObjectId, classId: classObjectId, type: "quest", status: "pending" }, { projection: { targetId: 1, userId: 1, cycleKey: 1 } })
+    .toArray();
+  const cycleOf = new Map(quests.map((q) => [String(q._id), q.cycleKey ?? null]));
+  const pendingByQuest = new Map();
+  for (const p of pending) {
+    const k = String(p.targetId);
+    if (!cycleOf.has(k) || (p.cycleKey ?? null) !== cycleOf.get(k)) continue; // 지난 회차 신청은 빼고
+    if (!pendingByQuest.has(k)) pendingByQuest.set(k, []);
+    pendingByQuest.get(k).push(p.userId);
+  }
+
+  return NextResponse.json(quests.map((q) => ({ ...q, pending: pendingByQuest.get(String(q._id)) ?? [] })));
 });

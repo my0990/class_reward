@@ -169,6 +169,12 @@ export default function QuestCard({
                             {studentCount}
                         </span>
                     </div>
+                    {/* 키오스크에서 완료 신청 → 승인 센터에서 확인을 기다리는 학생 */}
+                    {data.pending?.length > 0 && (
+                        <span className="mr-[12px] whitespace-nowrap rounded-full bg-amber-100 px-[10px] py-[2px] text-[0.9rem] font-bold text-amber-800" title="승인 센터에서 승인하면 보상이 지급돼요">
+                            ⏳ 승인 대기 {data.pending.length}명
+                        </span>
+                    )}
 
                     <button
                         type="button"
