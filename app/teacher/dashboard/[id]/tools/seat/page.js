@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { mutate } from "swr";
 import { toast } from "react-hot-toast";
-import { Cog6ToothIcon, PrinterIcon } from "@heroicons/react/24/outline";
+import { Cog6ToothIcon, PrinterIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon } from "@heroicons/react/24/outline";
 import { useFetchData } from "@/hooks/useFetchData";
 import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
 import { saveSeatSetup, confirmSeats, deleteSeatRecord } from "@/server-action/actions/seat/seat.action";
@@ -197,13 +197,29 @@ export default function SeatPage() {
     setPrintTarget(record);
     setModalId(PRINT_PREVIEW_ID);
   };
+  // 전체 화면 (타이머와 같은 방식: 자리표 화면만 꽉 채움, Esc로 끝)
+  const wrapRef = useRef(null);
+  const [isFull, setIsFull] = useState(false);
+  useEffect(() => {
+    const onChange = () => setIsFull(document.fullscreenElement === wrapRef.current);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+  const toggleFull = () => {
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    else wrapRef.current?.requestFullscreen?.().catch(() => toast.error("이 브라우저에서는 전체 화면을 쓸 수 없어요."));
+  };
+
   // 오른쪽 위 아이콘 버튼은 모두 같은 모양 (흰 배경 + 회색 선)
   const iconBtn = "btn btn-square btn-sm h-10 w-10 border-0 bg-white text-gray-600 hover:bg-orange-50";
 
   return (
     // 화면 높이만큼 → 아래로 스크롤하면 헤더가 올라가 자리표만 보인다 (타이머와 같은 방식)
     // 높이를 화면 높이로 '고정'(h-dvh)해야 자리표가 남은 높이에 맞춰진다 (min-h만 주면 칸이 아주 작아졌음)
-    <div className="mx-auto flex h-dvh w-full max-w-[1600px] flex-col px-4 py-6 print:block print:h-auto sm:px-8">
+    <div
+      ref={wrapRef}
+      className={`mx-auto flex h-dvh w-full flex-col px-4 py-6 print:block print:h-auto sm:px-8 ${isFull ? "max-w-none bg-white" : "max-w-[1600px]"}`}
+    >
       <div className="mb-4 flex items-center justify-end gap-3 print:hidden">
           <div className="flex items-center gap-1">
             <button
@@ -226,6 +242,9 @@ export default function SeatPage() {
             </button>
             <button type="button" title="책상 배치·조건 설정" aria-label="설정" className={iconBtn} onClick={() => setModalId(SEAT_SETTINGS_ID)}>
               <Cog6ToothIcon className="h-6 w-6" />
+            </button>
+            <button type="button" title={isFull ? "전체 화면 끝내기" : "전체 화면"} aria-label={isFull ? "전체 화면 끝내기" : "전체 화면"} className={iconBtn} onClick={toggleFull}>
+              {isFull ? <ArrowsPointingInIcon className="h-6 w-6" /> : <ArrowsPointingOutIcon className="h-6 w-6" />}
             </button>
           </div>
       </div>
