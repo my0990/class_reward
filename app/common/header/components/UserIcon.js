@@ -2,7 +2,7 @@ import Link from "next/link";
 import { profileImgProps } from "@/util/image/profileImage";
 export default function UserIcon({toggleUserInfo, profileIconRef, profileUrl, toggleHamburger, hasBadge = false, pendingCount = 0, approvalsHref}) {
     return (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-5">
             {/* 승인 대기 알림: 누르면 승인 센터로 */}
             {pendingCount > 0 && approvalsHref && (
                 <Link
