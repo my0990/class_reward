@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { withApiHandler, requireTeacher, parseObjectId, requireActiveClass } from "@/lib/api/routeHelpers";
 import { refreshQuestCycles } from "@/server-action/service/quest/quest.service";
+import { closeAlreadyDoneRequests } from "@/server-action/service/request/request.service";
 
 // 학급 퀘스트 목록 (교사)
 export const GET = withApiHandler(async (req, { params }) => {
@@ -12,6 +13,7 @@ export const GET = withApiHandler(async (req, { params }) => {
 
   const db = (await connectDB).db("data");
   await refreshQuestCycles(db, { teacher_id: teacherObjectId, classId: classObjectId }); // 일일·주간 퀘스트 회차가 바뀌었으면 먼저 비움
+  await closeAlreadyDoneRequests(db, { teacher_id: teacherObjectId, classId: classObjectId }); // 이미 완료한 학생의 신청은 처리 완료로
   const quests = await db
     .collection("quest")
     .find({ teacher_id: teacherObjectId, classId: classObjectId }, { projection: { code: 0 } })

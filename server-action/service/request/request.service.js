@@ -50,6 +50,34 @@ export function canDecide(actor, request, quest = null) {
   return false;
 }
 
+export const AUTO_DECIDER = { role: "system", id: "auto", label: "자동 처리" };
+
+/**
+ * 이미 완료된 학생의 퀘스트 신청은 '대기'에 두지 않고 바로 '승인(이미 완료)'으로 닫는다 (보상 없음)
+ * 선생님이 퀘스트 화면에서 직접 완료 처리한 경우 등. 이번 회차 신청만 해당 (지난 회차는 그대로 둠)
+ * questIds를 주면 그 퀘스트들만 본다.
+ */
+export async function closeAlreadyDoneRequests(db, scope, { questIds = null, now = new Date() } = {}) {
+  const col = db.collection("requests");
+  const filter = { ...scope, type: "quest", status: "pending" };
+  if (questIds) filter.targetId = { $in: questIds.map((id) => oid(id, "퀘스트")) };
+  const pending = await col.find(filter, { projection: { targetId: 1, userId: 1, cycleKey: 1 } }).toArray();
+  if (pending.length === 0) return 0;
+  const ids = [...new Set(pending.map((p) => String(p.targetId)))].map((id) => oid(id));
+  const quests = await db.collection("quest").find({ ...scope, _id: { $in: ids } }, { projection: { finished: 1, cycleKey: 1 } }).toArray();
+  const questById = new Map(quests.map((q) => [String(q._id), q]));
+  const done = pending.filter((p) => {
+    const q = questById.get(String(p.targetId));
+    return q && (p.cycleKey ?? null) === (q.cycleKey ?? null) && (q.finished ?? []).includes(p.userId);
+  });
+  if (done.length === 0) return 0;
+  const r = await col.updateMany(
+    { _id: { $in: done.map((p) => p._id) }, status: "pending" },
+    { $set: { status: "approved", note: "이미 완료", decidedAt: now, decidedBy: AUTO_DECIDER } }
+  );
+  return r.modifiedCount;
+}
+
 /** 키오스크: 학생의 퀘스트 완료 신청 */
 export async function createQuestRequestService({ teacherObjectId, classObjectId, userId, questId, now = new Date() }) {
   const db = (await connectDB).db("data");
@@ -109,6 +137,7 @@ export async function listKioskQuestsService({ teacherObjectId, classObjectId })
   const db = (await connectDB).db("data");
   const scope = { teacher_id: oid(teacherObjectId, "교사"), classId: oid(classObjectId, "학급") };
   await refreshQuestCycles(db, scope);
+  await closeAlreadyDoneRequests(db, scope);
   const [quests, pending] = await Promise.all([
     db
       .collection("quest")
@@ -147,6 +176,7 @@ export async function listRequestsService({ teacherObjectId, classObjectId, stat
       ? { ...scope, status: "pending" }
       : { ...scope, status: { $in: ["approved", "rejected"] }, decidedAt: { $gte: new Date(now.getTime() - DONE_DAYS * DAY) } };
   await refreshQuestCycles(db, scope, now);
+  await closeAlreadyDoneRequests(db, scope, { now });
   const rows = await db
     .collection("requests")
     .find(filter)
@@ -354,5 +384,8 @@ async function approveCurrencyRequests({ db, col, scope, list, claim, summary })
 /** 대기 중 요청 수 (메뉴 숫자 표시용) */
 export async function countPendingRequestsService({ teacherObjectId, classObjectId }) {
   const db = (await connectDB).db("data");
-  return db.collection("requests").countDocuments({ teacher_id: oid(teacherObjectId), classId: oid(classObjectId), status: "pending" });
+  const scope = { teacher_id: oid(teacherObjectId), classId: oid(classObjectId) };
+  await refreshQuestCycles(db, scope);
+  await closeAlreadyDoneRequests(db, scope);
+  return db.collection("requests").countDocuments({ ...scope, status: "pending" });
 }

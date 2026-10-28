@@ -1,5 +1,8 @@
 "use server";
 import { bumpFeature } from "@/lib/stats/featureUsage";
+import { ObjectId } from "mongodb";
+import { connectDB } from "@/lib/mongodb";
+import { closeAlreadyDoneRequests } from "@/server-action/service/request/request.service";
 import { authorizeTeacherClass, getTeacherId } from "@/lib/auth/actionAuth";
 
 import { getServerSession } from "next-auth";
@@ -116,7 +119,14 @@ export async function finishQuest({ classId, questData, rewarded }) {
 
   try {
     const res = await finishQuestService({ teacher_id, classId, questData, rewarded });
-    if (res?.result) bumpFeature("quest_finish", { classId });
+    if (res?.result) {
+      bumpFeature("quest_finish", { classId });
+      // 직접 완료 처리한 학생의 키오스크 신청은 바로 '처리 완료'로
+      try {
+        const db = (await connectDB).db("data");
+        await closeAlreadyDoneRequests(db, { teacher_id: new ObjectId(String(teacher_id)), classId: new ObjectId(String(classId)) }, { questIds: [questData?._id] });
+      } catch {}
+    }
     return res;
   } catch (err) {
     return { result: false, message: err?.message || "지급에 실패했습니다." };

@@ -118,6 +118,20 @@ describe("승인·반려", () => {
   });
 });
 
+describe("이미 완료한 학생의 신청은 자동으로 처리 완료", () => {
+  it("선생님이 직접 완료 처리하면 대기에서 빠지고 '승인(이미 완료)'으로, 보상 없음", async () => {
+    await ask("a");
+    await ask("b");
+    await mongo.db.collection("quest").updateOne({ _id: questId }, { $set: { finished: ["a"] } });
+    expect(await svc.countPendingRequestsService(ctx)).toBe(1);
+    const pending = await svc.listRequestsService({ ...ctx, status: "pending" });
+    expect(pending.map((r) => r.userId)).toEqual(["b"]);
+    const done = await svc.listRequestsService({ ...ctx, status: "done" });
+    expect(done).toEqual([expect.objectContaining({ userId: "a", status: "approved", note: "이미 완료", paid: null, decidedBy: svc.AUTO_DECIDER })]);
+    expect((await getStudent(mongo.db, s, "a")).money).toBe(0);
+  });
+});
+
 describe("권한 (canDecide)", () => {
   const req = { teacher_id: s.teacherObjectId, classId: s.classObjectId, type: "quest", userId: "a" };
   const manager = { role: "student", teacherId: s.teacher_id, classId: s.classId, userId: "b", permissions: ["quest"] };
