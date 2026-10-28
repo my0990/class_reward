@@ -72,7 +72,9 @@ export default function HeaderContainer({ classId }) {
     const { className = "", currencyEmoji, currencyName } = classData;
     const { profileUrl = "", role, userId, money } = userData;
     // 학생 대표는 '화폐 신청' 메뉴가 하나 더
-    const navItems = userData.role === "teacher" ? teacherNav : userData.representative ? [...studentNav, studentRepNav] : studentNav
+    // 메뉴 이름은 그 반 화폐 이름으로 (예: "⭐ 쿠키 관리")
+    const repNav = { ...studentRepNav, label: `⭐ ${currencyName || "화폐"} 관리` };
+    const navItems = userData.role === "teacher" ? teacherNav : userData.representative ? [...studentNav, repNav] : studentNav
     const homeHref = `/${role}/dashboard/${classId}`
     const settingHref = `/${role}/dashboard/${classId}/setting`
 
