@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { mutate } from "swr";
+import { pendingApprovalsKey } from "@/hooks/usePendingApprovals";
 import { useFetchData } from "@/hooks/useFetchData";
 import { listRequests, decideRequests } from "@/server-action/actions/request/request.action";
 import { formatHistoryDateParts, formatFullDate } from "../manage/utils/historyDate";
@@ -89,6 +90,7 @@ export default function ApprovalsContainer() {
         mutate(`/api/fetchQuestList/${classId}`);
         mutate(`/api/classData/${classId}`);
         mutate(`/api/students/${classId}`);
+        mutate(pendingApprovalsKey(classId));
       }
     } else toast.error(res?.message || "처리하지 못했어요.");
     load();
