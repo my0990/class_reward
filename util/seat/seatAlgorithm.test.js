@@ -30,10 +30,10 @@ describe("교실 배치", () => {
     expect([...mates.D]).toEqual(["E"]);
   });
 
-  it("앞뒤·옆 자리", () => {
+  it("둘러싼 자리: 앞뒤·옆·대각선", () => {
     const layout = makeLayout(3, 3);
-    expect(neighborSeats(layout, "1-1").sort()).toEqual(["0-1", "1-0", "1-2", "2-1"]);
-    expect(neighborSeats(layout, "0-0").sort()).toEqual(["0-1", "1-0"]);
+    expect(neighborSeats(layout, "1-1").sort()).toEqual(["0-0", "0-1", "0-2", "1-0", "1-2", "2-0", "2-1", "2-2"]);
+    expect(neighborSeats(layout, "0-0").sort()).toEqual(["0-1", "1-0", "1-1"]);
   });
 });
 

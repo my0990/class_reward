@@ -11,7 +11,7 @@
 //           그룹 학생은 그룹 자리 중 하나에만 앉는다. 여러 그룹이면 모든 그룹 자리가 겹치는 곳에만.
 //           자리를 하나도 고르지 않은 그룹은 아직 조건이 아닌 것으로 본다. 그룹 자리에 다른 학생이 앉는 건 막지 않는다.
 //   (예전) front: { userIds, rows } 앞쪽 n줄 → normalizeRules가 '앞자리' 그룹으로 바꾼다
-//   apart:  [[userIdA, userIdB], ...]      앞뒤·옆자리 금지
+//   apart:  [[userIdA, userIdB], ...]      앞뒤·옆·대각선 자리 금지
 //   avoidPrevPartner: boolean               바로 전 배치에서 옆자리였던 학생과 다시 옆자리 금지
 //                                           (이름은 예전 '지난 짝 피하기' 그대로. 2칸·3칸씩 붙은 책상 모두에 맞음)
 //
@@ -45,10 +45,12 @@ export function partnerSeat(layout, id) {
   return isDesk(layout, r, pc) ? seatId(r, pc) : null;
 }
 
-/** 앞뒤·옆 자리 id 목록 */
+/** 둘러싼 자리(앞뒤·옆·대각선) id 목록 */
 export function neighborSeats(layout, id) {
   const { r, c } = parseSeatId(id);
-  return [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].filter(([rr, cc]) => isDesk(layout, rr, cc)).map(([rr, cc]) => seatId(rr, cc));
+  const around = [];
+  for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) if (dr || dc) around.push([r + dr, c + dc]);
+  return around.filter(([rr, cc]) => isDesk(layout, rr, cc)).map(([rr, cc]) => seatId(rr, cc));
 }
 
 /** 옆자리(같은 줄 바로 왼쪽·오른쪽 책상) id 목록 */
@@ -191,7 +193,7 @@ export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random,
   const fits = (userId, sid, at) => {
     // 지난번 옆자리였던 학생과 다시 옆자리 X (양쪽 다 확인: 나중에 앉는 학생 쪽에서 걸러진다)
     if (prevSide[userId]) for (const n of sideSeats(layout, sid)) if (at[n] && prevSide[userId].has(at[n])) return false;
-    // 떨어뜨리기: 앞뒤·옆자리 X
+    // 떨어뜨리기: 앞뒤·옆·대각선 자리 X
     if (apart[userId]) for (const n of neighborSeats(layout, sid)) if (at[n] && apart[userId].has(at[n])) return false;
     return true;
   };

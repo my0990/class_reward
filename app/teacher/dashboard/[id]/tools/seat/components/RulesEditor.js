@@ -25,7 +25,7 @@ export default function RulesEditor({ rules, setRules, students }) {
 
       <section className={box}>
         <h3 className="font-bold">떨어뜨리기</h3>
-        <p className="mb-2 text-sm text-gray-500">두 학생이 앞뒤나 옆에 붙어 앉지 않게 합니다.</p>
+        <p className="mb-2 text-sm text-gray-500">두 학생이 앞뒤·옆·대각선으로 붙어 앉지 않게 합니다.</p>
         <div className="flex flex-wrap items-center gap-2">
           <select className={select} value={apartA} onChange={(e) => setApartA(e.target.value)}><option value="">학생 선택</option>{studentOptions}</select>
           <select className={select} value={apartB} onChange={(e) => setApartB(e.target.value)}><option value="">학생 선택</option>{studentOptions}</select>
