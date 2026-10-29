@@ -3,6 +3,24 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
+// newTab 지원 링크
+// 반드시 HeaderNav 바깥에 둔다: 안에서 만들면 다시 그릴 때마다 '다른 컴포넌트'가 되어 링크가 통째로 바뀌고,
+// 누르는 도중(탭으로 돌아와 첫 클릭 → 창 활성화 → 헤더 다시 그림)에 바뀌면 클릭이 사라진다.
+function NavLink({ href, newTab, children, className, onClick }) {
+  if (newTab) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className} onClick={onClick}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} prefetch={false} className={className} onClick={onClick}>
+      {children}
+    </Link>
+  );
+}
+
 export default function HeaderNav({ navItems, pathname, classId, badges = {} }) {
   const [openKey, setOpenKey] = useState(null);
   const closeTimer = useRef(null);
@@ -59,28 +77,6 @@ export default function HeaderNav({ navItems, pathname, classId, badges = {} }) 
   const onParentClick = (key) => {
     if (lastPointerType.current === "mouse") return; // 마우스는 이미 hover로 열려 있다
     setOpenKey((k) => (k === key ? null : key));
-  };
-
-  // ✅ newTab 지원 링크 렌더러
-  const NavLink = ({ href, newTab, children, className, onClick }) => {
-    if (newTab) {
-      return (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={className}
-          onClick={onClick}
-        >
-          {children}
-        </a>
-      );
-    }
-    return (
-      <Link href={href} prefetch={false} className={className} onClick={onClick}>
-        {children}
-      </Link>
-    );
   };
 
   return (
