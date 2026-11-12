@@ -121,6 +121,16 @@ export default function SeatTool({ store }) {
     setRules(next);
   };
 
+  // 전체 화면 (타이머와 같은 방식: 자리표 화면만 꽉 채움, Esc로 끝)
+  // 훅이라 아래 '불러오는 중' return보다 위에 있어야 한다 (순서가 바뀌면 React 오류)
+  const wrapRef = useRef(null);
+  const [isFull, setIsFull] = useState(false);
+  useEffect(() => {
+    const onChange = () => setIsFull(document.fullscreenElement === wrapRef.current);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
   if (isLoading || !layout) return <div className="p-8">불러오는 중...</div>;
   if (isError) return <div className="p-8">데이터를 불러오지 못했습니다.</div>;
 
@@ -210,14 +220,6 @@ export default function SeatTool({ store }) {
     setPrintTarget(record);
     setModalId(PRINT_PREVIEW_ID);
   };
-  // 전체 화면 (타이머와 같은 방식: 자리표 화면만 꽉 채움, Esc로 끝)
-  const wrapRef = useRef(null);
-  const [isFull, setIsFull] = useState(false);
-  useEffect(() => {
-    const onChange = () => setIsFull(document.fullscreenElement === wrapRef.current);
-    document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
-  }, []);
   const toggleFull = () => {
     if (document.fullscreenElement) document.exitFullscreen?.();
     else wrapRef.current?.requestFullscreen?.().catch(() => toast.error("이 브라우저에서는 전체 화면을 쓸 수 없어요."));
