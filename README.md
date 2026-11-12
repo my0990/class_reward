@@ -114,6 +114,9 @@ test/helpers/           테스트 공용 헬퍼 (메모리 DB)
 - 계정은 `admins.accounts`에 따로 저장한다 (교사 계정과 같은 이메일이어도 된다).
 - 보안: 5번 틀리면 15분 잠금, 세션 12시간, `ADMIN_EMAILS`에서 빼면 5분 안에 권한이 사라진다.
   관리자 세션으로는 교사/학생 화면과 API를 쓸 수 없다.
+- 관리자 모드: `ADMIN_EMAILS`에 있는 이메일로 **선생님 로그인**을 했다면, 프로필 메뉴 → "관리자 모드 켜기"에서
+  관리자 비밀번호만 한 번 확인하면 12시간 동안 선생님 로그인 그대로 `/admin`을 쓸 수 있다
+  (`lib/auth/adminAuth`의 `isAdminModeActive`, `server-action/admin/adminMode.action`). 끄면 관리자 권한만 사라진다.
 - 관리자 작업(로그인, 공지 등록/수정/삭제/고정)은 `admins.audit_log`에 남는다.
 - 대시보드는 개수만 보여준다 (교사 목록 없음). "최근 접속"은 로그인과 5분마다의 세션 확인 때 갱신되는 `lastSeenAt` 기준이다.
 

@@ -2,6 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAdminEmail } from "@/lib/auth/actionAuth";
 import AdminSignOutButton from "@/components/admin/AdminSignOutButton";
+import AdminModeOffButton from "@/components/admin/AdminModeOffButton";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export const metadata = { title: "관리자", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -10,6 +13,8 @@ export const dynamic = "force-dynamic";
 export default async function AdminLayout({ children }) {
   const adminEmail = await getAdminEmail();
   if (!adminEmail) redirect("/admin/login");
+  // 선생님 로그인 + 관리자 모드로 들어왔는지 (그러면 로그아웃 대신 '선생님 화면'·'관리자 모드 끄기')
+  const viaTeacher = (await getServerSession(authOptions))?.user?.role === "teacher";
 
   return (
     <div className="min-h-[100dvh] bg-slate-50 text-slate-900">
@@ -23,7 +28,14 @@ export default async function AdminLayout({ children }) {
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm text-slate-500">
             <span className="hidden sm:inline">{adminEmail}</span>
-            <AdminSignOutButton />
+            {viaTeacher ? (
+              <>
+                <Link href="/teacher/classes" className="btn btn-sm btn-ghost">선생님 화면</Link>
+                <AdminModeOffButton />
+              </>
+            ) : (
+              <AdminSignOutButton />
+            )}
           </div>
         </div>
       </header>

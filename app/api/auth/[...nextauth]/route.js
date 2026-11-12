@@ -5,7 +5,7 @@ import { compare } from "bcryptjs";
 import { ObjectId } from "mongodb";
 import { recheckUser } from "@/lib/auth/sessionCheck";
 import { touchLastSeen } from "@/lib/stats/dailyUsage";
-import { authorizeAdmin, isAdminEmail, ADMIN_SESSION_MS } from "@/lib/auth/adminAuth";
+import { authorizeAdmin, isAdminEmail, ADMIN_SESSION_MS, ADMIN_MODE_PURPOSE } from "@/lib/auth/adminAuth";
 import { assertNotLocked, recordLoginFailure, clearLoginFailures } from "@/lib/auth/loginLimit";
 import { isDefaultStudentPassword } from "@/lib/auth/studentPassword";
 import { readSignedToken } from "@/lib/auth/signedToken";
@@ -38,6 +38,26 @@ export const authOptions = {
             role: "kiosk",
             teacher_id: device.teacher_id.toHexString(),
             classId: device.classId.toHexString(),
+          };
+        }
+
+        // 🛠️ 관리자 모드 켜기·끄기: 선생님이 관리자 비밀번호를 확인하고 받은 토큰(2분)으로 다시 로그인
+        //    (server-action/admin/adminMode.action). 선생님 로그인은 그대로, adminUntil만 붙이거나 뗀다.
+        if (role === "admin-mode") {
+          const grant = readSignedToken(ADMIN_MODE_PURPOSE, credentials?.token);
+          if (!grant?.t || !/^[0-9a-f]{24}$/i.test(String(grant.t))) return null;
+          const teacher = await (await connectDB)
+            .db("user")
+            .collection("users")
+            .findOne({ _id: ObjectId.createFromHexString(String(grant.t)), role: "teacher", disabled: { $ne: true } });
+          if (!teacher) return null;
+          if (grant.on && !isAdminEmail(teacher.email)) return null;
+          return {
+            _id: teacher._id.toString(),
+            role: "teacher",
+            email: teacher.email ?? null,
+            mustChangePassword: Boolean(teacher.mustChangePassword),
+            adminUntil: grant.on ? Date.now() + ADMIN_SESSION_MS : null,
           };
         }
 
@@ -147,6 +167,8 @@ export const authOptions = {
             _id: user._id.toString(),
             teacher_id: user._id.toString(),
             mustChangePassword: Boolean(user.mustChangePassword),
+            // 관리자 모드 (12시간). 없으면 선생님 권한만
+            ...(typeof user.adminUntil === "number" ? { adminUntil: user.adminUntil } : {}),
           };
         } else if (user.role === "student") {
           token.user = {
@@ -173,6 +195,11 @@ export const authOptions = {
             expiresAt: Date.now() + ADMIN_SESSION_MS, // 관리자는 12시간 뒤 다시 로그인
           };
         }
+      }
+
+      // 관리자 모드: 12시간이 지났거나 ADMIN_EMAILS에서 빠졌으면 관리자 권한만 뗀다
+      if (token.user?.adminUntil && (Date.now() > token.user.adminUntil || !isAdminEmail(token.user.email))) {
+        delete token.user.adminUntil;
       }
 
       // 계정이 아직 있는지는 5분에 한 번만 DB로 확인한다 (lib/auth/sessionCheck)

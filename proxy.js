@@ -22,7 +22,9 @@ export async function proxy(req) {
   // (최종 확인은 페이지/액션에서 ADMIN_EMAILS까지 다시 본다)
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") return NextResponse.next();
-    if (role !== "admin") {
+    // 관리자 모드인 선생님도 통과 (ADMIN_EMAILS 확인은 페이지에서)
+    const adminMode = role === "teacher" && typeof token?.user?.adminUntil === "number" && Date.now() < token.user.adminUntil;
+    if (role !== "admin" && !adminMode) {
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
     return NextResponse.next();

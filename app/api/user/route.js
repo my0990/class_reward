@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { withApiHandler, requireMember, parseObjectId } from "@/lib/api/routeHelpers";
+import { isAdminEmail, isAdminModeActive } from "@/lib/auth/adminAuth";
 
 // 로그인한 사용자 본인의 user_data
 // - 교사: userId = 이메일 (회원가입 시 이렇게 저장됨)
@@ -25,5 +26,9 @@ export const GET = withApiHandler(async () => {
     return NextResponse.json({ error: "사용자 정보를 찾을 수 없습니다." }, { status: 404 });
   }
 
+  // 선생님: 관리자 모드를 켤 수 있는 계정인지 / 지금 켜져 있는지 (헤더 프로필 메뉴)
+  if (role === "teacher" && isAdminEmail(session.user.email)) {
+    return NextResponse.json({ ...userData, canAdmin: true, adminActive: isAdminModeActive(session.user) });
+  }
   return NextResponse.json(userData);
 });

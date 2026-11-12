@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import { useRef, useEffect } from "react";
 import Link from "next/link";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
+import AdminModeItem from "./AdminModeItem";
 export default function UserInfo({
   open,
   onClose,
@@ -14,7 +15,9 @@ export default function UserInfo({
   currencyName,
   settingHref,
   money,
-  role
+  role,
+  canAdmin = false,
+  adminActive = false,
 }) {
   const dropDownRef = useRef(null);
 
@@ -78,6 +81,13 @@ export default function UserInfo({
               </div>
             </Link>
           </li>
+
+          {/* 관리자 이메일로 로그인한 선생님만: 관리자 모드 (다시 로그인하지 않고 관리자 화면) */}
+          {role === "teacher" && canAdmin && (
+            <li className="border-t">
+              <AdminModeItem active={adminActive} onClose={onClose} />
+            </li>
+          )}
         </ul>
       </div>
     </div>

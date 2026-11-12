@@ -119,6 +119,8 @@ export default function HeaderContainer({ classId }) {
                     currencyEmoji={currencyEmoji}
                     currencyName={currencyName}
                     role={role}
+                    canAdmin={Boolean(userData?.canAdmin)}
+                    adminActive={Boolean(userData?.adminActive)}
                 />
             ) : null}
         </>
