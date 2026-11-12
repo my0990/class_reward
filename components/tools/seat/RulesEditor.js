@@ -6,7 +6,7 @@ export default function RulesEditor({ rules, setRules, students }) {
   const [apartA, setApartA] = useState("");
   const [apartB, setApartB] = useState("");
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
-  const name = (u) => (byId[u] ? `${byId[u].classNumber}. ${byId[u].profileNickname}` : u);
+  const name = (u) => (byId[u] ? `${byId[u].classNumber}.${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : "번"}` : u);
 
   const box = "rounded-2xl border border-orange-200 bg-white p-4";
   const select = "select select-bordered select-sm max-w-[180px]";

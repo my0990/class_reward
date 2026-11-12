@@ -6,6 +6,7 @@ import LayoutEditor from "./LayoutEditor";
 import RulesEditor from "./RulesEditor";
 import GroupEditor from "./GroupEditor";
 import StudentsEditor from "./StudentsEditor";
+import RosterEditor from "./RosterEditor";
 import HistoryEditor from "./HistoryEditor";
 
 export const SEAT_SETTINGS_ID = "SEAT_SETTINGS";
@@ -18,10 +19,12 @@ const tabs = [
   ["history", "기록"],
 ];
 
-export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, setLayout, rules, setRules, students, plan, onDeleteRecord, onPrintRecord, busy }) {
-  const [tab, setTab] = useState("layout"); // 창을 닫았다 열어도 마지막 탭 유지
+export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, setLayout, rules, setRules, students, plan, onDeleteRecord, onPrintRecord, busy, tab: tabProp, setTab: setTabProp, onRosterSave = null }) {
+  const [ownTab, setOwnTab] = useState("layout"); // 창을 닫았다 열어도 마지막 탭 유지
+  const tab = tabProp ?? ownTab;
+  const setTab = setTabProp ?? setOwnTab;
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
-  const name = (u) => (byId[u] ? `${byId[u].classNumber}. ${byId[u].profileNickname}` : u);
+  const name = (u) => (byId[u] ? `${byId[u].classNumber}.${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : "번"}` : u);
 
   return (
     <ModalTemplate id={SEAT_SETTINGS_ID} modalId={modalId} setModalId={setModalId} className="w-[960px] max-w-[95vw] print:hidden">
@@ -38,7 +41,15 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
           <div className="h-[min(640px,65vh)] overflow-y-auto overscroll-contain pr-1">
           {tab === "layout" && <LayoutEditor isNew={isNew} layout={layout} setLayout={setLayout} studentCount={students.length - (rules.excluded?.length ?? 0)} />}
           {tab === "students" && (
-            <StudentsEditor students={students} excluded={rules.excluded ?? []} setExcluded={(excluded) => setRules({ ...rules, excluded })} />
+            <>
+              {/* 비회원: 명단을 직접 넣는다 (key: 반영할 때마다 글상자를 새 명단으로) */}
+              {onRosterSave && <RosterEditor key={students.map((s) => s.userId + s.profileNickname).join("|")} students={students} onSave={onRosterSave} />}
+              {students.length > 0 ? (
+                <StudentsEditor students={students} excluded={rules.excluded ?? []} setExcluded={(excluded) => setRules({ ...rules, excluded })} />
+              ) : (
+                !onRosterSave && <p className="py-10 text-center text-sm text-gray-400">학생이 없어요.</p>
+              )}
+            </>
           )}
           {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} students={students} />}
           {tab === "groups" && (

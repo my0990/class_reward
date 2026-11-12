@@ -10,12 +10,10 @@
 // 권한 확인(authorizeTeacherClass)은 action에서 한다.
 import { ObjectId } from "mongodb";
 import { connectDB } from "@/lib/mongodb";
-import { LAYOUT_LIMITS, GROUP_COLORS, deskSeats, normalizeRules, parseSeatId } from "@/util/seat/seatAlgorithm";
+import { deskSeats, parseSeatId } from "@/util/seat/seatAlgorithm";
+import { cleanLayout, cleanRules, SEAT_HISTORY_MAX } from "@/util/seat/seatPlan";
 
-export const GROUP_MAX = 20;
-const GROUP_NAME_MAX = 20;
-
-export const SEAT_HISTORY_MAX = 5;
+export { GROUP_MAX, SEAT_HISTORY_MAX, cleanLayout, cleanRules } from "@/util/seat/seatPlan";
 
 function scopeOf(teacher_id, classId) {
   return { teacher_id: ObjectId.createFromHexString(teacher_id), classId: ObjectId.createFromHexString(classId) };
@@ -24,52 +22,6 @@ function scopeOf(teacher_id, classId) {
 async function studentIdsOf(db, scope) {
   const docs = await db.collection("user_data").find({ ...scope, role: "student" }, { projection: { userId: 1 } }).toArray();
   return new Set(docs.map((d) => d.userId));
-}
-
-/** 교실 배치 검사 → 정리된 layout 또는 { error } */
-export function cleanLayout(layout) {
-  const rows = Number(layout?.rows);
-  const cols = Number(layout?.cols);
-  const ok = (n) => Number.isInteger(n) && n >= LAYOUT_LIMITS.MIN && n <= LAYOUT_LIMITS.MAX;
-  if (!ok(rows) || !ok(cols)) return { error: `줄과 칸은 ${LAYOUT_LIMITS.MIN}~${LAYOUT_LIMITS.MAX} 사이로 정해 주세요.` };
-  const desks = Array.from({ length: rows }, (_, r) => Array.from({ length: cols }, (_, c) => Boolean(layout?.desks?.[r]?.[c])));
-  return { layout: { rows, cols, desks } };
-}
-
-/** 조건 검사: 이 학급 학생만, 책상이 있는 자리만 남긴다 */
-export function cleanRules(rules, layout, studentIds) {
-  const seats = new Set(deskSeats(layout));
-  const fixed = {};
-  for (const [u, s] of Object.entries(rules?.fixed ?? {})) if (studentIds.has(u) && seats.has(s)) fixed[u] = s;
-  // 그룹: 이 학급 학생만, 책상이 있는 자리만, 중복 없이 (예전 front → '앞자리' 그룹)
-  const groups = [];
-  const groupIds = new Set();
-  for (const [i, g] of normalizeRules(rules ?? {}, layout).groups.entries()) {
-    if (groups.length >= GROUP_MAX || !g || typeof g !== "object") continue;
-    let id = String(g.id ?? "").slice(0, 40) || `g${i}`;
-    while (groupIds.has(id)) id += "_";
-    groupIds.add(id);
-    const color = Number.isInteger(g.color) && g.color >= 0 && g.color < GROUP_COLORS.length ? g.color : i % GROUP_COLORS.length;
-    groups.push({
-      id,
-      name: String(g.name ?? "").trim().slice(0, GROUP_NAME_MAX) || `그룹 ${groups.length + 1}`,
-      color,
-      userIds: [...new Set((g.userIds ?? []).filter((u) => studentIds.has(u)))],
-      seats: [...new Set((g.seats ?? []).filter((sid) => seats.has(sid)))],
-    });
-  }
-  const apart = [];
-  const seen = new Set();
-  for (const pair of rules?.apart ?? []) {
-    const [a, b] = Array.isArray(pair) ? pair : [];
-    if (!studentIds.has(a) || !studentIds.has(b) || a === b) continue;
-    const key = [a, b].sort().join("|");
-    if (seen.has(key)) continue;
-    seen.add(key);
-    apart.push([a, b]);
-  }
-  const excluded = [...new Set((rules?.excluded ?? []).filter((u) => studentIds.has(u)))];
-  return { fixed, groups, apart, avoidPrevPartner: Boolean(rules?.avoidPrevPartner), excluded };
 }
 
 /** 교실 배치·조건 저장 */

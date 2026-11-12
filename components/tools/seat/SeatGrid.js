@@ -65,8 +65,15 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                 >
                   {hidden ? <span className="text-[1.6em]">?</span> : s ? (
                     <>
-                      <span className="text-[0.75em] text-orange-500">{s.classNumber}번</span>
-                      <span className="max-w-full truncate px-1 font-bold">{s.profileNickname}</span>
+                      {s.profileNickname ? (
+                        <>
+                          <span className="text-[0.75em] text-orange-500">{s.classNumber}번</span>
+                          <span className="max-w-full truncate px-1 font-bold">{s.profileNickname}</span>
+                        </>
+                      ) : (
+                        // 이름 없이 번호만 (비회원 명단)
+                        <span className="text-[1.3em] font-bold">{s.classNumber}번</span>
+                      )}
                     </>
                   ) : null}
                 </button>

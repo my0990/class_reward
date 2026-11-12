@@ -34,9 +34,11 @@ export default async function Home() {
             </div>
           </Link>
           {/* 가입 없이 쓰는 도구 (/tools) */}
-          <Link href="/tools/timer" className="mt-2 block text-center text-[1.05rem] font-semibold text-orange-800 underline-offset-4 hover:underline">
-            ⏱️ 가입 없이 수업 타이머 써 보기
-          </Link>
+          <div className="mt-2 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[1.05rem] font-semibold text-orange-800">
+            <span className="text-orange-900/70">가입 없이 써 보기:</span>
+            <Link href="/tools/timer" className="underline-offset-4 hover:underline">⏱️ 수업 타이머</Link>
+            <Link href="/tools/seat" className="underline-offset-4 hover:underline">🪑 자리 바꾸기</Link>
+          </div>
         </div>
       </div>
       <Footer className="border-orange-300 text-gray-600" />
