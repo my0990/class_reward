@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Analytics from "@/components/common/Analytics";
 import ClientErrorReporter from "@/components/common/ClientErrorReporter";
+import { SITE } from "@/config/siteInfo";
 import { Toaster } from "react-hot-toast";
 
 // import Head from "next/head";
@@ -16,6 +17,7 @@ const APP_DESCRIPTION = "학급 보상을 관리합니다";
 
 
 export const metadata = {
+  metadataBase: new URL(SITE.url),
   icons: {
     icon: "/favicon.png",
   },

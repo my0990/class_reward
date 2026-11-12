@@ -33,6 +33,10 @@ export default async function Home() {
               </div>
             </div>
           </Link>
+          {/* 가입 없이 쓰는 도구 (/tools) */}
+          <Link href="/tools/timer" className="mt-2 block text-center text-[1.05rem] font-semibold text-orange-800 underline-offset-4 hover:underline">
+            ⏱️ 가입 없이 수업 타이머 써 보기
+          </Link>
         </div>
       </div>
       <Footer className="border-orange-300 text-gray-600" />
