@@ -44,14 +44,6 @@ export default function SeatTool({ store }) {
     if (tab) setSettingsTab(tab);
     setModalId(SEAT_SETTINGS_ID);
   };
-  // 비회원: 명단이 비어 있으면 처음 한 번 설정 창의 [학생] 탭을 연다
-  const askedRoster = useRef(false);
-  useEffect(() => {
-    if (!guest || isLoading || askedRoster.current || (studentList?.length ?? 0) > 0) return;
-    askedRoster.current = true;
-    setSettingsTab("students");
-    setModalId(SEAT_SETTINGS_ID);
-  }, [guest, isLoading, studentList]);
   const [layout, setLayout] = useState(null);
   const [rules, setRules] = useState(EMPTY_RULES);
   const [draft, setDraft] = useState(null); // 방금 섞은 자리 (공개 애니메이션용)
