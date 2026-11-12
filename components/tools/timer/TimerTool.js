@@ -167,7 +167,7 @@ export default function TimerTool({ classId = null }) {
           <div className="absolute left-4 top-3 flex items-center gap-3">
             {!classId && (
               <a href="/" title="뀰 — 학급 화폐·퀘스트·자리 바꾸기" className="shrink-0 opacity-80 transition hover:opacity-100">
-                <img src="/icons/icon-96x96.png" alt="뀰" width={40} height={40} className="h-10 w-10 rounded-xl" />
+                <img src="/icons/icon-128x128.png" alt="뀰" width={64} height={64} className="h-16 w-16 rounded-2xl" />
               </a>
             )}
             {meter.active && <span className="rounded-full bg-black/10 px-3 py-1 text-sm font-semibold tabular-nums">소음 {meter.value}</span>}
