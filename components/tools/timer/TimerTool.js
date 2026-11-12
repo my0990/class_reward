@@ -162,11 +162,16 @@ export default function TimerTool({ classId = null }) {
         className={`relative min-w-0 flex-1 flex-col items-center justify-center gap-[4cqh] [container-type:size] ${boardPct === 100 ? "hidden" : "flex"}`}
         style={{ background: bg, color: fg, transition: "background-color 0.4s" }}
       >
-        {/* 왼쪽 위: 소음 */}
-        {meter.active && (
+        {/* 왼쪽 위: (비회원) 뀰 아이콘 · 소음 */}
+        {(!classId || meter.active) && (
           <div className="absolute left-4 top-3 flex items-center gap-3">
-            <span className="rounded-full bg-black/10 px-3 py-1 text-sm font-semibold tabular-nums">소음 {meter.value}</span>
-            {!settings.hideCount && (
+            {!classId && (
+              <a href="/" title="뀰 — 학급 화폐·퀘스트·자리 바꾸기" className="shrink-0 opacity-80 transition hover:opacity-100">
+                <img src="/icons/icon-96x96.png" alt="뀰" width={40} height={40} className="h-10 w-10 rounded-xl" />
+              </a>
+            )}
+            {meter.active && <span className="rounded-full bg-black/10 px-3 py-1 text-sm font-semibold tabular-nums">소음 {meter.value}</span>}
+            {meter.active && !settings.hideCount && (
               <div className="flex items-center gap-1">
                 <button
                   type="button"
