@@ -3,7 +3,8 @@
 // view = "student"(칠판이 위, 학생이 칠판을 보는 방향) | "teacher"(칠판이 아래, 앞에서 본 방향)
 import { seatId } from "@/util/seat/seatAlgorithm";
 
-export default function SeatGrid({ layout, assignment = {}, students = {}, view = "student", onSeatClick, hiddenSeats, size = "md" }) {
+// selected: 손으로 자리를 바꿀 때 고른 자리 (진한 테두리) / marks: { [seatId]: "📌" } 같은 작은 표시
+export default function SeatGrid({ layout, assignment = {}, students = {}, view = "student", onSeatClick, hiddenSeats, size = "md", selected = null, marks = null }) {
   const rows = [...Array(layout.rows).keys()];
   const cols = [...Array(layout.cols).keys()];
   const teacher = view === "teacher";
@@ -49,6 +50,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
               const userId = assignment[id];
               const s = userId ? students[userId] : null;
               const hidden = hiddenSeats?.has(id);
+              const isSelected = selected === id;
               // 통로: 자리만 차지하는 빈 공간 (테두리·글자 없음)
               if (!isDesk) return <div key={c} aria-hidden="true" style={cellStyle} className={`${cell} shrink-0`} />;
               return (
@@ -59,10 +61,12 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                   disabled={!onSeatClick}
                   onClick={() => onSeatClick?.(id)}
                   style={cellStyle}
-                  className={`${cell} flex flex-col items-center justify-center rounded-lg border-2 leading-tight transition
+                  className={`${cell} relative flex flex-col items-center justify-center rounded-lg border-2 leading-tight transition
+                    ${isSelected ? "z-10 scale-105 !border-orange-600 ring-4 ring-orange-400" : ""}
                     ${hidden ? "border-orange-300 bg-orange-300 text-white" : s ? "border-orange-300 bg-orange-100 text-gray-800" : "border-orange-300 bg-orange-100"}
                     ${onSeatClick ? "cursor-pointer hover:scale-105" : "cursor-default"}`}
                 >
+                  {marks?.[id] && <span className="absolute right-[0.3em] top-[0.15em] text-[0.7em] print:hidden">{marks[id]}</span>}
                   {hidden ? <span className="text-[1.6em]">?</span> : s ? (
                     <>
                       {s.profileNickname ? (

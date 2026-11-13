@@ -225,21 +225,21 @@ export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random,
   return { ok: false, reason: "조건을 모두 지키는 자리를 찾지 못했어요. 떨어뜨리기나 그룹 조건을 조금 줄여 보세요." };
 }
 
-/** 저장된 배치가 조건을 지키는지 확인 (테스트·확정 전 검사용). 어긴 조건 설명 목록을 돌려준다 */
-export function violations(assignment, layout, rules = {}, prevAssignment = null) {
+/** 저장된 배치가 조건을 지키는지 확인 (테스트·손으로 바꾼 뒤 안내용). 어긴 조건 설명 목록을 돌려준다 */
+export function violations(assignment, layout, rules = {}, prevAssignment = null, { nameOf = (u) => u } = {}) {
   rules = normalizeRules(rules, layout);
   const out = [];
   const seatOf = Object.fromEntries(Object.entries(assignment).map(([s, u]) => [u, s]));
-  for (const [u, s] of Object.entries(rules.fixed ?? {})) if (seatOf[u] && seatOf[u] !== s) out.push(`고정 자리: ${u}`);
-  for (const [u, lim] of Object.entries(groupLimits(rules.groups))) if (seatOf[u] && !lim.seats.has(seatOf[u])) out.push(`그룹: ${u}`);
+  for (const [u, s] of Object.entries(rules.fixed ?? {})) if (seatOf[u] && seatOf[u] !== s) out.push(`고정 자리: ${nameOf(u)}`);
+  for (const [u, lim] of Object.entries(groupLimits(rules.groups))) if (seatOf[u] && !lim.seats.has(seatOf[u])) out.push(`그룹(${lim.groups.join(", ")}): ${nameOf(u)}`);
   for (const [a, b] of rules.apart ?? []) {
     if (!seatOf[a] || !seatOf[b]) continue;
-    if (neighborSeats(layout, seatOf[a]).includes(seatOf[b])) out.push(`떨어뜨리기: ${a}·${b}`);
+    if (neighborSeats(layout, seatOf[a]).includes(seatOf[b])) out.push(`떨어뜨리기: ${nameOf(a)}·${nameOf(b)}`);
   }
   if (rules.avoidPrevPartner && prevAssignment) {
     const before = sideMatesOf(layout, prevAssignment);
     const now = sideMatesOf(layout, assignment);
-    for (const [u, mates] of Object.entries(now)) for (const m of mates) if (before[u]?.has(m) && u < m) out.push(`지난 옆자리: ${u}·${m}`);
+    for (const [u, mates] of Object.entries(now)) for (const m of mates) if (before[u]?.has(m) && u < m) out.push(`지난 옆자리: ${nameOf(u)}·${nameOf(m)}`);
   }
   return out;
 }

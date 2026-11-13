@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Cog6ToothIcon, PrinterIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon } from "@heroicons/react/24/outline";
-import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
+import { assignSeats, makeLayout, deskSeats, normalizeRules, violations } from "@/util/seat/seatAlgorithm";
 import { cleanRules } from "@/util/seat/seatPlan";
 import SeatGrid from "./SeatGrid";
 import PrintPreviewModal, { PRINT_PREVIEW_ID } from "./PrintPreviewModal";
@@ -53,6 +53,8 @@ export default function SeatTool({ store }) {
   const [printTarget, setPrintTarget] = useState(null); // 기록에서 인쇄할 때 그 기록 { layout, assignment, label } (없으면 지금 화면 자리)
   const [savedDraft, setSavedDraft] = useState(null); // 마지막으로 저장한 draft (같은 결과를 두 번 저장하지 않게)
   const [busy, setBusy] = useState(false);
+  const [picked, setPicked] = useState(null); // 손으로 자리 바꾸기: 먼저 누른 자리
+  const shuffleBase = useRef(null); // 섞을 때 기준이었던 지난 자리 ('지난 옆자리' 경고도 이것과 비교)
   const timer = useRef(null);
 
   const students = useMemo(() => studentList ?? [], [studentList]);
@@ -63,8 +65,8 @@ export default function SeatTool({ store }) {
     if (layout || plan === undefined || !studentList) return;
     const initial = plan?.layout ?? defaultLayout();
     setLayout(initial);
-    // 예전 '앞자리' → 그룹. 고정 자리는 옵션을 없앴으므로 비운다 (다음 저장 때 DB에서도 지워짐)
-    setRules({ ...normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial), fixed: {} });
+    // 예전 '앞자리' → 그룹
+    setRules(normalizeRules({ ...EMPTY_RULES, ...(plan?.rules ?? {}) }, initial));
   }, [plan, studentList, students.length, layout]);
 
   useEffect(() => () => clearInterval(timer.current), []);
@@ -133,6 +135,7 @@ export default function SeatTool({ store }) {
 
   const reveal = (assignment) => {
     clearInterval(timer.current);
+    setPicked(null);
     setDraft(assignment);
     setRevealed(0);
     let n = 0;
@@ -169,8 +172,9 @@ export default function SeatTool({ store }) {
       return openSettings("students");
     }
     const excluded = new Set(rules.excluded ?? []);
+    shuffleBase.current = plan?.current?.assignment ?? null;
     const res = assignSeats(students.map((s) => s.userId).filter((u) => !excluded.has(u)), layout, rules, {
-      prevAssignment: plan?.current?.assignment ?? null, // 마지막으로 저장한 자리
+      prevAssignment: shuffleBase.current, // 마지막으로 저장한 자리
       nameOf: (u) => (byId[u] ? `${byId[u].classNumber}번${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : ""}` : u),
     });
     if (!res.ok) return toast.error(res.reason);
@@ -179,6 +183,24 @@ export default function SeatTool({ store }) {
 
   // 저장: 지금 보이는 자리를 확정 (이전 자리는 기록으로)
   const unsaved = Boolean(draft) && draft !== savedDraft;
+
+  // 손으로 자리 바꾸기: 섞은 뒤(공개가 끝나면) 자리를 하나 누르고 다른 자리를 누르면 서로 바뀐다. 빈 책상이면 그리로 옮김
+  const nameOf = (u) => (byId[u] ? `${byId[u].classNumber}번${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : ""}` : u);
+  const canEdit = Boolean(draft) && !hiddenSeats && !busy;
+  const onSeatClick = (sid) => {
+    if (!picked) return draft[sid] && setPicked(sid);
+    if (picked === sid) return setPicked(null);
+    const next = { ...draft };
+    const a = next[picked];
+    const b = next[sid];
+    if (b) next[picked] = b;
+    else delete next[picked];
+    next[sid] = a;
+    setDraft(next);
+    setPicked(null);
+  };
+  // 손으로 바꾼 결과가 조건과 맞지 않으면 알려 준다 (막지는 않음)
+  const warnings = draft && !hiddenSeats ? violations(draft, layout, rules, shuffleBase.current, { nameOf }) : [];
   const onSave = () =>
     run(async () => {
       await saveSetup(); // 쓴 배치·조건도 함께 저장
@@ -276,8 +298,24 @@ export default function SeatTool({ store }) {
               view={printing ? printView : "student"}
               hiddenSeats={printing && printTarget ? null : hiddenSeats}
               size="fit"
+              onSeatClick={canEdit && !printing ? onSeatClick : undefined}
+              selected={printing ? null : picked}
             />
           </div>
+          {/* 손으로 바꾸기 안내 · 조건 경고 */}
+          {canEdit && (
+            <div className="-mt-2 flex flex-col items-center gap-1 text-center text-sm print:hidden">
+              <p className="text-gray-500">
+                {picked ? `${nameOf(draft[picked])} 학생을 옮길 자리를 누르세요 (같은 자리를 다시 누르면 취소)` : "✋ 자리를 하나 누르고 다른 자리를 누르면 서로 바뀌어요"}
+              </p>
+              {warnings.length > 0 && (
+                <p className="font-semibold text-amber-600">
+                  ⚠️ 조건과 맞지 않아요: {warnings.slice(0, 3).join(" · ")}
+                  {warnings.length > 3 ? ` 외 ${warnings.length - 3}개` : ""}
+                </p>
+              )}
+            </div>
+          )}
           <div className="print:hidden">
             <button
               type="button"

@@ -51,7 +51,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
               )}
             </>
           )}
-          {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} students={students} />}
+          {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} students={students} layout={layout} />}
           {tab === "groups" && (
             <div>
               <p className="mb-3 text-sm text-gray-500">
