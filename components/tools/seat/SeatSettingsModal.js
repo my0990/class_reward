@@ -65,7 +65,6 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
           {tab === "kkyul" && <KkyulTab guest={Boolean(onRosterSave)} rules={rules} setRules={setRules} students={students} layout={layout} />}
           {tab === "history" && <HistoryEditor plan={plan} layout={layout} studentsById={byId} onDelete={onDeleteRecord} onPrint={onPrintRecord} busy={busy} />}
           </div>
-          <p className="mt-5 text-center text-xs text-gray-400">바꾼 내용은 자동으로 저장됩니다.</p>
         </div>
       )}
     </ModalTemplate>
