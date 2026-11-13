@@ -48,6 +48,7 @@ export async function getFeatureUsageService({ client, now = new Date() } = {}) 
       key,
       label: FEATURES[key].label,
       client: Boolean(FEATURES[key].client),
+      guest: Boolean(FEATURES[key].guest),
       count7: c7,
       count30: c30,
       classes7: cls7.size,

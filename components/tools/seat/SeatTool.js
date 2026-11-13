@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import KkyulLogo from "@/components/tools/KkyulLogo";
 import { labelOf } from "./studentLabel";
+import { trackGuest } from "@/lib/stats/trackGuest";
 import { toast } from "react-hot-toast";
 import { Cog6ToothIcon, PrinterIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon } from "@heroicons/react/24/outline";
 import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
@@ -57,6 +58,10 @@ export default function SeatTool({ store }) {
   const [busy, setBusy] = useState(false);
   const [picked, setPicked] = useState(null); // 손으로 자리 바꾸기: 먼저 누른 자리
   const shuffleBase = useRef(null); // 섞을 때 기준이었던 지난 자리 ('지난 옆자리' 경고도 이것과 비교)
+  // 비회원: 방문(하루 한 번) · 섞기 · 저장 · 인쇄 횟수 (관리자 '기능 사용량'의 비회원 표)
+  useEffect(() => {
+    if (guest) trackGuest("guest_seat_visit", { oncePerDay: true });
+  }, [guest]);
   const shuffleRules = useRef(null); // 섞을 때 쓴 조건 (왼쪽을 눌러 고정 없이 섞었으면 고정 빼고 경고)
   const timer = useRef(null);
 
@@ -190,6 +195,7 @@ export default function SeatTool({ store }) {
     });
     if (!res.ok) return toast.error(res.reason);
     reveal(res.assignment);
+    if (guest) trackGuest("guest_seat_shuffle");
   };
 
   // 저장: 지금 보이는 자리를 확정 (이전 자리는 기록으로)
@@ -217,6 +223,7 @@ export default function SeatTool({ store }) {
       setSavedDraft(draft);
       await store.refresh();
       toast.success("이 자리로 저장했어요.");
+      if (guest) trackGuest("guest_seat_save");
     });
 
   // 기록 지우기 (설정 창 > 기록)
@@ -230,6 +237,7 @@ export default function SeatTool({ store }) {
 
   // 화면 자리표를 고른 방향으로 바꾼 뒤 인쇄하고, 끝나면 되돌린다
   const onPrint = () => {
+    if (guest) trackGuest("guest_seat_print");
     setPrinting(true);
     setTimeout(() => {
       window.print();

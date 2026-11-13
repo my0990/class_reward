@@ -1,5 +1,6 @@
 "use client";
 import { trackFeature } from "@/lib/stats/trackFeature";
+import { trackGuest } from "@/lib/stats/trackGuest";
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import KkyulLogo from "@/components/tools/KkyulLogo";
@@ -37,7 +38,14 @@ const BOARD_OPEN_PCT = 45;
 // classId가 없으면 비회원: 저장 칸을 'guest'로 따로 쓰고, 기능 사용량은 보내지 않는다.
 export default function TimerTool({ classId = null }) {
   const id = classId ?? "guest";
-  const track = useCallback((feature) => classId && trackFeature(feature, classId), [classId]);
+  // 기능 사용량: 선생님은 학급 기능으로, 비회원은 방문·시작만 (관리자 '기능 사용량'의 비회원 표)
+  const track = useCallback(
+    (feature) => (classId ? trackFeature(feature, classId) : feature === "timer_start" && trackGuest("guest_timer_start")),
+    [classId],
+  );
+  useEffect(() => {
+    if (!classId) trackGuest("guest_timer_visit", { oncePerDay: true });
+  }, [classId]);
   const [settings, update] = useTimerSettings();
   const [modalId, setModalId] = useState(null);
   const [count, setCount] = useState(0);

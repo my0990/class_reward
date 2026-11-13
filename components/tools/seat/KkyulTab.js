@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 
 const Lottie = dynamic(() => import("react-lottie-player"), { ssr: false });
 import FixedSeats from "./FixedSeats";
+import { trackGuest } from "@/lib/stats/trackGuest";
 
 // 자리 고정을 여는 코드 (화면에는 안 보임, 입력할 때도 ●로 가려짐). 바꾸려면 여기만 고치면 된다
 export const SEAT_SECRET_CODE = "0915";
@@ -71,7 +72,7 @@ export default function KkyulTab({ guest, rules, setRules, students, layout }) {
         </p>
         {guest ? (
           <div className="mt-4 flex flex-wrap gap-2">
-            <a href="/auth/signup" className="btn btn-sm border-0 bg-orange-500 text-white hover:bg-orange-600">
+            <a href="/auth/signup" onClick={() => trackGuest("guest_signup_click")} className="btn btn-sm border-0 bg-orange-500 text-white hover:bg-orange-600">
               무료로 가입하기
             </a>
             <a href="/auth/login/teacher" className="btn btn-sm border-0 bg-white text-gray-700 hover:bg-orange-50">
