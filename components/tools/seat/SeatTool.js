@@ -5,6 +5,7 @@
 // '시작'은 섞어서 보여 주기만 하고, 오른쪽 위 저장 버튼을 눌러야 지금 자리로 확정된다(지난 자리는 기록으로).
 // '지난 옆자리 피하기'는 마지막으로 저장한 자리를 기준으로 한다.
 import { useEffect, useMemo, useRef, useState } from "react";
+import KkyulLogo from "@/components/tools/KkyulLogo";
 import { toast } from "react-hot-toast";
 import { Cog6ToothIcon, PrinterIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon } from "@heroicons/react/24/outline";
 import { assignSeats, makeLayout, deskSeats, normalizeRules, violations } from "@/util/seat/seatAlgorithm";
@@ -261,9 +262,7 @@ export default function SeatTool({ store }) {
       <div className="mb-4 flex items-center justify-between gap-3 print:hidden">
           {/* 비회원: 왼쪽 위 뀰 아이콘 (첫 화면으로) */}
           {guest ? (
-            <a href="/" title="뀰 — 학급 화폐·퀘스트·자리 바꾸기" className="shrink-0 opacity-80 transition hover:opacity-100">
-              <img src="/icons/icon-128x128.png" alt="뀰" width={64} height={64} className="h-16 w-16 rounded-2xl" />
-            </a>
+            <KkyulLogo />
           ) : (
             <span />
           )}

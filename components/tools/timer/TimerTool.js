@@ -2,6 +2,7 @@
 import { trackFeature } from "@/lib/stats/trackFeature";
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import KkyulLogo from "@/components/tools/KkyulLogo";
 import { toast } from "react-hot-toast";
 import {
   ArrowPathIcon,
@@ -166,9 +167,7 @@ export default function TimerTool({ classId = null }) {
         {(!classId || meter.active) && (
           <div className="absolute left-4 top-3 flex items-center gap-3">
             {!classId && (
-              <a href="/" title="뀰 — 학급 화폐·퀘스트·자리 바꾸기" className="shrink-0 opacity-80 transition hover:opacity-100">
-                <img src="/icons/icon-128x128.png" alt="뀰" width={64} height={64} className="h-16 w-16 rounded-2xl" />
-              </a>
+              <KkyulLogo />
             )}
             {meter.active && <span className="rounded-full bg-black/10 px-3 py-1 text-sm font-semibold tabular-nums">소음 {meter.value}</span>}
             {meter.active && !settings.hideCount && (
