@@ -1,79 +1,89 @@
 "use client";
-// 자리 고정 (설정 창 [뀰] 탭의 숨은 버튼으로만 열림 — 학생들이 화면을 봐도 모르게)
+// 자리 고정 (설정 창 [뀰] 탭에서 코드를 맞게 넣어야 열림 — 학생들이 화면을 봐도 모르게)
+// 자리를 누르면 그 자리 옆에 학생 목록 → 학생을 누르면 그 자리에 고정 (📌). 고정된 자리는 목록에서 '비우기'
+import { useEffect, useRef, useState } from "react";
+import SeatGrid from "./SeatGrid";
 import { labelOf } from "./studentLabel";
-import { useState } from "react";
-import SeatGrid, { seatLabel } from "./SeatGrid";
 
-/** 자리 고정: 학생을 고르고 자리표에서 자리를 누른다. 섞을 때마다 그 자리 (공개 장면은 그대로라 학생들에겐 똑같이 섞인 것처럼 보임) */
 export default function FixedSeats({ rules, setRules, students, layout }) {
-  const [fixUser, setFixUser] = useState(""); // 고른 학생 (자리표에서 자리를 누르면 고정)
+  const [open, setOpen] = useState(null); // { sid, x, y } 학생 목록을 띄운 자리
+  const wrapRef = useRef(null);
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
   const name = labelOf(byId);
-  const box = "rounded-2xl border border-orange-200 bg-white p-4";
-  const select = "select select-bordered select-sm max-w-[180px]";
   const fixed = rules.fixed ?? {};
   const bySeat = Object.fromEntries(Object.entries(fixed).filter(([u]) => byId[u]).map(([u, s]) => [s, u]));
   const marks = Object.fromEntries(Object.keys(bySeat).map((s) => [s, "📌"]));
   const setFixed = (next) => setRules({ ...rules, fixed: next });
 
+  // 자리를 누르면 그 자리 아래(공간이 없으면 위)에 목록
   const onSeat = (sid) => {
-    if (fixUser) {
-      // 고른 학생을 이 자리에 (이 자리에 있던 다른 학생 고정은 풀림)
-      const next = Object.fromEntries(Object.entries(fixed).filter(([u, s]) => u !== fixUser && s !== sid));
-      next[fixUser] = sid;
-      setFixed(next);
-      setFixUser("");
-    } else if (bySeat[sid]) {
-      // 학생을 안 고르고 고정된 자리를 누르면 풀기
-      const { [bySeat[sid]]: _, ...rest } = fixed;
-      setFixed(rest);
-    }
+    if (open?.sid === sid) return setOpen(null);
+    const wrap = wrapRef.current?.getBoundingClientRect();
+    const el = wrapRef.current?.querySelector(`[data-seat="${sid}"]`)?.getBoundingClientRect();
+    if (!wrap || !el) return;
+    setOpen({ sid, x: el.left + el.width / 2 - wrap.left, top: el.bottom - wrap.top + 6, bottom: wrap.bottom - el.top + 6, up: el.top - wrap.top > wrap.height / 2 });
   };
 
-  const list = Object.entries(fixed).filter(([u]) => byId[u]).sort((a, b) => byId[a[0]].classNumber - byId[b[0]].classNumber);
+  const pick = (u) => {
+    const sid = open.sid;
+    // 이 학생이 다른 자리에 고정돼 있었거나 이 자리에 다른 학생이 있었으면 그건 풀린다
+    const next = Object.fromEntries(Object.entries(fixed).filter(([v, s]) => v !== u && s !== sid));
+    if (u) next[u] = sid;
+    setFixed(next);
+    setOpen(null);
+  };
+
+  // 바깥을 누르거나 Esc → 목록만 닫기 (설정 창은 그대로)
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDown = (e) => {
+      if (!e.target.closest?.("[data-fix-menu]") && !e.target.closest?.("[data-seat]")) setOpen(null);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    return () => document.removeEventListener("pointerdown", onDown, true);
+  }, [open]);
 
   return (
-    <section className={box}>
-      <h3 className="font-bold">자리 고정</h3>
-      <p className="mb-2 text-sm text-gray-500">
-        고정한 학생은 섞을 때마다 그 자리에 앉아요. 자리가 한 칸씩 공개되는 모습은 그대로예요. (시력·청력 등으로 꼭 필요한 자리)
-      </p>
-      <div className="mb-2 flex flex-wrap items-center gap-2">
-        <select className={select} value={fixUser} onChange={(e) => setFixUser(e.target.value)}>
-          <option value="">학생 선택</option>
-          {students.map((s) => (
-            <option key={s.userId} value={s.userId}>
-              {name(s.userId)}
-              {fixed[s.userId] ? ` (📌 ${seatLabel(fixed[s.userId])})` : ""}
-            </option>
-          ))}
-        </select>
-        <span className={`text-sm ${fixUser ? "font-semibold text-orange-600" : "text-gray-400"}`}>
-          {fixUser ? "👇 아래 자리표에서 앉힐 자리를 누르세요" : "학생을 고른 뒤 자리를 누르세요 · 📌 자리를 누르면 고정이 풀려요"}
-        </span>
-      </div>
-      <div className="flex h-[260px] w-full justify-center [container-type:size]">
-        <SeatGrid layout={layout} assignment={bySeat} students={byId} size="fit" onSeatClick={onSeat} marks={marks} selected={fixUser ? fixed[fixUser] ?? null : null} />
-      </div>
-      {list.length > 0 && (
-        <ul className="mt-2 flex flex-wrap gap-2">
-          {list.map(([u, s]) => (
-            <li key={u} className="flex items-center gap-2 rounded bg-orange-50 px-2 py-1 text-sm">
-              📌 {name(u)} → {seatLabel(s)}
-              <button
-                type="button"
-                className="text-gray-400 hover:text-red-500"
-                onClick={() => {
-                  const { [u]: _, ...rest } = fixed;
-                  setFixed(rest);
-                }}
-              >
-                삭제
+    <section className="rounded-2xl border border-orange-200 bg-white p-4">
+      <h3 className="mb-2 font-bold">자리 고정</h3>
+      <div ref={wrapRef} className="relative">
+        <div className="flex h-[min(420px,50vh)] w-full justify-center [container-type:size]">
+          <SeatGrid layout={layout} assignment={bySeat} students={byId} size="fit" onSeatClick={onSeat} marks={marks} selected={open?.sid ?? null} />
+        </div>
+
+        {open && (
+          <div
+            data-fix-menu
+            onKeyDown={(e) => e.key === "Escape" && (e.stopPropagation(), setOpen(null))}
+            className="absolute z-20 w-[220px] -translate-x-1/2 rounded-xl border border-orange-200 bg-white p-2 shadow-xl"
+            style={{ left: Math.min(Math.max(open.x, 110), (wrapRef.current?.clientWidth ?? 220) - 110), ...(open.up ? { bottom: open.bottom } : { top: open.top }) }}
+          >
+            {bySeat[open.sid] && (
+              <button type="button" onClick={() => pick(null)} className="mb-1 w-full rounded-lg px-2 py-1 text-left text-sm text-red-500 hover:bg-red-50">
+                비우기
               </button>
-            </li>
-          ))}
-        </ul>
-      )}
+            )}
+            <ul className="max-h-[240px] overflow-y-auto overscroll-contain">
+              {students.map((s) => {
+                const here = bySeat[open.sid] === s.userId;
+                return (
+                  <li key={s.userId}>
+                    <button
+                      type="button"
+                      autoFocus={here}
+                      onClick={() => pick(s.userId)}
+                      className={`flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-sm hover:bg-orange-50 ${here ? "bg-orange-100 font-bold" : ""}`}
+                    >
+                      <span className="truncate">{name(s.userId)}</span>
+                      {fixed[s.userId] && <span className="text-xs">📌</span>}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
