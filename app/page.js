@@ -49,17 +49,17 @@ export default async function Home() {
         </section>
 
         {/* 로그인 */}
-        <section className="order-1 flex flex-col items-center gap-4 rounded-[32px] bg-white p-7 shadow-[0_20px_40px_rgba(234,88,12,0.15)] sm:p-9 lg:order-2">
-          <KkyulHello size={150} />
+        <section className="order-1 flex flex-col items-center gap-5 rounded-[32px] bg-white px-7 py-10 shadow-[0_20px_40px_rgba(234,88,12,0.15)] sm:px-9 sm:py-14 lg:order-2">
+          <KkyulHello size={220} className="mb-2" />
           <Link
             href="/auth/login/teacher"
-            className="flex h-[84px] w-full items-center justify-center gap-3 rounded-3xl bg-orange-500 text-[1.7rem] font-extrabold text-white transition hover:bg-orange-600 active:scale-[0.98]"
+            className="flex h-[96px] w-full items-center justify-center gap-3 rounded-3xl bg-orange-500 text-[1.7rem] font-extrabold text-white transition hover:bg-orange-600 active:scale-[0.98]"
           >
             선생님 로그인
           </Link>
           <Link
             href="/auth/login/student"
-            className="flex h-[84px] w-full items-center justify-center gap-3 rounded-3xl border-[3px] border-orange-500 bg-white text-[1.7rem] font-extrabold text-orange-600 transition hover:bg-orange-50 active:scale-[0.98]"
+            className="flex h-[96px] w-full items-center justify-center gap-3 rounded-3xl border-[3px] border-orange-500 bg-white text-[1.7rem] font-extrabold text-orange-600 transition hover:bg-orange-50 active:scale-[0.98]"
           >
             학생 로그인
           </Link>
