@@ -3,6 +3,7 @@
 // 코드가 맞으면 탭 전체가 '자리 고정' 화면으로 바뀐다 (학생들이 TV 화면을 봐도 모르게)
 // 창을 닫거나 다른 탭으로 가면 다시 소개 화면으로 돌아간다.
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import FixedSeats from "./FixedSeats";
 
 // 자리 고정을 여는 코드 (화면에는 안 보임, 입력할 때도 ●로 가려짐). 바꾸려면 여기만 고치면 된다
@@ -88,22 +89,58 @@ export default function KkyulTab({ guest, rules, setRules, students, layout }) {
         >
           🍊
         </button>
-        {asking && (
-          <form onSubmit={submit} className="flex items-center gap-2">
-            <input
-              type="password"
-              inputMode="numeric"
-              autoComplete="off"
-              autoFocus
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              onKeyDown={(e) => e.key === "Escape" && (e.stopPropagation(), setAsking(false))}
-              className="input input-bordered input-sm w-28 text-center tracking-widest"
-              aria-label="코드"
-            />
-          </form>
-        )}
+        {asking && <CodeModal code={code} setCode={setCode} onSubmit={submit} onClose={() => setAsking(false)} />}
       </div>
     </div>
+  );
+}
+
+/**
+ * 코드 입력 창 (설정 창 위에 하나 더). 설정 창 안은 움직임(transform) 때문에 fixed가 창 안에 갇혀서
+ * 화면(전체 화면이면 그 요소)에 바로 붙인다. 여기서 누르거나 Esc를 눌러도 아래 설정 창은 닫히지 않게 막는다.
+ */
+function CodeModal({ code, setCode, onSubmit, onClose }) {
+  if (typeof document === "undefined") return null;
+  const stop = (e) => e.stopPropagation();
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+      onPointerDown={stop}
+      onPointerUp={stop}
+      onMouseDown={stop}
+      onMouseUp={stop}
+      onClick={(e) => {
+        stop(e);
+        if (e.target === e.currentTarget) onClose();
+      }}
+      onKeyDown={(e) => {
+        if (e.key !== "Escape") return;
+        stop(e);
+        onClose();
+      }}
+    >
+      <form onSubmit={onSubmit} className="w-[min(280px,100%)] rounded-2xl bg-white p-5 text-center shadow-xl">
+        <div className="mb-3 text-3xl" aria-hidden="true">🍊</div>
+        <input
+          type="password"
+          inputMode="numeric"
+          autoComplete="off"
+          autoFocus
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          className="input input-bordered w-full text-center text-lg tracking-[0.4em]"
+          aria-label="코드"
+        />
+        <div className="mt-3 flex justify-center gap-2">
+          <button type="button" className="btn btn-sm btn-ghost" onClick={onClose}>
+            닫기
+          </button>
+          <button type="submit" className="btn btn-sm border-0 bg-orange-500 text-white hover:bg-orange-600">
+            확인
+          </button>
+        </div>
+      </form>
+    </div>,
+    document.fullscreenElement ?? document.body
   );
 }
