@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { makeLayout, deskSeats, partnerSeat, neighborSeats, sideSeats, sideMatesOf, assignSeats, violations, precheck, seatId, normalizeRules, groupLimits } from "./seatAlgorithm.js";
+import { makeLayout, deskSeats, partnerSeat, neighborSeats, sideSeats, sideMatesOf, assignSeats, violations, precheck, seatId, normalizeRules, groupLimits, fixedConflicts } from "./seatAlgorithm.js";
 
 // 재현 가능한 난수
 function seeded(seed = 1) {
@@ -126,5 +126,27 @@ describe("자리 배치", () => {
     const res = assignSeats(["a", "b"], makeLayout(1, 2), { fixed: { ghost: "0-0" }, apart: [["a", "ghost"]] }, { rng: seeded(2) });
     expect(res.ok).toBe(true);
     expect(seatId(0, 0) in res.assignment).toBe(true);
+  });
+});
+
+describe("자리 고정이 다른 조건과 안 맞을 때 (그룹·떨어뜨리기 우선)", () => {
+  const layout = makeLayout(3, 4);
+  const ids = Array.from({ length: 10 }, (_, i) => `n${i + 1}`);
+  const rules = {
+    groups: [{ id: "g", name: "앞자리", userIds: ["n1", "n2", "n3", "n4"], seats: ["0-0", "0-1", "0-2", "0-3"] }],
+    fixed: { n1: "2-0", n9: "0-0", n5: "1-1", n6: "1-2" },
+    apart: [["n5", "n6"]],
+  };
+
+  it("안 맞는 고정을 찾는다", () => {
+    expect(Object.keys(fixedConflicts(rules, layout)).sort()).toEqual(["n1", "n5", "n6", "n9"]);
+  });
+
+  it("섞을 때는 안 맞는 고정을 빼고 그룹·떨어뜨리기를 지킨다", () => {
+    for (let k = 0; k < 20; k++) {
+      const res = assignSeats(ids, layout, rules, { rng: seeded(k + 1) });
+      expect(res.ok).toBe(true);
+      expect(violations(res.assignment, layout, { ...rules, fixed: {} })).toEqual([]);
+    }
   });
 });

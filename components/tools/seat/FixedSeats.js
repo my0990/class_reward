@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import SeatGrid from "./SeatGrid";
 import { labelOf } from "./studentLabel";
+import { fixedConflicts } from "@/util/seat/seatAlgorithm";
 
 export default function FixedSeats({ rules, setRules, students, layout }) {
   const [open, setOpen] = useState(null); // { sid, x, y } 학생 목록을 띄운 자리
@@ -13,6 +14,15 @@ export default function FixedSeats({ rules, setRules, students, layout }) {
   const fixed = rules.fixed ?? {};
   const bySeat = Object.fromEntries(Object.entries(fixed).filter(([u]) => byId[u]).map(([u, s]) => [s, u]));
   const setFixed = (next) => setRules({ ...rules, fixed: next });
+  // 그룹·떨어뜨리기와 안 맞는 고정 → 자리표 빨강 + 아래 경고 (섞을 때는 그룹·떨어뜨리기가 우선이라 이 고정은 빠짐)
+  const conflicts = fixedConflicts(rules, layout, { nameOf: name });
+  const warnSeats = new Set(Object.keys(conflicts).map((u) => fixed[u]).filter(Boolean));
+  // 목록: 이 학생을 이 자리에 고정하면 안 맞는지 미리 (빨간 글씨)
+  const reasonIf = (u, sid) => {
+    const next = Object.fromEntries(Object.entries(fixed).filter(([v, s]) => v !== u && s !== sid));
+    next[u] = sid;
+    return fixedConflicts({ ...rules, fixed: next }, layout, { nameOf: name })[u] ?? null;
+  };
 
   // 자리를 누르면 그 자리 아래(공간이 없으면 위)에 목록
   const onSeat = (sid) => {
@@ -47,7 +57,7 @@ export default function FixedSeats({ rules, setRules, students, layout }) {
       <h3 className="mb-2 font-bold">자리 고정</h3>
       <div ref={wrapRef} className="relative">
         <div className="flex h-[min(420px,50vh)] w-full justify-center [container-type:size]">
-          <SeatGrid layout={layout} assignment={bySeat} students={byId} size="fit" onSeatClick={onSeat} selected={open?.sid ?? null} />
+          <SeatGrid layout={layout} assignment={bySeat} students={byId} size="fit" onSeatClick={onSeat} selected={open?.sid ?? null} warnSeats={warnSeats} />
         </div>
 
         {open && (
@@ -65,15 +75,17 @@ export default function FixedSeats({ rules, setRules, students, layout }) {
             <ul className="max-h-[240px] overflow-y-auto overscroll-contain">
               {students.map((s) => {
                 const here = bySeat[open.sid] === s.userId;
+                const reason = reasonIf(s.userId, open.sid);
                 return (
                   <li key={s.userId}>
                     <button
                       type="button"
                       autoFocus={here}
                       onClick={() => pick(s.userId)}
-                      className={`flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-sm hover:bg-orange-50 ${here ? "bg-orange-100 font-bold" : ""}`}
+                      className={`flex w-full flex-col rounded-lg px-2 py-1 text-left text-sm hover:bg-orange-50 ${here ? "bg-orange-100 font-bold" : ""} ${reason ? "text-red-600" : ""}`}
                     >
                       <span className="truncate">{name(s.userId)}</span>
+                      {reason && <span className="text-xs font-normal">⚠️ {reason}</span>}
                     </button>
                   </li>
                 );
@@ -82,6 +94,15 @@ export default function FixedSeats({ rules, setRules, students, layout }) {
           </div>
         )}
       </div>
+      {Object.keys(conflicts).length > 0 && (
+        <ul className="mt-2 space-y-1 text-sm font-semibold text-red-600">
+          {Object.entries(conflicts).map(([u, why]) => (
+            <li key={u}>
+              ⚠️ {name(u)}: {why} — 섞을 때 그룹·떨어뜨리기가 우선이라 이 고정은 적용되지 않아요.
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

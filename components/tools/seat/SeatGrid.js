@@ -4,7 +4,7 @@
 import { seatId } from "@/util/seat/seatAlgorithm";
 
 // selected: 손으로 자리를 바꿀 때 고른 자리 (진한 테두리) / marks: { [seatId]: "📌" } 같은 작은 표시
-export default function SeatGrid({ layout, assignment = {}, students = {}, view = "student", onSeatClick, hiddenSeats, size = "md", selected = null, marks = null }) {
+export default function SeatGrid({ layout, assignment = {}, students = {}, view = "student", onSeatClick, hiddenSeats, size = "md", selected = null, marks = null, warnSeats = null }) {
   const rows = [...Array(layout.rows).keys()];
   const cols = [...Array(layout.cols).keys()];
   const teacher = view === "teacher";
@@ -51,6 +51,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
               const s = userId ? students[userId] : null;
               const hidden = hiddenSeats?.has(id);
               const isSelected = selected === id;
+              const warn = warnSeats?.has(id); // 다른 조건과 안 맞는 자리 (빨강)
               // 통로: 자리만 차지하는 빈 공간 (테두리·글자 없음)
               if (!isDesk) return <div key={c} aria-hidden="true" style={cellStyle} className={`${cell} shrink-0`} />;
               return (
@@ -63,6 +64,7 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                   style={cellStyle}
                   className={`${cell} relative flex flex-col items-center justify-center rounded-lg border-2 leading-tight transition
                     ${isSelected ? "z-10 scale-105 !border-orange-600 ring-4 ring-orange-400" : ""}
+                    ${warn ? "!border-red-500 !bg-red-50 !text-red-600" : ""}
                     ${hidden ? "border-orange-300 bg-orange-300 text-white" : s ? "border-orange-300 bg-orange-100 text-gray-800" : "border-orange-300 bg-orange-100"}
                     ${onSeatClick ? "cursor-pointer hover:scale-105" : "cursor-default"}`}
                 >

@@ -107,6 +107,46 @@ export function groupLimits(groups = [], ids) {
   return out;
 }
 
+/**
+ * 자리 고정이 다른 조건과 안 맞는 학생: userId → 이유
+ * - 그룹 자리 밖에 고정 / 그룹 자리를 그룹 밖 학생 고정이 차지해서 그룹 학생이 앉을 자리가 모자람
+ * - 떨어뜨리기 짝끼리 붙은 자리에 고정
+ * 섞을 때는 이런 고정을 빼고 섞는다 (그룹·떨어뜨리기가 우선) → withoutConflictingFixed
+ */
+export function fixedConflicts(rules, layout, { nameOf = (u) => u, ids = null } = {}) {
+  rules = normalizeRules(rules, layout);
+  const fixed = Object.fromEntries(Object.entries(rules.fixed ?? {}).filter(([u]) => !ids || ids.has(u)));
+  const limits = groupLimits(rules.groups, ids ?? undefined);
+  const out = {};
+  for (const [u, sid] of Object.entries(fixed)) {
+    const lim = limits[u];
+    if (lim && !lim.seats.has(sid)) out[u] = `그룹(${lim.groups.join(", ")}) 자리가 아니에요`;
+  }
+  for (const g of rules.groups ?? []) {
+    if (!g?.seats?.length) continue;
+    const gs = new Set(g.seats);
+    const members = new Set((g.userIds ?? []).filter((u) => !ids || ids.has(u)));
+    const need = [...members].filter((u) => !fixed[u] || out[u]).length; // 자리를 찾아야 하는 그룹 학생
+    const takenByOthers = Object.entries(fixed).filter(([u, sid]) => !members.has(u) && !out[u] && gs.has(sid));
+    const freeForGroup = g.seats.length - [...members].filter((u) => fixed[u] && !out[u] && gs.has(fixed[u])).length - takenByOthers.length;
+    if (need > freeForGroup) for (const [u] of takenByOthers.slice(0, need - freeForGroup)) out[u] = `'${g.name}' 그룹 자리가 모자라요`;
+  }
+  for (const [a, b] of rules.apart ?? []) {
+    if (fixed[a] && fixed[b] && neighborSeats(layout, fixed[a]).includes(fixed[b])) {
+      out[a] ??= `${nameOf(b)}와(과) 떨어뜨리기`;
+      out[b] ??= `${nameOf(a)}와(과) 떨어뜨리기`;
+    }
+  }
+  return out;
+}
+
+/** 섞을 때: 다른 조건과 안 맞는 자리 고정은 빼고 (그룹·떨어뜨리기가 우선) */
+export function withoutConflictingFixed(rules, layout, ids = null) {
+  const bad = fixedConflicts(rules, layout, { ids });
+  if (Object.keys(bad).length === 0) return rules;
+  return { ...rules, fixed: Object.fromEntries(Object.entries(rules.fixed ?? {}).filter(([u]) => !bad[u])) };
+}
+
 function shuffle(arr, rng) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -164,6 +204,7 @@ export function precheck(studentIds, layout, rules = {}, { nameOf = (u) => u } =
  */
 export function assignSeats(studentIds, layout, rules = {}, { rng = Math.random, prevAssignment = null, attempts = 30, nameOf } = {}) {
   rules = normalizeRules(rules, layout);
+  rules = withoutConflictingFixed(rules, layout, new Set(studentIds)); // 그룹·떨어뜨리기와 안 맞는 고정은 빼고
   const problem = precheck(studentIds, layout, rules, { nameOf });
   if (problem) return { ok: false, reason: problem };
 
