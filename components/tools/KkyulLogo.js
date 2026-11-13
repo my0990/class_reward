@@ -27,7 +27,7 @@ export default function KkyulLogo({ size = 64 }) {
       href="/"
       title="뀰 — 학급 화폐·퀘스트·자리 바꾸기"
       aria-label="뀰 첫 화면"
-      className="relative block shrink-0 overflow-hidden rounded-full bg-orange-50 shadow-sm ring-2 ring-orange-200 transition hover:scale-105"
+      className="relative block shrink-0 overflow-hidden transition hover:scale-105"
       style={{ width: size, height: size }}
     >
       {json ? (
@@ -36,7 +36,7 @@ export default function KkyulLogo({ size = 64 }) {
         </div>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src="/icons/icon-128x128.png" alt="" width={size} height={size} className="h-full w-full object-cover" />
+        <img src="/icons/icon-128x128.png" alt="" width={size} height={size} className="h-full w-full rounded-2xl object-cover" />
       )}
     </a>
   );
