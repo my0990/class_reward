@@ -5,7 +5,7 @@ import json, sys
 from fontTools.ttLib import TTCollection
 from fontTools.pens.recordingPen import RecordingPen
 
-FR, OP, W, H = 30, 178, 500, 500
+FR, OP, W, H = 30, 206, 500, 500  # 굴러 나간 뒤(176) 1초(30프레임) 비었다가 반복
 OUT0, OUT1 = 150, 176  # 굴러 나가는 구간
 INTRO = 72
 CX, GROUND = 250, 374
