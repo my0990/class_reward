@@ -42,16 +42,18 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
           </div>
           {/* 탭 내용 높이 고정 (탭을 바꿔도 창 크기가 그대로, 넘치면 이 안에서 스크롤) */}
           <div className="h-[min(640px,65vh)] overflow-y-auto overscroll-contain pr-1">
-          {tab === "layout" && <LayoutEditor isNew={isNew} layout={layout} setLayout={setLayout} studentCount={students.length - (rules.excluded?.length ?? 0)} />}
+          {tab === "layout" && <LayoutEditor isNew={isNew} layout={layout} setLayout={setLayout} studentCount={students.length - (onRosterSave ? 0 : rules.excluded?.length ?? 0)} />}
           {tab === "students" && (
             <>
               {/* 비회원: 명단을 직접 넣는다 (key: 반영할 때마다 글상자를 새 명단으로) */}
               {onRosterSave && <RosterEditor key={students.map((s) => `${s.userId}:${s.profileNickname}:${s.hideNumber ? 1 : 0}`).join("|")} students={students} onSave={onRosterSave} />}
-              {students.length > 0 ? (
-                <StudentsEditor students={students} excluded={rules.excluded ?? []} setExcluded={(excluded) => setRules({ ...rules, excluded })} />
-              ) : (
-                !onRosterSave && <p className="py-10 text-center text-sm text-gray-400">학생이 없어요.</p>
-              )}
+              {/* 선생님 학급만: 자리 바꾸기에서 뺄 학생 고르기 (비회원은 명단에서 지우면 됨) */}
+              {!onRosterSave &&
+                (students.length > 0 ? (
+                  <StudentsEditor students={students} excluded={rules.excluded ?? []} setExcluded={(excluded) => setRules({ ...rules, excluded })} />
+                ) : (
+                  <p className="py-10 text-center text-sm text-gray-400">학생이 없어요.</p>
+                ))}
             </>
           )}
           {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} students={students} />}

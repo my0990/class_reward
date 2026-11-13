@@ -181,7 +181,7 @@ export default function SeatTool({ store }) {
       toast.error("학생 명단을 먼저 넣어 주세요.");
       return openSettings("students");
     }
-    const excluded = new Set(rules.excluded ?? []);
+    const excluded = new Set(guest ? [] : rules.excluded ?? []); // 비회원은 '제외'가 없다 (명단에서 지우면 됨)
     shuffleBase.current = plan?.current?.assignment ?? null;
     shuffleRules.current = useFixed ? rules : { ...rules, fixed: {} };
     const res = assignSeats(students.map((s) => s.userId).filter((u) => !excluded.has(u)), layout, shuffleRules.current, {

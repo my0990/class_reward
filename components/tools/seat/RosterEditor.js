@@ -125,9 +125,17 @@ export default function RosterEditor({ students, onSave }) {
     <section className="mb-6 rounded-2xl border border-orange-200 bg-orange-50/50 p-4">
       <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-bold">학생 명단</h3>
-        <p className="text-xs text-gray-500">🔒 이름은 서버로 보내지 않고 이 컴퓨터(브라우저)에만 저장돼요.</p>
+        {/* 번호를 빨리 채우기 (이미 쓴 이름은 그대로) */}
+        <div className="flex items-center gap-1 text-sm text-gray-500">
+          <input type="number" min={1} max={MAX} value={count} onChange={(e) => setCount(e.target.value)} className="input input-bordered input-xs w-16" aria-label="학생 수" />
+          명
+          <button type="button" className="btn btn-xs border-0 bg-white text-gray-600 hover:bg-orange-100" onClick={fillNumbers}>
+            번호 1~{Math.min(MAX, Math.max(1, Math.floor(Number(count) || 0)))} 채우기
+          </button>
+        </div>
       </div>
-      <p className="mb-3 text-sm text-gray-500">번호와 이름을 적어 주세요. 번호만, 이름만 적어도 돼요 — 적은 대로 자리표에 보여요.</p>
+      <p className="text-sm text-gray-500">번호와 이름을 적어 주세요. 번호만, 이름만 적어도 돼요 — 적은 대로 자리표에 보여요.</p>
+      <p className="mb-3 text-xs text-gray-400">🔒 이름은 서버로 보내지 않고 이 컴퓨터(브라우저)에만 저장돼요.</p>
 
       <div className="max-h-[340px] overflow-y-auto rounded-xl bg-white p-2">
         <div className={`${grid} mb-1 px-1 text-xs font-semibold text-gray-500`}>
@@ -178,15 +186,7 @@ export default function RosterEditor({ students, onSave }) {
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        {/* 번호를 빨리 채우기 (이미 쓴 이름은 그대로) */}
-        <div className="flex items-center gap-1 text-sm text-gray-500">
-          <input type="number" min={1} max={MAX} value={count} onChange={(e) => setCount(e.target.value)} className="input input-bordered input-xs w-16" aria-label="학생 수" />
-          명
-          <button type="button" className="btn btn-xs border-0 bg-white text-gray-600 hover:bg-orange-100" onClick={fillNumbers}>
-            번호 1~{Math.min(MAX, Math.max(1, Math.floor(Number(count) || 0)))} 채우기
-          </button>
-        </div>
+      <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">
             {roster.length}명{roster.length ? ` · 자리표에 ${shownAs}` : ""}
