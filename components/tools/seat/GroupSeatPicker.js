@@ -39,9 +39,22 @@ export default function GroupSeatPicker({ layout, seats, color, onChange }) {
     drag.current = null;
   };
 
+  // 칠판: 자리표(SeatGrid)와 같은 색. 책상 4칸 너비(자리표 너비까지만)
+  const boardWidth = Math.min(4, layout.cols) * 24 + (Math.min(4, layout.cols) - 1) * 3;
   return (
+    <div className="inline-flex flex-col items-center gap-2 rounded-lg bg-gray-50 p-2">
+      <div
+        role="img"
+        aria-label="칠판"
+        className="h-[16px] rounded-[3px]"
+        style={{
+          width: boardWidth,
+          background: "linear-gradient(180deg, #2f5d4f 0%, #264941 60%, #213f38 100%)",
+          border: "2px solid #8b5a2b",
+        }}
+      />
     <div
-      className="inline-grid touch-none select-none gap-[3px] rounded-lg bg-gray-50 p-2"
+      className="inline-grid touch-none select-none gap-[3px]"
       style={{ gridTemplateColumns: `repeat(${layout.cols}, 24px)` }}
       onPointerDown={onPointerDown}
       onPointerMove={(e) => drag.current && apply(cellAt(e))}
@@ -66,6 +79,7 @@ export default function GroupSeatPicker({ layout, seats, color, onChange }) {
           );
         }),
       )}
+    </div>
     </div>
   );
 }
