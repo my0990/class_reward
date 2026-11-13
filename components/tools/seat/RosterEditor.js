@@ -120,7 +120,6 @@ export default function RosterEditor({ students, onSave }) {
 
   const cell = "input input-bordered input-sm w-full";
   const grid = "grid grid-cols-[80px_1fr_32px] items-center gap-2";
-  const shownAs = mode === "name" ? "이름만" : mode === "number" ? "번호만" : "번호와 이름";
   return (
     <section className="mb-6 rounded-2xl border border-orange-200 bg-orange-50/50 p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -187,7 +186,7 @@ export default function RosterEditor({ students, onSave }) {
       <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">
-            {roster.length}명{roster.length ? ` · 자리표에 ${shownAs}` : ""}
+            {roster.length}명
             {changed ? " (아직 반영 안 됨)" : ""}
           </span>
           <button type="button" disabled={!changed} className="btn btn-sm border-0 bg-orange-500 text-white hover:bg-orange-600" onClick={() => onSave(roster)}>
