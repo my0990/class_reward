@@ -92,7 +92,7 @@ export default function TimerTool({ classId = null }) {
     return () => clearInterval(t);
   }, [showEndAt]);
   const endAtText = showEndAt
-    ? new Intl.DateTimeFormat("ko-KR", { hour: "numeric", minute: "2-digit", second: "2-digit" }).format(new Date(now + timer.remainingMs))
+    ? new Intl.DateTimeFormat("ko-KR", { hour: "numeric", minute: "2-digit" }).format(new Date(now + timer.remainingMs))
     : "";
   const toggleRun = useCallback(() => {
     unlockSound();
