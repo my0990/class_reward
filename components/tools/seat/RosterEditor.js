@@ -123,7 +123,7 @@ export default function RosterEditor({ students, onSave }) {
   const shownAs = mode === "name" ? "이름만" : mode === "number" ? "번호만" : "번호와 이름";
   return (
     <section className="mb-6 rounded-2xl border border-orange-200 bg-orange-50/50 p-4">
-      <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-bold">학생 명단</h3>
         {/* 번호를 빨리 채우기 (이미 쓴 이름은 그대로) */}
         <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -134,8 +134,6 @@ export default function RosterEditor({ students, onSave }) {
           </button>
         </div>
       </div>
-      <p className="text-sm text-gray-500">번호와 이름을 적어 주세요. 번호만, 이름만 적어도 돼요 — 적은 대로 자리표에 보여요.</p>
-      <p className="mb-3 text-xs text-gray-400">🔒 이름은 서버로 보내지 않고 이 컴퓨터(브라우저)에만 저장돼요.</p>
 
       <div className="max-h-[340px] overflow-y-auto rounded-xl bg-white p-2">
         <div className={`${grid} mb-1 px-1 text-xs font-semibold text-gray-500`}>
