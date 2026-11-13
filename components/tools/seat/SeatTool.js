@@ -9,7 +9,7 @@ import KkyulLogo from "@/components/tools/KkyulLogo";
 import { labelOf } from "./studentLabel";
 import { toast } from "react-hot-toast";
 import { Cog6ToothIcon, PrinterIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon } from "@heroicons/react/24/outline";
-import { assignSeats, makeLayout, deskSeats, normalizeRules, violations } from "@/util/seat/seatAlgorithm";
+import { assignSeats, makeLayout, deskSeats, normalizeRules } from "@/util/seat/seatAlgorithm";
 import { cleanRules } from "@/util/seat/seatPlan";
 import SeatGrid from "./SeatGrid";
 import PrintPreviewModal, { PRINT_PREVIEW_ID } from "./PrintPreviewModal";
@@ -196,7 +196,6 @@ export default function SeatTool({ store }) {
   const unsaved = Boolean(draft) && draft !== savedDraft;
 
   // 손으로 자리 바꾸기: 섞은 뒤(공개가 끝나면) 자리를 하나 누르고 다른 자리를 누르면 서로 바뀐다. 빈 책상이면 그리로 옮김
-  const nameOf = labelOf(byId);
   const canEdit = Boolean(draft) && !hiddenSeats && !busy;
   const onSeatClick = (sid) => {
     if (!picked) return draft[sid] && setPicked(sid);
@@ -210,8 +209,6 @@ export default function SeatTool({ store }) {
     setDraft(next);
     setPicked(null);
   };
-  // 손으로 바꾼 결과가 조건과 맞지 않으면 알려 준다 (막지는 않음). 자리 고정은 학생들이 보면 안 되므로 경고하지 않는다
-  const warnings = draft && !hiddenSeats ? violations(draft, layout, { ...(shuffleRules.current ?? rules), fixed: {} }, shuffleBase.current, { nameOf }) : [];
   const onSave = () =>
     run(async () => {
       await saveSetup(); // 쓴 배치·조건도 함께 저장
@@ -311,18 +308,6 @@ export default function SeatTool({ store }) {
               selected={printing ? null : picked}
             />
           </div>
-          {/* 손으로 바꾸기 안내 · 조건 경고 */}
-          {canEdit && (
-            <div className="-mt-2 flex flex-col items-center gap-1 text-center text-sm print:hidden">
-              <p className="text-gray-500">
-                {picked ? `${nameOf(draft[picked])} 학생을 옮길 자리를 누르세요 (같은 자리를 다시 누르면 취소)` : "✋ 자리를 하나 누르고 다른 자리를 누르면 서로 바뀌어요"}
-              </p>
-              {warnings.length > 0 && (
-                <p className="font-semibold text-amber-600">
-                  ⚠️ 조건과 맞지 않아요: {warnings.slice(0, 3).join(" · ")}
-                  {warnings.length > 3 ? ` 외 ${warnings.length - 3}개` : ""}
-                </p>
-              )}
             </div>
           )}
           <div className="print:hidden">
