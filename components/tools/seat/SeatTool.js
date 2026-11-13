@@ -208,8 +208,8 @@ export default function SeatTool({ store }) {
     setDraft(next);
     setPicked(null);
   };
-  // 손으로 바꾼 결과가 조건과 맞지 않으면 알려 준다 (막지는 않음)
-  const warnings = draft && !hiddenSeats ? violations(draft, layout, shuffleRules.current ?? rules, shuffleBase.current, { nameOf }) : [];
+  // 손으로 바꾼 결과가 조건과 맞지 않으면 알려 준다 (막지는 않음). 자리 고정은 학생들이 보면 안 되므로 경고하지 않는다
+  const warnings = draft && !hiddenSeats ? violations(draft, layout, { ...(shuffleRules.current ?? rules), fixed: {} }, shuffleBase.current, { nameOf }) : [];
   const onSave = () =>
     run(async () => {
       await saveSetup(); // 쓴 배치·조건도 함께 저장
