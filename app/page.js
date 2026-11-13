@@ -50,7 +50,7 @@ export default async function Home() {
 
         {/* 로그인 */}
         <section className="order-1 flex flex-col items-center gap-5 rounded-[32px] bg-white px-7 pb-7 pt-8 shadow-[0_20px_40px_rgba(234,88,12,0.15)] sm:px-9 sm:pb-8 sm:pt-10 lg:order-2">
-          <KkyulHello size={280} className="-my-3" />
+          <KkyulHello size={280} className="-my-3" src="/kkyul-roll.json" introEnd={72} />
           <Link
             href="/auth/login/teacher"
             className="flex h-[96px] w-full items-center justify-center gap-3 rounded-3xl bg-orange-500 text-[1.7rem] font-extrabold text-white transition hover:bg-orange-600 active:scale-[0.98]"
