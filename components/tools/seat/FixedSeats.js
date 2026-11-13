@@ -1,6 +1,6 @@
 "use client";
 // 자리 고정 (설정 창 [뀰] 탭에서 코드를 맞게 넣어야 열림 — 학생들이 화면을 봐도 모르게)
-// 자리를 누르면 그 자리 옆에 학생 목록 → 학생을 누르면 그 자리에 고정 (📌). 고정된 자리는 목록에서 '비우기'
+// 자리를 누르면 그 자리 옆에 학생 목록 → 학생을 누르면 그 자리에 고정 (자리표에 이름이 보임). 고정된 자리는 목록에서 '비우기'
 import { useEffect, useRef, useState } from "react";
 import SeatGrid from "./SeatGrid";
 import { labelOf } from "./studentLabel";
@@ -12,7 +12,6 @@ export default function FixedSeats({ rules, setRules, students, layout }) {
   const name = labelOf(byId);
   const fixed = rules.fixed ?? {};
   const bySeat = Object.fromEntries(Object.entries(fixed).filter(([u]) => byId[u]).map(([u, s]) => [s, u]));
-  const marks = Object.fromEntries(Object.keys(bySeat).map((s) => [s, "📌"]));
   const setFixed = (next) => setRules({ ...rules, fixed: next });
 
   // 자리를 누르면 그 자리 아래(공간이 없으면 위)에 목록
@@ -48,7 +47,7 @@ export default function FixedSeats({ rules, setRules, students, layout }) {
       <h3 className="mb-2 font-bold">자리 고정</h3>
       <div ref={wrapRef} className="relative">
         <div className="flex h-[min(420px,50vh)] w-full justify-center [container-type:size]">
-          <SeatGrid layout={layout} assignment={bySeat} students={byId} size="fit" onSeatClick={onSeat} marks={marks} selected={open?.sid ?? null} />
+          <SeatGrid layout={layout} assignment={bySeat} students={byId} size="fit" onSeatClick={onSeat} selected={open?.sid ?? null} />
         </div>
 
         {open && (
@@ -75,7 +74,6 @@ export default function FixedSeats({ rules, setRules, students, layout }) {
                       className={`flex w-full items-center justify-between rounded-lg px-2 py-1 text-left text-sm hover:bg-orange-50 ${here ? "bg-orange-100 font-bold" : ""}`}
                     >
                       <span className="truncate">{name(s.userId)}</span>
-                      {fixed[s.userId] && <span className="text-xs">📌</span>}
                     </button>
                   </li>
                 );
