@@ -21,7 +21,7 @@ export default function KkyulTab({ guest, rules, setRules, students, layout }) {
       <section className="rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 p-5">
         <h3 className="text-xl font-extrabold text-orange-600">🍊 뀰 — 우리 반 학급 화폐</h3>
         <p className="mt-2 leading-7 text-gray-700">
-          선생님이 직접 만든 무료 학급 운영 서비스예요. 칭찬과 보상을 화폐로 쌓고, 퀘스트로 습관을 만들고, 수업 도구까지 한곳에서 써요.
+          무료 학급 운영 서비스예요. 칭찬과 보상을 화폐로 쌓고, 퀘스트로 습관을 만들고, 수업 도구까지 한곳에서 써요.
         </p>
         {guest ? (
           <div className="mt-4 flex flex-wrap gap-2">
@@ -46,12 +46,6 @@ export default function KkyulTab({ guest, rules, setRules, students, layout }) {
           </li>
         ))}
       </ul>
-
-      {guest && (
-        <p className="text-center text-sm text-gray-500">
-          가입하면 학생 명단이 저장되고, 여러 컴퓨터에서 같은 자리 기록을 볼 수 있어요.
-        </p>
-      )}
 
       {/* 숨은 버튼: 평범한 장식처럼 보이게 (손가락 모양 커서·테두리 없음). 두 번 눌러야 열림 */}
       <p className="mt-2 text-center text-xs text-gray-300">
