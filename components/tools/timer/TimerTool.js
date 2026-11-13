@@ -81,6 +81,19 @@ export default function TimerTool({ classId = null }) {
   }, []);
 
   const running = timer.status === "running";
+
+  // 시작 전(또는 일시정지)·시간이 있을 때: 지금 시작하면 끝나는 시각을 흐리게 (1초마다 다시 계산)
+  const showEndAt = !running && timer.status !== "done" && timer.remainingMs > 0;
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!showEndAt) return undefined;
+    setNow(Date.now());
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [showEndAt]);
+  const endAtText = showEndAt
+    ? new Intl.DateTimeFormat("ko-KR", { hour: "numeric", minute: "2-digit", second: "2-digit" }).format(new Date(now + timer.remainingMs))
+    : "";
   const toggleRun = useCallback(() => {
     unlockSound();
     if (running) timer.pause();
@@ -221,6 +234,11 @@ export default function TimerTool({ classId = null }) {
             className={`text-[min(19cqw,40cqh)] ${timer.status === "done" ? "animate-pulse" : ""}`}
           />
         )}
+
+        {/* 끝나는 시각 (자리는 늘 차지 → 시작해도 아래 버튼이 움직이지 않음) */}
+        <p className={`-my-[1cqh] text-[min(2.4cqw,5cqh)] tabular-nums opacity-50 ${showEndAt ? "" : "invisible"}`} aria-live="off">
+          {showEndAt ? `${endAtText}에 끝나요` : "\u00a0"}
+        </p>
 
         <div className="flex flex-nowrap items-center justify-center gap-[0.4em] whitespace-nowrap text-[min(2.2cqw,4.5cqh)]">
           {PRESETS.map((min) => (
