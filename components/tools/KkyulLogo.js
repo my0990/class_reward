@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 
 const Lottie = dynamic(() => import("react-lottie-player"), { ssr: false });
 
-export default function KkyulLogo({ size = 64 }) {
+export default function KkyulLogo({ size = 77 }) {
   const [json, setJson] = useState(null);
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return undefined;
