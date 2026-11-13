@@ -2,8 +2,11 @@
 // 설정 창 [뀰] 탭: 뀰 소개(홍보). 맨 아래 🍊를 누르면 코드 입력칸이 나오고,
 // 코드가 맞으면 탭 전체가 '자리 고정' 화면으로 바뀐다 (학생들이 TV 화면을 봐도 모르게)
 // 창을 닫거나 다른 탭으로 가면 다시 소개 화면으로 돌아간다.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import dynamic from "next/dynamic";
+
+const Lottie = dynamic(() => import("react-lottie-player"), { ssr: false });
 import FixedSeats from "./FixedSeats";
 
 // 자리 고정을 여는 코드 (화면에는 안 보임, 입력할 때도 ●로 가려짐). 바꾸려면 여기만 고치면 된다
@@ -43,6 +46,21 @@ export default function KkyulTab({ guest, rules, setRules, students, layout }) {
     }
     setCode(""); // 틀려도 아무 안내 없이 비우기만
   };
+
+  // 선생님(회원): 홍보 대신 로그인 화면의 귤 애니메이션을 크게. 누르면 코드 입력
+  if (!guest) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <BigKkyul
+          onClick={() => {
+            setAsking(true);
+            setCode("");
+          }}
+        />
+        {asking && <CodeModal code={code} setCode={setCode} onSubmit={submit} onClose={() => setAsking(false)} />}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -142,5 +160,36 @@ function CodeModal({ code, setCode, onSubmit, onClose }) {
       </form>
     </div>,
     document.fullscreenElement ?? document.body
+  );
+}
+
+/** 로그인 화면과 같은 귤 애니메이션 (둥근 틀, 설정 창 높이에 맞춤). 장식처럼 보이게 손가락 커서 없음 */
+function BigKkyul({ onClick }) {
+  const [json, setJson] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetch("/kkyul-hello.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => alive && j && setJson(j))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+  // 로티(500×500) 중 귤이 보이는 곳은 가운데 지름 300 → 틀 크기의 5/3로 그려 가운데만 (로그인 화면과 같은 비율)
+  return (
+    <button
+      type="button"
+      tabIndex={-1}
+      aria-hidden="true"
+      onClick={onClick}
+      className="relative aspect-square w-[min(100%,58vh,520px)] cursor-default select-none overflow-hidden rounded-full [container-type:size]"
+    >
+      {json && (
+        <div className="absolute left-1/2 top-1/2 h-[166.67cqh] w-[166.67cqw] -translate-x-1/2 -translate-y-1/2">
+          <Lottie loop play animationData={json} style={{ width: "100%", height: "100%" }} />
+        </div>
+      )}
+    </button>
   );
 }
