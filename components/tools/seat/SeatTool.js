@@ -55,6 +55,7 @@ export default function SeatTool({ store }) {
   const [busy, setBusy] = useState(false);
   const [picked, setPicked] = useState(null); // 손으로 자리 바꾸기: 먼저 누른 자리
   const shuffleBase = useRef(null); // 섞을 때 기준이었던 지난 자리 ('지난 옆자리' 경고도 이것과 비교)
+  const shuffleRules = useRef(null); // 섞을 때 쓴 조건 (왼쪽을 눌러 고정 없이 섞었으면 고정 빼고 경고)
   const timer = useRef(null);
 
   const students = useMemo(() => studentList ?? [], [studentList]);
@@ -166,14 +167,22 @@ export default function SeatTool({ store }) {
   };
 
   // 시작: 섞어서 한 자리씩 공개 (저장은 아직 안 함)
-  const onStart = () => {
+  // '시작' 버튼: 오른쪽 절반을 누르면 자리 고정 포함, 왼쪽 절반을 누르면 자리 고정 없이 섞는다 (화면에는 표시 안 함)
+  // 키보드(Enter·Space)로 누르면 위치가 없으므로 고정 포함
+  const onStartClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const byPointer = e.detail > 0 && e.clientX > 0;
+    onStart({ useFixed: !byPointer || e.clientX >= rect.left + rect.width / 2 });
+  };
+  const onStart = ({ useFixed = true } = {}) => {
     if (students.length === 0) {
       toast.error("학생 명단을 먼저 넣어 주세요.");
       return openSettings("students");
     }
     const excluded = new Set(rules.excluded ?? []);
     shuffleBase.current = plan?.current?.assignment ?? null;
-    const res = assignSeats(students.map((s) => s.userId).filter((u) => !excluded.has(u)), layout, rules, {
+    shuffleRules.current = useFixed ? rules : { ...rules, fixed: {} };
+    const res = assignSeats(students.map((s) => s.userId).filter((u) => !excluded.has(u)), layout, shuffleRules.current, {
       prevAssignment: shuffleBase.current, // 마지막으로 저장한 자리
       nameOf: (u) => (byId[u] ? `${byId[u].classNumber}번${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : ""}` : u),
     });
@@ -200,7 +209,7 @@ export default function SeatTool({ store }) {
     setPicked(null);
   };
   // 손으로 바꾼 결과가 조건과 맞지 않으면 알려 준다 (막지는 않음)
-  const warnings = draft && !hiddenSeats ? violations(draft, layout, rules, shuffleBase.current, { nameOf }) : [];
+  const warnings = draft && !hiddenSeats ? violations(draft, layout, shuffleRules.current ?? rules, shuffleBase.current, { nameOf }) : [];
   const onSave = () =>
     run(async () => {
       await saveSetup(); // 쓴 배치·조건도 함께 저장
@@ -321,7 +330,7 @@ export default function SeatTool({ store }) {
               type="button"
               className="btn btn-lg border-0 bg-orange-500 px-16 text-xl text-white hover:bg-orange-600"
               disabled={busy || Boolean(hiddenSeats)}
-              onClick={onStart}
+              onClick={onStartClick}
             >
               시작
             </button>
