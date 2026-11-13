@@ -308,8 +308,6 @@ export default function SeatTool({ store }) {
               selected={printing ? null : picked}
             />
           </div>
-            </div>
-          )}
           <div className="print:hidden">
             <button
               type="button"
