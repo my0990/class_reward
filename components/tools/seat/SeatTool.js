@@ -6,6 +6,7 @@
 // '지난 옆자리 피하기'는 마지막으로 저장한 자리를 기준으로 한다.
 import { useEffect, useMemo, useRef, useState } from "react";
 import KkyulLogo from "@/components/tools/KkyulLogo";
+import { labelOf } from "./studentLabel";
 import { toast } from "react-hot-toast";
 import { Cog6ToothIcon, PrinterIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon } from "@heroicons/react/24/outline";
 import { assignSeats, makeLayout, deskSeats, normalizeRules, violations } from "@/util/seat/seatAlgorithm";
@@ -185,7 +186,7 @@ export default function SeatTool({ store }) {
     shuffleRules.current = useFixed ? rules : { ...rules, fixed: {} };
     const res = assignSeats(students.map((s) => s.userId).filter((u) => !excluded.has(u)), layout, shuffleRules.current, {
       prevAssignment: shuffleBase.current, // 마지막으로 저장한 자리
-      nameOf: (u) => (byId[u] ? `${byId[u].classNumber}번${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : ""}` : u),
+      nameOf: labelOf(byId),
     });
     if (!res.ok) return toast.error(res.reason);
     reveal(res.assignment);
@@ -195,7 +196,7 @@ export default function SeatTool({ store }) {
   const unsaved = Boolean(draft) && draft !== savedDraft;
 
   // 손으로 자리 바꾸기: 섞은 뒤(공개가 끝나면) 자리를 하나 누르고 다른 자리를 누르면 서로 바뀐다. 빈 책상이면 그리로 옮김
-  const nameOf = (u) => (byId[u] ? `${byId[u].classNumber}번${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : ""}` : u);
+  const nameOf = labelOf(byId);
   const canEdit = Boolean(draft) && !hiddenSeats && !busy;
   const onSeatClick = (sid) => {
     if (!picked) return draft[sid] && setPicked(sid);

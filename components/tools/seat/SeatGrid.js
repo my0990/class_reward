@@ -69,7 +69,10 @@ export default function SeatGrid({ layout, assignment = {}, students = {}, view 
                   {marks?.[id] && <span className="absolute right-[0.3em] top-[0.15em] text-[0.7em] print:hidden">{marks[id]}</span>}
                   {hidden ? <span className="text-[1.6em]">?</span> : s ? (
                     <>
-                      {s.profileNickname ? (
+                      {s.hideNumber ? (
+                        // 이름만 (비회원 명단)
+                        <span className="max-w-full truncate px-1 text-[1.2em] font-bold">{s.profileNickname}</span>
+                      ) : s.profileNickname ? (
                         <>
                           <span className="text-[0.75em] text-orange-500">{s.classNumber}번</span>
                           <span className="max-w-full truncate px-1 font-bold">{s.profileNickname}</span>

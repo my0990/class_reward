@@ -15,37 +15,6 @@ function read() {
   }
 }
 
-/**
- * 명단 글 → 학생 목록. 한 줄에 한 명: "3 김철수", "3. 김철수", "3번 김철수", "김철수"(번호 자동), "3"(이름 없이 번호만)
- * 번호가 같으면 앞의 것만. userId는 번호로 정한다 (n3) → 명단을 고쳐도 조건·그룹이 그 번호에 남는다
- */
-export function parseRoster(text) {
-  const out = [];
-  const used = new Set();
-  let next = 1;
-  for (const raw of String(text ?? "").split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line) continue;
-    const m = line.match(/^(\d{1,3})\s*(?:번|\.|\)|,)?\s*(.*)$/);
-    let n = m ? Number(m[1]) : null;
-    const name = (m ? m[2] : line).trim().slice(0, 20);
-    if (!n) {
-      while (used.has(next)) next++;
-      n = next;
-    }
-    if (n < 1 || n > 999 || used.has(n)) continue;
-    used.add(n);
-    next = Math.max(next, n + 1);
-    out.push({ userId: `n${n}`, classNumber: n, profileNickname: name });
-    if (out.length >= 100) break;
-  }
-  return out.sort((a, b) => a.classNumber - b.classNumber);
-}
-
-export function rosterToText(roster) {
-  return (roster ?? []).map((s) => (s.profileNickname ? `${s.classNumber} ${s.profileNickname}` : String(s.classNumber))).join("\n");
-}
-
 export function useGuestSeatStore() {
   const [state, setState] = useState(null); // null: 아직 못 읽음 (서버 렌더와 맞추려고 마운트 후에 읽는다)
   const latest = useRef(EMPTY);

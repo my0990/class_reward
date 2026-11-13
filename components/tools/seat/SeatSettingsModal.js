@@ -1,5 +1,6 @@
 "use client";
 // 설정 창: [책상 배치] · [학생] · [조건] · [그룹] · [기록] · [뀰] 탭. 바꾼 내용은 페이지가 자동 저장한다.
+import { labelOf } from "./studentLabel";
 import { useState } from "react";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import LayoutEditor from "./LayoutEditor";
@@ -26,7 +27,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
   const tab = tabProp ?? ownTab;
   const setTab = setTabProp ?? setOwnTab;
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
-  const name = (u) => (byId[u] ? `${byId[u].classNumber}.${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : "번"}` : u);
+  const name = labelOf(byId);
 
   return (
     <ModalTemplate id={SEAT_SETTINGS_ID} modalId={modalId} setModalId={setModalId} className="w-[960px] max-w-[95vw] print:hidden">
@@ -45,7 +46,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
           {tab === "students" && (
             <>
               {/* 비회원: 명단을 직접 넣는다 (key: 반영할 때마다 글상자를 새 명단으로) */}
-              {onRosterSave && <RosterEditor key={students.map((s) => s.userId + s.profileNickname).join("|")} students={students} onSave={onRosterSave} />}
+              {onRosterSave && <RosterEditor key={students.map((s) => `${s.userId}:${s.profileNickname}:${s.hideNumber ? 1 : 0}`).join("|")} students={students} onSave={onRosterSave} />}
               {students.length > 0 ? (
                 <StudentsEditor students={students} excluded={rules.excluded ?? []} setExcluded={(excluded) => setRules({ ...rules, excluded })} />
               ) : (

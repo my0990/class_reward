@@ -32,7 +32,7 @@ export default function StudentsEditor({ students, excluded, setExcluded }) {
                 isOut ? "border-dashed border-gray-200 bg-gray-50 text-gray-400" : "border-orange-300 bg-orange-50 text-gray-800"
               }`}
             >
-              <span className={`text-sm ${isOut ? "" : "text-orange-500"}`}>{s.classNumber}번</span>
+              {!s.hideNumber && <span className={`text-sm ${isOut ? "" : "text-orange-500"}`}>{s.classNumber}번</span>}
               <span className={`min-w-0 flex-1 truncate font-bold ${isOut ? "line-through" : ""}`}>{s.profileNickname}</span>
               <span className="text-xs">{isOut ? "제외" : "참여"}</span>
             </button>

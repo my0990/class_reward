@@ -1,5 +1,6 @@
 "use client";
 // 자리 고정 (설정 창 [뀰] 탭의 숨은 버튼으로만 열림 — 학생들이 화면을 봐도 모르게)
+import { labelOf } from "./studentLabel";
 import { useState } from "react";
 import SeatGrid, { seatLabel } from "./SeatGrid";
 
@@ -7,7 +8,7 @@ import SeatGrid, { seatLabel } from "./SeatGrid";
 export default function FixedSeats({ rules, setRules, students, layout }) {
   const [fixUser, setFixUser] = useState(""); // 고른 학생 (자리표에서 자리를 누르면 고정)
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
-  const name = (u) => (byId[u] ? `${byId[u].classNumber}.${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : "번"}` : u);
+  const name = labelOf(byId);
   const box = "rounded-2xl border border-orange-200 bg-white p-4";
   const select = "select select-bordered select-sm max-w-[180px]";
   const fixed = rules.fixed ?? {};

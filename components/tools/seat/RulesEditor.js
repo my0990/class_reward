@@ -1,12 +1,13 @@
 "use client";
 // 조건: 지난 옆자리 피하기 · 떨어뜨리기 (그룹은 [그룹] 탭, 자리 고정은 [뀰] 탭의 숨은 버튼 → FixedSeats)
+import { labelOf } from "./studentLabel";
 import { useState } from "react";
 
 export default function RulesEditor({ rules, setRules, students }) {
   const [apartA, setApartA] = useState("");
   const [apartB, setApartB] = useState("");
   const byId = Object.fromEntries(students.map((s) => [s.userId, s]));
-  const name = (u) => (byId[u] ? `${byId[u].classNumber}.${byId[u].profileNickname ? ` ${byId[u].profileNickname}` : "번"}` : u);
+  const name = labelOf(byId);
 
   const box = "rounded-2xl border border-orange-200 bg-white p-4";
   const select = "select select-bordered select-sm max-w-[180px]";
