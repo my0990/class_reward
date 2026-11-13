@@ -55,13 +55,13 @@ export default async function Home() {
             href="/auth/login/teacher"
             className="flex h-[84px] w-full items-center justify-center gap-3 rounded-3xl bg-orange-500 text-[1.7rem] font-extrabold text-white transition hover:bg-orange-600 active:scale-[0.98]"
           >
-            👩‍🏫 선생님 로그인
+            선생님 로그인
           </Link>
           <Link
             href="/auth/login/student"
             className="flex h-[84px] w-full items-center justify-center gap-3 rounded-3xl border-[3px] border-orange-500 bg-white text-[1.7rem] font-extrabold text-orange-600 transition hover:bg-orange-50 active:scale-[0.98]"
           >
-            🎒 학생 로그인
+            학생 로그인
           </Link>
           {/* 가입 없이 쓰는 도구 (/tools) */}
           <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-[15px] text-orange-900">
