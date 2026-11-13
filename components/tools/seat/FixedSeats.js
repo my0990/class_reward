@@ -98,7 +98,7 @@ export default function FixedSeats({ rules, setRules, students, layout }) {
         <ul className="mt-2 space-y-1 text-sm font-semibold text-red-600">
           {Object.entries(conflicts).map(([u, why]) => (
             <li key={u}>
-              ⚠️ {name(u)}: {why} — 섞을 때 그룹·떨어뜨리기가 우선이라 이 고정은 적용되지 않아요.
+              ⚠️ {name(u)}: {why} — 이 고정은 적용되지 않아요.
             </li>
           ))}
         </ul>

@@ -2,13 +2,13 @@
 // 조건 > 그룹: 그룹을 만들고 → 학생을 넣고 → 그 그룹 학생이 앉을 수 있는 자리를 고른다.
 // 한 학생이 여러 그룹에 들어갈 수 있다 (그때는 모든 그룹 자리가 겹치는 곳에만 앉음).
 // 그룹 자리에 다른 학생이 앉는 건 막지 않는다.
-import { GROUP_COLORS, groupLimits, fixedConflicts } from "@/util/seat/seatAlgorithm";
+import { GROUP_COLORS, groupLimits } from "@/util/seat/seatAlgorithm";
 import GroupSeatPicker from "./GroupSeatPicker";
 
 const GROUP_MAX = 20;
 
-// fixed·apart: 다른 조건과 안 맞는 학생을 빨갛게 (그룹이 우선). 학생들이 화면을 볼 수 있어 '고정'이라는 말은 쓰지 않는다
-export default function GroupEditor({ groups, setGroups, layout, students, name, fixed = {}, apart = [] }) {
+// 자리 고정과 안 맞아도 여기서는 아무 표시도 하지 않는다 (학생들이 화면을 볼 수 있음). 섞을 때는 그룹이 우선
+export default function GroupEditor({ groups, setGroups, layout, students, name }) {
   const update = (i, patch) => setGroups(groups.map((g, j) => (j === i ? { ...g, ...patch } : g)));
   const remove = (i) => setGroups(groups.filter((_, j) => j !== i));
   const add = () => {
@@ -23,7 +23,6 @@ export default function GroupEditor({ groups, setGroups, layout, students, name,
   // 여러 그룹에 든 학생 중 겹치는 자리가 없는 학생 (바로 알려 준다)
   const limits = groupLimits(groups);
   const noOverlap = Object.entries(limits).filter(([, l]) => l.groups.length > 1 && l.seats.size === 0);
-  const conflicts = fixedConflicts({ groups, fixed, apart }, layout, { nameOf: name });
 
   return (
     <div className="space-y-3">
@@ -31,8 +30,6 @@ export default function GroupEditor({ groups, setGroups, layout, students, name,
       {groups.map((g, i) => {
         const color = GROUP_COLORS[g.color] ?? GROUP_COLORS[0];
         const short = g.seats.length > 0 && g.userIds.length > g.seats.length;
-        // 이 그룹과 관련해 다른 설정과 안 맞는 학생 (그룹 학생이거나, 그룹 자리를 차지한 학생)
-        const bad = Object.keys(conflicts).filter((u) => g.userIds.includes(u) || (g.seats.includes(fixed[u]) && conflicts[u].includes(g.name)));
         return (
           <div key={g.id} className="rounded-xl border-2 p-3" style={{ borderColor: color }}>
             <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -75,8 +72,8 @@ export default function GroupEditor({ groups, setGroups, layout, students, name,
                         key={s.userId}
                         type="button"
                         onClick={() => update(i, { userIds: on ? g.userIds.filter((u) => u !== s.userId) : [...g.userIds, s.userId] })}
-                        className={`rounded-full px-2 py-1 text-sm ${on ? "text-white" : "bg-orange-50 text-gray-600"} ${bad.includes(s.userId) ? "!bg-red-500 !text-white ring-2 ring-red-300" : ""}`}
-                        style={on && !bad.includes(s.userId) ? { background: color } : undefined}
+                        className={`rounded-full px-2 py-1 text-sm ${on ? "text-white" : "bg-orange-50 text-gray-600"}`}
+                        style={on ? { background: color } : undefined}
                       >
                         {name(s.userId)}
                       </button>
@@ -91,11 +88,6 @@ export default function GroupEditor({ groups, setGroups, layout, students, name,
                 <p className={`mt-1 text-xs text-gray-400 ${g.seats.length ? "invisible" : ""}`}>자리를 고르기 전에는 조건으로 쓰지 않아요.</p>
               </div>
             </div>
-            {bad.length > 0 && (
-              <p className="mt-2 text-sm font-semibold text-red-600">
-                ⚠️ {bad.map((u) => name(u)).join(", ")}: 다른 설정과 맞지 않아요. 섞을 때는 그룹이 우선이에요.
-              </p>
-            )}
           </div>
         );
       })}
