@@ -3,7 +3,7 @@
 // 번호 칸과 이름 칸을 따로 입력. 고르는 단계 없이 쓴 대로 자리표에 보인다:
 //   번호만 쓰면 → "3번" / 이름만 쓰면 → "김하늘" / 둘 다 쓰면 → "3번 김하늘"
 // 엑셀에서 여러 줄을 복사해 칸에 붙여 넣으면 그 칸부터 아래로 채운다 (번호·이름 두 열이면 둘 다)
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const MAX = 100;
 
@@ -65,6 +65,27 @@ export default function RosterEditor({ students, onSave }) {
       const last = Number.parseInt(rs[rs.length - 1]?.num, 10);
       return [...rs, { num: last >= 1 ? String(last + 1) : "", name: "" }];
     });
+  // 다음·이전 줄의 같은 칸으로 (마지막 줄에서 아래로 가면 새 줄을 만든다)
+  const listRef = useRef(null);
+  const focusCell = (i, key) =>
+    requestAnimationFrame(() => listRef.current?.querySelector(`[data-row="${i}"][data-key="${key}"]`)?.focus());
+  const moveKeys = (i, key) => (e) => {
+    const down = e.key === "ArrowDown" || e.key === "Enter" || (key === "name" && e.key === "Tab" && !e.shiftKey);
+    const up = e.key === "ArrowUp";
+    if (!down && !up) return;
+    if (e.nativeEvent.isComposing) return; // 한글 조합 중 Enter는 글자 확정
+    if (up) {
+      if (i === 0) return;
+      e.preventDefault();
+      return focusCell(i - 1, key);
+    }
+    e.preventDefault();
+    if (i === rows.length - 1) {
+      if (rows.length >= MAX) return;
+      addRow();
+    }
+    focusCell(i + 1, key);
+  };
   const removeRow = (i) => setRows((rs) => (rs.length > 1 ? rs.filter((_, j) => j !== i) : [{ num: "", name: "" }]));
 
   // 여러 줄 붙여넣기: 이 칸부터 아래로. 탭으로 나뉜 두 열(번호·이름)이면 둘 다 채움
@@ -114,7 +135,7 @@ export default function RosterEditor({ students, onSave }) {
           <span>이름</span>
           <span />
         </div>
-        <div className="flex flex-col gap-1">
+        <div ref={listRef} className="flex flex-col gap-1">
           {rows.map((r, i) => (
             <div key={i} className={grid}>
               <input
@@ -124,6 +145,9 @@ export default function RosterEditor({ students, onSave }) {
                 placeholder={i === 0 ? "1" : ""}
                 onChange={(e) => setCell(i, "num", e.target.value.replace(/[^\d]/g, "").slice(0, 3))}
                 onPaste={onPaste(i, "num")}
+                onKeyDown={moveKeys(i, "num")}
+                data-row={i}
+                data-key="num"
                 aria-label={`${i + 1}째 줄 번호`}
               />
               <input
@@ -133,10 +157,12 @@ export default function RosterEditor({ students, onSave }) {
                 placeholder={i === 0 ? "김하늘 (엑셀에서 여러 줄 붙여넣기 가능)" : ""}
                 onChange={(e) => setCell(i, "name", e.target.value)}
                 onPaste={onPaste(i, "name")}
-                onKeyDown={(e) => e.key === "Enter" && i === rows.length - 1 && (e.preventDefault(), addRow())}
+                onKeyDown={moveKeys(i, "name")}
+                data-row={i}
+                data-key="name"
                 aria-label={`${i + 1}째 줄 이름`}
               />
-              <button type="button" onClick={() => removeRow(i)} className="text-gray-300 hover:text-red-500" aria-label="이 줄 지우기">
+              <button type="button" tabIndex={-1} onClick={() => removeRow(i)} className="text-gray-300 hover:text-red-500" aria-label="이 줄 지우기">
                 ✕
               </button>
             </div>
