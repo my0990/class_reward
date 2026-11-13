@@ -120,7 +120,7 @@ export function fixedConflicts(rules, layout, { nameOf = (u) => u, ids = null } 
   const out = {};
   for (const [u, sid] of Object.entries(fixed)) {
     const lim = limits[u];
-    if (lim && !lim.seats.has(sid)) out[u] = `그룹(${lim.groups.join(", ")}) 자리가 아니에요`;
+    if (lim && !lim.seats.has(sid)) out[u] = `${lim.groups.join("·")} 자리가 아니에요`;
   }
   for (const g of rules.groups ?? []) {
     if (!g?.seats?.length) continue;
