@@ -48,9 +48,9 @@ export default async function Home() {
           </ul>
         </section>
 
-        {/* 로그인 */}
+        {/* 로그인 (애니메이션을 바꾸면 ?v= 숫자를 올려 브라우저에 남은 예전 파일을 쓰지 않게) */}
         <section className="order-1 flex flex-col items-center gap-5 rounded-[32px] bg-white px-7 pb-7 pt-8 shadow-[0_20px_40px_rgba(234,88,12,0.15)] sm:px-9 sm:pb-8 sm:pt-10 lg:order-2">
-          <KkyulHello size={280} className="-my-3" src="/kkyul-roll.json" />
+          <KkyulHello size={280} className="-my-3" src="/kkyul-roll.json?v=2" />
           <Link
             href="/auth/login/teacher"
             className="flex h-[96px] w-full items-center justify-center gap-3 rounded-3xl bg-orange-500 text-[1.7rem] font-extrabold text-white transition hover:bg-orange-600 active:scale-[0.98]"
