@@ -1,5 +1,5 @@
 "use client";
-// 설정 창: [책상 배치] · [학생] · [조건] · [그룹] · [기록] 탭. 바꾼 내용은 페이지가 자동 저장한다.
+// 설정 창: [책상 배치] · [학생] · [조건] · [그룹] · [기록] · [뀰] 탭. 바꾼 내용은 페이지가 자동 저장한다.
 import { useState } from "react";
 import ModalTemplate from "@/components/ui/common/ModalTemplate";
 import LayoutEditor from "./LayoutEditor";
@@ -7,6 +7,7 @@ import RulesEditor from "./RulesEditor";
 import GroupEditor from "./GroupEditor";
 import StudentsEditor from "./StudentsEditor";
 import RosterEditor from "./RosterEditor";
+import KkyulTab from "./KkyulTab";
 import HistoryEditor from "./HistoryEditor";
 
 export const SEAT_SETTINGS_ID = "SEAT_SETTINGS";
@@ -17,6 +18,7 @@ const tabs = [
   ["rules", "조건"],
   ["groups", "그룹"],
   ["history", "기록"],
+  ["kkyul", "뀰"],
 ];
 
 export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, setLayout, rules, setRules, students, plan, onDeleteRecord, onPrintRecord, busy, tab: tabProp, setTab: setTabProp, onRosterSave = null }) {
@@ -51,7 +53,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
               )}
             </>
           )}
-          {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} students={students} layout={layout} />}
+          {tab === "rules" && <RulesEditor rules={rules} setRules={setRules} students={students} />}
           {tab === "groups" && (
             <div>
               <p className="mb-3 text-sm text-gray-500">
@@ -60,6 +62,7 @@ export default function SeatSettingsModal({ modalId, setModalId, isNew, layout, 
               <GroupEditor groups={rules.groups ?? []} setGroups={(groups) => setRules({ ...rules, groups })} layout={layout} students={students} name={name} />
             </div>
           )}
+          {tab === "kkyul" && <KkyulTab guest={Boolean(onRosterSave)} rules={rules} setRules={setRules} students={students} layout={layout} />}
           {tab === "history" && <HistoryEditor plan={plan} layout={layout} studentsById={byId} onDelete={onDeleteRecord} onPrint={onPrintRecord} busy={busy} />}
           </div>
           <p className="mt-5 text-center text-xs text-gray-400">바꾼 내용은 자동으로 저장됩니다.</p>
