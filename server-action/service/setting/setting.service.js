@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { compare, hash } from "bcryptjs";
 import { checkNewStudentPassword } from "@/lib/auth/studentPassword";
+import { cleanNickname, cleanState, NICKNAME_MAX, STATE_MAX } from "@/server-action/service/account/studentProfile.service";
 
 function toAccountFilter({ _id, email, userId, role }) {
   if (!_id) {
@@ -30,6 +31,13 @@ export async function updateProfileService({
 }) {
   const filter = toAccountFilter({ _id, email, userId, role });
 
+  // 별명·상태 메시지 길이 제한 (선생님이 학생 관리에서 고칠 때와 같은 규칙)
+  const nickname = cleanNickname(profileNickname);
+  const state = cleanState(profileState);
+  if (!nickname) throw new Error("별명을 입력해 주세요.");
+  if (nickname.length > NICKNAME_MAX) throw new Error(`별명은 ${NICKNAME_MAX}자까지 쓸 수 있어요.`);
+  if (state.length > STATE_MAX) throw new Error(`상태 메시지는 ${STATE_MAX}자까지 쓸 수 있어요.`);
+
   const db = (await connectDB).db("data");
   const db2 = (await connectDB).db("user");
 
@@ -40,7 +48,7 @@ export async function updateProfileService({
 
   await db.collection("user_data").updateOne(
     { userId: role === "teacher" ? email : userId, role },
-    { $set: { profileNickname, profileState } },
+    { $set: { profileNickname: nickname, profileState: state } },
     { upsert: true }
   );
 

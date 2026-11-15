@@ -39,6 +39,7 @@ export default function ProfileSection({ profileNickname, profileState, profileU
           className="w-full border-2 focus:outline-orange-500"
           name="profileNickname"
           value={formData.profileNickname}
+          maxLength={20}
           onChange={onChange}
         />
 
@@ -47,8 +48,11 @@ export default function ProfileSection({ profileNickname, profileState, profileU
           className="w-full border-2 focus:outline-orange-500"
           name="profileState"
           value={formData.profileState}
+          maxLength={200}
           onChange={onChange}
         />
+        {/* 너무 긴 글은 저장도 안 되고 서버가 요청 자체를 거절한다 (1MB 넘으면 오류 화면) → 입력에서 막기 */}
+        <p className="text-right text-xs text-gray-400">{(formData.profileState ?? "").length}/200</p>
 
         <button
           type="submit"

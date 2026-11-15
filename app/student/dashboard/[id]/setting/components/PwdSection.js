@@ -8,7 +8,7 @@ export default function PwdSection({ onPwdChange, password, onPwdSubmit, error }
             <h1 className="text-[2rem]">계정 관리</h1>
             <div>
                 <h2 className="mt-[24px]">현재 비밀번호</h2>
-                <input type="password" className="border-2 focus:outline-orange-500 w-[100%]" value={password.currentPassword} onChange={onPwdChange} name="currentPassword" />
+                <input type="password" maxLength={50} className="border-2 focus:outline-orange-500 w-[100%]" value={password.currentPassword} onChange={onPwdChange} name="currentPassword" />
             </div>
             <div>
                 <h2 className="mt-[24px]">새로운 비밀번호</h2>
