@@ -128,7 +128,7 @@ describe("이미 완료한 학생의 신청은 자동으로 처리 완료", () =
     expect(pending.map((r) => r.userId)).toEqual(["b"]);
     const done = await svc.listRequestsService({ ...ctx, status: "done" });
     expect(done).toEqual([expect.objectContaining({ userId: "a", status: "approved", note: "이미 완료", paid: null, decidedBy: svc.AUTO_DECIDER })]);
-    expect((await getStudent(mongo.db, s, "a")).money).toBe(0);
+    expect((await getStudent(mongo.db, "a")).money).toBe(0);
   });
 });
 
