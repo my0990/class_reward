@@ -7,11 +7,21 @@ const fetcher = async (url) => {
   const res = await fetch(url);
 
   let body = null;
+  let parsed = true;
 
   try {
     body = await res.json();
   } catch {
     body = null;
+    parsed = false;
+  }
+
+  // 200인데 JSON이 아님 (응답이 중간에 잘림, 와이파이 로그인 페이지, 일부 앱 내장 브라우저 등)
+  // → 예전엔 data가 null이 되어 화면이 '불러오는 중'도 '오류'도 아닌 채로 null을 읽다 멈췄다. 오류로 처리해 다시 시도하게 한다
+  if (res.ok && !parsed) {
+    const error = new Error("서버 응답을 읽지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    error.status = res.status;
+    throw error;
   }
 
   if (!res.ok) {

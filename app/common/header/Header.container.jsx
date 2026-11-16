@@ -63,7 +63,8 @@ export default function HeaderContainer({ classId }) {
 
 
 
-    if (isLoading) {
+    // 데이터가 아직 없으면(불러오는 중이거나 비어 있는 응답) 빈 칸 — null을 읽다 화면 전체가 멈추지 않게
+    if (isLoading || (!isError && (!classData || !userData))) {
         return <div></div>;
     }
 
