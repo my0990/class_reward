@@ -1,6 +1,7 @@
 "use client";
 // 관리자 대시보드: 기능 사용량 (많이 쓴 순) + 30일 추이 막대 + 설정해 둔 반
 import { useState } from "react";
+import GuestStats from "./GuestStats";
 
 const fmtDay = (key) => {
   const [, m, d] = key.split("-");
@@ -43,12 +44,8 @@ export default function FeatureUsage({ usage }) {
   const countKey = period === 7 ? "count7" : "count30";
   const classKey = period === 7 ? "classes7" : "classes30";
   const memberItems = usage.items.filter((i) => !i.guest);
-  const guestItems = usage.items.filter((i) => i.guest); // 비회원 도구(/tools): 정해 둔 순서 그대로
   const rows = [...memberItems].sort((a, b) => b[countKey] - a[countKey] || b.count30 - a.count30);
   const nothing = memberItems.every((i) => i.count30 === 0);
-  const g = (key) => guestItems.find((i) => i.key === key)?.[countKey] ?? 0;
-  const visits = g("guest_timer_visit") + g("guest_seat_visit");
-  const signups = g("guest_signup_click");
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -105,41 +102,8 @@ export default function FeatureUsage({ usage }) {
         </div>
       )}
 
-      {/* 비회원 도구 (로그인 없이 쓰는 /tools/timer, /tools/seat) */}
-      {guestItems.length > 0 && (
-        <div className="mt-5">
-          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-sm font-semibold text-slate-700">비회원 도구</h3>
-            <span className="text-xs text-slate-500">
-              {period}일 방문 {visits.toLocaleString()} → 가입하기 클릭 {signups.toLocaleString()}
-              {visits ? ` (${Math.round((signups / visits) * 1000) / 10}%)` : ""}
-            </span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[420px] text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 text-left text-slate-500">
-                  <th className="py-2 font-medium">항목</th>
-                  <th className="py-2 text-right font-medium">횟수</th>
-                  <th className="py-2 pl-4 font-medium">30일 추이</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {guestItems.map((r) => (
-                  <tr key={r.key} className={r[countKey] === 0 ? "text-slate-400" : ""}>
-                    <td className="py-2">{r.label}</td>
-                    <td className="py-2 text-right tabular-nums">{r[countKey].toLocaleString()}</td>
-                    <td className="py-2 pl-4">
-                      <Spark series={r.series} period={period} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-1 text-xs text-slate-500">※ 방문은 같은 브라우저에서 하루 한 번만 셉니다. 이름·IP는 남기지 않습니다.</p>
-        </div>
-      )}
+      {/* 비회원 도구 (로그인 없이 쓰는 /tools/timer, /tools/seat): 도구마다 일일·주간 방문자 */}
+      <GuestStats guest={usage.guest} />
 
       <div className="mt-4 rounded-xl bg-slate-50 p-3">
         <h3 className="text-sm font-semibold text-slate-700">지금까지 설정해 둔 반 (전체 {usage.activeClasses}개 중)</h3>

@@ -3,7 +3,7 @@
 // ② 지금까지 설정해 둔 반 수 (이미 있는 데이터로: 자리 저장, 퀘스트, 아이템, 키오스크 연결, 승인 요청)
 //    → ①은 기록을 시작한 날부터 쌓이므로, 처음에는 ②로 퍼진 정도를 본다
 import { connectDB } from "@/lib/mongodb";
-import { dayKey } from "@/lib/stats/dailyUsage";
+import { dayKey, weekKeyOfDay } from "@/lib/stats/dailyUsage";
 import { FEATURES, FEATURE_KEYS } from "@/lib/stats/featureList";
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -49,6 +49,7 @@ export async function getFeatureUsageService({ client, now = new Date() } = {}) 
       label: FEATURES[key].label,
       client: Boolean(FEATURES[key].client),
       guest: Boolean(FEATURES[key].guest),
+      hidden: Boolean(FEATURES[key].hidden),
       count7: c7,
       count30: c30,
       classes7: cls7.size,
@@ -69,7 +70,29 @@ export async function getFeatureUsageService({ client, now = new Date() } = {}) 
     distinctCount(data.collection("requests"), "classId"),
   ]);
 
+  // 비회원 도구 요약: 도구마다 오늘·어제·이번 주·지난주 방문자 + 최근 14일 일별 방문자
+  const sumOf = (feature, pred) => docs.filter((d) => d.feature === feature && pred(d.day)).reduce((a, d) => a + (d.count ?? 0), 0);
+  const today = dayKey(now);
+  const yesterday = dayKey(new Date(now.getTime() - DAY));
+  const thisWeek = weekKeyOfDay(today);
+  const lastWeek = weekKeyOfDay(dayKey(new Date(now.getTime() - 7 * DAY)));
+  const days14 = days30.slice(-14);
+  const guestTool = (name, actions) => ({
+    today: sumOf(`guest_${name}_visit`, (d) => d === today),
+    yesterday: sumOf(`guest_${name}_visit`, (d) => d === yesterday),
+    thisWeek: sumOf(`guest_${name}_weekly`, (d) => weekKeyOfDay(d) === thisWeek),
+    lastWeek: sumOf(`guest_${name}_weekly`, (d) => weekKeyOfDay(d) === lastWeek),
+    daily: days14.map((day) => ({ day, count: sumOf(`guest_${name}_visit`, (d) => d === day) })),
+    actions: actions.map(([key, label]) => ({ key, label, today: sumOf(key, (d) => d === today), week: sumOf(key, (d) => weekKeyOfDay(d) === thisWeek) })),
+  });
+  const guest = {
+    timer: guestTool("timer", [["guest_timer_start", "시작"]]),
+    seat: guestTool("seat", [["guest_seat_shuffle", "섞기"], ["guest_seat_save", "저장"], ["guest_seat_print", "인쇄"]]),
+    signups: { today: sumOf("guest_signup_click", (d) => d === today), week: sumOf("guest_signup_click", (d) => weekKeyOfDay(d) === thisWeek) },
+  };
+
   return {
+    guest,
     since: docs.length ? docs.reduce((m, d) => (d.day < m ? d.day : m), docs[0].day) : null,
     activeClasses: activeIds.length,
     items,

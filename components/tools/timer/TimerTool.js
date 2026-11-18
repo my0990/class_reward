@@ -44,7 +44,10 @@ export default function TimerTool({ classId = null }) {
     [classId],
   );
   useEffect(() => {
-    if (!classId) trackGuest("guest_timer_visit", { oncePerDay: true });
+    if (!classId) {
+      trackGuest("guest_timer_visit", { oncePerDay: true });
+      trackGuest("guest_timer_weekly", { oncePerWeek: true });
+    }
   }, [classId]);
   const [settings, update] = useTimerSettings();
   const [modalId, setModalId] = useState(null);

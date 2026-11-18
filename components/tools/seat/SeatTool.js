@@ -60,7 +60,10 @@ export default function SeatTool({ store }) {
   const shuffleBase = useRef(null); // 섞을 때 기준이었던 지난 자리 ('지난 옆자리' 경고도 이것과 비교)
   // 비회원: 방문(하루 한 번) · 섞기 · 저장 · 인쇄 횟수 (관리자 '기능 사용량'의 비회원 표)
   useEffect(() => {
-    if (guest) trackGuest("guest_seat_visit", { oncePerDay: true });
+    if (guest) {
+      trackGuest("guest_seat_visit", { oncePerDay: true });
+      trackGuest("guest_seat_weekly", { oncePerWeek: true });
+    }
   }, [guest]);
   const shuffleRules = useRef(null); // 섞을 때 쓴 조건 (왼쪽을 눌러 고정 없이 섞었으면 고정 빼고 경고)
   const timer = useRef(null);
