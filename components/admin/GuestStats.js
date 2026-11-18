@@ -37,12 +37,15 @@ function Bars({ daily }) {
           const weekend = ["토", "일"].includes(weekday(d.day));
           return (
             <div key={d.day} className="group flex flex-1 flex-col items-center justify-end" title={`${fmtDay(d.day)}(${weekday(d.day)}) · ${d.count}명`}>
-              <span className={`mb-0.5 text-[10px] tabular-nums ${d.count ? "text-slate-600" : "text-transparent"}`}>{d.count}</span>
+              <span className={`mb-0.5 text-[10px] tabular-nums ${d.count ? "text-slate-600" : "text-slate-300"}`}>{d.count}</span>
               <div
                 className={`w-full rounded-t ${d.count ? (isToday ? "bg-orange-500" : "bg-orange-300 group-hover:bg-orange-400") : "bg-slate-200"}`}
                 style={{ height: d.count ? `${Math.max(4, (d.count / max) * 88)}px` : "2px" }}
               />
-              <span className={`mt-1 text-[10px] ${weekend ? "text-rose-400" : "text-slate-400"}`}>{i % 2 === daily.length % 2 || isToday ? fmtDay(d.day) : ""}</span>
+              {/* 날짜는 매일 (첫 칸·1일만 월까지, 나머지는 일만 → 14칸이 좁아도 겹치지 않게) */}
+              <span className={`mt-1 whitespace-nowrap text-[10px] tabular-nums ${isToday ? "font-bold text-orange-600" : weekend ? "text-rose-400" : "text-slate-400"}`}>
+                {i === 0 || d.day.endsWith("-01") ? fmtDay(d.day) : Number(d.day.slice(8))}
+              </span>
             </div>
           );
         })}
